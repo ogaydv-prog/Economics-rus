@@ -76,35 +76,28 @@
             align-items: center;
         }
 
-        /* 
-          ИЗМЕНЕНО: Рамка подстраивается ровно под пропорции картинки.
-          Убран жесткий height: 230px, высота рассчитывается автоматически.
-        */
+       /* Теперь карточки сами подстраиваются под картинку */
         .card {
             display: inline-block;
             text-decoration: none;
             background: #ffffff;
             border: 2px solid #e2e8f0;
             border-radius: 20px;
-            padding: 0;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 200px;
-            height: auto; 
+            /* Убираем жесткий width/height, чтобы они не были одинаковыми принудительно */
         }
 
-        /* 
-          ИЗМЕНЕНО: Картинка занимает 100% ширины и сама задает естественную высоту 
-          без урезаний (contain/cover убраны).
-        */
         .card img {
-            width: 100%;
-            height: auto;
+            width: 190px; /* Базовый размер, который можно менять */
             display: block;
             transition: transform 0.3s ease;
         }
 
+        /* Индивидуальная настройка (если нужно): */
+        .card.video { width: 210px; } /* Чуть увеличили Video */
+        .card.news { width: 180px; }  /* Чуть уменьшили News */
         /* Hover Effect полностью сохранен */
         .card:hover {
             transform: translateY(-8px) scale(1.03);
