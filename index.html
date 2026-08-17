@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Principles of Economics Dashboard | AlmaU</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 30px 20px;
+            position: relative;
+        }
+
+        /* AlmaU Logo in top-left corner */
+        .top-left-logo {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: #f0f4f8;
+            color: #001e50;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 6px 16px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #001e50;
+            margin-bottom: 12px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            font-color: #555555;
+            max-width: 650px;
+            line-height: 1.5;
+            margin: 0 auto;
+        }
+
+        /* Grid for 10 Image-Buttons */
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1150px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Bordered Image Button Style (Zero Padding) */
+        .card {
+            display: inline-block;
+            text-decoration: none;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 20px;
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 200px;
+            height: 230px;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        /* Hover Effect */
+        .card:hover {
+            transform: translateY(-8px) scale(1.03);
+            border-color: #001e50;
+            box-shadow: 0 16px 30px rgba(0, 30, 80, 0.15);
+        }
+
+        .card:hover img {
+            transform: scale(1.03);
+        }
+
+        /* Footer */
+        footer {
+            margin-top: auto;
+            font-size: 14px;
+            color: #718096;
+            padding-top: 50px;
+            text-align: center;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Logo in Top Left Corner -->
+    <img src="https://ogaydv-prog.github.io/principles-economics/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+
+    <!-- Header -->
+    <header>
+        <span class="badge">Educational Portal</span>
+        <h1>Principles of Economics</h1>
+        <p class="subtitle">Interactive Learning Hub | International Business Team 2026 Almaty<br>Almaty Management University (AlmaU)</p>
+    </header>
+
+    <!-- Grid for 10 Image Buttons -->
+    <main class="grid-container">
+        
+        <!-- Button 1: Topics -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/topics.html" class="card" title="Course Topics">
+            <img src="https://ogaydv-prog.github.io/principles-economics/pic-topics.png" alt="Course Topics">
+        </a>
+
+        <!-- Button 2: Syllabus -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/syllabus.html" class="card" title="Syllabus">
+            <img src="https://ogaydv-prog.github.io/principles-economics/pic-sill.png" alt="Syllabus">
+        </a>
+
+        <!-- Button 3: Books (Google Drive Link) -->
+        <a href="https://drive.google.com/file/d/1YZO8iSB4Y4oQstswHHTFdT2SiS29-1zs/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="card" title="Textbooks & Literature">
+            <img src="https://ogaydv-prog.github.io/principles-economics/pic-books.png" alt="Textbooks & Literature">
+        </a>
+
+        <!-- Button 4: Glossary -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/glossary.html" class="card" title="Glossary">
+            <img src="https://ogaydv-prog.github.io/principles-economics/pic-glos.png" alt="Glossary">
+        </a>
+
+        <!-- Button 5: Videos (YouTube Link) -->
+        <a href="https://www.youtube.com/watch?v=NdbbcO35arw" target="_blank" rel="noopener noreferrer" class="card" title="Video Lectures">
+            <img src="https://ogaydv-prog.github.io/principles-economics/pic-video.png" alt="Video Lectures">
+        </a>
+
+        <!-- Button 6: International Business News -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/ibn.html" class="card" title="International Business News">
+            <img src="https://ogaydv-prog.github.io/principles-economics/pic-ibn.png" alt="International Business News">
+        </a>
+
+        <!-- Button 7: Midterm Check 1 -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/mc1.html" class="card" title="Midterm Control 1">
+            <img src="https://ogaydv-prog.github.io/principles-economics/pic-mc1.png" alt="Midterm Control 1">
+        </a>
+
+        <!-- Button 8: Midterm Check 2 -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/mc2.html" class="card" title="Midterm Control 2">
+            <img src="https://ogaydv-prog.github.io/principles-economics/pic-mc2.png" alt="Midterm Control 2">
+        </a>
+
+        <!-- Button 9: Examination -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/exam.html" class="card" title="Final Exam Preparation">
+            <img src="https://ogaydv-prog.github.io/principles-economics/pic-exam.png" alt="Final Exam Preparation">
+        </a>
+
+        <!-- Button 10: Grading Policy -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/grading.html" class="card" title="Grading & Evaluation">
+            <img src="https://ogaydv-prog.github.io/principles-economics/pic-grade.png" alt="Grading & Evaluation">
+        </a>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>Developed for International Business Team AlmaU 2026 | Course: Principles of Economics</p>
+        <p>© Almaty Management University | School of Digital Technologies & Economics</p>
+    </footer>
+
+</body>
+</html>
