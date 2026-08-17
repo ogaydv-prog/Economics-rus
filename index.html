@@ -117,6 +117,15 @@
             text-align: center;
             line-height: 1.6;
         }
+        /* Чуть-чуть вытягиваем по вертикали картинку Video */
+        .card.stretch-v img {
+            transform: scaleY(1.06);
+        }
+
+        /* Чуть-чуть сжимаем по вертикали картинку Business News */
+        .card.shrink-v img {
+            transform: scaleY(0.94);
+        }
     </style>
 </head>
 <body>
@@ -145,10 +154,13 @@
        <a href="https://www.economist.com/economics-a-to-z" target="_blank" rel="noopener noreferrer" class="card" title="Glossary">
     <img src="https://ogaydv-prog.github.io/principles-economics/pic-glos.png" alt="Glossary">
 </a>
-        <a href="https://www.youtube.com/watch?v=NdbbcO35arw" target="_blank" rel="noopener noreferrer" class="card" title="Video Lectures">
+       <!-- Для Video Materials (добавлено слово stretch-v) -->
+        <a href="https://www.youtube.com/watch?v=NdbbcO35arw" target="_blank" rel="noopener noreferrer" class="card stretch-v" title="Video Lectures">
             <img src="https://ogaydv-prog.github.io/principles-economics/pic-video.png" alt="Video Lectures">
         </a>
-        <a href="https://ogaydv-prog.github.io/principles-economics/ibn.html" class="card" title="International Business News">
+
+        <!-- Для International Business News (добавлено слово shrink-v) -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/ibn.html" class="card shrink-v" title="International Business News">
             <img src="https://ogaydv-prog.github.io/principles-economics/pic-ibn.png" alt="International Business News">
         </a>
         <a href="https://ogaydv-prog.github.io/principles-economics/mc1.html" class="card" title="Midterm Control 1">
