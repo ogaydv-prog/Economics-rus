@@ -117,14 +117,24 @@
             text-align: center;
             line-height: 1.6;
         }
-        /* Чуть-чуть вытягиваем по вертикали картинку Video */
-        .card.stretch-v img {
-            transform: scaleY(1.06);
+      /* Делаем рамку карточки Video чуть выше */
+        .card.stretch-v {
+            height: 245px; 
         }
 
-        /* Чуть-чуть сжимаем по вертикали картинку Business News */
+        /* Делаем рамку карточки International Business News чуть ниже */
+        .card.shrink-v {
+            height: 215px; 
+        }
+
+        /* Возвращаем картинкам нормальный масштаб для новых рамок */
+        .card.stretch-v img,
         .card.shrink-v img {
-            transform: scaleY(0.94);
+            transform: none;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
         }
     </style>
 </head>
