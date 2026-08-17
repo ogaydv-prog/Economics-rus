@@ -76,7 +76,7 @@
             align-items: center;
         }
 
-       /* Теперь карточки сами подстраиваются под картинку */
+        /* Единый стиль карточек для всех 10 кнопок */
         .card {
             display: inline-block;
             text-decoration: none;
@@ -86,19 +86,15 @@
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            /* Убираем жесткий width/height, чтобы они не были одинаковыми принудительно */
         }
 
         .card img {
-            width: 190px; /* Базовый размер, который можно менять */
+            width: 190px;
             display: block;
             transition: transform 0.3s ease;
         }
 
-        /* Индивидуальная настройка (если нужно): */
-        .card.video { width: 210px; } /* Чуть увеличили Video */
-        .card.news { width: 180px; }  /* Чуть уменьшили News */
-        /* Hover Effect полностью сохранен */
+        /* Hover Effect */
         .card:hover {
             transform: translateY(-8px) scale(1.03);
             border-color: #001e50;
@@ -117,33 +113,13 @@
             text-align: center;
             line-height: 1.6;
         }
-      /* Делаем рамку карточки Video чуть выше */
-        .card.stretch-v {
-            height: 245px; 
-        }
-
-        /* Делаем рамку карточки International Business News чуть ниже */
-        .card.shrink-v {
-            height: 215px; 
-        }
-
-        /* Возвращаем картинкам нормальный масштаб для новых рамок */
-        .card.stretch-v img,
-        .card.shrink-v img {
-            transform: none;
-            height: 100%;
-            object-fit: cover;
-        }
-    </style>
-        }
     </style>
 </head>
 <body>
 
     <img src="https://ogaydv-prog.github.io/principles-economics/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
 
-  <header>
-        <!-- Блок .badge удален -->
+    <header>
         <h1 style="margin-top: -20px;">Principles of Economics</h1>
         <p class="subtitle" style="margin-bottom: 10px;">
             Interactive Learning Hub | International Business Team 2026 <br>
@@ -161,16 +137,13 @@
         <a href="https://drive.google.com/file/d/1YZO8iSB4Y4oQstswHHTFdT2SiS29-1zs/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="card" title="Textbooks & Literature">
             <img src="https://ogaydv-prog.github.io/principles-economics/pic-books.png" alt="Textbooks & Literature">
         </a>
-       <a href="https://www.economist.com/economics-a-to-z" target="_blank" rel="noopener noreferrer" class="card" title="Glossary">
-    <img src="https://ogaydv-prog.github.io/principles-economics/pic-glos.png" alt="Glossary">
-</a>
-       <!-- Для Video Materials (добавлено слово stretch-v) -->
-        <a href="https://www.youtube.com/watch?v=NdbbcO35arw" target="_blank" rel="noopener noreferrer" class="card stretch-v" title="Video Lectures">
+        <a href="https://www.economist.com/economics-a-to-z" target="_blank" rel="noopener noreferrer" class="card" title="Glossary">
+            <img src="https://ogaydv-prog.github.io/principles-economics/pic-glos.png" alt="Glossary">
+        </a>
+        <a href="https://www.youtube.com/watch?v=NdbbcO35arw" target="_blank" rel="noopener noreferrer" class="card" title="Video Lectures">
             <img src="https://ogaydv-prog.github.io/principles-economics/pic-video.png" alt="Video Lectures">
         </a>
-
-        <!-- Для International Business News (добавлено слово shrink-v) -->
-        <a href="https://ogaydv-prog.github.io/principles-economics/ibn.html" class="card shrink-v" title="International Business News">
+        <a href="https://ogaydv-prog.github.io/principles-economics/ibn.html" class="card" title="International Business News">
             <img src="https://ogaydv-prog.github.io/principles-economics/pic-ibn.png" alt="International Business News">
         </a>
         <a href="https://ogaydv-prog.github.io/principles-economics/mc1.html" class="card" title="Midterm Control 1">
