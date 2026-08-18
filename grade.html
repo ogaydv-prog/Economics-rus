@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMAU — Principles of Economics</title>
+    <title>ALMAU — Principles of Economics Dashboard</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts (Inter) -->
@@ -12,7 +12,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js for beautiful analytics -->
+    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
@@ -33,7 +33,6 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #475569;
         }
-        /* Smooth fade-in animation */
         .fade-enter {
             opacity: 0;
             transform: translateY(12px);
@@ -43,7 +42,6 @@
             transform: translateY(0);
             transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        /* Animated Radial Progress Ring */
         #finalScoreCircle {
             transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
@@ -59,36 +57,36 @@
                     <i class="fa-solid fa-graduation-cap text-2xl"></i>
                 </div>
                 <div>
-                    <span class="text-xs font-bold tracking-widest text-indigo-400 uppercase">Principles of Economics</span>
-                    <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent">STDE ALMAU</h1>
+                    <span class="text-xs font-bold tracking-widest text-indigo-400 uppercase">Principles of Economics — International Business - 2026</span>
+                    <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent">ALMAU</h1>
                 </div>
             </div>
             
             <div class="flex items-center space-x-3">
                 <div id="mode-badge" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center space-x-1.5">
                     <span class="h-2 w-2 bg-indigo-400 rounded-full animate-pulse"></span>
-                    <span>Режим Слушателя</span>
+                    <span>Student Mode</span>
                 </div>
                 
                 <button id="auth-action-btn" onclick="openAuthModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs sm:text-sm font-semibold transition-all border border-slate-700 hover:border-slate-600 flex items-center space-x-2">
                     <i class="fa-solid fa-user-tie text-indigo-400"></i>
-                    <span id="auth-btn-text">Панель преподавателя</span>
+                    <span id="auth-btn-text">Instructor Portal</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content Dynamic Area -->
+    <!-- Main Content Area -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         <!-- ================= STUDENT VIEW ================= -->
         <div id="student-view" class="space-y-8 block">
             <div class="max-w-2xl mx-auto text-center space-y-4 py-6">
                 <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-slate-400 bg-clip-text text-transparent">
-                    Личный кабинет успеваемости слушателя
+                    Student Performance Dashboard
                 </h2>
                 <p class="text-sm sm:text-base text-slate-400">
-                    Введите ваши Фамилию и Имя для детального просмотра успеваемости и графического отчёта активности.
+                    Enter your Full Name to view detailed grades and visual progress analytics.
                 </p>
             </div>
 
@@ -97,28 +95,28 @@
                 <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-500"></div>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Ф.И.О. Слушателя</label>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Student Full Name</label>
                         <div class="relative">
                             <i class="fa-solid fa-user absolute left-4 top-3.5 text-slate-500"></i>
-                            <input type="text" id="student-search-input" onkeydown="handleSearchKeyDown(event)" placeholder="" 
+                            <input type="text" id="student-search-input" onkeydown="handleSearchKeyDown(event)" placeholder="e.g. Student XXX 01" 
                                 class="w-full pl-11 pr-24 py-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
                             <button onclick="searchStudentGrade()" class="absolute right-2 top-2 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">
-                                Найти
+                                Search
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Student Result Presentation Card (Hidden by default) -->
-            <div id="student-result-card" class="max-w-3xl mx-auto bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden hidden">
+            <!-- Student Result Presentation Card -->
+            <div id="student-result-card" class="max-w-4xl mx-auto bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden hidden">
                 <div class="bg-gradient-to-r from-indigo-950/40 to-slate-900 px-6 py-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <span class="text-[10px] font-bold bg-indigo-900/50 text-indigo-300 px-2.5 py-1 rounded-full border border-indigo-800/30 uppercase tracking-wider">Слушатель курса MBA</span>
-                        <h3 id="sr-name" class="text-xl font-extrabold text-white mt-1.5">ФИО студента</h3>
+                        <span class="text-[10px] font-bold bg-indigo-900/50 text-indigo-300 px-2.5 py-1 rounded-full border border-indigo-800/30 uppercase tracking-wider">International Business Team Student</span>
+                        <h3 id="sr-name" class="text-xl font-extrabold text-white mt-1.5">Student Full Name</h3>
                     </div>
                     <div class="text-right">
-                        <span class="text-xs text-slate-400 block font-medium">Итоговая оценка</span>
+                        <span class="text-xs text-slate-400 block font-medium">Final Score</span>
                         <div class="flex items-center justify-end space-x-2.5 mt-1">
                             <span id="sr-letter" class="text-2xl font-black bg-indigo-600 px-3 py-1 rounded-xl text-white shadow-md">-</span>
                             <span id="sr-total-score" class="text-3xl font-extrabold text-slate-100">0.0</span>
@@ -126,18 +124,18 @@
                     </div>
                 </div>
 
-                <!-- Rich Dashboard Graphs Grid -->
+                <!-- Dashboard Graphs Grid -->
                 <div class="p-6 border-b border-slate-800 bg-slate-950/30">
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2">
                         <i class="fa-solid fa-chart-line text-indigo-400"></i>
-                        Интерактивная карта успеваемости по критериям
+                        Interactive Performance Breakdown
                     </h4>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <!-- Widget 1: Attendance (Vertical Bar Chart) -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Widget 1: Attendance -->
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center">
                             <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                                <i class="fa-solid fa-calendar-check"></i> Посещение (30%)
+                                <i class="fa-solid fa-calendar-check"></i> Attendance (10%)
                             </span>
                             <div class="relative w-full h-28 flex items-center justify-center">
                                 <canvas id="attendanceBarChart"></canvas>
@@ -145,32 +143,32 @@
                             <div class="text-sm font-bold text-emerald-400 mt-2" id="val-att-text">0%</div>
                         </div>
 
-                        <!-- Widget 2: Activity (Timeline line chart) -->
+                        <!-- Widget 2: Continuous Assessment -->
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center">
                             <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                                <i class="fa-solid fa-bolt"></i> Активность (30%)
+                                <i class="fa-solid fa-bolt"></i> Assessment (30%)
                             </span>
                             <div class="relative w-full h-28 flex items-center justify-center">
                                 <canvas id="activityLineChart"></canvas>
                             </div>
-                            <div class="text-sm font-bold text-blue-400 mt-2" id="val-act-text">0/100</div>
+                            <div class="text-sm font-bold text-blue-400 mt-2" id="val-act-text">Act, CA1, CA2</div>
                         </div>
 
-                        <!-- Widget 3: Exam (Fuel Gauge) -->
+                        <!-- Widget 3: Midterm Controls -->
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center">
-                            <span class="text-[10px] font-bold text-rose-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                                <i class="fa-solid fa-gauge-high"></i> Экзамен (40%)
+                            <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
+                                <i class="fa-solid fa-pen-ruler"></i> Midterms (20%)
                             </span>
                             <div class="relative w-full h-28 flex items-center justify-center">
                                 <canvas id="examGaugeChart"></canvas>
                             </div>
-                            <div class="text-sm font-bold text-rose-400 mt-2" id="val-ex-text">0/100</div>
+                            <div class="text-sm font-bold text-amber-400 mt-2" id="val-ex-text">MC1 & MC2</div>
                         </div>
 
-                        <!-- Widget 4: Final Progress (Radial circle with glow) -->
+                        <!-- Widget 4: Final Progress -->
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center justify-center relative overflow-hidden">
                             <span class="text-[10px] font-bold text-violet-400 uppercase tracking-wider mb-3 flex items-center gap-1">
-                                <i class="fa-solid fa-circle-nodes"></i> Итоговый итог
+                                <i class="fa-solid fa-circle-nodes"></i> Total Score
                             </span>
                             <div class="relative w-24 h-24 flex items-center justify-center">
                                 <svg class="w-full h-full transform -rotate-90">
@@ -182,87 +180,96 @@
                                     <span class="text-[10px] text-slate-400 font-semibold" id="finalCircleScore">0.0</span>
                                 </div>
                             </div>
-                            <div class="text-[9px] text-violet-300 font-semibold uppercase mt-3 tracking-widest">Макс: 100</div>
+                            <div class="text-[9px] text-violet-300 font-semibold uppercase mt-3 tracking-widest">Max: 100</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Three grade breakdown columns -->
-                <div class="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-slate-800 border-b border-slate-800 bg-slate-900/20">
-                    <div class="p-5 text-center space-y-1.5">
-                        <div class="inline-flex h-9 w-9 bg-emerald-500/10 text-emerald-400 rounded-xl items-center justify-center text-base">
-                            <i class="fa-solid fa-calendar-check"></i>
-                        </div>
-                        <h4 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Посещение</h4>
-                        <div class="text-xl font-bold text-emerald-400" id="sr-val-attendance">0 / 100</div>
-                        <p class="text-[10px] text-slate-500">Вес в оценке: <strong class="text-emerald-400">30%</strong></p>
+                <!-- 7 Grade breakdown columns -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 divide-y sm:divide-y-0 divide-x divide-slate-800 border-b border-slate-800 bg-slate-900/20">
+                    <div class="p-3 text-center space-y-1">
+                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Attendance</h4>
+                        <div class="text-base font-bold text-emerald-400" id="sr-val-attendance">0 / 100</div>
+                        <p class="text-[8px] text-slate-500">Weight: <strong class="text-emerald-400">10%</strong></p>
                     </div>
-
-                    <div class="p-5 text-center space-y-1.5">
-                        <div class="inline-flex h-9 w-9 bg-blue-500/10 text-blue-400 rounded-xl items-center justify-center text-base">
-                            <i class="fa-solid fa-comments"></i>
-                        </div>
-                        <h4 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Активность</h4>
-                        <div class="text-xl font-bold text-blue-400" id="sr-val-activity">0 / 100</div>
-                        <p class="text-[10px] text-slate-500">Вес в оценке: <strong class="text-blue-400">30%</strong></p>
+                    <div class="p-3 text-center space-y-1">
+                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Activities</h4>
+                        <div class="text-base font-bold text-teal-400" id="sr-val-activities">0 / 100</div>
+                        <p class="text-[8px] text-slate-500">Weight: <strong class="text-teal-400">10%</strong></p>
                     </div>
-
-                    <div class="p-5 text-center space-y-1.5">
-                        <div class="inline-flex h-9 w-9 bg-rose-500/10 text-rose-400 rounded-xl items-center justify-center text-base">
-                            <i class="fa-solid fa-file-pen"></i>
-                        </div>
-                        <h4 class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">Экзамен</h4>
-                        <div class="text-xl font-bold text-rose-400" id="sr-val-exam">0 / 100</div>
-                        <p class="text-[10px] text-slate-500">Вес в оценке: <strong class="text-rose-400">40%</strong></p>
+                    <div class="p-3 text-center space-y-1">
+                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">CA 1</h4>
+                        <div class="text-base font-bold text-blue-400" id="sr-val-ca1">0 / 100</div>
+                        <p class="text-[8px] text-slate-500">Weight: <strong class="text-blue-400">10%</strong></p>
+                    </div>
+                    <div class="p-3 text-center space-y-1">
+                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">MC 1</h4>
+                        <div class="text-base font-bold text-amber-400" id="sr-val-mc1">0 / 100</div>
+                        <p class="text-[8px] text-slate-500">Weight: <strong class="text-amber-400">10%</strong></p>
+                    </div>
+                    <div class="p-3 text-center space-y-1">
+                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">CA 2</h4>
+                        <div class="text-base font-bold text-indigo-400" id="sr-val-ca2">0 / 100</div>
+                        <p class="text-[8px] text-slate-500">Weight: <strong class="text-indigo-400">10%</strong></p>
+                    </div>
+                    <div class="p-3 text-center space-y-1">
+                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">MC 2</h4>
+                        <div class="text-base font-bold text-orange-400" id="sr-val-mc2">0 / 100</div>
+                        <p class="text-[8px] text-slate-500">Weight: <strong class="text-orange-400">10%</strong></p>
+                    </div>
+                    <div class="p-3 text-center space-y-1">
+                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Final Exam</h4>
+                        <div class="text-base font-bold text-rose-400" id="sr-val-exam">0 / 100</div>
+                        <p class="text-[8px] text-slate-500">Weight: <strong class="text-rose-400">40%</strong></p>
                     </div>
                 </div>
 
-                <!-- Expanded detailed attendance table for Student -->
+                <!-- Expanded detailed attendance table -->
                 <div class="p-6 border-b border-slate-800 bg-slate-950/20">
                     <button onclick="toggleStudentAttDetails()" class="w-full flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider hover:text-slate-200 transition-colors">
                         <span class="flex items-center gap-2">
                             <i class="fa-solid fa-list-check text-emerald-400"></i>
-                            Детализация посещений по занятиям (10 дней по 2 часа)
+                            Attendance Session Details (10 Days x 2 Hours)
                         </span>
-                        <span id="student-att-toggle-icon" class="text-[10px] bg-slate-800 px-2.5 py-1 rounded border border-slate-700 transition-all">Развернуть ▾</span>
+                        <span id="student-att-toggle-icon" class="text-[10px] bg-slate-800 px-2.5 py-1 rounded border border-slate-700 transition-all">Expand ▾</span>
                     </button>
                     <div id="student-att-details" class="hidden mt-4 pt-4 border-t border-slate-800/60">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="student-att-list-grid">
-                            <!-- Dynamic checklist status shown here -->
+                            <!-- Dynamic checklist status -->
                         </div>
                     </div>
                 </div>
 
-                <!-- Bottom informational box -->
+                <!-- Bottom info box -->
                 <div class="bg-indigo-950/20 px-6 py-4 flex items-start space-x-3">
                     <i class="fa-solid fa-circle-info text-indigo-400 text-lg mt-0.5"></i>
                     <div>
-                        <h5 class="text-xs font-bold text-slate-300">Инструкция оценивания</h5>
+                        <h5 class="text-xs font-bold text-slate-300">Grading Policy</h5>
                         <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                            Итоговая оценка рассчитывается по формуле силлабуса: Посещение (30%) + Активность (30%) + Экзамен (40%). Минимальный порог зачета по дисциплине — 50 баллов (Грейд D).
+                            Final grade formula: Attendance (10%) + Activities (10%) + CA1 (10%) + MC1 (10%) + CA2 (10%) + MC2 (10%) + Final Exam (40%). Passing threshold: 50 points (Grade D).
                         </p>
                     </div>
                 </div>
             </div>
 
-            <!-- Student Not Found Helper State -->
+            <!-- Student Not Found State -->
             <div id="student-not-found" class="max-w-xl mx-auto bg-rose-950/10 border border-rose-900/30 p-5 rounded-2xl text-center hidden">
                 <i class="fa-solid fa-user-slash text-rose-500 text-2xl mb-2.5"></i>
-                <h4 class="text-sm font-bold text-rose-400">Слушатель не найден</h4>
+                <h4 class="text-sm font-bold text-rose-400">Student Not Found</h4>
                 <p class="text-xs text-slate-400 mt-1 leading-relaxed">
-                    Проверьте написание фамилии. Попробуйте написать только имя или только фамилию (например, <strong class="text-slate-300">Асель</strong> или <strong class="text-slate-300">Ажибекова</strong>).
+                    Please check spelling (e.g. search for <strong class="text-slate-300">Student XXX 01</strong>).
                 </p>
             </div>
         </div>
 
-        <!-- ================= TEACHER WORKSPACE VIEW (ADMIN PANEL) ================= -->
+        <!-- ================= INSTRUCTOR WORKSPACE VIEW ================= -->
         <div id="teacher-view" class="space-y-8 hidden">
             
             <!-- Statistics Overview Widgets -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
                 <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Всего слушателей</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Students</p>
                         <h3 class="text-3xl font-extrabold text-white mt-1" id="stat-total-students">0</h3>
                     </div>
                     <div class="h-12 w-12 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center text-xl border border-indigo-500/20">
@@ -271,7 +278,7 @@
                 </div>
                 <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Средний балл группы</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Group Average Score</p>
                         <div class="flex items-baseline space-x-1.5 mt-1">
                             <h3 class="text-3xl font-extrabold text-white" id="stat-average-grade">0.0</h3>
                             <span class="text-xs font-bold text-indigo-400" id="stat-average-letter">-</span>
@@ -283,7 +290,7 @@
                 </div>
                 <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Успеваемость (>=50)</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pass Rate (>=50)</p>
                         <h3 class="text-3xl font-extrabold text-white mt-1" id="stat-pass-rate">0%</h3>
                     </div>
                     <div class="h-12 w-12 bg-blue-500/10 text-blue-400 rounded-xl flex items-center justify-center text-xl border border-blue-500/20">
@@ -292,7 +299,7 @@
                 </div>
                 <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Лучший результат</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Top Performer</p>
                         <h3 class="text-sm font-bold text-violet-400 mt-2 truncate max-w-[150px]" id="stat-best-student">—</h3>
                     </div>
                     <div class="h-12 w-12 bg-violet-500/10 text-violet-400 rounded-xl flex items-center justify-center text-xl border border-violet-500/20">
@@ -301,35 +308,27 @@
                 </div>
             </div>
 
-            <!-- Group Performance Graphic Analysis Row -->
+            <!-- Group Analytics Chart -->
             <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 shadow-2xl">
                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                     <div>
                         <h3 class="text-base font-bold text-white flex items-center gap-2">
                             <i class="fa-solid fa-chart-column text-indigo-400"></i>
-                            Визуальный анализ активности и успеваемости группы
+                            Group Performance Graphic Overview
                         </h3>
                         <p class="text-xs text-slate-400 mt-1">
-                            Интерактивное сравнение студентов по критериям: посещаемость (зелёный), активность (синий), экзамен (красный) и итог (фиолетовый)
+                            Interactive comparison across Attendance, Activities, CA, Midterms, Exam, and Final Scores.
                         </p>
                     </div>
-                    <div class="flex flex-wrap items-center gap-4 text-xs font-semibold">
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-3 h-3 rounded bg-emerald-500"></span>
-                            <span class="text-slate-300">Посещение</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-3 h-3 rounded bg-blue-500"></span>
-                            <span class="text-slate-300">Активность</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-3 h-3 rounded bg-rose-500"></span>
-                            <span class="text-slate-300">Экзамен</span>
-                        </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="w-3 h-3 rounded bg-violet-500"></span>
-                            <span class="text-slate-300">Итоговый балл</span>
-                        </div>
+                    <div class="flex flex-wrap items-center gap-3 text-[11px] font-semibold">
+                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span><span class="text-slate-300">Att</span></div>
+                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-teal-500"></span><span class="text-slate-300">Act</span></div>
+                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-blue-500"></span><span class="text-slate-300">CA1</span></div>
+                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-500"></span><span class="text-slate-300">MC1</span></div>
+                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-indigo-500"></span><span class="text-slate-300">CA2</span></div>
+                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-orange-500"></span><span class="text-slate-300">MC2</span></div>
+                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-500"></span><span class="text-slate-300">Exam</span></div>
+                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-violet-500"></span><span class="text-slate-300">Final</span></div>
                     </div>
                 </div>
                 <div class="relative w-full h-80">
@@ -340,45 +339,48 @@
             <!-- Main Interactive Table Grid & Inputs -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                <!-- Full dynamic Gradebook table (2/3 width) -->
+                <!-- Gradebook table (2/3 width) -->
                 <div class="lg:col-span-2 flex flex-col space-y-6">
-                    
                     <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden flex flex-col shadow-2xl">
                         <!-- Table controls -->
                         <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-center gap-4">
                             <div class="relative w-full sm:w-72">
                                 <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-500"></i>
-                                <input type="text" id="teacher-search-input" placeholder="Поиск среди слушателей..." 
+                                <input type="text" id="teacher-search-input" placeholder="Search students..." 
                                     class="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-600">
                             </div>
                             <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
                                 <button onclick="exportToCSV()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-md transition-colors flex items-center space-x-2">
                                     <i class="fa-solid fa-file-excel"></i>
-                                    <span>Экспорт в Excel</span>
+                                    <span>Export Excel</span>
                                 </button>
                                 <button onclick="confirmReset()" class="px-4 py-2.5 bg-rose-950/40 text-rose-400 hover:bg-rose-900/40 rounded-xl text-xs font-semibold transition-colors flex items-center space-x-2 border border-rose-900/40">
                                     <i class="fa-solid fa-trash-can"></i>
-                                    <span>Сбросить всё</span>
+                                    <span>Reset All</span>
                                 </button>
                             </div>
                         </div>
 
                         <!-- Main Grid Table -->
                         <div class="overflow-x-auto custom-scrollbar">
-                            <table class="w-full text-left border-collapse">
+                            <table class="w-full text-left border-collapse min-w-[780px]">
                                 <thead>
-                                    <tr class="border-b border-slate-800 bg-slate-900/40 text-slate-400 text-[10px] font-bold uppercase tracking-wider">
-                                        <th class="py-3.5 px-5">Слушатель (MBA-B26-МД)</th>
-                                        <th class="py-3.5 px-4 text-center w-28">Посещ. (30%)</th>
-                                        <th class="py-3.5 px-4 text-center w-24">Активн. (30%)</th>
-                                        <th class="py-3.5 px-4 text-center w-24">Экзамен (40%)</th>
-                                        <th class="py-3.5 px-5 text-right w-24 bg-indigo-950/20">Итог (100)</th>
-                                        <th class="py-3.5 px-5 text-center w-20">Оценка</th>
-                                        <th class="py-3.5 px-4 text-center w-14"></th>
+                                    <tr class="border-b border-slate-800 bg-slate-900/40 text-slate-400 text-[9px] font-bold uppercase tracking-wider">
+                                        <th class="py-3.5 px-3">Student (International Business Team)</th>
+                                        <th class="py-3.5 px-1.5 text-center w-14">Att (10%)</th>
+                                        <th class="py-3.5 px-1.5 text-center w-14">Act (10%)</th>
+                                        <th class="py-3.5 px-1.5 text-center w-14">CA1 (10%)</th>
+                                        <th class="py-3.5 px-1.5 text-center w-14">MC1 (10%)</th>
+                                        <th class="py-3.5 px-1.5 text-center w-14">CA2 (10%)</th>
+                                        <th class="py-3.5 px-1.5 text-center w-14">MC2 (10%)</th>
+                                        <th class="py-3.5 px-1.5 text-center w-14">Exam (40%)</th>
+                                        <th class="py-3.5 px-2 text-right w-14 bg-indigo-950/20">Final</th>
+                                        <th class="py-3.5 px-2 text-center w-12">Grade</th>
+                                        <th class="py-3.5 px-1.5 text-center w-8"></th>
                                     </tr>
                                 </thead>
                                 <tbody id="students-table-body" class="divide-y divide-slate-800/40">
-                                    <!-- Dynamic rows from JS -->
+                                    <!-- Dynamic rows -->
                                 </tbody>
                             </table>
                         </div>
@@ -388,14 +390,14 @@
                             <div class="p-4 bg-slate-950 rounded-full text-slate-500 mb-3 text-3xl">
                                 <i class="fa-solid fa-user-slash"></i>
                             </div>
-                            <h4 class="text-sm font-semibold text-slate-300">Ведомость пуста</h4>
-                            <p class="text-xs text-slate-500 mt-1">Добавьте слушателей вручную или импортируйте их списком.</p>
+                            <h4 class="text-sm font-semibold text-slate-300">Gradebook is empty</h4>
+                            <p class="text-xs text-slate-500 mt-1">Add students manually or use bulk import.</p>
                         </div>
                         
                         <!-- Real-time editing tips -->
                         <div class="bg-indigo-950/10 p-4 border-t border-slate-800/80 text-xs text-indigo-300 flex items-center space-x-3.5">
                             <i class="fa-solid fa-circle-info text-indigo-400 text-lg"></i>
-                            <p><strong>Мгновенный расчет по часам:</strong> Нажимайте на проценты в графе «Посещ.», чтобы открыть 20-часовую форму учета посещений!</p>
+                            <p><strong>Attendance tracking:</strong> Click percentage in the "Att" column to open the 20-hour session checklist!</p>
                         </div>
                     </div>
                 </div>
@@ -407,17 +409,17 @@
                     <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 shadow-2xl">
                         <h3 class="text-sm font-bold text-white mb-3.5 flex items-center space-x-2">
                             <i class="fa-solid fa-file-import text-indigo-400"></i>
-                            <span>Массовый импорт слушателей</span>
+                            <span>Bulk Import Students</span>
                         </h3>
                         <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
-                            Каждая новая строка воспринимается как Ф.И.О. нового слушателя. Оценки по умолчанию инициализируются нулями.
+                            Each line will be imported as a student name. Initial grades default to 0.
                         </p>
-                        <textarea id="bulk-import-area" rows="4" placeholder="Иванов Иван&#10;Петров Петр" 
+                        <textarea id="bulk-import-area" rows="4" placeholder="Student XXX 21&#10;Student XXX 22" 
                             class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-700 font-mono"></textarea>
                         
                         <button onclick="runBulkImport()" class="w-full mt-3 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-colors flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/15">
                             <i class="fa-solid fa-users-medical"></i>
-                            <span>Импортировать список в базу</span>
+                            <span>Import List into System</span>
                         </button>
                     </div>
 
@@ -425,34 +427,54 @@
                     <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 shadow-2xl">
                         <h3 class="text-sm font-bold text-white mb-3.5 flex items-center space-x-2">
                             <i class="fa-solid fa-user-plus text-blue-400"></i>
-                            <span>Добавить одного слушателя</span>
+                            <span>Add Single Student</span>
                         </h3>
                         <div class="space-y-3">
                             <div>
-                                <label class="block text-[10px] font-bold text-slate-400 mb-1">Ф. И. О. Слушателя</label>
-                                <input type="text" id="add-student-name" placeholder="Введите имя полностью" 
+                                <label class="block text-[10px] font-bold text-slate-400 mb-1">Student Full Name</label>
+                                <input type="text" id="add-student-name" placeholder="Enter Full Name" 
                                     class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-700">
                             </div>
-                            <div class="grid grid-cols-3 gap-2">
+                            <div class="grid grid-cols-4 gap-2">
                                 <div>
-                                    <label class="block text-[9px] font-bold text-slate-400 mb-1" title="Посещение">Посещ.</label>
+                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Attendance">Att</label>
                                     <input type="number" id="add-student-attendance" min="0" max="100" placeholder="0" 
-                                        class="w-full px-2 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-[9px] font-bold text-slate-400 mb-1" title="Активность">Активн.</label>
-                                    <input type="number" id="add-student-activity" min="0" max="100" placeholder="0" 
-                                        class="w-full px-2 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Activities">Act</label>
+                                    <input type="number" id="add-student-activities" min="0" max="100" placeholder="0" 
+                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-[9px] font-bold text-slate-400 mb-1" title="Экзаменационная работа">Экзамен</label>
+                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Current Assessment 1">CA 1</label>
+                                    <input type="number" id="add-student-ca1" min="0" max="100" placeholder="0" 
+                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Midterm Control 1">MC 1</label>
+                                    <input type="number" id="add-student-mc1" min="0" max="100" placeholder="0" 
+                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Current Assessment 2">CA 2</label>
+                                    <input type="number" id="add-student-ca2" min="0" max="100" placeholder="0" 
+                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Midterm Control 2">MC 2</label>
+                                    <input type="number" id="add-student-mc2" min="0" max="100" placeholder="0" 
+                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div class="col-span-2">
+                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Final Exam">Exam (40%)</label>
                                     <input type="number" id="add-student-exam" min="0" max="100" placeholder="0" 
-                                        class="w-full px-2 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                             </div>
                             <button onclick="addSingleStudent()" class="w-full mt-2 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl text-xs transition-colors flex items-center justify-center space-x-2 border border-slate-700">
                                 <i class="fa-solid fa-plus"></i>
-                                <span>Записать в журнал</span>
+                                <span>Save to Register</span>
                             </button>
                         </div>
                     </div>
@@ -465,38 +487,38 @@
 
     </main>
 
-    <!-- Teacher Password Authentication Modal -->
+    <!-- Instructor Authentication Modal -->
     <div id="auth-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
         <div class="bg-slate-900 p-6 rounded-2xl max-w-sm w-full mx-4 shadow-2xl border border-slate-800 transform scale-95 transition-transform duration-200">
             <div class="h-12 w-12 bg-indigo-500/10 text-indigo-400 rounded-full flex items-center justify-center text-xl mb-4 border border-indigo-500/20">
                 <i class="fa-solid fa-key"></i>
             </div>
-            <h3 class="text-lg font-extrabold text-white">Доступ преподавателя</h3>
-            <p class="text-slate-400 text-xs mt-1">Для открытия ведомости группы введите установленный пароль.</p>
+            <h3 class="text-lg font-extrabold text-white">Instructor Access</h3>
+            <p class="text-slate-400 text-xs mt-1">Enter password to unlock instructor management panel.</p>
             
             <div class="mt-4">
-                <input type="password" id="auth-password" onkeydown="handleAuthKeyDown(event)" placeholder="Введите пароль..." 
+                <input type="password" id="auth-password" onkeydown="handleAuthKeyDown(event)" placeholder="Enter password..." 
                     class="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-700">
             </div>
             
             <div class="mt-6 flex justify-end space-x-3">
-                <button onclick="closeAuthModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition-colors">Отмена</button>
-                <button onclick="verifyTeacherPassword()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-colors shadow-lg shadow-indigo-600/30">Войти</button>
+                <button onclick="closeAuthModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition-colors">Cancel</button>
+                <button onclick="verifyTeacherPassword()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-colors shadow-lg shadow-indigo-600/30">Login</button>
             </div>
         </div>
     </div>
 
-    <!-- Confirm Dialog Modal -->
+    <!-- Confirm Reset Dialog Modal -->
     <div id="confirm-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
         <div class="bg-slate-900 p-6 rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-slate-800 transform scale-95 transition-transform duration-200">
             <div class="h-12 w-12 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center text-xl mb-4 border border-rose-500/20">
                 <i class="fa-solid fa-triangle-exclamation"></i>
             </div>
-            <h3 class="text-lg font-bold text-white">Вы абсолютно уверены?</h3>
-            <p class="text-slate-400 text-xs mt-2">Вы собираетесь стереть всех слушателей из текущей базы данных. Это действие необратимо.</p>
+            <h3 class="text-lg font-bold text-white">Are you sure?</h3>
+            <p class="text-slate-400 text-xs mt-2">This action will erase all student data from the current gradebook. This cannot be undone.</p>
             <div class="mt-6 flex justify-end space-x-3">
-                <button onclick="closeConfirmModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition-colors">Отмена</button>
-                <button onclick="resetAllData()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-xs transition-colors shadow-lg shadow-rose-600/30">Сбросить данные</button>
+                <button onclick="closeConfirmModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition-colors">Cancel</button>
+                <button onclick="resetAllData()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-xs transition-colors shadow-lg shadow-rose-600/30">Reset Database</button>
             </div>
         </div>
     </div>
@@ -510,8 +532,8 @@
                         <i class="fa-solid fa-calendar-days"></i>
                     </div>
                     <div>
-                        <h3 class="text-sm font-extrabold text-white" id="att-modal-student-name">Детализация посещений</h3>
-                        <p class="text-[10px] text-slate-400">Отметьте присутствие по часам (всего 20 часов)</p>
+                        <h3 class="text-sm font-extrabold text-white" id="att-modal-student-name">Attendance Details</h3>
+                        <p class="text-[10px] text-slate-400">Mark hourly attendance (20 hours total)</p>
                     </div>
                 </div>
                 <button onclick="closeAttendanceModal()" class="text-slate-400 hover:text-white transition-colors">
@@ -522,15 +544,15 @@
             <!-- List content -->
             <div class="flex-grow overflow-y-auto custom-scrollbar my-4 pr-1">
                 <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 mb-4 flex justify-between items-center">
-                    <span class="text-xs text-slate-400 font-semibold">Итого посещаемость:</span>
+                    <span class="text-xs text-slate-400 font-semibold">Total Attendance:</span>
                     <div class="flex items-center space-x-2">
                         <span id="att-modal-percent" class="text-emerald-400 font-extrabold text-sm">0%</span>
-                        <span id="att-modal-hours" class="text-slate-500 text-xs font-medium">(0 из 20 ч)</span>
+                        <span id="att-modal-hours" class="text-slate-500 text-xs font-medium">(0 of 20 hrs)</span>
                     </div>
                 </div>
                 
                 <div class="space-y-2" id="attendance-dates-grid">
-                    <!-- Dynamic hour checklist rows rendered from JS -->
+                    <!-- Dynamic hour checklist -->
                 </div>
             </div>
 
@@ -538,15 +560,15 @@
             <div class="pt-4 border-t border-slate-800 flex justify-between items-center">
                 <div class="flex space-x-1.5">
                     <button onclick="toggleAllAttendance(true)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-[10px] transition-all border border-slate-700">
-                        Отметить все
+                        Select All
                     </button>
                     <button onclick="toggleAllAttendance(false)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-[10px] transition-all border border-slate-700">
-                        Снять все
+                        Clear All
                     </button>
                 </div>
                 <button onclick="saveAttendanceDetails()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-colors shadow-lg shadow-emerald-600/30 flex items-center space-x-1.5">
                     <i class="fa-solid fa-floppy-disk"></i>
-                    <span>Сохранить</span>
+                    <span>Save</span>
                 </button>
             </div>
         </div>
@@ -558,92 +580,85 @@
     <!-- Footer Area -->
     <footer class="bg-slate-950 border-t border-slate-900 py-6 text-center text-xs text-slate-500">
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-            <p>© 2026 Высшая школа бизнеса ALMAU. Все права защищены.</p>
-            <p class="text-slate-600">Силлабус курса: Посещение (30%) | Активность (30%) | Экзамен (40%)</p>
+            <p>© 2026 ALMAU School of Digital Technologies & Economics. All rights reserved.</p>
+            <p class="text-slate-600">Syllabus: Att (10%) | Act (10%) | CA1 (10%) | MC1 (10%) | CA2 (10%) | MC2 (10%) | Exam (40%)</p>
         </div>
     </footer>
 
     <script>
-        // Official cleaned student list for the specified MBA group
-       const initialGroupStudents = [
-            { id: 'st-1', name: 'Ажибекова Асель Саметкуловна', attendance: 90, activity: 100, exam: 90 },
-            { id: 'st-2', name: 'Харитонов Дмитрий Викторович', attendance: 95, activity: 85, exam: 90 },
-            { id: 'st-3', name: 'Крисанова Оксана Владимировна', attendance: 80, activity: 90, exam: 90 },
-            { id: 'st-4', name: 'Зарубин Александр Александрович', attendance: 60, activity: 75, exam: 85 },
-            { id: 'st-5', name: 'Рахимжанов Даулет Болатович', attendance: 100, activity: 90, exam: 90 },
-            { id: 'st-6', name: 'Шигенова Дина Александровна', attendance: 70, activity: 80, exam: 80 },
-            { id: 'st-7', name: 'Жигарь Александр Григорьевич', attendance: 100, activity: 90, exam: 90 },
-            { id: 'st-8', name: 'Жаксылыкпай Екатерина Евгеньевна', attendance: 60, activity: 75, exam: 85 },
-            { id: 'st-9', name: 'Жанпейсова Лиза Омирсериковна', attendance: 60, activity: 50, exam: 70 },
-            { id: 'st-10', name: 'Ирисбаев Тулкинжон', attendance: 80, activity: 90, exam: 90 }
-        ];
+        // Initial list of 20 students with all grades reset to ZERO
+        const initialGroupStudents = Array.from({ length: 20 }, (_, i) => {
+            const num = String(i + 1).padStart(2, '0');
+            return {
+                id: `st-${i + 1}`,
+                name: `Student XXX ${num}`,
+                attendance: 0,
+                activities: 0,
+                ca1: 0,
+                mc1: 0,
+                ca2: 0,
+                mc2: 0,
+                exam: 0,
+                attendanceHours: Array(20).fill(false)
+            };
+        });
 
-        // Specific calendar dates configured by user (10 dates total)
+        // Attendance Dates Configuration (10 sessions, 2 hours each)
         const ATTENDANCE_DATES = [
-            '10 июня', '12 июня', '15 июня', '17 июня', '19 июня', 
-            '22 июня', '24 июня', '26 июня', '29 июня', '1 июля'
+            'June 10', 'June 12', 'June 15', 'June 17', 'June 19', 
+            'June 22', 'June 24', 'June 26', 'June 29', 'July 01'
         ];
 
         let students = [];
-        // Personal widget chart references
         let personalAttChart = null;
         let personalActChart = null;
         let personalExamChart = null;
-        
         let groupChart = null;
         let isTeacherMode = false;
-        const correctPassword = 'MEE-12072026';
+        
+        const correctPassword = 'PE-12092026';
 
-        // Tracking state for the pop-up attendance grid editor
         let activeEditingStudentId = null;
         let tempAttendanceHours = [];
 
-        // Initialize App
         window.onload = function() {
             loadDatabase();
             initGroupChart();
             updateDashboardData();
             
-            // Set up real-time search listener in teacher panel
             document.getElementById('teacher-search-input').addEventListener('input', function(e) {
                 renderTeacherTable(e.target.value);
             });
         };
 
-        // Guarantee that a student possesses the 20 boolean slots for detailed hours tracking
         function ensureAttendanceHours(student) {
             if (!student.hasOwnProperty('attendanceHours') || !Array.isArray(student.attendanceHours)) {
-                student.attendanceHours = [];
-                // Fallback conversion: set active slots matching their current percentage
-                const numTrue = Math.round((student.attendance || 0) / 5);
-                for (let i = 0; i < 20; i++) {
-                    student.attendanceHours.push(i < numTrue);
-                }
+                student.attendanceHours = Array(20).fill(false);
             }
         }
 
-        // Load database from local storage
-       function loadDatabase() {
+        function loadDatabase() {
             students = initialGroupStudents;
             students.forEach(student => ensureAttendanceHours(student));
             updateDashboardData();
-            console.log("Данные загружены напрямую из кода.");
         }
 
-        // Save state to local storage
         function saveDatabase() {
-            localStorage.setItem('almau_gradebook_v3_students', JSON.stringify(students));
+            localStorage.setItem('almau_pe_ib_students_v2', JSON.stringify(students));
         }
 
-        // Weighted grade calculation helper (30% att, 30% act, 40% exam)
-        function calculateWeightedScore(attendance, activity, exam) {
-            const attWeight = (attendance || 0) * 0.30;
-            const actWeight = (activity || 0) * 0.30;
-            const exmWeight = (exam || 0) * 0.40;
-            return parseFloat((attWeight + actWeight + exmWeight).toFixed(1));
+        // Weighted grade calculation formula: 10% Att, 10% Act, 10% CA1, 10% MC1, 10% CA2, 10% MC2, 40% Exam
+        function calculateWeightedScore(att, act, ca1, mc1, ca2, mc2, exam) {
+            const wAtt = (att || 0) * 0.10;
+            const wAct = (act || 0) * 0.10;
+            const wCa1 = (ca1 || 0) * 0.10;
+            const wMc1 = (mc1 || 0) * 0.10;
+            const wCa2 = (ca2 || 0) * 0.10;
+            const wMc2 = (mc2 || 0) * 0.10;
+            const wExam = (exam || 0) * 0.40;
+            return parseFloat((wAtt + wAct + wCa1 + wMc1 + wCa2 + wMc2 + wExam).toFixed(1));
         }
 
-        // Get Grade scale metrics and CSS
         function getLetterGrade(score) {
             if (score >= 95) return { letter: 'A', class: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' };
             if (score >= 90) return { letter: 'A-', class: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' };
@@ -658,18 +673,16 @@
             return { letter: 'F', class: 'bg-rose-500/10 text-rose-400 border-rose-500/30' };
         }
 
-        // Search Student Action for Личный Кабинет
         function searchStudentGrade() {
             const searchInput = document.getElementById('student-search-input').value.trim().toLowerCase();
             const resultCard = document.getElementById('student-result-card');
             const notFoundCard = document.getElementById('student-not-found');
 
             if (!searchInput) {
-                showToast('Пожалуйста, введите вашу Фамилию!', 'error');
+                showToast('Please enter your full name!', 'error');
                 return;
             }
 
-            // Simple partial word matching
             const queryWords = searchInput.split(/\s+/);
             const matchedStudent = students.find(s => {
                 const normalizedName = s.name.toLowerCase();
@@ -679,8 +692,15 @@
             if (matchedStudent) {
                 notFoundCard.classList.add('hidden');
                 
-                // Final Grade calculation and Display Setup
-                const finalScore = calculateWeightedScore(matchedStudent.attendance, matchedStudent.activity, matchedStudent.exam);
+                const finalScore = calculateWeightedScore(
+                    matchedStudent.attendance, 
+                    matchedStudent.activities,
+                    matchedStudent.ca1, 
+                    matchedStudent.mc1, 
+                    matchedStudent.ca2, 
+                    matchedStudent.mc2, 
+                    matchedStudent.exam
+                );
                 const gradeInfo = getLetterGrade(finalScore);
 
                 document.getElementById('sr-name').textContent = matchedStudent.name;
@@ -690,102 +710,54 @@
                 letterBadge.className = `text-2xl font-black px-3.5 py-1 rounded-xl text-white shadow-md bg-indigo-600`;
 
                 document.getElementById('sr-total-score').textContent = finalScore;
-                document.getElementById('sr-val-attendance').textContent = `${matchedStudent.attendance || 0} / 100`;
-                document.getElementById('sr-val-activity').textContent = `${matchedStudent.activity || 0} / 100`;
-                document.getElementById('sr-val-exam').textContent = `${matchedStudent.exam || 0} / 100`;
+                document.getElementById('sr-val-attendance').textContent = `${matchedStudent.attendance || 0}%`;
+                document.getElementById('sr-val-activities').textContent = `${matchedStudent.activities || 0}`;
+                document.getElementById('sr-val-ca1').textContent = `${matchedStudent.ca1 || 0}`;
+                document.getElementById('sr-val-mc1').textContent = `${matchedStudent.mc1 || 0}`;
+                document.getElementById('sr-val-ca2').textContent = `${matchedStudent.ca2 || 0}`;
+                document.getElementById('sr-val-mc2').textContent = `${matchedStudent.mc2 || 0}`;
+                document.getElementById('sr-val-exam').textContent = `${matchedStudent.exam || 0}`;
 
-                // Render student personal attendance list
                 renderStudentAttendanceDetails(matchedStudent);
+                renderPersonalCharts(matchedStudent, finalScore, gradeInfo.letter);
 
-                // Render upgraded dashboard widget elements
-                renderPersonalCharts(matchedStudent.attendance, matchedStudent.activity, matchedStudent.exam, finalScore, gradeInfo.letter);
-
-                // Show panel and animate
                 resultCard.classList.remove('hidden');
                 resultCard.classList.add('fade-enter');
                 setTimeout(() => {
                     resultCard.classList.add('fade-enter-active');
                 }, 10);
 
-                showToast(`Найдены результаты для: ${matchedStudent.name}`, 'success');
+                showToast(`Loaded results for: ${matchedStudent.name}`, 'success');
             } else {
                 resultCard.classList.add('hidden');
                 notFoundCard.classList.remove('hidden');
-                showToast('Слушатель не найден в базе', 'error');
+                showToast('Student not found in register', 'error');
             }
         }
 
-        // Key press trigger for search
         function handleSearchKeyDown(event) {
             if (event.key === 'Enter') {
                 searchStudentGrade();
             }
         }
 
-        // Render Personal activity parameters using individual customized rich charts
-        function renderPersonalCharts(attendance, activity, exam, total, letter) {
-            // Destroy existing charts to reload clean animations
+        function renderPersonalCharts(student, total, letter) {
             if (personalAttChart) personalAttChart.destroy();
             if (personalActChart) personalActChart.destroy();
             if (personalExamChart) personalExamChart.destroy();
 
-            // 1. Attendance Widget (Styled Mini Bar Chart - Студент vs Максимум)
+            // 1. Attendance Chart
             const attCtx = document.getElementById('attendanceBarChart').getContext('2d');
-            document.getElementById('val-att-text').textContent = `${attendance}%`;
+            document.getElementById('val-att-text').textContent = `${student.attendance}%`;
             personalAttChart = new Chart(attCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['Результат', 'Цель'],
+                    labels: ['Actual', 'Goal'],
                     datasets: [{
-                        data: [attendance, 100],
-                        backgroundColor: [
-                            'rgba(16, 185, 129, 0.85)', // Emerald for student
-                            'rgba(16, 185, 129, 0.15)'  // Semitransparent trace for total goal
-                        ],
+                        data: [student.attendance, 100],
+                        backgroundColor: ['rgba(16, 185, 129, 0.85)', 'rgba(16, 185, 129, 0.15)'],
                         borderRadius: 6,
-                        borderWidth: 0,
                         maxBarThickness: 16
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { enabled: true } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } },
-                        y: { min: 0, max: 100, grid: { color: '#1e293b' }, ticks: { display: false } }
-                    }
-                }
-            });
-
-            // 2. Activity Widget (Timeline Smooth Trend Curve)
-            const actCtx = document.getElementById('activityLineChart').getContext('2d');
-            document.getElementById('val-act-text').textContent = `${activity}/100`;
-            
-            // Build 5 simulated trend points leading organically to their final activity score
-            const trendPoints = [
-                Math.max(15, Math.round(activity * 0.60)),
-                Math.min(100, Math.max(30, Math.round(activity * 0.85))),
-                Math.max(25, Math.round(activity * 0.70)),
-                Math.min(100, Math.max(45, Math.round(activity * 0.95))),
-                activity
-            ];
-
-            personalActChart = new Chart(actCtx, {
-                type: 'line',
-                data: {
-                    labels: ['М1', 'М2', 'М3', 'М4', 'Итог'],
-                    datasets: [{
-                        data: trendPoints,
-                        borderColor: '#3b82f6',
-                        backgroundColor: 'rgba(59, 130, 246, 0.12)',
-                        fill: true,
-                        tension: 0.45,
-                        borderWidth: 2,
-                        pointBackgroundColor: '#3b82f6',
-                        pointHoverBackgroundColor: '#60a5fa',
-                        pointRadius: 2.5,
-                        pointHoverRadius: 4
                     }]
                 },
                 options: {
@@ -793,25 +765,50 @@
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
                     scales: {
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 8 } } },
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } },
                         y: { min: 0, max: 100, grid: { color: '#1e293b' }, ticks: { display: false } }
                     }
                 }
             });
 
-            // 3. Exam Widget (Speedometer Fuel Gauge Semi-circle)
+            // 2. Continuous Assessment Trend (Act, CA1, CA2)
+            const actCtx = document.getElementById('activityLineChart').getContext('2d');
+            personalActChart = new Chart(actCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Act', 'CA 1', 'CA 2'],
+                    datasets: [{
+                        data: [student.activities || 0, student.ca1 || 0, student.ca2 || 0],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.12)',
+                        fill: true,
+                        tension: 0.3,
+                        borderWidth: 2,
+                        pointBackgroundColor: '#3b82f6',
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } },
+                        y: { min: 0, max: 100, grid: { color: '#1e293b' }, ticks: { display: false } }
+                    }
+                }
+            });
+
+            // 3. Midterm Gauge (MC1 vs MC2)
             const exCtx = document.getElementById('examGaugeChart').getContext('2d');
-            document.getElementById('val-ex-text').textContent = `${exam}/100`;
+            const avgMc = Math.round(((student.mc1 || 0) + (student.mc2 || 0)) / 2);
             personalExamChart = new Chart(exCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Набрано', 'Осталось'],
+                    labels: ['Midterm Avg', 'Remaining'],
                     datasets: [{
-                        data: [exam, 100 - exam],
-                        backgroundColor: [
-                            'rgba(244, 63, 94, 0.9)', // Glowing Rose
-                            'rgba(30, 41, 59, 0.6)'    // Slate empty space
-                        ],
+                        data: [avgMc, 100 - avgMc],
+                        backgroundColor: ['rgba(245, 158, 11, 0.9)', 'rgba(30, 41, 59, 0.6)'],
                         borderWidth: 0
                     }]
                 },
@@ -821,27 +818,19 @@
                     cutout: '80%',
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    }
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
                 }
             });
 
-            // 4. Circular Glowing Radial Progress Animation (Final Score Ring)
+            // 4. Circle Score
             const circle = document.getElementById('finalScoreCircle');
-            const letterEl = document.getElementById('finalCircleLetter');
-            const scoreEl = document.getElementById('finalCircleScore');
+            document.getElementById('finalCircleLetter').textContent = letter;
+            document.getElementById('finalCircleScore').textContent = total.toFixed(1);
 
-            letterEl.textContent = letter;
-            scoreEl.textContent = total.toFixed(1);
-
-            // Radius is 40 -> Circumference is ~251.2. 
             const strokeOffset = 251.2 - (251.2 * total) / 100;
             circle.style.strokeDashoffset = strokeOffset;
         }
 
-        // Password Authentication
         function verifyTeacherPassword() {
             const pwdInput = document.getElementById('auth-password');
             if (pwdInput.value === correctPassword) {
@@ -849,9 +838,9 @@
                 pwdInput.value = '';
                 closeAuthModal();
                 updateViewMode();
-                showToast('Панель преподавателя ALMAU разблокирована.', 'success');
+                showToast('Instructor Workspace Unlocked.', 'success');
             } else {
-                showToast('Неверный пароль доступа!', 'error');
+                showToast('Invalid password access!', 'error');
                 pwdInput.select();
             }
         }
@@ -862,7 +851,6 @@
             }
         }
 
-        // Toggle UI modes (Student view vs Teacher administration workspace)
         function updateViewMode() {
             const studentView = document.getElementById('student-view');
             const teacherView = document.getElementById('teacher-view');
@@ -872,18 +860,16 @@
             if (isTeacherMode) {
                 studentView.classList.add('hidden');
                 teacherView.classList.remove('hidden');
-                badge.innerHTML = `<span class="h-2 w-2 bg-emerald-400 rounded-full animate-pulse"></span><span>Режим Преподавателя</span>`;
+                badge.innerHTML = `<span class="h-2 w-2 bg-emerald-400 rounded-full animate-pulse"></span><span>Instructor Mode</span>`;
                 badge.className = "px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center space-x-1.5";
-                authBtnText.textContent = "Выйти из режима управления";
-                
-                // Populate Admin workspace and draw group analytics chart
+                authBtnText.textContent = "Exit Instructor Panel";
                 updateDashboardData();
             } else {
                 studentView.classList.remove('hidden');
                 teacherView.classList.add('hidden');
-                badge.innerHTML = `<span class="h-2 w-2 bg-indigo-400 rounded-full animate-pulse"></span><span>Режим Студента</span>`;
+                badge.innerHTML = `<span class="h-2 w-2 bg-indigo-400 rounded-full animate-pulse"></span><span>Student Mode</span>`;
                 badge.className = "px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center space-x-1.5";
-                authBtnText.textContent = "Панель преподавателя";
+                authBtnText.textContent = "Instructor Portal";
             }
         }
 
@@ -891,7 +877,7 @@
             if (isTeacherMode) {
                 isTeacherMode = false;
                 updateViewMode();
-                showToast('Сессия управления закрыта.', 'info');
+                showToast('Session closed.', 'info');
                 return;
             }
             const modal = document.getElementById('auth-modal');
@@ -912,7 +898,6 @@
             }, 200);
         }
 
-        // Render Admin Gradebook Table
         function renderTeacherTable(filterQuery = '') {
             const tbody = document.getElementById('students-table-body');
             const emptyState = document.getElementById('empty-state');
@@ -928,43 +913,71 @@
             }
 
             filtered.forEach(student => {
-                const finalScore = calculateWeightedScore(student.attendance, student.activity, student.exam);
+                const finalScore = calculateWeightedScore(
+                    student.attendance, 
+                    student.activities,
+                    student.ca1, 
+                    student.mc1, 
+                    student.ca2, 
+                    student.mc2, 
+                    student.exam
+                );
                 const gradeInfo = getLetterGrade(finalScore);
 
                 const row = document.createElement('tr');
                 row.className = "hover:bg-slate-900/60 transition-colors border-b border-slate-800/40";
                 row.innerHTML = `
-                    <td class="py-3 px-5 font-medium text-slate-100">
-                        <span class="block font-bold text-slate-200 truncate max-w-[240px]" title="${student.name}">${student.name}</span>
+                    <td class="py-2.5 px-3 font-medium text-slate-100">
+                        <span class="block font-bold text-slate-200 truncate max-w-[190px]" title="${student.name}">${student.name}</span>
                     </td>
-                    <td class="py-3 px-4">
+                    <td class="py-2.5 px-1">
                         <button onclick="openAttendanceModal('${student.id}')" id="att-trigger-${student.id}"
-                            class="px-2 py-1.5 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 focus:ring-1 focus:ring-indigo-500 rounded-lg text-emerald-400 text-xs font-bold w-full transition-all flex items-center justify-center gap-1.5" title="Детализация посещений по часам">
+                            class="px-1 py-1 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 focus:ring-1 focus:ring-indigo-500 rounded-lg text-emerald-400 text-xs font-bold w-full transition-all flex items-center justify-center gap-1" title="Hourly Attendance Checklist">
                             <span>${student.attendance}%</span>
-                            <i class="fa-solid fa-pencil text-[9px] text-slate-500"></i>
+                            <i class="fa-solid fa-pencil text-[8px] text-slate-500"></i>
                         </button>
                     </td>
-                    <td class="py-3 px-4">
-                        <input type="number" min="0" max="100" value="${student.activity}" 
-                            onchange="updateStudentGrade('${student.id}', 'activity', this.value)"
-                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-slate-100 text-sm font-semibold transition-all">
+                    <td class="py-2.5 px-1">
+                        <input type="number" min="0" max="100" value="${student.activities || 0}" 
+                            onchange="updateStudentGrade('${student.id}', 'activities', this.value)"
+                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-teal-300 text-xs font-semibold transition-all">
                     </td>
-                    <td class="py-3 px-4">
-                        <input type="number" min="0" max="100" value="${student.exam}" 
+                    <td class="py-2.5 px-1">
+                        <input type="number" min="0" max="100" value="${student.ca1 || 0}" 
+                            onchange="updateStudentGrade('${student.id}', 'ca1', this.value)"
+                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-slate-100 text-xs font-semibold transition-all">
+                    </td>
+                    <td class="py-2.5 px-1">
+                        <input type="number" min="0" max="100" value="${student.mc1 || 0}" 
+                            onchange="updateStudentGrade('${student.id}', 'mc1', this.value)"
+                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-amber-300 text-xs font-semibold transition-all">
+                    </td>
+                    <td class="py-2.5 px-1">
+                        <input type="number" min="0" max="100" value="${student.ca2 || 0}" 
+                            onchange="updateStudentGrade('${student.id}', 'ca2', this.value)"
+                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-slate-100 text-xs font-semibold transition-all">
+                    </td>
+                    <td class="py-2.5 px-1">
+                        <input type="number" min="0" max="100" value="${student.mc2 || 0}" 
+                            onchange="updateStudentGrade('${student.id}', 'mc2', this.value)"
+                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-orange-300 text-xs font-semibold transition-all">
+                    </td>
+                    <td class="py-2.5 px-1">
+                        <input type="number" min="0" max="100" value="${student.exam || 0}" 
                             onchange="updateStudentGrade('${student.id}', 'exam', this.value)"
-                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-slate-100 text-sm font-semibold transition-all">
+                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-rose-300 text-xs font-semibold transition-all">
                     </td>
-                    <td class="py-3 px-5 text-right font-extrabold text-violet-400 bg-indigo-950/10">
+                    <td class="py-2.5 px-2 text-right font-extrabold text-violet-400 bg-indigo-950/10">
                         <span id="final-score-${student.id}">${finalScore}</span>
                     </td>
-                    <td class="py-3 px-5 text-center">
-                        <span id="letter-${student.id}" class="inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold rounded-lg border ${gradeInfo.class} w-12">
+                    <td class="py-2.5 px-2 text-center">
+                        <span id="letter-${student.id}" class="inline-flex items-center justify-center px-2 py-0.5 text-[11px] font-bold rounded-lg border ${gradeInfo.class} w-10">
                             ${gradeInfo.letter}
                         </span>
                     </td>
-                    <td class="py-3 px-4 text-center">
-                        <button onclick="deleteStudent('${student.id}')" class="p-1.5 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors" title="Исключить">
-                            <i class="fa-regular fa-trash-can text-sm"></i>
+                    <td class="py-2.5 px-1 text-center">
+                        <button onclick="deleteStudent('${student.id}')" class="p-1 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors" title="Delete">
+                            <i class="fa-regular fa-trash-can text-xs"></i>
                         </button>
                     </td>
                 `;
@@ -972,7 +985,6 @@
             });
         }
 
-        // Inline inputs change listener (activity, exam)
         function updateStudentGrade(id, field, value) {
             let numVal = parseInt(value);
             if (isNaN(numVal)) numVal = 0;
@@ -984,21 +996,27 @@
                 student[field] = numVal;
                 saveDatabase();
                 
-                // Rapid UI recalculations avoiding full DOM redraw operations
-                const finalScore = calculateWeightedScore(student.attendance, student.activity, student.exam);
+                const finalScore = calculateWeightedScore(
+                    student.attendance, 
+                    student.activities,
+                    student.ca1, 
+                    student.mc1, 
+                    student.ca2, 
+                    student.mc2, 
+                    student.exam
+                );
                 document.getElementById(`final-score-${id}`).textContent = finalScore;
                 
                 const gradeInfo = getLetterGrade(finalScore);
                 const letterBadge = document.getElementById(`letter-${id}`);
                 letterBadge.textContent = gradeInfo.letter;
-                letterBadge.className = `inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold rounded-lg border ${gradeInfo.class} w-12`;
+                letterBadge.className = `inline-flex items-center justify-center px-2 py-0.5 text-[11px] font-bold rounded-lg border ${gradeInfo.class} w-10`;
                 
                 updateStats();
                 updateGroupChart();
             }
         }
 
-        // Update Admin Statistics Metrics
         function updateStats() {
             const total = students.length;
             document.getElementById('stat-total-students').textContent = total;
@@ -1017,7 +1035,7 @@
             let topScore = -1;
 
             students.forEach(s => {
-                const final = calculateWeightedScore(s.attendance, s.activity, s.exam);
+                const final = calculateWeightedScore(s.attendance, s.activities, s.ca1, s.mc1, s.ca2, s.mc2, s.exam);
                 sum += final;
                 if (final >= 50) passes++;
                 
@@ -1036,11 +1054,9 @@
 
             if (topStudent) {
                 document.getElementById('stat-best-student').textContent = `${topStudent.name} (${topScore})`;
-                document.getElementById('stat-best-student').title = `${topStudent.name} (Итог: ${topScore})`;
             }
         }
 
-        // Initialize Group Performance Comparative Analytics Chart
         function initGroupChart() {
             const ctx = document.getElementById('groupPerformanceChart').getContext('2d');
             groupChart = new Chart(ctx, {
@@ -1048,106 +1064,65 @@
                 data: {
                     labels: [],
                     datasets: [
-                        {
-                            label: 'Посещение',
-                            data: [],
-                            backgroundColor: 'rgba(16, 185, 129, 0.85)', // Green
-                            borderRadius: 4,
-                            maxBarThickness: 10
-                        },
-                        {
-                            label: 'Активность',
-                            data: [],
-                            backgroundColor: 'rgba(59, 130, 246, 0.85)', // Blue
-                            borderRadius: 4,
-                            maxBarThickness: 10
-                        },
-                        {
-                            label: 'Экзамен',
-                            data: [],
-                            backgroundColor: 'rgba(244, 63, 94, 0.85)', // Red
-                            borderRadius: 4,
-                            maxBarThickness: 10
-                        },
-                        {
-                            label: 'Итоговый балл',
-                            data: [],
-                            backgroundColor: 'rgba(139, 92, 246, 0.85)', // Violet/Purple
-                            borderRadius: 4,
-                            maxBarThickness: 12
-                        }
+                        { label: 'Att', data: [], backgroundColor: 'rgba(16, 185, 129, 0.85)', borderRadius: 2, maxBarThickness: 6 },
+                        { label: 'Act', data: [], backgroundColor: 'rgba(20, 184, 166, 0.85)', borderRadius: 2, maxBarThickness: 6 },
+                        { label: 'CA1', data: [], backgroundColor: 'rgba(59, 130, 246, 0.85)', borderRadius: 2, maxBarThickness: 6 },
+                        { label: 'MC1', data: [], backgroundColor: 'rgba(245, 158, 11, 0.85)', borderRadius: 2, maxBarThickness: 6 },
+                        { label: 'CA2', data: [], backgroundColor: 'rgba(99, 102, 241, 0.85)', borderRadius: 2, maxBarThickness: 6 },
+                        { label: 'MC2', data: [], backgroundColor: 'rgba(249, 115, 22, 0.85)', borderRadius: 2, maxBarThickness: 6 },
+                        { label: 'Exam', data: [], backgroundColor: 'rgba(244, 63, 94, 0.85)', borderRadius: 2, maxBarThickness: 6 },
+                        { label: 'Final', data: [], backgroundColor: 'rgba(139, 92, 246, 0.85)', borderRadius: 2, maxBarThickness: 8 }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false } // Custom legend is in HTML
-                    },
+                    plugins: { legend: { display: false } },
                     scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#94a3b8', font: { size: 10 } }
-                        },
-                        y: {
-                            min: 0,
-                            max: 100,
-                            grid: { color: '#1e293b' },
-                            ticks: { color: '#94a3b8', font: { size: 9 } }
-                        }
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 9 } } },
+                        y: { min: 0, max: 100, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 9 } } }
                     }
                 }
             });
         }
 
-        // Update Group comparative chart data
         function updateGroupChart() {
             if (!groupChart) return;
 
-            // Sort students alphabetically to maintain graph structure
             const sorted = [...students].sort((a, b) => a.name.localeCompare(b.name));
-
-            const names = sorted.map(s => {
-                const parts = s.name.split(' ');
-                if (parts.length >= 2) return `${parts[0]} ${parts[1][0]}.`;
-                return s.name;
-            });
-
-            const attendanceData = sorted.map(s => s.attendance);
-            const activityData = sorted.map(s => s.activity);
-            const examData = sorted.map(s => s.exam);
-            const finalData = sorted.map(s => calculateWeightedScore(s.attendance, s.activity, s.exam));
+            const names = sorted.map(s => s.name.replace('Student XXX ', '#'));
 
             groupChart.data.labels = names;
-            groupChart.data.datasets[0].data = attendanceData;
-            groupChart.data.datasets[1].data = activityData;
-            groupChart.data.datasets[2].data = examData;
-            groupChart.data.datasets[3].data = finalData;
+            groupChart.data.datasets[0].data = sorted.map(s => s.attendance);
+            groupChart.data.datasets[1].data = sorted.map(s => s.activities || 0);
+            groupChart.data.datasets[2].data = sorted.map(s => s.ca1 || 0);
+            groupChart.data.datasets[3].data = sorted.map(s => s.mc1 || 0);
+            groupChart.data.datasets[4].data = sorted.map(s => s.ca2 || 0);
+            groupChart.data.datasets[5].data = sorted.map(s => s.mc2 || 0);
+            groupChart.data.datasets[6].data = sorted.map(s => s.exam || 0);
+            groupChart.data.datasets[7].data = sorted.map(s => calculateWeightedScore(s.attendance, s.activities, s.ca1, s.mc1, s.ca2, s.mc2, s.exam));
 
             groupChart.update();
         }
 
-        // Global refresh action
         function updateDashboardData() {
             renderTeacherTable();
             updateStats();
             updateGroupChart();
         }
 
-        // Toggle collapse student detailed attendance
         function toggleStudentAttDetails() {
             const container = document.getElementById('student-att-details');
             const toggleIcon = document.getElementById('student-att-toggle-icon');
             if (container.classList.contains('hidden')) {
                 container.classList.remove('hidden');
-                toggleIcon.textContent = "Свернуть ▴";
+                toggleIcon.textContent = "Collapse ▴";
             } else {
                 container.classList.add('hidden');
-                toggleIcon.textContent = "Развернуть ▾";
+                toggleIcon.textContent = "Expand ▾";
             }
         }
 
-        // Render attendance details checklist in Student dashboard view
         function renderStudentAttendanceDetails(student) {
             ensureAttendanceHours(student);
             const grid = document.getElementById('student-att-list-grid');
@@ -1167,10 +1142,10 @@
                     </span>
                     <div class="flex items-center space-x-2">
                         <span class="px-2 py-1 rounded font-semibold text-[10px] flex items-center gap-1 ${h1 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-950 text-slate-600 border border-slate-800'}">
-                            1-й ч: ${h1 ? '<i class="fa-solid fa-check text-[9px]"></i>' : '<i class="fa-solid fa-xmark text-[9px]"></i>'}
+                            Hour 1: ${h1 ? '<i class="fa-solid fa-check text-[9px]"></i>' : '<i class="fa-solid fa-xmark text-[9px]"></i>'}
                         </span>
                         <span class="px-2 py-1 rounded font-semibold text-[10px] flex items-center gap-1 ${h2 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-950 text-slate-600 border border-slate-800'}">
-                            2-й ч: ${h2 ? '<i class="fa-solid fa-check text-[9px]"></i>' : '<i class="fa-solid fa-xmark text-[9px]"></i>'}
+                            Hour 2: ${h2 ? '<i class="fa-solid fa-check text-[9px]"></i>' : '<i class="fa-solid fa-xmark text-[9px]"></i>'}
                         </span>
                     </div>
                 `;
@@ -1178,7 +1153,6 @@
             });
         }
 
-        // Open detailed attendance hour checklist modal (Teacher panel)
         function openAttendanceModal(studentId) {
             const student = students.find(s => s.id === studentId);
             if (!student) return;
@@ -1190,7 +1164,6 @@
             document.getElementById('att-modal-student-name').textContent = student.name;
             updateAttendanceModalStats();
 
-            // Build checkboxes inside popup list
             const grid = document.getElementById('attendance-dates-grid');
             grid.innerHTML = '';
 
@@ -1208,10 +1181,10 @@
                     </span>
                     <div class="flex items-center space-x-3">
                         <button onclick="toggleTempHour(${h1Idx})" id="temp-chk-${h1Idx}" class="px-3 py-1.5 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1.5">
-                            Час 1
+                            Hour 1
                         </button>
                         <button onclick="toggleTempHour(${h2Idx})" id="temp-chk-${h2Idx}" class="px-3 py-1.5 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1.5">
-                            Час 2
+                            Hour 2
                         </button>
                     </div>
                 `;
@@ -1228,7 +1201,6 @@
             }, 10);
         }
 
-        // Close detailed attendance checklist modal
         function closeAttendanceModal() {
             const modal = document.getElementById('attendance-modal');
             modal.classList.add('opacity-0');
@@ -1239,28 +1211,25 @@
             activeEditingStudentId = null;
         }
 
-        // Toggle single temp checkbox in modal
         function toggleTempHour(idx) {
             tempAttendanceHours[idx] = !tempAttendanceHours[idx];
             updateTempHourButtonUI(idx);
             updateAttendanceModalStats();
         }
 
-        // Update checkbox visual appearance
         function updateTempHourButtonUI(idx) {
             const btn = document.getElementById(`temp-chk-${idx}`);
             if (!btn) return;
             const isChecked = tempAttendanceHours[idx];
             if (isChecked) {
                 btn.className = "px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-500/10 border-emerald-500/30 text-emerald-400 border transition-all flex items-center gap-1";
-                btn.innerHTML = `<i class="fa-solid fa-check"></i> Присутствует`;
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> Present`;
             } else {
                 btn.className = "px-3 py-1.5 rounded-lg text-[10px] font-bold bg-slate-950 border-slate-800 text-slate-500 border transition-all flex items-center gap-1";
-                btn.innerHTML = `<i class="fa-solid fa-xmark"></i> Отсутствует`;
+                btn.innerHTML = `<i class="fa-solid fa-xmark"></i> Absent`;
             }
         }
 
-        // Quick select/unselect all hours inside modal
         function toggleAllAttendance(status) {
             for (let i = 0; i < 20; i++) {
                 tempAttendanceHours[i] = status;
@@ -1269,15 +1238,13 @@
             updateAttendanceModalStats();
         }
 
-        // Recalculate helper for modal header progress
         function updateAttendanceModalStats() {
             const checkedCount = tempAttendanceHours.filter(Boolean).length;
-            const percent = checkedCount * 5; // 20 hours = 100% total, so 5% per hour
+            const percent = checkedCount * 5;
             document.getElementById('att-modal-percent').textContent = `${percent}%`;
-            document.getElementById('att-modal-hours').textContent = `(${checkedCount} из 20 ч)`;
+            document.getElementById('att-modal-hours').textContent = `(${checkedCount} of 20 hrs)`;
         }
 
-        // Save detailed checklists back to database state and calculate overall percentage
         function saveAttendanceDetails() {
             if (!activeEditingStudentId) return;
 
@@ -1289,55 +1256,60 @@
 
                 saveDatabase();
                 
-                // Rapid live UI recalculation
-                const finalScore = calculateWeightedScore(student.attendance, student.activity, student.exam);
+                const finalScore = calculateWeightedScore(
+                    student.attendance, 
+                    student.activities,
+                    student.ca1, 
+                    student.mc1, 
+                    student.ca2, 
+                    student.mc2, 
+                    student.exam
+                );
                 document.getElementById(`final-score-${student.id}`).textContent = finalScore;
                 
                 const gradeInfo = getLetterGrade(finalScore);
                 const letterBadge = document.getElementById(`letter-${student.id}`);
                 letterBadge.textContent = gradeInfo.letter;
-                letterBadge.className = `inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold rounded-lg border ${gradeInfo.class} w-12`;
+                letterBadge.className = `inline-flex items-center justify-center px-2 py-0.5 text-[11px] font-bold rounded-lg border ${gradeInfo.class} w-10`;
                 
-                // Refresh table cells
                 const attTriggerBtn = document.getElementById(`att-trigger-${student.id}`);
                 if (attTriggerBtn) {
-                    attTriggerBtn.innerHTML = `<span>${student.attendance}%</span><i class="fa-solid fa-pencil text-[9px] text-slate-500"></i>`;
+                    attTriggerBtn.innerHTML = `<span>${student.attendance}%</span><i class="fa-solid fa-pencil text-[8px] text-slate-500"></i>`;
                 }
 
                 updateStats();
                 updateGroupChart();
                 closeAttendanceModal();
-                showToast(`Посещаемость студента ${student.name} успешно сохранена.`, 'success');
+                showToast(`Attendance updated for ${student.name}.`, 'success');
             }
         }
 
-        // Single student registration action
         function addSingleStudent() {
             const nameInput = document.getElementById('add-student-name');
             const attInput = document.getElementById('add-student-attendance');
-            const actInput = document.getElementById('add-student-activity');
+            const actInput = document.getElementById('add-student-activities');
+            const ca1Input = document.getElementById('add-student-ca1');
+            const mc1Input = document.getElementById('add-student-mc1');
+            const ca2Input = document.getElementById('add-student-ca2');
+            const mc2Input = document.getElementById('add-student-mc2');
             const exmInput = document.getElementById('add-student-exam');
 
             const name = nameInput.value.trim();
             if (!name) {
-                showToast('Укажите ФИО слушателя!', 'error');
+                showToast('Please specify student Full Name!', 'error');
                 return;
             }
-
-            let att = parseInt(attInput.value) || 0;
-            let act = parseInt(actInput.value) || 0;
-            let exm = parseInt(exmInput.value) || 0;
-
-            att = Math.max(0, Math.min(100, att));
-            act = Math.max(0, Math.min(100, act));
-            exm = Math.max(0, Math.min(100, exm));
 
             const newStudent = {
                 id: 'st-' + Date.now(),
                 name,
-                attendance: att,
-                activity: act,
-                exam: exm
+                attendance: Math.max(0, Math.min(100, parseInt(attInput.value) || 0)),
+                activities: Math.max(0, Math.min(100, parseInt(actInput.value) || 0)),
+                ca1: Math.max(0, Math.min(100, parseInt(ca1Input.value) || 0)),
+                mc1: Math.max(0, Math.min(100, parseInt(mc1Input.value) || 0)),
+                ca2: Math.max(0, Math.min(100, parseInt(ca2Input.value) || 0)),
+                mc2: Math.max(0, Math.min(100, parseInt(mc2Input.value) || 0)),
+                exam: Math.max(0, Math.min(100, parseInt(exmInput.value) || 0))
             };
 
             ensureAttendanceHours(newStudent);
@@ -1348,18 +1320,21 @@
             nameInput.value = '';
             attInput.value = '';
             actInput.value = '';
+            ca1Input.value = '';
+            mc1Input.value = '';
+            ca2Input.value = '';
+            mc2Input.value = '';
             exmInput.value = '';
 
-            showToast(`Слушатель ${name} внесен в ведомость!`, 'success');
+            showToast(`Student ${name} added!`, 'success');
         }
 
-        // Bulk imports textbox processor
         function runBulkImport() {
             const textarea = document.getElementById('bulk-import-area');
             const text = textarea.value.trim();
 
             if (!text) {
-                showToast('Введите ФИО (каждый студент на новой строке)!', 'error');
+                showToast('Enter student names (one per line)!', 'error');
                 return;
             }
 
@@ -1373,7 +1348,11 @@
                         id: 'st-' + Date.now() + Math.random().toString(36).substr(2, 4),
                         name: cleanName,
                         attendance: 0,
-                        activity: 0,
+                        activities: 0,
+                        ca1: 0,
+                        mc1: 0,
+                        ca2: 0,
+                        mc2: 0,
                         exam: 0
                     };
                     ensureAttendanceHours(newSt);
@@ -1386,13 +1365,12 @@
                 saveDatabase();
                 updateDashboardData();
                 textarea.value = '';
-                showToast(`Успешно импортировано слушателей: ${counter}`, 'success');
+                showToast(`Successfully imported: ${counter} students`, 'success');
             } else {
-                showToast('Не найдено корректных строк для импорта', 'error');
+                showToast('No valid lines found for import', 'error');
             }
         }
 
-        // Delete single student
         function deleteStudent(id) {
             const index = students.findIndex(s => s.id === id);
             if (index !== -1) {
@@ -1400,11 +1378,10 @@
                 students.splice(index, 1);
                 saveDatabase();
                 updateDashboardData();
-                showToast(`Слушатель ${name} удален из журнала.`, 'info');
+                showToast(`Student ${name} removed from register.`, 'info');
             }
         }
 
-        // Confirmation modals controls
         function confirmReset() {
             const modal = document.getElementById('confirm-modal');
             modal.classList.remove('hidden');
@@ -1423,43 +1400,40 @@
             }, 200);
         }
 
-        // Reset database back to empty
         function resetAllData() {
             students = [];
             saveDatabase();
             updateDashboardData();
             closeConfirmModal();
-            showToast('Ведомость группы успешно очищена', 'info');
+            showToast('Gradebook reset completed.', 'info');
         }
 
-        // CSV Exporter for spreadsheet analysis
         function exportToCSV() {
             if (students.length === 0) {
-                showToast('Ведомость пуста. Нечего экспортировать!', 'error');
+                showToast('Gradebook is empty!', 'error');
                 return;
             }
 
-            let csvContent = "\uFEFF"; // BOM UTF-8 for Excel compliance
-            csvContent += "Ф.И.О. Слушателя;Посещение (30%);Активность (30%);Экзамен (40%);Итог;Грейд\n";
+            let csvContent = "\uFEFF";
+            csvContent += "Student Name;Attendance (10%);Activities (10%);CA1 (10%);MC1 (10%);CA2 (10%);MC2 (10%);Exam (40%);Total Score;Grade\n";
 
             students.forEach(s => {
-                const final = calculateWeightedScore(s.attendance, s.activity, s.exam);
+                const final = calculateWeightedScore(s.attendance, s.activities, s.ca1, s.mc1, s.ca2, s.mc2, s.exam);
                 const letter = getLetterGrade(final).letter;
-                csvContent += `"${s.name.replace(/"/g, '""')}";${s.attendance};${s.activity};${s.exam};${final};${letter}\n`;
+                csvContent += `"${s.name.replace(/"/g, '""')}";${s.attendance};${s.activities || 0};${s.ca1 || 0};${s.mc1 || 0};${s.ca2 || 0};${s.mc2 || 0};${s.exam || 0};${final};${letter}\n`;
             });
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement("a");
             link.setAttribute("href", url);
-            link.setAttribute("download", "MBA_ALMAU_Economics_Grades.csv");
+            link.setAttribute("download", "ALMAU_Principles_of_Economics_Grades.csv");
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('Экспорт ведомости в Excel завершен!', 'success');
+            showToast('Export to Excel completed!', 'success');
         }
 
-        // Toast notifications logic
         function showToast(message, type = 'info') {
             const container = document.getElementById('toast-container');
             const toast = document.createElement('div');
