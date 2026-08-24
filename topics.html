@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Topics | Principles of Economics</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px 20px;
+            position: relative;
+        }
+
+        .top-left-logo {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        /* Кнопка "Назад" на главный дашборд */
+        .back-button {
+            position: absolute;
+            top: 35px;
+            right: 30px;
+            text-decoration: none;
+            background-color: #001e50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #003380;
+        }
+
+        header {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #001e50;
+            margin-bottom: 8px;
+            margin-top: 20px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #555555;
+            max-width: 650px;
+            line-height: 1.5;
+            margin: 0 auto;
+        }
+
+        /* Сетка для 14 карточек (выстраивает до 7 карточек в ряд) */
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1400px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 40px;
+        }
+
+        /* ЕДИНАЯ РАМКА ДЛЯ ВСЕХ 14 КАРТОЧЕК */
+        .card {
+            display: inline-block;
+            text-decoration: none;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* Жесткие одинаковые размеры */
+            width: 160px; 
+            height: 250px; 
+        }
+
+        /* Автоматическое выравнивание сжатых/вытянутых картинок */
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill; /* Принудительно растягивает картинки ровно под размер карточки */
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        /* Эффект при наведении (увеличение и тень) */
+        .card:hover {
+            transform: translateY(-8px) scale(1.03);
+            border-color: #001e50;
+            box-shadow: 0 16px 30px rgba(0, 30, 80, 0.15);
+        }
+
+        footer {
+            margin-top: auto;
+            font-size: 14px;
+            color: #718096;
+            padding-top: 30px;
+            padding-bottom: 20px;
+            text-align: center;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Логотип AlmaU -->
+    <img src="https://ogaydv-prog.github.io/principles-economics/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    
+    <!-- Кнопка возврата на главный дашборд -->
+    <a href="https://ogaydv-prog.github.io/principles-economics/index.html" class="back-button">← Back to Dashboard</a>
+
+    <header>
+        <h1>Course Topics</h1>
+        <p class="subtitle">
+            Explore the 14 fundamental topics of Principles of Economics
+        </p>
+    </header>
+
+    <main class="grid-container">
+        <!-- 14 карточек с вашими именами файлов -->
+        <a href="#" class="card" title="Topic 1"><img src="pic-top1.png" alt="Topic 1"></a>
+        <a href="#" class="card" title="Topic 2"><img src="pic-top2.png" alt="Topic 2"></a>
+        <a href="#" class="card" title="Topic 3"><img src="pic-top3.png" alt="Topic 3"></a>
+        <a href="#" class="card" title="Topic 4"><img src="pic-top4.png" alt="Topic 4"></a>
+        <a href="#" class="card" title="Topic 5"><img src="pic-top5.png" alt="Topic 5"></a>
+        <a href="#" class="card" title="Topic 6"><img src="pic-top6.png" alt="Topic 6"></a>
+        <a href="#" class="card" title="Topic 7"><img src="pic-top7.png" alt="Topic 7"></a>
+        
+        <a href="#" class="card" title="Topic 8"><img src="pic-top8.png" alt="Topic 8"></a>
+        <a href="#" class="card" title="Topic 9"><img src="pic-top9.png" alt="Topic 9"></a>
+        <a href="#" class="card" title="Topic 10"><img src="pic-top10.png" alt="Topic 10"></a>
+        <a href="#" class="card" title="Topic 11"><img src="pic-top11.png" alt="Topic 11"></a>
+        <a href="#" class="card" title="Topic 12"><img src="pic-top12.png" alt="Topic 12"></a>
+        <a href="#" class="card" title="Topic 13"><img src="pic-top13.png" alt="Topic 13"></a>
+        <a href="#" class="card" title="Topic 14"><img src="pic-top14.png" alt="Topic 14"></a>
+    </main>
+
+    <footer>
+        <p>Developed for International Business Team AlmaU 2026 | Course: Principles of Economics</p>
+        <p>© Almaty Management University | School of Digital Technologies & Economics</p>
+    </footer>
+
+</body>
+</html>
