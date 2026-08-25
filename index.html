@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Principles of Economics Dashboard | AlmaU</title>
+    <title>Principles of Economics Dashboard | AlmaU SE</title>
     <style>
         * {
             box-sizing: border-box;
@@ -35,20 +35,7 @@
         header {
             text-align: center;
             margin-top: 10px;
-            margin-bottom: 20px;
-        }
-
-        .badge {
-            display: inline-block;
-            background-color: #f0f4f8;
-            color: #001e50;
-            font-size: 13px;
-            font-weight: 600;
-            padding: 6px 16px;
-            border-radius: 20px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-bottom: 25px;
         }
 
         h1 {
@@ -56,6 +43,7 @@
             font-weight: 700;
             color: #001e50;
             margin-bottom: 12px;
+            margin-top: 20px;
         }
 
         .subtitle {
@@ -66,6 +54,7 @@
             margin: 0 auto;
         }
 
+        /* Сетка для 10 карточек */
         .grid-container {
             display: flex;
             flex-wrap: wrap;
@@ -74,46 +63,60 @@
             width: 100%;
             justify-content: center;
             align-items: center;
+            padding-bottom: 30px;
         }
 
-        /* Единая строго одинаковая рамка для ВСЕХ 10 карточек */
+        /* Строго одинаковые пропорции карточек */
         .card {
             display: inline-block;
             text-decoration: none;
             background: #ffffff;
             border: 2px solid #e2e8f0;
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 190px;  /* Фиксированная ширина */
-            height: 240px; /* Фиксированная высота */
+            width: 190px;
+            height: 250px;
+            position: relative;
         }
 
         .card img {
             width: 100%;
             height: 100%;
-            object-fit: fill; /* Заполняет рамку целиком БЕЗ обрезки деталей */
+            object-fit: fill; /* Заполняет рамку ровно без обрезки */
             display: block;
             transition: transform 0.3s ease;
         }
 
-        /* Hover Effect */
         .card:hover {
             transform: translateY(-8px) scale(1.03);
             border-color: #001e50;
-            box-shadow: 0 16px 30px rgba(0, 30, 80, 0.15);
+            box-shadow: 0 16px 30px rgba(0, 30, 80, 0.18);
         }
 
         .card:hover img {
-            transform: scale(1.03);
+            transform: scale(1.02);
+        }
+
+        /* Карточки без активных ссылок */
+        .card.disabled {
+            cursor: default;
+            opacity: 0.85;
+        }
+
+        .card.disabled:hover {
+            transform: none;
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
         }
 
         footer {
             margin-top: auto;
             font-size: 14px;
             color: #718096;
-            padding-top: 50px;
+            padding-top: 30px;
+            padding-bottom: 20px;
             text-align: center;
             line-height: 1.6;
         }
@@ -124,48 +127,67 @@
     <img src="https://ogaydv-prog.github.io/principles-economics/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
 
     <header>
-        <h1 style="margin-top: 20px;">Principles of Economics</h1>
-        <p class="subtitle" style="margin-bottom: 10px;">
-            Interactive Learning Hub | International Business Team 2026 <br>
-            Almaty Management University 
+        <h1>Principles of Economics</h1>
+        <p class="subtitle">
+            Interactive Learning Hub | Software Engineering (SE) 2026 <br>
+            Almaty Management University
         </p>
     </header>
 
     <main class="grid-container">
-        <a href="https://ogaydv-prog.github.io/principles-economics/topics.html" class="card" title="Course Topics">
-            <img src="https://ogaydv-prog.github.io/principles-economics/pic-topics.png" alt="Course Topics">
+        <!-- 1. Topics -->
+        <a href="topics.html" class="card" title="Course Topics">
+            <img src="pic-topics-se.png" alt="Course Topics">
         </a>
-        <a href="https://ogaydv-prog.github.io/principles-economics/syllabus.html" class="card" title="Syllabus">
-            <img src="https://ogaydv-prog.github.io/principles-economics/pic-sill.png" alt="Syllabus">
+
+        <!-- 2. Syllabus -->
+        <a href="syllabus.html" class="card" title="Syllabus">
+            <img src="pic-sill-se.png" alt="Syllabus">
         </a>
+
+        <!-- 3. Textbooks -->
         <a href="https://drive.google.com/file/d/1kUkhmBb-sgYD5qQoQza12CgiUu6R9dEE/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="card" title="Textbooks & Literature">
-            <img src="https://ogaydv-prog.github.io/principles-economics/pic-books.png" alt="Textbooks & Literature">
+            <img src="pic-book-se.png" alt="Textbooks & Literature">
         </a>
+
+        <!-- 4. Glossary -->
         <a href="https://www.economist.com/economics-a-to-z" target="_blank" rel="noopener noreferrer" class="card" title="Glossary">
-            <img src="https://ogaydv-prog.github.io/principles-economics/pic-glos.png" alt="Glossary">
+            <img src="pic-gloss-se.png" alt="Glossary">
         </a>
+
+        <!-- 5. Economic News (Coming soon) -->
+        <div class="card disabled" title="Economic News - Coming Soon">
+            <img src="pic-news-se.png" alt="Economic News">
+        </div>
+
+        <!-- 6. Video Materials -->
         <a href="https://www.youtube.com/watch?v=NdbbcO35arw" target="_blank" rel="noopener noreferrer" class="card" title="Video Lectures">
-            <img src="https://ogaydv-prog.github.io/principles-economics/pic-video.png" alt="Video Lectures">
+            <img src="pic-video-se.png" alt="Video Lectures">
         </a>
-        <a href="https://ogaydv-prog.github.io/principles-economics/ibn.html" class="card" title="International Business News">
-            <img src="https://ogaydv-prog.github.io/principles-economics/pic-ibn.png" alt="International Business News">
-        </a>
-        <a href="https://ogaydv-prog.github.io/principles-economics/mc1.html" class="card" title="Midterm Control 1">
-            <img src="https://ogaydv-prog.github.io/principles-economics/pic-mc1.png" alt="Midterm Control 1">
-        </a>
-        <a href="https://ogaydv-prog.github.io/principles-economics/mc2.html" class="card" title="Midterm Control 2">
-            <img src="https://ogaydv-prog.github.io/principles-economics/pic-mc2.png" alt="Midterm Control 2">
-        </a>
-        <a href="https://ogaydv-prog.github.io/principles-economics/exam.html" class="card" title="Final Exam Preparation">
-            <img src="https://ogaydv-prog.github.io/principles-economics/pic-exam.png" alt="Final Exam Preparation">
-        </a>
-        <a href="https://ogaydv-prog.github.io/principles-economics/grade.html" class="card" title="Grading & Evaluation">
-            <img src="https://ogaydv-prog.github.io/principles-economics/pic-grade.png" alt="Grading & Evaluation">
+
+        <!-- 7. Midterm Control 1 (Coming soon) -->
+        <div class="card disabled" title="Midterm Control 1 - Coming Soon">
+            <img src="pic-mc1-se.png" alt="Midterm Control 1">
+        </div>
+
+        <!-- 8. Midterm Control 2 (Coming soon) -->
+        <div class="card disabled" title="Midterm Control 2 - Coming Soon">
+            <img src="pic-mc2-se.png" alt="Midterm Control 2">
+        </div>
+
+        <!-- 9. Final Exam (Coming soon) -->
+        <div class="card disabled" title="Final Exam - Coming Soon">
+            <img src="pic-exam-se.png" alt="Final Exam Preparation">
+        </div>
+
+        <!-- 10. Grade -->
+        <a href="grade.html" class="card" title="Grading & Evaluation">
+            <img src="pic-grade-se.png" alt="Grading & Evaluation">
         </a>
     </main>
 
     <footer>
-        <p>Developed for International Business Team AlmaU 2026 | Course: Principles of Economics</p>
+        <p>Developed for Software Engineering Team AlmaU 2026 | Course: Principles of Economics</p>
         <p>© Almaty Management University | School of Digital Technologies & Economics</p>
     </footer>
 
