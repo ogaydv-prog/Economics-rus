@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradebook & Attendance | Principles of Economics (SE)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .top-left-logo {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            text-decoration: none;
+            background-color: #001e50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #003380;
+        }
+
+        header {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #001e50;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #64748b;
+        }
+
+        /* Форма ввода пароля */
+        .auth-container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.06);
+            border: 1px solid #e2e8f0;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .auth-container input {
+            width: 100%;
+            padding: 10px;
+            margin: 15px 0;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .auth-container button {
+            background-color: #001e50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease;
+        }
+
+        .auth-container button:hover {
+            background-color: #003380;
+        }
+
+        .error-msg {
+            color: #e53e3e;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Таблица оценок */
+        .gradebook-container {
+            display: none;
+            width: 100%;
+            max-width: 1200px;
+            background: #ffffff;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 8px 10px;
+            text-align: center;
+            font-size: 13px;
+        }
+
+        th {
+            background-color: #001e50;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        td.student-name {
+            text-align: left;
+            font-weight: 600;
+            color: #001e50;
+        }
+
+        .badge-present {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .badge-absent {
+            color: #c62828;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: auto;
+            font-size: 14px;
+            color: #718096;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="https://ogaydv-prog.github.io/principles-economics/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    <a href="index.html" class="back-button">← Back to Dashboard</a>
+
+    <header>
+        <h1>Grading & Attendance Dashboard</h1>
+        <p class="subtitle">Software Engineering (SE) | Principles of Economics 2026</p>
+    </header>
+
+    <!-- Окно авторизации -->
+    <div id="authBox" class="auth-container">
+        <h3>Instructor Access</h3>
+        <p style="font-size: 13px; color: #64748b; margin-top: 5px;">Enter security code to view class record</p>
+        <input type="password" id="passInput" placeholder="Enter Password">
+        <button onclick="checkPassword()">Access Gradebook</button>
+        <div id="errorMsg" class="error-msg">Incorrect password. Please try again.</div>
+    </div>
+
+    <!-- Журнал оценок -->
+    <div id="gradebook" class="gradebook-container">
+        <h2 style="color: #001e50; margin-bottom: 15px; font-size: 20px;">Student Performance Roster (10 Students)</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Student Name</th>
+                    <th>Classroom Attendance<br>(15 Hours)</th>
+                    <th>Online Attendance<br>(15 Hours)</th>
+                    <th>RK 1 (50%)</th>
+                    <th>RK 2 (50%)</th>
+                    <th>Rating Score</th>
+                    <th>Final Exam</th>
+                    <th>Total Grade</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td class="student-name">Student 01</td>
+                    <td>14 / 15</td>
+                    <td>15 / 15</td>
+                    <td>88</td>
+                    <td>92</td>
+                    <td>90.0</td>
+                    <td>90</td>
+                    <td><strong>90.0 (A-)</strong></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td class="student-name">Student 02</td>
+                    <td>15 / 15</td>
+                    <td>14 / 15</td>
+                    <td>95</td>
+                    <td>94</td>
+                    <td>94.5</td>
+                    <td>95</td>
+                    <td><strong>94.7 (A)</strong></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td class="student-name">Student 03</td>
+                    <td>13 / 15</td>
+                    <td>13 / 15</td>
+                    <td>78</td>
+                    <td>82</td>
+                    <td>80.0</td>
+                    <td>85</td>
+                    <td><strong>82.0 (B)</strong></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td class="student-name">Student 04</td>
+                    <td>15 / 15</td>
+                    <td>15 / 15</td>
+                    <td>90</td>
+                    <td>90</td>
+                    <td>90.0</td>
+                    <td>88</td>
+                    <td><strong>89.2 (B+)</strong></td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td class="student-name">Student 05</td>
+                    <td>12 / 15</td>
+                    <td>14 / 15</td>
+                    <td>70</td>
+                    <td>75</td>
+                    <td>72.5</td>
+                    <td>78</td>
+                    <td><strong>74.7 (C+)</strong></td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td class="student-name">Student 06</td>
+                    <td>15 / 15</td>
+                    <td>15 / 15</td>
+                    <td>100</td>
+                    <td>96</td>
+                    <td>98.0</td>
+                    <td>95</td>
+                    <td><strong>96.8 (A)</strong></td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td class="student-name">Student 07</td>
+                    <td>14 / 15</td>
+                    <td>13 / 15</td>
+                    <td>82</td>
+                    <td>80</td>
+                    <td>81.0</td>
+                    <td>84</td>
+                    <td><strong>82.2 (B)</strong></td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td class="student-name">Student 08</td>
+                    <td>11 / 15</td>
+                    <td>12 / 15</td>
+                    <td>65</td>
+                    <td>68</td>
+                    <td>66.5</td>
+                    <td>70</td>
+                    <td><strong>67.9 (C)</strong></td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td class="student-name">Student 09</td>
+                    <td>15 / 15</td>
+                    <td>14 / 15</td>
+                    <td>91</td>
+                    <td>89</td>
+                    <td>90.0</td>
+                    <td>92</td>
+                    <td><strong>90.8 (A-)</strong></td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td class="student-name">Student 10</td>
+                    <td>13 / 15</td>
+                    <td>15 / 15</td>
+                    <td>85</td>
+                    <td>87</td>
+                    <td>86.0</td>
+                    <td>85</td>
+                    <td><strong>85.6 (B+)</strong></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <footer>
+        <p>© Almaty Management University | School of Digital Technologies & Economics 2026</p>
+    </footer>
+
+    <script>
+        function checkPassword() {
+            const pass = document.getElementById('passInput').value;
+            const errorMsg = document.getElementById('errorMsg');
+            
+            if (pass === 'SE-12092026') {
+                document.getElementById('authBox').style.display = 'none';
+                document.getElementById('gradebook').style.display = 'block';
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+    </script>
+
+</body>
+</html>
