@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circular Flow of Resources and Income Model</title>
+    <!-- Google Fonts & Tailwind CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at center, #0f1322 0%, #05060a 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Neon Gray Box Styling */
+        .neon-box {
+            background: #0d0f17;
+            border: 1.5px solid rgba(197, 160, 89, 0.25);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.6);
+            transition: all 0.3s ease;
+        }
+        .neon-box:hover {
+            border-color: rgba(197, 160, 89, 0.45);
+        }
+        /* Pulse Animation */
+        @keyframes click-glow-pulse {
+            0% { filter: drop-shadow(0 0 3px rgba(197, 160, 89, 0.4)); }
+            50% { filter: drop-shadow(0 0 20px rgba(197, 160, 89, 0.9)); }
+            100% { filter: drop-shadow(0 0 3px rgba(197, 160, 89, 0.4)); }
+        }
+        .node-clickable {
+            animation: click-glow-pulse 1.6s infinite ease-in-out;
+            cursor: pointer;
+        }
+        /* Red Arrow Blink Animation */
+        @keyframes red-arrow-blink {
+            0%, 100% { stroke: #ef4444; filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.4)); opacity: 0.5; }
+            50% { stroke: #ff4d4d; filter: drop-shadow(0 0 20px #ff0000); opacity: 1; stroke-width: 9; }
+        }
+        .blink-red-arrow {
+            animation: red-arrow-blink 0.8s infinite ease-in-out !important;
+        }
+        /* Yellow Arrow Blink Animation */
+        @keyframes yellow-arrow-blink {
+            0%, 100% { stroke: #d97706; filter: drop-shadow(0 0 2px rgba(197, 160, 89, 0.4)); opacity: 0.5; }
+            50% { stroke: #fbbf24; filter: drop-shadow(0 0 16px #fbbf24); opacity: 1; stroke-width: 6; }
+        }
+        .blink-yellow-arrow {
+            animation: yellow-arrow-blink 0.8s infinite ease-in-out !important;
+        }
+        /* Yellow Arrow Soft Pulse Animation */
+        @keyframes yellow-arrow-pulse {
+            0%, 100% { stroke: #d97706; opacity: 0.6; }
+            50% { stroke: #fbbf24; opacity: 1; filter: drop-shadow(0 0 10px rgba(251, 191, 36, 0.7)); }
+        }
+        .pulse-yellow-arrow {
+            animation: yellow-arrow-pulse 1.5s infinite ease-in-out !important;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-4 flex flex-col justify-between min-h-screen">
+
+    <!-- Header Section -->
+    <header class="neon-box max-w-7xl mx-auto w-full p-3 rounded-2xl text-center mb-3">
+        <h1 class="text-xl md:text-2xl font-black text-[#c5a059] tracking-wider uppercase mb-0.5">
+            Circular Flow of Material and Monetary Resources in the Economy
+        </h1>
+        <p class="text-xs text-slate-300 font-bold tracking-widest">
+            Principles of Economics, International Business, Fall Semester 2026
+        </p>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-grow">
+        
+        <!-- Left Sidebar: Controls & Instructions -->
+        <section class="lg:col-span-3 neon-box p-4 rounded-xl flex flex-col justify-between space-y-4 text-xs">
+            <div>
+                <div class="flex items-center gap-2 border-b border-slate-700/60 pb-1.5 mb-3">
+                    <span class="text-lg">🗺️</span>
+                    <h2 class="text-xs font-bold text-[#c5a059] uppercase tracking-wider">Lecturer Control Panel</h2>
+                </div>
+
+                <div class="space-y-3">
+                    <div id="step-desc" class="p-3 bg-slate-900/80 rounded-lg border border-amber-500/20 text-slate-200 leading-relaxed text-[11px] font-medium">
+                        <strong class="text-amber-400 block mb-1">💡 Initial State:</strong>
+                        The economic system is in standby mode. 
+                        <br><br>
+                        <span class="text-yellow-400 font-black">👉 Click on Households (House icon)</span> to launch the circular flow!
+                    </div>
+
+                    <!-- Reset Button -->
+                    <button onclick="resetSimulation()" class="w-full bg-[#1b1e2a] hover:bg-[#272c3d] text-amber-400 font-bold py-2 px-3 rounded-lg border border-amber-500/30 transition-all text-center">
+                        🔄 Reset Simulation
+                    </button>
+                </div>
+            </div>
+
+            <!-- Theory Description Block -->
+            <div class="space-y-2">
+                <div class="p-2.5 bg-slate-900/60 border-l-2 border-[#c5a059] rounded-r text-[10px] text-slate-400 leading-relaxed">
+                    <span class="font-bold text-[#c5a059] block mb-0.5">MACROECONOMIC EQUILIBRIUM:</span>
+                    In a closed economy, total Spending identically equals total Income. Government intervention and global market integration reshape these flows through taxation and export-import operations.
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Section: SVG Canvas -->
+        <section class="lg:col-span-9 bg-[#0b0d19] p-2 rounded-2xl shadow-2xl border border-slate-800/80 flex flex-col justify-between relative text-slate-200 overflow-hidden">
+            <div class="relative w-full aspect-[4/3] rounded overflow-hidden flex-grow">
+                <svg viewBox="0 0 820 620" class="w-full h-full select-none" id="circ-svg">
+                    <defs>
+                        <!-- Glow filters -->
+                        <filter id="glow-gold" x="-25%" y="-25%" width="150%" height="150%">
+                            <feGaussianBlur stdDeviation="6" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                        <filter id="glow-red" x="-25%" y="-25%" width="150%" height="150%">
+                            <feGaussianBlur stdDeviation="5" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+
+                        <!-- Vector Markers -->
+                        <marker id="arrow-red-head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#ef4444" />
+                        </marker>
+                        <marker id="arrow-yellow-head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#fbbf24" />
+                        </marker>
+                        <marker id="arrow-green-head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#10b981" />
+                        </marker>
+                        <marker id="arrow-blue-head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                            <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#06b6d4" />
+                        </marker>
+
+                        <!-- Coin radial gradient -->
+                        <radialGradient id="gold-coin-grad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#fffbeb" />
+                            <stop offset="40%" stop-color="#fbbf24" />
+                            <stop offset="100%" stop-color="#b45309" />
+                        </radialGradient>
+
+                        <!-- Globe water gradient -->
+                        <radialGradient id="globe-water-grad" cx="40%" cy="40%" r="60%">
+                            <stop offset="0%" stop-color="#3b82f6" />
+                            <stop offset="70%" stop-color="#1d4ed8" />
+                            <stop offset="100%" stop-color="#1e3a8a" />
+                        </radialGradient>
+
+                        <!-- Mask elements -->
+                        <mask id="import-mask">
+                            <rect width="820" height="620" fill="black" />
+                            <path id="import-mask-path" d="M 788,303 L 788,85 L 470,85" fill="none" stroke="white" stroke-width="10" />
+                        </mask>
+                        <mask id="export-mask">
+                            <rect width="820" height="620" fill="black" />
+                            <path id="export-mask-path" d="M 788,303 L 788,515 L 470,515" fill="none" stroke="white" stroke-width="10" />
+                        </mask>
+                    </defs>
+
+                    <!-- INNER CIRCLE RED CURVES -->
+                    <path id="path-spending" d="M 430,128 A 175,175 0 0,1 573,275" fill="none" stroke="#ef4444" stroke-width="7.5" marker-end="url(#arrow-red-head)" />
+                    <path id="path-revenue" d="M 573,325 A 175,175 0 0,1 430,472" fill="none" stroke="#ef4444" stroke-width="7.5" marker-end="url(#arrow-red-head)" />
+                    <path id="path-costs" d="M 370,472 A 175,175 0 0,1 227,325" fill="none" stroke="#ef4444" stroke-width="7.5" marker-end="url(#arrow-red-head)" />
+                    <path id="path-income" d="M 227,275 A 175,175 0 0,1 370,128" fill="none" stroke="#ef4444" stroke-width="7.5" marker-end="url(#arrow-red-head)" />
+
+                    <!-- OUTER CIRCLE YELLOW CURVES -->
+                    <path id="path-goods" d="M 624,275 A 225,225 0 0,0 430,77" fill="none" stroke="#fbbf24" stroke-width="5" marker-end="url(#arrow-yellow-head)" />
+                    <path id="path-goods-sold" d="M 370,523 A 225,225 0 0,0 624,325" fill="none" stroke="#fbbf24" stroke-width="5" marker-end="url(#arrow-yellow-head)" />
+                    <path id="path-factors-out" d="M 370,77 A 225,225 0 0,0 176,275" fill="none" stroke="#fbbf24" stroke-width="5" marker-end="url(#arrow-yellow-head)" />
+                    <path id="path-factors-in" d="M 176,325 A 225,225 0 0,0 430,523" fill="none" stroke="#fbbf24" stroke-width="5" marker-end="url(#arrow-yellow-head)" />
+
+                    <!-- PATH LABELS -->
+                    <path id="label-spending" d="M 430,102 A 200,200 0 0,1 598,270" fill="none" />
+                    <text font-size="14" font-weight="900" fill="#f87171" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))" dy="4">
+                        <textPath href="#label-spending" startOffset="15%">Consumer Spending</textPath>
+                    </text>
+
+                    <path id="label-revenue" d="M 430,498 A 200,200 0 0,0 598,330" fill="none" />
+                    <text font-size="14" font-weight="900" fill="#f87171" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))" dy="4">
+                        <textPath href="#label-revenue" startOffset="18%">Business Revenue</textPath>
+                    </text>
+
+                    <path id="label-costs" d="M 202,330 A 200,200 0 0,0 370,498" fill="none" />
+                    <text font-size="14" font-weight="900" fill="#f87171" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))" dy="4">
+                        <textPath href="#label-costs" startOffset="10%">Wages, Rent, Interest</textPath>
+                    </text>
+
+                    <path id="label-income" d="M 202,270 A 200,200 0 0,1 370,102" fill="none" />
+                    <text font-size="14" font-weight="900" fill="#f87171" filter="drop-shadow(0 2px 4px rgba(0,0,0,0.9))" dy="4">
+                        <textPath href="#label-income" startOffset="12%">Household Income</textPath>
+                    </text>
+
+                    <!-- Outer Yellow Labels -->
+                    <text x="545" y="45" fill="#fbbf24" font-size="12" font-weight="extrabold" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.9))">Goods Consumption</text>
+                    <text x="545" y="565" fill="#fbbf24" font-size="12" font-weight="extrabold" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.9))">Finished Goods</text>
+                    <text x="125" y="45" fill="#fbbf24" font-size="12" font-weight="extrabold" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.9))">Factors of Production</text>
+                    <text x="125" y="565" fill="#fbbf24" font-size="12" font-weight="extrabold" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.9))">Factor Utilization</text>
+
+                    <!-- CENTRAL GOVERNMENT BLOCK -->
+                    <g transform="translate(325, 250)" id="node-government" onclick="clickGovernment()" class="node-clickable">
+                        <rect width="150" height="100" rx="14" fill="#1e293b" stroke="#0284c7" stroke-width="2.5" />
+                        <path d="M 35,80 L 115,80 M 35,32 L 115,32" stroke="#38bdf8" stroke-width="3" />
+                        <rect x="42" y="32" width="10" height="48" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+                        <rect x="62" y="32" width="10" height="48" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+                        <rect x="82" y="32" width="10" height="48" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+                        <rect x="102" y="32" width="10" height="48" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+                        <path d="M 25,32 L 75,8 L 125,32 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="2.5" />
+                        <text x="75" y="93" fill="#f8fafc" font-size="12" font-weight="extrabold" text-anchor="middle">Government</text>
+                    </g>
+
+                    <!-- TAX CHANNELS -->
+                    <g id="tax-h-gov" opacity="0">
+                        <path d="M 400,150 L 400,230" fill="none" stroke="#ef4444" stroke-width="4" marker-end="url(#arrow-red-head)" />
+                        <text x="415" y="195" fill="#ef4444" font-size="13" font-weight="900" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.9))">Taxes</text>
+                    </g>
+                    <g id="tax-f-gov" opacity="0">
+                        <path d="M 400,450 L 400,370" fill="none" stroke="#ef4444" stroke-width="4" marker-end="url(#arrow-red-head)" />
+                        <text x="415" y="415" fill="#ef4444" font-size="13" font-weight="900" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.9))">Taxes</text>
+                    </g>
+
+                    <!-- Government Regulation Paths -->
+                    <g id="regulation-left" opacity="0">
+                        <line x1="325" y1="300" x2="215" y2="300" stroke="#10b981" stroke-width="3.5" marker-end="url(#arrow-green-head)" />
+                        <text x="270" y="290" fill="#10b981" font-size="11" font-weight="900" text-anchor="middle" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.9))">Regulation</text>
+                    </g>
+                    <g id="regulation-right" opacity="0">
+                        <line x1="475" y1="300" x2="585" y2="300" stroke="#10b981" stroke-width="3.5" marker-end="url(#arrow-green-head)" />
+                        <text x="530" y="290" fill="#10b981" font-size="11" font-weight="900" text-anchor="middle" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.9))">Regulation</text>
+                    </g>
+
+                    <!-- HOUSEHOLDS -->
+                    <g transform="translate(330, 40)" id="node-households" class="node-clickable" onclick="clickHouse()">
+                        <rect width="140" height="100" rx="14" fill="#1e293b" stroke="#d97706" stroke-width="2.5" />
+                        <text x="70" y="24" fill="#f8fafc" font-size="12" font-weight="extrabold" text-anchor="middle">Households</text>
+                        <path d="M 30,62 L 70,32 L 110,62 Z" fill="#d97706" />
+                        <rect x="45" y="62" width="50" height="30" fill="#0f172a" stroke="#d97706" stroke-width="1.5" />
+                        <rect x="58" y="68" width="24" height="16" fill="#fef08a" rx="2" />
+                        <line x1="70" y1="68" x2="70" y2="84" stroke="#d97706" stroke-width="1" />
+                        <line x1="58" y1="76" x2="82" y2="76" stroke="#d97706" stroke-width="1" />
+                    </g>
+
+                    <!-- FIRMS -->
+                    <g transform="translate(330, 470)" id="node-firms" onclick="clickFirm()">
+                        <rect width="140" height="100" rx="14" fill="#1e293b" stroke="#c5a059" stroke-width="2.5" />
+                        <text x="70" y="24" fill="#f8fafc" font-size="12" font-weight="extrabold" text-anchor="middle">Firms</text>
+                        <rect x="35" y="62" width="70" height="30" fill="#0f172a" stroke="#c5a059" stroke-width="1.5" />
+                        <path d="M 35,62 L 50,42 L 50,62 L 65,42 L 65,62 L 80,42 L 80,62 L 105,42 L 105,62 Z" fill="#c5a059" />
+                        <rect x="60" y="72" width="20" height="20" fill="#1e293b" stroke="#c5a059" />
+                    </g>
+
+                    <!-- RESOURCE MARKET -->
+                    <g transform="translate(50, 275)" id="node-resource-market">
+                        <rect width="150" height="50" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="2.5" />
+                        <text x="75" y="30" fill="#a7f3d0" font-size="13" font-weight="900" text-anchor="middle">Resource Market</text>
+                    </g>
+
+                    <!-- PRODUCT MARKET -->
+                    <g transform="translate(590, 275)" id="node-product-market">
+                        <rect width="150" height="50" rx="10" fill="#1e293b" stroke="#3b82f6" stroke-width="2.5" />
+                        <text x="75" y="30" fill="#93c5fd" font-size="12" font-weight="900" text-anchor="middle">Product & Services Market</text>
+                    </g>
+
+                    <!-- TRADE CHANNELS -->
+                    <g id="trade-channels" opacity="0">
+                        <path id="path-import" d="M 788,303 L 788,85 L 470,85" fill="none" stroke="#06b6d4" stroke-width="3" stroke-dasharray="4,4" mask="url(#import-mask)" marker-end="url(#arrow-blue-head)" />
+                        <path id="path-export" d="M 788,303 L 788,515 L 470,515" fill="none" stroke="#f43f5e" stroke-width="3" stroke-dasharray="4,4" mask="url(#export-mask)" marker-end="url(#arrow-red-head)" />
+
+                        <path id="label-import-text" d="M 470,85 L 788,85" fill="none" />
+                        <path id="label-export-text" d="M 470,515 L 788,515" fill="none" />
+
+                        <text font-size="13" font-weight="black" fill="#22d3ee" dy="-6">
+                            <textPath href="#label-import-text" startOffset="50%" text-anchor="middle">Imports</textPath>
+                        </text>
+                        <text font-size="13" font-weight="black" fill="#f43f5e" dy="16">
+                            <textPath href="#label-export-text" startOffset="50%" text-anchor="middle">Exports</textPath>
+                        </text>
+                    </g>
+
+                    <!-- REST OF THE WORLD: EARTH GLOBE -->
+                    <g transform="translate(760, 275)" id="node-globe" onclick="clickGlobe()" class="node-clickable">
+                        <circle cx="28" cy="28" r="26" fill="url(#globe-water-grad)" stroke="#38bdf8" stroke-width="2" filter="drop-shadow(0 0 8px rgba(56, 189, 248, 0.5))" />
+                        <path d="M 10,22 Q 18,12 30,16 Q 38,20 44,12 Q 46,24 50,34 Q 36,41 32,31 Z" fill="#10b981" opacity="0.95" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.3))" />
+                        <path d="M 16,38 Q 22,46 28,46 Q 34,42 24,38 Z" fill="#10b981" opacity="0.95" filter="drop-shadow(0 1px 2px rgba(0,0,0,0.3))" />
+                        <text x="28" y="70" fill="#38bdf8" font-size="11" font-weight="black" text-anchor="middle">Rest of World</text>
+                    </g>
+
+                    <!-- DYNAMIC COIN LAYER -->
+                    <g id="coins-container"></g>
+                </svg>
+            </div>
+        </section>
+    </main>
+
+    <!-- Technical Footer -->
+    <footer class="text-center text-[10px] text-slate-500 mt-3 border-t border-slate-800/60 pt-2 font-bold tracking-wide">
+        Developed for International Business Students, AlmaU Fall Semester 2026.
+    </footer>
+
+    <!-- Simulation Engine Script -->
+    <script>
+        const svg = document.getElementById('circ-svg');
+        const coinsContainer = document.getElementById('coins-container');
+        const stepDesc = document.getElementById('step-desc');
+        
+        const nodeHouseholds = document.getElementById('node-households');
+        const nodeFirms = document.getElementById('node-firms');
+        const nodeGovernment = document.getElementById('node-government');
+        const nodeGlobe = document.getElementById('node-globe');
+
+        // Flow vector paths
+        const pathSpending = document.getElementById('path-spending');
+        const pathRevenue = document.getElementById('path-revenue');
+        const pathCosts = document.getElementById('path-costs');
+        const pathIncome = document.getElementById('path-income');
+        const pathGoods = document.getElementById('path-goods');
+        const pathGoodsSold = document.getElementById('path-goods-sold');
+        const pathFactorsOut = document.getElementById('path-factors-out');
+        const pathFactorsIn = document.getElementById('path-factors-in');
+        
+        // International trade vectors
+        const pathExport = document.getElementById('path-export');
+        const pathImport = document.getElementById('path-import');
+        const importMaskPath = document.getElementById('import-mask-path');
+        const exportMaskPath = document.getElementById('export-mask-path');
+
+        // Dynamic Elements
+        const taxH = document.getElementById('tax-h-gov');
+        const taxF = document.getElementById('tax-f-gov');
+        const regL = document.getElementById('regulation-left');
+        const regR = document.getElementById('regulation-right');
+        const tradeChannels = document.getElementById('trade-channels');
+
+        // Animation states
+        let simState = 0; // 0: Idle, 1: Households, 2: Firms, 3: Govt, 4: Globe
+        let animatedCoins = [];
+        let rAF_Timer = null;
+
+        function getPointOnPath(path, percent) {
+            const length = path.getTotalLength();
+            return path.getPointAtLength(length * percent);
+        }
+
+        function createCoin() {
+            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("r", "11");
+            circle.setAttribute("fill", "url(#gold-coin-grad)");
+            circle.setAttribute("stroke", "#d97706");
+            circle.setAttribute("stroke-width", "1.5");
+            
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute("dy", "4");
+            text.setAttribute("fill", "#451a03");
+            text.setAttribute("font-size", "12");
+            text.setAttribute("font-weight", "900");
+            text.textContent = "$";
+
+            g.appendChild(circle);
+            g.appendChild(text);
+            coinsContainer.appendChild(g);
+            return g;
+        }
+
+        function clearCoins() {
+            coinsContainer.innerHTML = "";
+            animatedCoins = [];
+        }
+
+        function clearBlinkingArrows() {
+            pathSpending.classList.remove('blink-red-arrow');
+            pathRevenue.classList.remove('blink-red-arrow');
+            pathCosts.classList.remove('blink-red-arrow');
+            pathIncome.classList.remove('blink-red-arrow');
+
+            pathGoods.classList.remove('pulse-yellow-arrow', 'blink-yellow-arrow');
+            pathGoodsSold.classList.remove('pulse-yellow-arrow', 'blink-yellow-arrow');
+            pathFactorsOut.classList.remove('pulse-yellow-arrow', 'blink-yellow-arrow');
+            pathFactorsIn.classList.remove('pulse-yellow-arrow', 'blink-yellow-arrow');
+        }
+
+        // PHASE 0: IDLE
+        function startIdle() {
+            cancelAnimationFrame(rAF_Timer);
+            clearCoins();
+            clearBlinkingArrows();
+            simState = 0;
+
+            nodeHouseholds.classList.add('node-clickable');
+            nodeFirms.classList.remove('node-clickable');
+
+            stepDesc.innerHTML = `
+                <strong class="text-amber-400 block mb-1">🔄 Standby Mode</strong>
+                System is ready. The circular flow is paused awaiting market impulse.
+                <br><br>
+                <span class="text-yellow-400 font-black">👉 Click on Households (House icon)</span> to launch the consumer spending flow!
+            `;
+
+            animatedCoins = [];
+        }
+
+        // PHASE 1: HOUSEHOLDS CLICKED
+        function clickHouse() {
+            if (simState !== 0) return;
+            cancelAnimationFrame(rAF_Timer);
+            clearCoins();
+            clearBlinkingArrows();
+
+            simState = 1;
+            nodeHouseholds.classList.remove('node-clickable');
+            pathSpending.classList.add('blink-red-arrow');
+
+            stepDesc.innerHTML = `
+                <strong class="text-red-400 block mb-1">💸 Step 1: Consumer Spending</strong>
+                Five coins flow from Households toward the Product Market. 
+                <br>The <span class="font-bold text-red-500">"Consumer Spending"</span> arrow blinks intensely.
+            `;
+
+            animatedCoins = [];
+            for (let i = 0; i < 5; i++) {
+                animatedCoins.push({
+                    el: createCoin(),
+                    path: pathSpending,
+                    progress: -i * 0.08,
+                    speed: 0.015,
+                    arrived: false
+                });
+            }
+
+            animateSpending();
+        }
+
+        function animateSpending() {
+            if (simState !== 1) return;
+            let allArrived = true;
+
+            animatedCoins.forEach(coin => {
+                if (coin.progress < 1.0) {
+                    coin.progress += coin.speed;
+                    allArrived = false;
+                } else {
+                    coin.arrived = true;
+                }
+
+                if (coin.progress >= 0.0) {
+                    const clamped = Math.min(1.0, coin.progress);
+                    const pt = getPointOnPath(coin.path, clamped);
+                    coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                    coin.el.style.display = "block";
+                } else {
+                    coin.el.style.display = "none";
+                }
+            });
+
+            if (allArrived) {
+                triggerRevenueSplit();
+            } else {
+                rAF_Timer = requestAnimationFrame(animateSpending);
+            }
+        }
+
+        function triggerRevenueSplit() {
+            clearBlinkingArrows();
+            
+            const staticCoin = animatedCoins[0];
+            const ptStatic = getPointOnPath(pathSpending, 1.0);
+            staticCoin.el.setAttribute("transform", `translate(${ptStatic.x}, ${ptStatic.y})`);
+
+            pathGoods.classList.add('pulse-yellow-arrow');
+
+            const movingCoins = animatedCoins.slice(1);
+            movingCoins.forEach((coin, idx) => {
+                coin.path = pathRevenue;
+                coin.progress = -idx * 0.08;
+                coin.speed = 0.015;
+                coin.arrived = false;
+            });
+
+            pathRevenue.classList.add('blink-red-arrow');
+            pathGoodsSold.classList.add('blink-yellow-arrow');
+            nodeFirms.classList.add('node-clickable');
+
+            stepDesc.innerHTML = `
+                <strong class="text-amber-400 block mb-1">🏦 Step 2: Revenue Allocation</strong>
+                One coin stays at the Product Market, activating the counter-flow of goods. 
+                Four remaining coins advance toward Firms along the revenue path. 
+                <br><br>
+                <span class="text-yellow-400 font-bold">👉 Now click on Firms</span> to redirect factor payments!
+            `;
+
+            animateRevenueSplit(movingCoins);
+        }
+
+        function animateRevenueSplit(coins) {
+            if (simState !== 1) return;
+            let allArrived = true;
+
+            coins.forEach(coin => {
+                if (coin.progress < 1.0) {
+                    coin.progress += coin.speed;
+                    allArrived = false;
+                }
+                if (coin.progress >= 0.0) {
+                    const clamped = Math.min(1.0, coin.progress);
+                    const pt = getPointOnPath(coin.path, clamped);
+                    coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                    coin.el.style.display = "block";
+                } else {
+                    coin.el.style.display = "none";
+                }
+            });
+
+            if (!allArrived) {
+                rAF_Timer = requestAnimationFrame(() => animateRevenueSplit(coins));
+            }
+        }
+
+        // PHASE 2: FIRMS CLICKED
+        function clickFirm() {
+            if (simState !== 1) return;
+            cancelAnimationFrame(rAF_Timer);
+            clearBlinkingArrows();
+
+            simState = 2;
+            nodeFirms.classList.remove('node-clickable');
+            pathCosts.classList.add('blink-red-arrow');
+
+            stepDesc.innerHTML = `
+                <strong class="text-emerald-400 block mb-1">🛠️ Step 3: Factor Payments</strong>
+                The Firm pays for land, labor, and capital. Three coins move to the Resource Market along the cost arrow.
+            `;
+
+            animatedCoins = [];
+            for (let i = 0; i < 3; i++) {
+                animatedCoins.push({
+                    el: createCoin(),
+                    path: pathCosts,
+                    progress: -i * 0.1,
+                    speed: 0.015,
+                    arrived: false
+                });
+            }
+
+            pathCosts.classList.add('blink-red-arrow');
+            pathFactorsIn.classList.add('blink-yellow-arrow');
+
+            animateToResourceMarket();
+        }
+
+        function animateToResourceMarket() {
+            if (simState !== 2) return;
+            let allArrived = true;
+
+            animatedCoins.forEach(coin => {
+                if (coin.progress < 1.0) {
+                    coin.progress += coin.speed;
+                    allArrived = false;
+                }
+                if (coin.progress >= 0.0) {
+                    const clamped = Math.min(1.0, coin.progress);
+                    const pt = getPointOnPath(coin.path, clamped);
+                    coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                    coin.el.style.display = "block";
+                } else {
+                    coin.el.style.display = "none";
+                }
+            });
+
+            if (allArrived) {
+                triggerIncomeToHouse();
+            } else {
+                rAF_Timer = requestAnimationFrame(animateToResourceMarket);
+            }
+        }
+
+        function triggerIncomeToHouse() {
+            clearBlinkingArrows();
+
+            const coin1 = animatedCoins[0];
+            const coin2 = animatedCoins[1];
+            const pt1 = getPointOnPath(pathCosts, 1.0);
+            coin1.el.setAttribute("transform", `translate(${pt1.x - 10}, ${pt1.y})`);
+            coin2.el.setAttribute("transform", `translate(${pt1.x + 10}, ${pt1.y})`);
+
+            const movingCoin = animatedCoins[2];
+            movingCoin.path = pathIncome;
+            movingCoin.progress = 0.0;
+            movingCoin.speed = 0.015;
+
+            pathIncome.classList.add('blink-red-arrow');
+            pathFactorsOut.classList.add('pulse-yellow-arrow');
+
+            stepDesc.innerHTML = `
+                <strong class="text-green-400 block mb-1">🏡 Step 4: Income Return</strong>
+                Two coins remain at the Resource Market as factor owner savings. 
+                One coin returns to Households, completing the macroeconomic balance.
+            `;
+
+            animateLastCoin(movingCoin);
+        }
+
+        function animateLastCoin(coin) {
+            if (simState !== 2) return;
+
+            if (coin.progress < 1.0) {
+                coin.progress += coin.speed;
+                const pt = getPointOnPath(coin.path, coin.progress);
+                coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                rAF_Timer = requestAnimationFrame(() => animateLastCoin(coin));
+            } else {
+                setTimeout(startIdle, 1800);
+            }
+        }
+
+        // PHASE 3: GOVERNMENT / TAXES
+        function clickGovernment() {
+            cancelAnimationFrame(rAF_Timer);
+            clearCoins();
+            clearBlinkingArrows();
+
+            simState = 3;
+
+            stepDesc.innerHTML = `
+                <strong class="text-blue-500 block mb-1">🏛️ Public Finance (Fiscal Sector)</strong>
+                Government collects taxes from Households and Firms to provide public goods and regulate markets.
+            `;
+
+            const coinHouseTax = { el: createCoin(), startY: 130, endY: 260, progress: 0.0, speed: 0.02 };
+            const coinFirmTax = { el: createCoin(), startY: 470, endY: 340, progress: 0.0, speed: 0.02 };
+
+            taxH.setAttribute('opacity', '1');
+            taxF.setAttribute('opacity', '1');
+            regL.setAttribute('opacity', '1');
+            regR.setAttribute('opacity', '1');
+
+            animateGovTax(coinHouseTax, coinFirmTax);
+        }
+
+        function animateGovTax(c1, c2) {
+            if (simState !== 3) return;
+            let finished = true;
+
+            if (c1.progress < 1.0) {
+                c1.progress += c1.speed;
+                const curY = c1.startY + (c1.endY - c1.startY) * c1.progress;
+                c1.el.setAttribute("transform", `translate(400, ${curY})`);
+                finished = false;
+            } else {
+                c1.el.style.display = 'none';
+            }
+
+            if (c2.progress < 1.0) {
+                c2.progress += c2.speed;
+                const curY = c2.startY + (c2.endY - c2.startY) * c2.progress;
+                c2.el.setAttribute("transform", `translate(400, ${curY})`);
+                finished = false;
+            } else {
+                c2.el.style.display = 'none';
+            }
+
+            if (!finished) {
+                rAF_Timer = requestAnimationFrame(() => animateGovTax(c1, c2));
+            } else {
+                setTimeout(() => {
+                    taxH.setAttribute('opacity', '0');
+                    taxF.setAttribute('opacity', '0');
+                    regL.setAttribute('opacity', '0');
+                    regR.setAttribute('opacity', '0');
+                    startIdle();
+                }, 3500);
+            }
+        }
+
+        // PHASE 4: GLOBE / INTERNATIONAL TRADE
+        function clickGlobe() {
+            cancelAnimationFrame(rAF_Timer);
+            clearCoins();
+            clearBlinkingArrows();
+
+            simState = 4;
+            tradeChannels.setAttribute('opacity', '1');
+
+            stepDesc.innerHTML = `
+                <strong class="text-pink-600 block mb-1">🌐 International Trade (Exports & Imports)</strong>
+                Constructing trade channels. First, drawing the import line...
+            `;
+
+            const impLen = pathImport.getTotalLength();
+            const expLen = pathExport.getTotalLength();
+
+            importMaskPath.style.strokeDasharray = impLen;
+            importMaskPath.style.strokeDashoffset = impLen;
+            exportMaskPath.style.strokeDasharray = expLen;
+            exportMaskPath.style.strokeDashoffset = expLen;
+
+            animateImportLine(impLen);
+        }
+
+        function animateImportLine(len) {
+            let offset = parseFloat(importMaskPath.style.strokeDashoffset);
+            if (offset > 0) {
+                offset -= 12;
+                if (offset < 0) offset = 0;
+                importMaskPath.style.strokeDashoffset = offset;
+                rAF_Timer = requestAnimationFrame(() => animateImportLine(len));
+            } else {
+                stepDesc.innerHTML = `
+                    <strong class="text-cyan-400 block mb-1">🌐 Imports (Capital Outflow)</strong>
+                    Import line established. A coin travels from Households to the Rest of World as payment for foreign goods.
+                `;
+                const impCoin = { el: createCoin(), path: pathImport, progress: 1.0, speed: 0.007 };
+                animateImportCoin(impCoin);
+            }
+        }
+
+        function animateImportCoin(coin) {
+            if (simState !== 4) return;
+            if (coin.progress > 0.0) {
+                coin.progress -= coin.speed;
+                const pt = getPointOnPath(coin.path, coin.progress);
+                coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                rAF_Timer = requestAnimationFrame(() => animateImportCoin(coin));
+            } else {
+                coin.el.style.display = 'none';
+                stepDesc.innerHTML = `
+                    <strong class="text-pink-400 block mb-1">🌐 Exports (Channel Construction)</strong>
+                    Import payment complete. Now drawing the export line from the Rest of World to Firms...
+                `;
+                const expLen = pathExport.getTotalLength();
+                animateExportLine(expLen);
+            }
+        }
+
+        function animateExportLine(len) {
+            let offset = parseFloat(exportMaskPath.style.strokeDashoffset);
+            if (offset > 0) {
+                offset -= 12;
+                if (offset < 0) offset = 0;
+                exportMaskPath.style.strokeDashoffset = offset;
+                rAF_Timer = requestAnimationFrame(() => animateExportLine(len));
+            } else {
+                stepDesc.innerHTML = `
+                    <strong class="text-pink-400 block mb-1">🌐 Exports (Capital Inflow)</strong>
+                    Export line established. A coin travels from the Rest of World to Firms as payment for exported goods.
+                `;
+                const expCoin = { el: createCoin(), path: pathExport, progress: 0.0, speed: 0.007 };
+                animateExportCoin(expCoin);
+            }
+        }
+
+        function animateExportCoin(coin) {
+            if (simState !== 4) return;
+            if (coin.progress < 1.0) {
+                coin.progress += coin.speed;
+                const pt = getPointOnPath(coin.path, coin.progress);
+                coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                rAF_Timer = requestAnimationFrame(() => animateExportCoin(coin));
+            } else {
+                coin.el.style.display = 'none';
+                stepDesc.innerHTML = `
+                    <strong class="text-emerald-400 block mb-1">✅ Trade Cycle Complete</strong>
+                    Foreign trade turnover successfully simulated. Returning to base state.
+                `;
+                setTimeout(() => {
+                    tradeChannels.setAttribute('opacity', '0');
+                    startIdle();
+                }, 3000);
+            }
+        }
+
+        // RESET
+        function resetSimulation() {
+            cancelAnimationFrame(rAF_Timer);
+            taxH.setAttribute('opacity', '0');
+            taxF.setAttribute('opacity', '0');
+            regL.setAttribute('opacity', '0');
+            regR.setAttribute('opacity', '0');
+            tradeChannels.setAttribute('opacity', '0');
+            startIdle();
+        }
+
+        window.onload = function() {
+            startIdle();
+        };
+    </script>
+</body>
+</html>

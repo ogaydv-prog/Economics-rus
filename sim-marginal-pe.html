@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marginal Analysis Fundamentals • AlmaU</title>
+    <!-- Google Fonts & Tailwind CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Dark Sidebar Styling */
+        .sidebar-dark {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1.5px solid rgba(197, 160, 89, 0.25);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        }
+        /* Light Workspace Styling */
+        .workspace-light {
+            background: #ffffff;
+            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+        /* Custom styled Range slider for Dark Sidebar */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: #334155;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #c5a059;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(197, 160, 89, 0.8);
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.35);
+        }
+        /* Custom scrollbar for tables */
+        .custom-scroll::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .text-gold {
+            color: #c5a059;
+        }
+        .border-gold {
+            border-color: #c5a059;
+        }
+        /* Pulse Animation for Optimal Point */
+        @keyframes optimal-pulse {
+            0% { r: 5px; stroke-width: 1px; opacity: 0.7; }
+            50% { r: 9px; stroke-width: 3px; opacity: 1; filter: drop-shadow(0 0 8px #10b981); }
+            100% { r: 5px; stroke-width: 1px; opacity: 0.7; }
+        }
+        .pulse-dot {
+            animation: optimal-pulse 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 flex flex-col justify-between min-h-screen">
+
+    <!-- Header Area -->
+    <header class="sidebar-dark max-w-7xl mx-auto w-full p-4 rounded-2xl text-center mb-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div class="text-left">
+            <h1 class="text-2xl md:text-3xl font-black text-gold tracking-wide uppercase mb-1">
+                Marginal Analysis: Bio-Oat Premium
+            </h1>
+            <p class="text-xs text-slate-400 font-semibold tracking-wider uppercase">
+                Principles of Economics • Fall Semester 2026 • Interactive Lab on Marginal Analysis & Microeconomic Optimization
+            </p>
+        </div>
+        <div class="flex items-center gap-3 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 self-center md:self-auto">
+            <span class="text-2xl">🥛</span>
+            <div class="text-left text-[11px]">
+                <span class="text-slate-400 font-medium block">New Product Launch:</span>
+                <span class="text-gold font-bold">Market Capacity & Price Optimum Evaluation</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch w-full flex-grow">
+        
+        <!-- Left Column: Inputs / Model Parameters -->
+        <section class="lg:col-span-4 sidebar-dark p-5 rounded-xl flex flex-col justify-between space-y-5 text-xs">
+            <div>
+                <div class="flex items-center gap-2 border-b border-slate-800 pb-2 mb-4">
+                    <span class="text-lg">⚙️</span>
+                    <h2 class="text-xs font-bold text-gold uppercase tracking-wider">Product Launch Parameters</h2>
+                </div>
+
+                <!-- SECTION 1: DEMAND STRUCTURE -->
+                <div class="space-y-4 mb-5 bg-slate-950/40 p-3 rounded-lg border border-slate-900">
+                    <h3 class="font-bold text-gold uppercase tracking-wider text-[10px] flex justify-between">
+                        <span>1. Market Demand & Marketing</span>
+                        <span class="text-slate-500 font-normal">Consumer Behavior</span>
+                    </h3>
+                    
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Max Willingness-to-Pay (Choke Price, $):</span>
+                            <span class="text-gold font-bold" id="choke-val">$1,600</span>
+                        </div>
+                        <input type="range" id="choke-input" min="800" max="2500" step="50" value="1600">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Price at which demand drops to zero (brand equity / marketing power).</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Price Sensitivity (Slope factor):</span>
+                            <span class="text-gold font-bold" id="slope-val">0.035</span>
+                        </div>
+                        <input type="range" id="slope-input" min="0.010" max="0.090" step="0.005" value="0.035">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Slope of the demand curve. Lower slope indicates broader market reach.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: COST STRUCTURE -->
+                <div class="space-y-4 mb-5 bg-slate-950/40 p-3 rounded-lg border border-slate-900">
+                    <h3 class="font-bold text-sky-400 uppercase tracking-wider text-[10px]">
+                        2. Production Cost Structure
+                    </h3>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Fixed Costs (FC, $M/mo):</span>
+                            <span class="text-gold font-bold" id="fc-val">$3.5M</span>
+                        </div>
+                        <input type="range" id="fc-input" min="1.0" max="10.0" step="0.5" value="3.5">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Facility lease, R&D staff, marketing retainer, and certification fees.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Base Variable Cost (VC base, $/unit):</span>
+                            <span class="text-gold font-bold" id="vc-val">$380</span>
+                        </div>
+                        <input type="range" id="vc-input" min="200" max="900" step="10" value="380">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Oat-almond raw base, glass bottle, label, and last-mile logistics.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Capacity Bottleneck Factor (β):</span>
+                            <span class="text-gold font-bold" id="beta-val">0.0005</span>
+                        </div>
+                        <input type="range" id="beta-input" min="0.0001" max="0.0020" step="0.0001" value="0.0005">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Diseconomies of scale. Cost growth under facility overload (overtime, wear).</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: OPERATIONAL CONTROL -->
+                <div class="space-y-4 bg-slate-950/40 p-3 rounded-lg border border-slate-900">
+                    <h3 class="font-bold text-emerald-400 uppercase tracking-wider text-[10px]">
+                        3. Operational Decision (Output)
+                    </h3>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300 font-bold">Current Monthly Output (Q, units):</span>
+                            <span class="text-emerald-400 font-black" id="q-val">12,000 units</span>
+                        </div>
+                        <input type="range" id="q-input" min="1000" max="35000" step="500" value="12000" class="accent-emerald-500">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Physical units bottled and distributed to retail channels per month.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Economic theory snippet -->
+            <div class="p-2.5 bg-slate-950/80 border-l-2 border-gold rounded-r text-[10px] text-slate-400 leading-normal">
+                <span class="font-bold text-gold block mb-0.5">Profit Maximization Rule:</span>
+                A firm maximizes total profit at the output volume where <strong>Marginal Revenue equals Marginal Cost (MR = MC)</strong>. Any deviation reduces economic efficiency.
+            </div>
+        </section>
+
+        <!-- Right Column: Workspace -->
+        <section class="lg:col-span-8 flex flex-col justify-between space-y-4">
+            
+            <!-- Dynamic KPI Cards Box -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-slate-800">
+                <div class="workspace-light p-3.5 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-amber-500">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Optimal Output (Q*)</span>
+                    <h3 class="text-lg font-black text-amber-600 font-mono" id="opt-q-disp">0 units</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5">MR = MC Equilibrium Point</p>
+                </div>
+
+                <div class="workspace-light p-3.5 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-emerald-600">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Optimal Price (P*)</span>
+                    <h3 class="text-lg font-black text-emerald-600 font-mono" id="opt-p-disp">$0</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5">Profit-Maximizing Market Price</p>
+                </div>
+
+                <div class="workspace-light p-3.5 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-indigo-600">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Max Profit (π*)</span>
+                    <h3 class="text-lg font-black text-indigo-600 font-mono" id="max-profit-disp">$0</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5">Total Monthly Net Profit</p>
+                </div>
+
+                <div class="workspace-light p-3.5 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-rose-500">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Break-Even Point (BEP)</span>
+                    <h3 class="text-lg font-black text-rose-500 font-mono" id="bep-q-disp">0 units</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5">Cost Recovery Threshold</p>
+                </div>
+            </div>
+
+            <!-- Dynamic Managerial Verdict Board -->
+            <div class="workspace-light p-4 rounded-xl text-slate-800">
+                <div class="flex items-center gap-2 mb-1.5 border-b border-slate-100 pb-1">
+                    <span class="text-sm">📈</span>
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Real-Time Managerial Verdict</h4>
+                </div>
+                <div id="verdict-content" class="text-[11px] text-slate-600 leading-relaxed font-medium">
+                    Calculating market dynamics...
+                </div>
+            </div>
+
+            <!-- Visualization: Charts Row -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                
+                <!-- Chart 1: Marginal Curves (P, MR, MC) -->
+                <div class="workspace-light p-4 rounded-xl flex flex-col justify-between">
+                    <div class="flex justify-between items-center mb-2 border-b border-slate-100 pb-1">
+                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Marginal Curves ($)</h4>
+                        <span class="text-[8px] font-mono text-slate-400">Equilibrium Point MR = MC</span>
+                    </div>
+                    <!-- SVG Chart -->
+                    <div class="w-full h-44 relative bg-slate-50 rounded border border-slate-100">
+                        <svg viewBox="0 0 320 200" class="w-full h-full select-none" id="svg-marginal">
+                            <!-- JS will generate elements -->
+                        </svg>
+                    </div>
+                    <!-- Legends -->
+                    <div class="flex justify-around text-[8px] mt-2 font-bold text-slate-500">
+                        <div class="flex items-center gap-1">
+                            <span class="w-2.5 h-0.5 bg-blue-500 block"></span>
+                            <span>Demand (P)</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="w-2.5 h-0.5 bg-indigo-600 block"></span>
+                            <span>Marginal Revenue (MR)</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="w-2.5 h-0.5 bg-rose-500 block"></span>
+                            <span>Marginal Cost (MC)</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500 block"></span>
+                            <span>Current Q</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart 2: Total Curves (TR, TC, Profit) -->
+                <div class="workspace-light p-4 rounded-xl flex flex-col justify-between">
+                    <div class="flex justify-between items-center mb-2 border-b border-slate-100 pb-1">
+                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Totals & Profit Curve ($)</h4>
+                        <span class="text-[8px] font-mono text-slate-400">Total Revenue & Total Cost</span>
+                    </div>
+                    <!-- SVG Chart -->
+                    <div class="w-full h-44 relative bg-slate-50 rounded border border-slate-100">
+                        <svg viewBox="0 0 320 200" class="w-full h-full select-none" id="svg-total">
+                            <!-- JS will generate elements -->
+                        </svg>
+                    </div>
+                    <!-- Legends -->
+                    <div class="flex justify-around text-[8px] mt-2 font-bold text-slate-500">
+                        <div class="flex items-center gap-1">
+                            <span class="w-2.5 h-0.5 bg-blue-600 block"></span>
+                            <span>Total Revenue (TR)</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="w-2.5 h-0.5 bg-orange-500 block"></span>
+                            <span>Total Cost (TC)</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="w-2.5 h-0.5 bg-emerald-600 block"></span>
+                            <span>Profit (π)</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="w-2 h-2 rounded-full bg-purple-500 block"></span>
+                            <span>BEP Point</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Operations Data Breakdown Grid -->
+            <div class="workspace-light p-4 rounded-xl text-slate-800">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Marginal Inspection at Current Output</h4>
+                    <span class="text-[8px] text-slate-400 font-mono">Financial Efficiency Audit</span>
+                </div>
+                <div class="overflow-x-auto custom-scroll">
+                    <table class="w-full text-left border-collapse text-[10px] font-mono">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-slate-500 uppercase text-[8px] tracking-wider">
+                                <th class="pb-1.5">Metric Per Unit</th>
+                                <th class="pb-1.5 text-right">Current Q (Output)</th>
+                                <th class="pb-1.5 text-right">Optimum (MR=MC)</th>
+                                <th class="pb-1.5 text-right">Variance / Reserve</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td class="py-1.5 text-slate-500">Selling Price ($/unit):</td>
+                                <td class="text-right font-bold text-slate-800" id="tbl-curr-p">$0</td>
+                                <td class="text-right font-bold text-amber-600" id="tbl-opt-p">$0</td>
+                                <td class="text-right" id="tbl-diff-p">$0</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1.5 text-slate-500">Marginal Revenue (MR, $/unit):</td>
+                                <td class="text-right font-bold text-indigo-600" id="tbl-curr-mr">$0</td>
+                                <td class="text-right font-bold text-indigo-600" id="tbl-opt-mr">$0</td>
+                                <td class="text-right" id="tbl-diff-mr">$0</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1.5 text-slate-500">Marginal Cost (MC, $/unit):</td>
+                                <td class="text-right font-bold text-rose-500" id="tbl-curr-mc">$0</td>
+                                <td class="text-right font-bold text-rose-500" id="tbl-opt-mc">$0</td>
+                                <td class="text-right" id="tbl-diff-mc">$0</td>
+                            </tr>
+                            <tr class="bg-slate-50 font-bold">
+                                <td class="py-1.5 text-slate-800">Monthly Net Profit ($):</td>
+                                <td class="text-right text-emerald-600" id="tbl-curr-profit">$0</td>
+                                <td class="text-right text-emerald-600" id="tbl-opt-profit">$0</td>
+                                <td class="text-right text-indigo-600" id="tbl-diff-profit">$0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Technical Footer -->
+    <footer class="text-center text-[10px] text-slate-500 mt-4 border-t border-slate-800/60 pt-2 font-bold tracking-wide">
+        Principles of Economics • Developed for International Business Students, AlmaU Fall Semester 2026
+    </footer>
+
+    <!-- Interactive Simulation Script -->
+    <script>
+        // DOM Parameters Inputs
+        const chokeInput = document.getElementById('choke-input');
+        const slopeInput = document.getElementById('slope-input');
+        const fcInput = document.getElementById('fc-input');
+        const vcInput = document.getElementById('vc-input');
+        const betaInput = document.getElementById('beta-input');
+        const qInput = document.getElementById('q-input');
+
+        // DOM Displays
+        const chokeVal = document.getElementById('choke-val');
+        const slopeVal = document.getElementById('slope-val');
+        const fcVal = document.getElementById('fc-val');
+        const vcVal = document.getElementById('vc-val');
+        const betaVal = document.getElementById('beta-val');
+        const qVal = document.getElementById('q-val');
+
+        // Cards display elements
+        const optQDisp = document.getElementById('opt-q-disp');
+        const optPDisp = document.getElementById('opt-p-disp');
+        const maxProfitDisp = document.getElementById('max-profit-disp');
+        const bepQDisp = document.getElementById('bep-q-disp');
+        const verdictContent = document.getElementById('verdict-content');
+
+        // Table Elements
+        const tblCurrP = document.getElementById('tbl-curr-p');
+        const tblOptP = document.getElementById('tbl-opt-p');
+        const tblDiffP = document.getElementById('tbl-diff-p');
+        
+        const tblCurrMR = document.getElementById('tbl-curr-mr');
+        const tblOptMR = document.getElementById('tbl-opt-mr');
+        const tblDiffMR = document.getElementById('tbl-diff-mr');
+
+        const tblCurrMC = document.getElementById('tbl-curr-mc');
+        const tblOptMC = document.getElementById('tbl-opt-mc');
+        const tblDiffMC = document.getElementById('tbl-diff-mc');
+
+        const tblCurrProfit = document.getElementById('tbl-curr-profit');
+        const tblOptProfit = document.getElementById('tbl-opt-profit');
+        const tblDiffProfit = document.getElementById('tbl-diff-profit');
+
+        // Chart Container elements
+        const svgMarginal = document.getElementById('svg-marginal');
+        const svgTotal = document.getElementById('svg-total');
+
+        // Formats currency nicely in USD
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+        }
+
+        // Calculations & Rendering
+        function recalculate() {
+            // Get values
+            const A = parseFloat(chokeInput.value); // Choke price ($)
+            const B = parseFloat(slopeInput.value); // Demand curve slope
+            const FC = parseFloat(fcInput.value) * 1000000; // Fixed costs in USD
+            const VC_base = parseFloat(vcInput.value); // Variable base cost ($)
+            const beta = parseFloat(betaInput.value); // Capacity bottleneck cost slope
+            const Q_curr = parseFloat(qInput.value); // Current output choice (units)
+
+            // Dynamic sliders text update
+            chokeVal.innerText = formatCurrency(A);
+            slopeVal.innerText = B.toFixed(3);
+            fcVal.innerText = '$' + (FC / 1000000).toFixed(1) + 'M';
+            vcVal.innerText = formatCurrency(VC_base);
+            betaVal.innerText = beta.toFixed(4);
+            qVal.innerText = Q_curr.toLocaleString('en-US') + ' units';
+
+            // MATHEMATICAL DERIVATION:
+            // Demand: P(Q) = A - B * Q
+            // Total Revenue: TR(Q) = P(Q) * Q = A * Q - B * Q^2
+            // Marginal Revenue: MR(Q) = dTR/dQ = A - 2B * Q
+            
+            // Total Cost: TC(Q) = FC + VC_base * Q + beta * Q^2
+            // Marginal Cost: MC(Q) = dTC/dQ = VC_base + 2 * beta * Q
+
+            // Optima: MR = MC => A - 2B * Q* = VC_base + 2 * beta * Q*
+            // => Q* * (2B + 2*beta) = A - VC_base
+            // => Q* = (A - VC_base) / (2 * (B + beta))
+            const Q_opt = Math.max(0, (A - VC_base) / (2 * (B + beta)));
+            const P_opt = Math.max(0, A - B * Q_opt);
+            
+            const TR_opt = P_opt * Q_opt;
+            const TC_opt = FC + VC_base * Q_opt + beta * Math.pow(Q_opt, 2);
+            const profit_opt = TR_opt - TC_opt;
+
+            // Break-even point (BEP) where TR(Q) = TC(Q)
+            // (A * Q - B * Q^2) = FC + VC_base * Q + beta * Q^2
+            // => (B + beta) * Q^2 - (A - VC_base) * Q + FC = 0
+            // Solve quadratic equation: ax^2 + bx + c = 0
+            const q_a = B + beta;
+            const q_b = -(A - VC_base);
+            const q_c = FC;
+            const discriminant = Math.pow(q_b, 2) - 4 * q_a * q_c;
+            
+            let Q_bep = 0;
+            if (discriminant >= 0) {
+                // Focus on lower (starting) break-even limit
+                Q_bep = Math.max(0, (-q_b - Math.sqrt(discriminant)) / (2 * q_a));
+            }
+
+            // Current Operating Values
+            const P_curr = Math.max(0, A - B * Q_curr);
+            const TR_curr = P_curr * Q_curr;
+            const TC_curr = FC + VC_base * Q_curr + beta * Math.pow(Q_curr, 2);
+            const profit_curr = TR_curr - TC_curr;
+            const MR_curr = A - 2 * B * Q_curr;
+            const MC_curr = VC_base + 2 * beta * Q_curr;
+
+            const MR_opt = A - 2 * B * Q_opt;
+            const MC_opt = VC_base + 2 * beta * Q_opt;
+
+            // Update primary KPI Cards
+            optQDisp.innerText = Math.round(Q_opt).toLocaleString('en-US') + ' units';
+            optPDisp.innerText = formatCurrency(P_opt);
+            maxProfitDisp.innerText = formatCurrency(profit_opt);
+            bepQDisp.innerText = discriminant >= 0 ? Math.round(Q_bep).toLocaleString('en-US') + ' units' : 'Unattainable';
+
+            // Operational audit calculations
+            const reserveProfit = Math.max(0, profit_opt - profit_curr);
+
+            // Populate table details
+            tblCurrP.innerText = formatCurrency(P_curr);
+            tblOptP.innerText = formatCurrency(P_opt);
+            tblDiffP.innerHTML = formatDiff(P_curr - P_opt);
+
+            tblCurrMR.innerText = formatCurrency(MR_curr);
+            tblOptMR.innerText = formatCurrency(MR_opt);
+            tblDiffMR.innerHTML = formatDiff(MR_curr - MR_opt);
+
+            tblCurrMC.innerText = formatCurrency(MC_curr);
+            tblOptMC.innerText = formatCurrency(MC_opt);
+            tblDiffMC.innerHTML = formatDiff(MC_curr - MC_opt);
+
+            tblCurrProfit.innerText = formatCurrency(profit_curr);
+            tblOptProfit.innerText = formatCurrency(profit_opt);
+            tblDiffProfit.innerHTML = `<span class="text-indigo-600 font-bold">${formatCurrency(reserveProfit)}</span>`;
+
+            // Verdict and analysis builder
+            generateVerdict(Q_curr, Q_opt, MR_curr, MC_curr, profit_curr, reserveProfit, A, VC_base, Q_bep);
+
+            // Render Charts
+            drawMarginalChart(A, B, VC_base, beta, Q_curr, Q_opt);
+            drawTotalChart(FC, VC_base, beta, A, B, Q_curr, Q_opt, Q_bep);
+        }
+
+        function formatDiff(val) {
+            if (val > 0.01) return `<span class="text-emerald-600">+${formatCurrency(val)}</span>`;
+            if (val < -0.01) return `<span class="text-rose-600">${formatCurrency(val)}</span>`;
+            return `<span class="text-slate-400">$0</span>`;
+        }
+
+        // Live economic counselor text in English
+        function generateVerdict(Q, Q_opt, MR, MC, profit, reserve, A, VC_base, Q_bep) {
+            let text = "";
+
+            if (A < VC_base) {
+                text = `<span class="text-rose-600 font-bold">⚠️ Critically Unprofitable Product!</span> Maximum willingness-to-pay (${formatCurrency(A)}) is lower than base variable raw costs (${formatCurrency(VC_base)}). No volume of output can save this venture. Re-engineer product formula or enhance brand value immediately!`;
+                verdictContent.innerHTML = text;
+                return;
+            }
+
+            const diff = Q - Q_opt;
+            
+            if (Math.abs(diff) < 250) {
+                text = `🌟 <strong>Optimal Production Volume Achieved!</strong> Operations are balanced at maximum efficiency. At <strong>${Math.round(Q).toLocaleString('en-US')} units/mo</strong>, Marginal Revenue equals Marginal Cost (MR: ${formatCurrency(MR)} ≈ MC: ${formatCurrency(MC)}). Monthly net profit is maximized at <strong class="text-emerald-600">${formatCurrency(profit)}</strong>.`;
+            } else if (diff < 0) {
+                text = `📈 <strong>Underproduction (Supply Shortage)!</strong> Current output (${Math.round(Q).toLocaleString('en-US')} units) is below optimal capacity. Currently, <strong>Marginal Revenue exceeds Marginal Cost (MR: ${formatCurrency(MR)} > MC: ${formatCurrency(MC)})</strong>. Each additional unit brings in more revenue than its production cost. <span class="text-amber-600 font-bold">Increase output by ${Math.round(-diff).toLocaleString('en-US')} units</span> to capture an additional <strong class="text-indigo-600">${formatCurrency(reserve)}</strong> in profit!`;
+            } else {
+                text = `📉 <strong>Overproduction (Diminishing Marginal Returns)!</strong> You have surpassed optimal capacity. Currently, <strong>Marginal Cost exceeds Marginal Revenue (MC: ${formatCurrency(MC)} > MR: ${formatCurrency(MR)})</strong>. Additional output requires overtime pay, accelerates equipment depreciation, and demands retail price discounts. <span class="text-rose-600 font-bold">Reduce volume by ${Math.round(diff).toLocaleString('en-US')} units</span> to eliminate excess costs and reclaim <strong class="text-indigo-600">${formatCurrency(reserve)}</strong>!`;
+            }
+
+            if (profit < 0) {
+                text += `<br><span class="text-rose-500 font-bold">🚨 Warning:</span> Net profit is currently negative (${formatCurrency(profit)}) as production volume is insufficient to cover fixed costs (FC). Cross the break-even threshold of <strong>${Math.round(Q_bep).toLocaleString('en-US')} units</strong> to reach profitability.`;
+            }
+
+            verdictContent.innerHTML = text;
+        }
+
+        // SVG vector charting logic: Marginals
+        function drawMarginalChart(A, B, VC_base, beta, Q_curr, Q_opt) {
+            svgMarginal.innerHTML = '';
+            
+            const xMaxScale = 30000;
+            const yMaxScale = 2200;
+
+            function sx(val) { return 35 + (val / xMaxScale) * 270; }
+            function sy(val) { return 175 - (val / yMaxScale) * 155; }
+
+            // Grid background
+            for (let i = 1; i <= 4; i++) {
+                const yVal = (yMaxScale / 4) * i;
+                const xVal = (xMaxScale / 4) * i;
+
+                // Horizontal grid lines
+                const lineH = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                lineH.setAttribute("x1", "35"); lineH.setAttribute("y1", sy(yVal));
+                lineH.setAttribute("x2", "305"); lineH.setAttribute("y2", sy(yVal));
+                lineH.setAttribute("stroke", "#e2e8f0");
+                svgMarginal.appendChild(lineH);
+
+                // Vertical grid lines
+                const lineV = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                lineV.setAttribute("x1", sx(xVal)); lineV.setAttribute("y1", "20");
+                lineV.setAttribute("x2", sx(xVal)); lineV.setAttribute("y2", "175");
+                lineV.setAttribute("stroke", "#e2e8f0");
+                svgMarginal.appendChild(lineV);
+            }
+
+            // Axes lines
+            const axisX = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            axisX.setAttribute("x1", "35"); axisX.setAttribute("y1", "175");
+            axisX.setAttribute("x2", "310"); axisX.setAttribute("y2", "175");
+            axisX.setAttribute("stroke", "#64748b"); axisX.setAttribute("stroke-width", "1.5");
+            svgMarginal.appendChild(axisX);
+
+            const axisY = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            axisY.setAttribute("x1", "35"); axisY.setAttribute("y1", "15");
+            axisY.setAttribute("x2", "35"); axisY.setAttribute("y2", "175");
+            axisY.setAttribute("stroke", "#64748b"); axisY.setAttribute("stroke-width", "1.5");
+            svgMarginal.appendChild(axisY);
+
+            // CURVE 1: Demand Line P = A - B * Q
+            const dLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            dLine.setAttribute("x1", sx(0)); dLine.setAttribute("y1", sy(A));
+            dLine.setAttribute("x2", sx(xMaxScale)); dLine.setAttribute("y2", sy(A - B * xMaxScale));
+            dLine.setAttribute("stroke", "#3b82f6"); dLine.setAttribute("stroke-width", "2");
+            svgMarginal.appendChild(dLine);
+
+            // CURVE 2: MR = A - 2B * Q
+            const mrLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            mrLine.setAttribute("x1", sx(0)); mrLine.setAttribute("y1", sy(A));
+            mrLine.setAttribute("x2", sx(xMaxScale)); mrLine.setAttribute("y2", sy(A - 2 * B * xMaxScale));
+            mrLine.setAttribute("stroke", "#4f46e5"); mrLine.setAttribute("stroke-width", "2");
+            svgMarginal.appendChild(mrLine);
+
+            // CURVE 3: MC = VC_base + 2 * beta * Q
+            const mcLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            mcLine.setAttribute("x1", sx(0)); mcLine.setAttribute("y1", sy(VC_base));
+            mcLine.setAttribute("x2", sx(xMaxScale)); mcLine.setAttribute("y2", sy(VC_base + 2 * beta * xMaxScale));
+            mcLine.setAttribute("stroke", "#f43f5e"); mcLine.setAttribute("stroke-width", "2");
+            svgMarginal.appendChild(mcLine);
+
+            // Optimal intersection point (Q_opt)
+            const MC_opt = VC_base + 2 * beta * Q_opt;
+
+            // Highlight Optimal output
+            const optLineV = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            optLineV.setAttribute("x1", sx(Q_opt)); optLineV.setAttribute("y1", sy(0));
+            optLineV.setAttribute("x2", sx(Q_opt)); optLineV.setAttribute("y2", sy(MC_opt));
+            optLineV.setAttribute("stroke", "#d97706"); optLineV.setAttribute("stroke-dasharray", "2,2");
+            svgMarginal.appendChild(optLineV);
+
+            // Optimal target point dot
+            const optDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            optDot.setAttribute("cx", sx(Q_opt)); optDot.setAttribute("cy", sy(MC_opt));
+            optDot.setAttribute("fill", "#10b981");
+            optDot.setAttribute("class", "pulse-dot");
+            svgMarginal.appendChild(optDot);
+
+            // Current Operating Pointer Line
+            const currLineV = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            currLineV.setAttribute("x1", sx(Q_curr)); currLineV.setAttribute("y1", "20");
+            currLineV.setAttribute("x2", sx(Q_curr)); currLineV.setAttribute("y2", "175");
+            currLineV.setAttribute("stroke", "#10b981"); currLineV.setAttribute("stroke-width", "1.5");
+            currLineV.setAttribute("stroke-dasharray", "4,4");
+            svgMarginal.appendChild(currLineV);
+
+            const currDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            currDot.setAttribute("cx", sx(Q_curr)); currDot.setAttribute("cy", sy(A - B * Q_curr));
+            currDot.setAttribute("r", "4"); currDot.setAttribute("fill", "#10b981");
+            svgMarginal.appendChild(currDot);
+
+            // Text Labels for Axes
+            const yLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            yLabel.setAttribute("x", "10"); yLabel.setAttribute("y", "12");
+            yLabel.setAttribute("font-size", "7"); yLabel.setAttribute("fill", "#64748b");
+            yLabel.setAttribute("font-weight", "bold");
+            yLabel.textContent = "Price / Cost ($)";
+            svgMarginal.appendChild(yLabel);
+
+            const xLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            xLabel.setAttribute("x", "265"); xLabel.setAttribute("y", "190");
+            xLabel.setAttribute("font-size", "7"); xLabel.setAttribute("fill", "#64748b");
+            xLabel.setAttribute("font-weight", "bold");
+            xLabel.textContent = "Q (Output, units)";
+            svgMarginal.appendChild(xLabel);
+        }
+
+        // SVG vector charting logic: Totals
+        function drawTotalChart(FC, VC_base, beta, A, B, Q_curr, Q_opt, Q_bep) {
+            svgTotal.innerHTML = '';
+
+            const xMaxScale = 30000;
+            const yMaxScale = 25000000;
+
+            function sx(val) { return 45 + (val / xMaxScale) * 260; }
+            function sy(val) { return 175 - (val / yMaxScale) * 155; }
+
+            // Grid background
+            for (let i = 1; i <= 4; i++) {
+                const yVal = (yMaxScale / 4) * i;
+                const xVal = (xMaxScale / 4) * i;
+
+                const lineH = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                lineH.setAttribute("x1", "45"); lineH.setAttribute("y1", sy(yVal));
+                lineH.setAttribute("x2", "305"); lineH.setAttribute("y2", sy(yVal));
+                lineH.setAttribute("stroke", "#e2e8f0");
+                svgTotal.appendChild(lineH);
+
+                const lineV = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                lineV.setAttribute("x1", sx(xVal)); lineV.setAttribute("y1", "20");
+                lineV.setAttribute("x2", sx(xVal)); lineV.setAttribute("y2", "175");
+                lineV.setAttribute("stroke", "#e2e8f0");
+                svgTotal.appendChild(lineV);
+            }
+
+            // Zero profit level
+            const zeroProfitLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            zeroProfitLine.setAttribute("x1", "45"); zeroProfitLine.setAttribute("y1", sy(0));
+            zeroProfitLine.setAttribute("x2", "310"); zeroProfitLine.setAttribute("y2", sy(0));
+            zeroProfitLine.setAttribute("stroke", "#94a3b8"); zeroProfitLine.setAttribute("stroke-width", "1");
+            svgTotal.appendChild(zeroProfitLine);
+
+            // Curve drawing helper
+            function buildPath(calcFunc) {
+                let dStr = "";
+                const segments = 40;
+                for (let i = 0; i <= segments; i++) {
+                    const q = (xMaxScale / segments) * i;
+                    const y = calcFunc(q);
+                    const px = sx(q);
+                    const py = sy(y);
+                    if (i === 0) dStr += `M ${px} ${py}`;
+                    else dStr += ` L ${px} ${py}`;
+                }
+                return dStr;
+            }
+
+            // TR curve: P*Q = (A - B*Q)*Q
+            const trPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            trPath.setAttribute("d", buildPath(q => (A - B * q) * q));
+            trPath.setAttribute("fill", "none"); trPath.setAttribute("stroke", "#2563eb");
+            trPath.setAttribute("stroke-width", "2");
+            svgTotal.appendChild(trPath);
+
+            // TC curve: FC + VC_base*Q + beta * Q^2
+            const tcPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            tcPath.setAttribute("d", buildPath(q => FC + VC_base * q + beta * Math.pow(q, 2)));
+            tcPath.setAttribute("fill", "none"); tcPath.setAttribute("stroke", "#ea580c");
+            tcPath.setAttribute("stroke-width", "2");
+            svgTotal.appendChild(tcPath);
+
+            // Profit Curve: TR - TC
+            const profitPath = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            profitPath.setAttribute("d", buildPath(q => ((A - B * q) * q) - (FC + VC_base * q + beta * Math.pow(q, 2))));
+            profitPath.setAttribute("fill", "none"); profitPath.setAttribute("stroke", "#059669");
+            profitPath.setAttribute("stroke-width", "2.5");
+            svgTotal.appendChild(profitPath);
+
+            // Draw Break-even Point indicator (BEP)
+            if (Q_bep > 0 && Q_bep < xMaxScale) {
+                const bepDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                bepDot.setAttribute("cx", sx(Q_bep)); bepDot.setAttribute("cy", sy((A - B * Q_bep) * Q_bep));
+                bepDot.setAttribute("r", "4"); bepDot.setAttribute("fill", "#a855f7");
+                svgTotal.appendChild(bepDot);
+            }
+
+            // Optimal point indicator
+            const optLineV = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            optLineV.setAttribute("x1", sx(Q_opt)); optLineV.setAttribute("y1", "20");
+            optLineV.setAttribute("x2", sx(Q_opt)); optLineV.setAttribute("y2", "175");
+            optLineV.setAttribute("stroke", "#d97706"); optLineV.setAttribute("stroke-dasharray", "2,2");
+            svgTotal.appendChild(optLineV);
+
+            // Current state vertical indicator
+            const currLineV = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            currLineV.setAttribute("x1", sx(Q_curr)); currLineV.setAttribute("y1", "20");
+            currLineV.setAttribute("x2", sx(Q_curr)); currLineV.setAttribute("y2", "175");
+            currLineV.setAttribute("stroke", "#10b981"); currLineV.setAttribute("stroke-width", "1.5");
+            currLineV.setAttribute("stroke-dasharray", "4,4");
+            svgTotal.appendChild(currLineV);
+
+            // Labels
+            const yLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            yLabel.setAttribute("x", "10"); yLabel.setAttribute("y", "12");
+            yLabel.setAttribute("font-size", "7"); yLabel.setAttribute("fill", "#64748b");
+            yLabel.setAttribute("font-weight", "bold");
+            yLabel.textContent = "Totals ($M)";
+            svgTotal.appendChild(yLabel);
+
+            const xLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            xLabel.setAttribute("x", "265"); xLabel.setAttribute("y", "190");
+            xLabel.setAttribute("font-size", "7"); xLabel.setAttribute("fill", "#64748b");
+            xLabel.setAttribute("font-weight", "bold");
+            xLabel.textContent = "Q (Output, units)";
+            svgTotal.appendChild(xLabel);
+        }
+
+        // Event listeners block
+        const allInputs = [chokeInput, slopeInput, fcInput, vcInput, betaInput, qInput];
+        allInputs.forEach(inp => inp.addEventListener('input', recalculate));
+
+        // Initial trigger
+        recalculate();
+    </script>
+</body>
+</html>
