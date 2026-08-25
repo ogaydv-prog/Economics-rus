@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Topics | Principles of Economics</title>
+    <title>Course Topics | Economics (SE)</title>
     <style>
         * {
             box-sizing: border-box;
@@ -73,7 +73,7 @@
             margin: 0 auto;
         }
 
-        /* Сетка для 14 карточек (выстраивает до 7 карточек в ряд) */
+        /* Сетка для 14 карточек */
         .grid-container {
             display: flex;
             flex-wrap: wrap;
@@ -95,21 +95,18 @@
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            /* Жесткие одинаковые размеры */
             width: 160px; 
             height: 250px; 
         }
 
-        /* Автоматическое выравнивание сжатых/вытянутых картинок */
         .card img {
             width: 100%;
             height: 100%;
-            object-fit: fill; /* Принудительно растягивает картинки ровно под размер карточки */
+            object-fit: fill;
             display: block;
             transition: transform 0.3s ease;
         }
 
-        /* Эффект при наведении (увеличение и тень) */
         .card:hover {
             transform: translateY(-8px) scale(1.03);
             border-color: #001e50;
@@ -129,24 +126,24 @@
 </head>
 <body>
 
-    <!-- Логотип AlmaU -->
-    <img src="https://ogaydv-prog.github.io/principles-economics/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    <!-- Исправленный логотип на новый репозиторий -->
+    <img src="https://ogaydv-prog.github.io/Economics-se/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
     
-    <!-- Кнопка возврата на главный дашборд -->
-    <a href="https://ogaydv-prog.github.io/principles-economics/index.html" class="back-button">← Back to Dashboard</a>
+    <!-- Кнопка возврата на главный дашборд нового репозитория -->
+    <a href="index.html" class="back-button">← Back to Dashboard</a>
 
     <header>
         <h1>Course Topics</h1>
         <p class="subtitle">
-            Explore the 14 fundamental topics of Principles of Economics
+            Explore the fundamental topics of Economics for Software Engineering
         </p>
     </header>
 
     <main class="grid-container">
-        <!-- 14 карточек с вашими именами файлов -->
-        <a href="https://ogaydv-prog.github.io/principles-economics/topic1.html" class="card" title="Topic 1"><img src="pic-top1.png" alt="Topic 1"></a>
-       <a href="topic2.html" class="card" title="Topic 2"><img src="pic-top2.png" alt="Topic 2"></a>
-        <a href="#" class="card" title="Topic 3"><img src="pic-top3.png" alt="Topic 3"></a>
+        <!-- 14 карточек -->
+        <a href="topic1.html" class="card" title="Topic 1"><img src="pic-top1.png" alt="Topic 1"></a>
+        <a href="topic2.html" class="card" title="Topic 2"><img src="pic-top2.png" alt="Topic 2"></a>
+        <a href="topic3.html" class="card" title="Topic 3"><img src="pic-top3.png" alt="Topic 3"></a>
         <a href="#" class="card" title="Topic 4"><img src="pic-top4.png" alt="Topic 4"></a>
         <a href="#" class="card" title="Topic 5"><img src="pic-top5.png" alt="Topic 5"></a>
         <a href="#" class="card" title="Topic 6"><img src="pic-top6.png" alt="Topic 6"></a>
@@ -162,7 +159,7 @@
     </main>
 
     <footer>
-        <p>Developed for International Business Team AlmaU 2026 | Course: Principles of Economics</p>
+        <p>Developed for Software Engineering Team AlmaU 2026 | Course: Economics</p>
         <p>© Almaty Management University | School of Digital Technologies & Economics</p>
     </footer>
 
