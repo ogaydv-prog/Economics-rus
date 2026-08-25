@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Astana Coffee Market Simulator — Economics Lab</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+  
+  :root {
+    --bg-dark: #090b0e;
+    --panel-dark: #111418;
+    --border-neon: rgba(16, 185, 129, 0.15);
+    
+    --neon-green: #10b981;    /* Demand Curve - Green */
+    --neon-red: #ef4444;      /* Supply Curve - Red */
+    --neon-orange: #f97316;   /* Surplus / Excess Supply */
+    --neon-blue: #0ea5e9;      /* Equilibrium / Neutral */
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.03) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.03) 0px, transparent 50%);
+  }
+
+  /* Range sliders styling */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: #1e252b;
+    height: 4px;
+    border-radius: 999px;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.1s ease;
+  }
+
+  .demand-thumb::-webkit-slider-thumb {
+    background: var(--neon-green);
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  }
+  .demand-thumb::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+  .supply-thumb::-webkit-slider-thumb {
+    background: var(--neon-red);
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+  }
+  .supply-thumb::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+  /* Equilibrium glow animation */
+  @keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+
+  .equilibrium-pulse {
+    animation: pulse-glow 2s infinite;
+  }
+</style>
+</head>
+<body class="text-slate-100 min-h-screen p-3 md:p-4 flex flex-col items-center justify-start overflow-x-hidden">
+
+<div class="w-full max-w-7xl bg-[#111518]/95 border border-emerald-500/10 shadow-[0_0_40px_rgba(16,185,129,0.04)] rounded-xl p-4 md:p-5 backdrop-blur-md">
+  
+  <!-- Header Area -->
+  <div class="relative flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-4 mb-4 gap-4">
+    <div class="text-left">
+      <div class="flex items-center gap-1.5">
+        <span>☕</span>
+        <span class="text-[10px] font-bold tracking-[0.2em] text-emerald-500 uppercase">Practical Case Study</span>
+      </div>
+      
+      <!-- Глубокий кофейно-коричневый цвет (style="color: #78350f;") и убраны все лишние значки-прямоугольники -->
+      <h1 class="text-lg md:text-xl font-extrabold tracking-tight mt-0.5 uppercase whitespace-nowrap" style="color: #8b4513;">
+        Astana Coffee Market Simulator
+      </h1>
+      
+      <!-- Подзаголовок: название предмета и группы ярко-красным -->
+      <p class="text-xs text-red-500 font-bold tracking-wider uppercase mt-0.5">
+        Principles of Economics • International Business • Fall Semester 2026
+      </p>
+    </div>
+    
+    <!-- Price Slider Container -->
+    <div class="w-full md:w-auto min-w-[320px] bg-slate-900/90 border border-slate-800 px-4 py-2.5 rounded-xl flex flex-col gap-1.5">
+      <div class="flex justify-between items-center">
+        <span class="text-[10px] uppercase font-bold text-slate-400">Market Price of Coffee</span>
+        <div id="price-display-val" class="text-lg font-black text-emerald-400 tracking-tight">
+          1,200 ₸
+        </div>
+      </div>
+
+      <input type="range" id="price-slider" min="500" max="2000" step="10" value="1200" class="w-full demand-thumb">
+    </div>
+  </div>
+      <input type="range" id="price-slider" min="500" max="2000" step="10" value="1200" class="w-full demand-thumb">
+    </div>
+  </div>
+  <!-- Main Grid Container -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+    
+    <!-- LEFT COLUMN: Shifter Controls (40% width) -->
+    <div class="lg:col-span-5 flex flex-col gap-4">
+      
+      <!-- Demand Controls Block -->
+      <div class="bg-[#14181c] border-t-4 border-emerald-500 rounded-lg p-3.5 shadow-inner">
+        <div class="flex justify-between items-center mb-1.5">
+          <h3 class="text-xs font-extrabold text-emerald-400 tracking-wider uppercase">Demand Curve (Demand)</h3>
+          <span class="text-[10px] font-mono text-slate-500">Qd = f(P, D)</span>
+        </div>
+        <div class="font-mono text-[10px] text-slate-400 bg-black/40 px-2.5 py-1 rounded border border-slate-800/60 mb-3">
+          Qd = 52.5 - 0.025·P + 4·(Σw_i·D_i)
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <!-- Slider D1 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Specialty Coffee Popularity (D₁)</span>
+              <span id="lbl-w1" class="font-bold text-emerald-400">0.5</span>
+            </div>
+            <input type="range" id="sld-w1" min="0" max="1" step="0.1" value="0.5" class="w-full demand-thumb">
+          </div>
+          <!-- Slider D2 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Astana Household Income (D₂)</span>
+              <span id="lbl-w2" class="font-bold text-emerald-400">0.5</span>
+            </div>
+            <input type="range" id="sld-w2" min="0" max="1" step="0.1" value="0.5" class="w-full demand-thumb">
+          </div>
+          <!-- Slider D3 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Inflation Expectations (D₃)</span>
+              <span id="lbl-w3" class="font-bold text-emerald-400">0.5</span>
+            </div>
+            <input type="range" id="sld-w3" min="0" max="1" step="0.1" value="0.5" class="w-full demand-thumb">
+          </div>
+          <!-- Slider D4 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Tea Price Increase (D₄)</span>
+              <span id="lbl-w4" class="font-bold text-emerald-400">0.5</span>
+            </div>
+            <input type="range" id="sld-w4" min="0" max="1" step="0.1" value="0.5" class="w-full demand-thumb">
+          </div>
+        </div>
+      </div>
+
+      <!-- Supply Controls Block -->
+      <div class="bg-[#14181c] border-t-4 border-red-500 rounded-lg p-3.5 shadow-inner">
+        <div class="flex justify-between items-center mb-1.5">
+          <h3 class="text-xs font-extrabold text-red-400 tracking-wider uppercase">Supply Curve (Supply)</h3>
+          <span class="text-[10px] font-mono text-slate-500">Qs = f(P, S)</span>
+        </div>
+        <div class="font-mono text-[10px] text-slate-400 bg-black/40 px-2.5 py-1 rounded border border-slate-800/60 mb-3">
+          Qs = -7.5 + 0.025·P + 4·(Σv_i·S_i)
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <!-- Slider S1 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Green Bean Imports (S₁)</span>
+              <span id="lbl-v1" class="font-bold text-red-400">0.5</span>
+            </div>
+            <input type="range" id="sld-v1" min="0" max="1" step="0.1" value="0.5" class="w-full supply-thumb">
+          </div>
+          <!-- Slider S2 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Super-Automatic Tech (S₂)</span>
+              <span id="lbl-v2" class="font-bold text-red-400">0.5</span>
+            </div>
+            <input type="range" id="sld-v2" min="0" max="1" step="0.1" value="0.5" class="w-full supply-thumb">
+          </div>
+          <!-- Slider S3 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Tax Holidays / Subsidies (S₃)</span>
+              <span id="lbl-v3" class="font-bold text-red-400">0.5</span>
+            </div>
+            <input type="range" id="sld-v3" min="0" max="1" step="0.1" value="0.5" class="w-full supply-thumb">
+          </div>
+          <!-- Slider S4 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Number of Local Roasters (S₄)</span>
+              <span id="lbl-v4" class="font-bold text-red-400">0.5</span>
+            </div>
+            <input type="range" id="sld-v4" min="0" max="1" step="0.1" value="0.5" class="w-full supply-thumb">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT COLUMN: Chart and Analytical Report (60% width) -->
+    <div class="lg:col-span-7 flex flex-col gap-4">
+      
+      <!-- Chart Canvas Box -->
+      <div class="bg-white border border-slate-200 shadow-md rounded-lg p-3 relative">
+        <div class="absolute top-3 right-4 flex gap-3 text-[10px] font-bold z-10">
+          <div class="flex items-center gap-1">
+            <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block"></span>
+            <span class="text-slate-700">Demand (D)</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="w-2.5 h-2.5 bg-red-500 rounded-full inline-block"></span>
+            <span class="text-slate-700">Supply (S)</span>
+          </div>
+        </div>
+        <canvas id="marketCanvas" class="w-full h-auto block" width="800" height="320"></canvas>
+      </div>
+
+      <!-- Analytical Insights Panel -->
+      <div id="insights-panel" class="bg-[#14181c] border-l-4 border-slate-700 rounded-lg p-4 shadow-sm transition-all duration-300">
+        <h4 id="insights-title" class="text-xs font-black tracking-wider uppercase mb-1 text-slate-300">Market Analysis</h4>
+        <p id="insights-text" class="text-slate-400 text-xs leading-relaxed">
+          Initializing coffee market economic dataset...
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Technical Footer -->
+  <div class="text-center text-[10px] text-slate-600 border-t border-slate-800/60 mt-4 pt-3 font-semibold">
+    Principles of Economics • International Business • AlmaU Fall Semester 2026
+  </div>
+
+</div>
+
+<script>
+  // Demand Sliders
+  const sldW1 = document.getElementById('sld-w1');
+  const sldW2 = document.getElementById('sld-w2');
+  const sldW3 = document.getElementById('sld-w3');
+  const sldW4 = document.getElementById('sld-w4');
+
+  // Supply Sliders
+  const sldV1 = document.getElementById('sld-v1');
+  const sldV2 = document.getElementById('sld-v2');
+  const sldV3 = document.getElementById('sld-v3');
+  const sldV4 = document.getElementById('sld-v4');
+
+  // Price Control
+  const priceSlider = document.getElementById('price-slider');
+  const priceDisplay = document.getElementById('price-display-val');
+
+  // Canvas
+  const canvas = document.getElementById('marketCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Padding
+  const pad = { top: 30, right: 50, bottom: 40, left: 70 };
+
+  // Drag State
+  let activeDragElement = null;
+
+  // Formatting helpers
+  function fmtMoney(num) {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'KZT', maximumFractionDigits: 0 }).format(num).replace('KZT', '₸');
+  }
+  function fmtQty(num) {
+    return new Intl.NumberFormat('en-US').format(Math.round(num * 1000)) + ' cups';
+  }
+
+  // Calculate Market State
+  function getMarketState(P) {
+    const w1 = parseFloat(sldW1.value);
+    const w2 = parseFloat(sldW2.value);
+    const w3 = parseFloat(sldW3.value);
+    const w4 = parseFloat(sldW4.value);
+
+    const v1 = parseFloat(sldV1.value);
+    const v2 = parseFloat(sldV2.value);
+    const v3 = parseFloat(sldV3.value);
+    const v4 = parseFloat(sldV4.value);
+
+    const dShift = 4 * (w1 + w2 + w3 + w4);
+    const sShift = 4 * (v1 + v2 + v3 + v4);
+
+    const Qd = 52.5 - 0.025 * P + dShift;
+    const Qs = -7.5 + 0.025 * P + sShift;
+
+    const P_eq = (60 + dShift - sShift) / 0.05;
+    const Q_eq = 52.5 - 0.025 * P_eq + dShift;
+
+    return {
+      Qd: Math.max(0, Qd),
+      Qs: Math.max(0, Qs),
+      P_eq: Math.round(P_eq),
+      Q_eq: Math.max(0, Q_eq),
+      dShift,
+      sShift
+    };
+  }
+
+  function draw() {
+    const P = parseInt(priceSlider.value);
+    const state = getMarketState(P);
+    const Qd = state.Qd;
+    const Qs = state.Qs;
+    const P_eq = state.P_eq;
+    const Q_eq = state.Q_eq;
+
+    // Update slider readouts
+    document.getElementById('lbl-w1').innerText = parseFloat(sldW1.value).toFixed(1);
+    document.getElementById('lbl-w2').innerText = parseFloat(sldW2.value).toFixed(1);
+    document.getElementById('lbl-w3').innerText = parseFloat(sldW3.value).toFixed(1);
+    document.getElementById('lbl-w4').innerText = parseFloat(sldW4.value).toFixed(1);
+
+    document.getElementById('lbl-v1').innerText = parseFloat(sldV1.value).toFixed(1);
+    document.getElementById('lbl-v2').innerText = parseFloat(sldV2.value).toFixed(1);
+    document.getElementById('lbl-v3').innerText = parseFloat(sldV3.value).toFixed(1);
+    document.getElementById('lbl-v4').innerText = parseFloat(sldV4.value).toFixed(1);
+
+    priceDisplay.innerText = fmtMoney(P);
+
+    // Canvas prep
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const gW = w - pad.left - pad.right;
+    const gH = h - pad.top - pad.bottom;
+
+    // Scale axes: Q from 0 to 50 (k cups), P from 400 to 2100 (₸)
+    const getX = (q) => pad.left + (q / 50) * gW;
+    const getY = (p) => pad.top + (1 - (p - 400) / 1700) * gH;
+
+    // 1. Grid
+    ctx.strokeStyle = '#f1f5f9';
+    ctx.lineWidth = 1;
+    for (let q_val = 10; q_val <= 50; q_val += 10) {
+      ctx.beginPath();
+      ctx.moveTo(getX(q_val), pad.top);
+      ctx.lineTo(getX(q_val), h - pad.bottom);
+      ctx.stroke();
+    }
+    for (let p_val = 500; p_val <= 2000; p_val += 300) {
+      ctx.beginPath();
+      ctx.moveTo(pad.left, getY(p_val));
+      ctx.lineTo(w - pad.right, getY(p_val));
+      ctx.stroke();
+    }
+
+    // 2. Axes
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top - 10);
+    ctx.lineTo(pad.left, h - pad.bottom);
+    ctx.lineTo(w - pad.right + 10, h - pad.bottom);
+    ctx.stroke();
+
+    // 3. Surplus / Shortage shaded zones
+    if (Math.abs(P - P_eq) > 10) {
+      ctx.fillStyle = P > P_eq ? 'rgba(249, 115, 22, 0.05)' : 'rgba(239, 68, 68, 0.05)';
+      const qStart = Math.min(Qd, Qs);
+      const qEnd = Math.max(Qd, Qs);
+      ctx.fillRect(getX(qStart), getY(P), (qEnd - qStart) / 50 * gW, getY(P_eq) - getY(P));
+    }
+
+    // 4. Base dashed curves (at 0.0 shift)
+    ctx.strokeStyle = 'rgba(16, 185, 129, 0.15)'; 
+    ctx.lineWidth = 1.5; 
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath(); 
+    ctx.moveTo(getX(52.5 - 0.025 * 500), getY(500)); 
+    ctx.lineTo(getX(52.5 - 0.025 * 2000), getY(2000)); 
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.15)';
+    ctx.beginPath(); 
+    ctx.moveTo(getX(-7.5 + 0.025 * 500), getY(500)); 
+    ctx.lineTo(getX(-7.5 + 0.025 * 2000), getY(2000)); 
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 5. Shifted Active Curves
+    // Demand Curve (D) - Green
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(getX(52.5 - 0.025 * 500 + state.dShift), getY(500));
+    ctx.lineTo(getX(52.5 - 0.025 * 2000 + state.dShift), getY(2000));
+    ctx.stroke();
+
+    // Supply Curve (S) - Red
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(getX(-7.5 + 0.025 * 500 + state.sShift), getY(500));
+    ctx.lineTo(getX(-7.5 + 0.025 * 2000 + state.sShift), getY(2000));
+    ctx.stroke();
+
+    // 6. Current Market Price Trace (Horizontal Line)
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, getY(P));
+    ctx.lineTo(w - pad.right, getY(P));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Projections to axes
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(getX(Qd), getY(P)); ctx.lineTo(getX(Qd), h - pad.bottom); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(getX(Qs), getY(P)); ctx.lineTo(getX(Qs), h - pad.bottom); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 7. Interactive Dots
+    // Qd Dot
+    ctx.fillStyle = '#10b981';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(getX(Qd), getY(P), 7, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+
+    // Qs Dot
+    ctx.fillStyle = '#ef4444';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(getX(Qs), getY(P), 7, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+
+    // 8. Equilibrium Point
+    const isEquilibrium = Math.abs(P - P_eq) <= 12;
+    if (isEquilibrium) {
+      ctx.fillStyle = '#10b981';
+      ctx.shadowColor = '#10b981';
+      ctx.shadowBlur = 12;
+      ctx.beginPath(); 
+      ctx.arc(getX(Q_eq), getY(P_eq), 9, 0, 2 * Math.PI); 
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    } else {
+      ctx.fillStyle = '#64748b';
+      ctx.beginPath();
+      ctx.arc(getX(Q_eq), getY(P_eq), 4.5, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    // 9. Axes Labels & Text
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 11px Inter';
+    ctx.fillText('Cup Price (P, ₸)', pad.left - 65, pad.top - 12);
+    ctx.fillText('Monthly Sales Volume (Q, k cups)', w - pad.right - 200, h - pad.bottom + 28);
+
+    // Scale values
+    ctx.fillStyle = '#475569';
+    ctx.font = 'bold 10px Inter';
+    ctx.fillText('500', pad.left - 25, getY(500) + 3);
+    ctx.fillText('1 200', pad.left - 32, getY(1200) + 3);
+    ctx.fillText('2 000', pad.left - 32, getY(2000) + 3);
+    
+    ctx.fillText('10', getX(10) - 5, h - pad.bottom + 15);
+    ctx.fillText('30.5', getX(30.5) - 12, h - pad.bottom + 15);
+    ctx.fillText('50', getX(50) - 5, h - pad.bottom + 15);
+
+    // Curve Letters
+    ctx.fillStyle = '#10b981';
+    ctx.font = '900 12px Inter';
+    ctx.fillText('D', getX(52.5 - 0.025 * 500 + state.dShift) + 8, getY(500) + 3);
+
+    ctx.fillStyle = '#ef4444';
+    ctx.fillText('S', getX(-7.5 + 0.025 * 2000 + state.sShift) + 8, getY(2000) + 3);
+
+    // On-Canvas Text Indicators
+    if (!isEquilibrium) {
+      if (P > P_eq) {
+        ctx.fillStyle = '#f97316';
+        ctx.font = 'bold 10px Inter';
+        ctx.fillText(`MARKET SURPLUS = ${fmtQty(Qs - Qd)}`, getX(Math.min(Qd, Qs)) + 10, getY(P) - 8);
+      } else {
+        ctx.fillStyle = '#ef4444';
+        ctx.font = 'bold 10px Inter';
+        ctx.fillText(`MARKET SHORTAGE = ${fmtQty(Qd - Qs)}`, getX(Math.min(Qd, Qs)) + 10, getY(P) - 8);
+      }
+    }
+
+    // --- ANALYTICAL INSIGHTS NARRATIVE ---
+    const iPanel = document.getElementById('insights-panel');
+    const iTitle = document.getElementById('insights-title');
+    const iText = document.getElementById('insights-text');
+
+    iPanel.style.boxShadow = "none";
+    iPanel.style.borderLeftWidth = "4px";
+
+    if (isEquilibrium) {
+      iPanel.style.borderLeftColor = "var(--neon-green)";
+      iPanel.classList.add("equilibrium-pulse");
+      iTitle.style.color = "var(--neon-green)";
+      iTitle.innerText = "MARKET EQUILIBRIUM ACHIEVED!";
+      iText.innerHTML = `Congratulations! Market supply and demand forces have perfectly balanced the Astana coffee market. At a price of <strong>${fmtMoney(P_eq)}</strong>, quantity demanded exactly equals quantity supplied at <strong>${fmtQty(Q_eq)}</strong>. There is neither shortage nor surplus. This represents optimal economic welfare allocation.`;
+    } else if (P > P_eq) {
+      iPanel.classList.remove("equilibrium-pulse");
+      iPanel.style.borderLeftColor = "var(--neon-orange)";
+      iTitle.style.color = "var(--neon-orange)";
+      iTitle.innerText = `MARKET SURPLUS (EXCESS SUPPLY) — BUYER'S MARKET`;
+      iText.innerHTML = `The current price (<strong>${fmtMoney(P)}</strong>) exceeds the equilibrium price of ${fmtMoney(P_eq)}. Coffee shops are willing to supply <strong>${fmtQty(Qs)}</strong>, but consumers demand only <strong>${fmtQty(Qd)}</strong>. An excess inventory surplus of <strong>${fmtQty(Qs - Qd)}</strong> has formed. <br><strong>Managerial Action:</strong> Coffee shops face unsold inventory and will discount prices. Downward pressure will drive price toward equilibrium.`;
+    } else {
+      iPanel.classList.remove("equilibrium-pulse");
+      iPanel.style.borderLeftColor = "var(--neon-red)";
+      iTitle.style.color = "var(--neon-red)";
+      iTitle.innerText = `MARKET SHORTAGE (EXCESS DEMAND) — SELLER'S MARKET`;
+      iText.innerHTML = `The current price (<strong>${fmtMoney(P)}</strong>) is below the equilibrium level of ${fmtMoney(P_eq)}. Consumers demand <strong>${fmtQty(Qd)}</strong>, but coffee shops supply only <strong>${fmtQty(Qs)}</strong>. The market deficit stands at <strong>${fmtQty(Qd - Qs)}</strong>.<br><strong>Managerial Action:</strong> Customer queues expand. Willingness-to-pay exceeds current price, prompting roasters to raise prices toward market equilibrium.`;
+    }
+  }
+
+  // Interactive Drag & Touch Handlers
+  function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+    
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+
+  canvas.addEventListener('mousedown', function(e) {
+    const pos = getMousePos(e);
+    const P = parseInt(priceSlider.value);
+    const state = getMarketState(P);
+    const Qd = state.Qd;
+    const Qs = state.Qs;
+
+    const gW = canvas.width - pad.left - pad.right;
+    const gH = canvas.height - pad.top - pad.bottom;
+    const getX = (q) => pad.left + (q / 50) * gW;
+    const getY = (p) => pad.top + (1 - (p - 400) / 1700) * gH;
+
+    const distD = Math.hypot(pos.x - getX(Qd), pos.y - getY(P));
+    const distS = Math.hypot(pos.x - getX(Qs), pos.y - getY(P));
+
+    if (distD < 16) {
+      activeDragElement = 'demand_point';
+      canvas.style.cursor = 'grabbing';
+    } else if (distS < 16) {
+      activeDragElement = 'supply_point';
+      canvas.style.cursor = 'grabbing';
+    } else if (Math.abs(pos.y - getY(P)) < 12 && pos.x >= pad.left && pos.x <= canvas.width - pad.right) {
+      activeDragElement = 'price_line';
+      canvas.style.cursor = 'grabbing';
+    }
+  });
+
+  window.addEventListener('mousemove', function(e) {
+    if (!activeDragElement) {
+      const pos = getMousePos(e);
+      const P = parseInt(priceSlider.value);
+      const state = getMarketState(P);
+      const Qd = state.Qd;
+      const Qs = state.Qs;
+
+      const gW = canvas.width - pad.left - pad.right;
+      const gH = canvas.height - pad.top - pad.bottom;
+      const getX = (q) => pad.left + (q / 50) * gW;
+      const getY = (p) => pad.top + (1 - (p - 400) / 1700) * gH;
+
+      const distD = Math.hypot(pos.x - getX(Qd), pos.y - getY(P));
+      const distS = Math.hypot(pos.x - getX(Qs), pos.y - getY(P));
+
+      if (distD < 16 || distS < 16 || (Math.abs(pos.y - getY(P)) < 8 && pos.x >= pad.left && pos.x <= canvas.width - pad.right)) {
+        canvas.style.cursor = 'grab';
+      } else {
+        canvas.style.cursor = 'default';
+      }
+      return;
+    }
+
+    const pos = getMousePos(e);
+    const gH = canvas.height - pad.top - pad.bottom;
+    let relativeY = (pos.y - pad.top) / gH;
+    let price = 400 + (1 - relativeY) * 1700;
+    price = Math.min(2000, Math.max(500, Math.round(price)));
+
+    priceSlider.value = price;
+    draw();
+  });
+
+  window.addEventListener('mouseup', function() {
+    activeDragElement = null;
+    canvas.style.cursor = 'default';
+  });
+
+  // Touch Support
+  canvas.addEventListener('touchstart', function(e) {
+    const pos = getMousePos(e);
+    const P = parseInt(priceSlider.value);
+    const state = getMarketState(P);
+    const Qd = state.Qd;
+    const Qs = state.Qs;
+
+    const gW = canvas.width - pad.left - pad.right;
+    const gH = canvas.height - pad.top - pad.bottom;
+    const getX = (q) => pad.left + (q / 50) * gW;
+    const getY = (p) => pad.top + (1 - (p - 400) / 1700) * gH;
+
+    const distD = Math.hypot(pos.x - getX(Qd), pos.y - getY(P));
+    const distS = Math.hypot(pos.x - getX(Qs), pos.y - getY(P));
+
+    if (distD < 24) {
+      activeDragElement = 'demand_point';
+    } else if (distS < 24) {
+      activeDragElement = 'supply_point';
+    } else if (Math.abs(pos.y - getY(P)) < 20 && pos.x >= pad.left && pos.x <= canvas.width - pad.right) {
+      activeDragElement = 'price_line';
+    }
+  });
+
+  canvas.addEventListener('touchmove', function(e) {
+    if (!activeDragElement) return;
+    e.preventDefault();
+    
+    const pos = getMousePos(e);
+    const gH = canvas.height - pad.top - pad.bottom;
+    let relativeY = (pos.y - pad.top) / gH;
+    let price = 400 + (1 - relativeY) * 1700;
+    price = Math.min(2000, Math.max(500, Math.round(price)));
+
+    priceSlider.value = price;
+    draw();
+  });
+
+  canvas.addEventListener('touchend', function() {
+    activeDragElement = null;
+  });
+
+  // Event listeners on input sliders
+  [sldW1, sldW2, sldW3, sldW4, sldV1, sldV2, sldV3, sldV4, priceSlider].forEach(slider => {
+    slider.addEventListener('input', draw);
+  });
+
+  // Initial draw
+  draw();
+</script>
+
+</body>
+</html>

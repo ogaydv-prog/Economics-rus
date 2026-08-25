@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supply & Demand Analysis • International Business</title>
+    <!-- Google Fonts & Tailwind CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+        }
+        /* Dark Sidebar Styling */
+        .sidebar-dark {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1.5px solid rgba(197, 160, 89, 0.25);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar-dark:hover {
+            border-color: rgba(197, 160, 89, 0.45);
+        }
+        /* Light Workspace Styling */
+        .workspace-light {
+            background: #ffffff;
+            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+        /* Range slider customized for premium dark theme */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: #334155;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #c5a059;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(197, 160, 89, 0.8);
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.35);
+        }
+        /* Custom scrollbar for tables */
+        .custom-scroll::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .text-gold {
+            color: #c5a059;
+        }
+        .border-gold {
+            border-color: #c5a059;
+        }
+        /* Soft pulse animation for equilibrium points */
+        @keyframes eq-pulse {
+            0% { r: 5px; stroke-width: 1px; opacity: 0.7; }
+            50% { r: 9px; stroke-width: 3px; opacity: 1; filter: drop-shadow(0 0 8px #10b981); }
+            100% { r: 5px; stroke-width: 1px; opacity: 0.7; }
+        }
+        .pulse-dot {
+            animation: eq-pulse 2s infinite ease-in-out;
+        }
+        /* Toggle Switch Styling */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #c5a059;
+            background-color: #c5a059;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #475569;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 flex flex-col justify-between min-h-screen">
+
+    <!-- Header Area -->
+   <!-- Header Area -->
+    <header class="sidebar-dark max-w-7xl mx-auto w-full p-4 rounded-2xl text-center mb-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div class="text-left">
+            <!-- Главный заголовок: уменьшенный шрифт (text-lg md:text-xl), ярко-желтый цвет (text-yellow-300) и запрет переноса (whitespace-nowrap) -->
+            <h1 class="text-lg md:text-xl font-black text-yellow-300 tracking-wide uppercase mb-1 whitespace-nowrap">
+                Supply & Demand Analysis • Banana Market in RK
+            </h1>
+            <!-- Подзаголовок: ярко-голубой цвет (text-cyan-400) -->
+            <p class="text-xs text-cyan-400 font-semibold tracking-wider uppercase">
+                Principles of Economics • International Business • Fall Semester 2026 • Market Equilibrium Lab
+            </p>
+        </div>
+        <div class="flex items-center gap-3 bg-slate-900/80 p-2.5 rounded-xl border border-slate-800 self-center md:self-auto">
+            <span class="text-2xl">🍌</span>
+            <div class="text-left text-[11px]">
+                <span class="text-slate-400 font-medium block">Microeconomic Simulator:</span>
+                <span class="text-gold font-bold">Elasticity & Government Regulation Assessment</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Government Regulation Alert Banner -->
+    <div class="max-w-7xl mx-auto w-full mb-4 p-3 bg-red-950/40 border-l-4 border-red-500 rounded-r-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div class="text-xs">
+            <span class="font-bold text-red-400 block uppercase tracking-wide mb-0.5">⚠️ GOVERNMENT PRICE REGULATION IN KAZAKHSTAN (PRICE FLOOR):</span>
+            <span class="text-slate-300">
+                The Minimum Price Level (Price Floor) for fresh banana imports in Q2 2026 is set by the Government of RK at 
+                <strong class="text-red-400">403 ₸ per kg</strong>. Selling below this threshold blocks customs declaration.
+            </span>
+        </div>
+        <a href="https://www.zakon.kz/pravo/6511242-ustanovlen-minimalnyy-uroven-tsen-na-otdelnye-vidy-tovarov-na-vtoroy-kvartal-2026-goda.html" 
+           target="_blank" 
+           class="bg-red-500 hover:bg-red-600 text-white font-bold text-[10px] px-3 py-1.5 rounded transition-all whitespace-nowrap uppercase tracking-wider">
+            Law Reference (Zakon.kz) 🔗
+        </a>
+    </div>
+
+    <!-- Main Workspace -->
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch w-full flex-grow">
+        
+        <!-- Left Column: Inputs & Model Parameters (Dark sidebar) -->
+        <section class="lg:col-span-4 sidebar-dark p-5 rounded-xl flex flex-col justify-between space-y-4 text-xs">
+            <div>
+                <div class="flex items-center gap-2 border-b border-slate-800 pb-2 mb-3">
+                    <span class="text-lg">⚙️</span>
+                    <h2 class="text-xs font-bold text-gold uppercase tracking-wider">Banana Business Parameters</h2>
+                </div>
+
+                <!-- SECTION 1: CORE MARKET VARIABLES -->
+                <div class="space-y-4 mb-4 bg-slate-950/40 p-3 rounded-lg border border-slate-900">
+                    <h3 class="font-bold text-gold uppercase tracking-wider text-[10px] flex justify-between">
+                        <span>1. Core Pricing Parameters</span>
+                        <span class="text-slate-500 font-normal">₸ per kg</span>
+                    </h3>
+                    
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Wholesale Purchase Price (₸/kg):</span>
+                            <span class="text-gold font-bold" id="wholesale-val">350 ₸</span>
+                        </div>
+                        <input type="range" id="wholesale-input" min="200" max="800" step="10" value="350">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Wholesale cost including ocean freight from Ecuador.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Retail Selling Price (₸/kg):</span>
+                            <span class="text-gold font-bold" id="retail-val">950 ₸</span>
+                        </div>
+                        <input type="range" id="retail-input" min="300" max="1500" step="10" value="950">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Your retail price on store shelves.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Base Market Capacity (kg/mo):</span>
+                            <span class="text-gold font-bold" id="base-q-val">1000 kg</span>
+                        </div>
+                        <input type="range" id="base-q-input" min="500" max="2000" step="50" value="1000">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Potential capacity of the local retail micro-zone.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: SHIFTERS TOGGLE & CONTROLS -->
+                <div class="space-y-4 bg-slate-950/40 p-3 rounded-lg border border-slate-900 mb-4">
+                    <div class="flex items-center justify-between border-b border-slate-900 pb-2">
+                        <h3 class="font-bold text-sky-400 uppercase tracking-wider text-[10px]">
+                            2. Curve Shift Management (Shifters)
+                        </h3>
+                        <div class="relative inline-block w-10 mr-2 align-middle select-none">
+                            <input type="checkbox" id="shifters-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-slate-800 border-4 border-slate-900 appearance-none cursor-pointer transition-all duration-300 right-4"/>
+                            <label for="shifters-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-slate-950 cursor-pointer"></label>
+                        </div>
+                    </div>
+
+                    <!-- Shift Sliders (hidden unless toggled) -->
+                    <div id="shifters-panel" class="space-y-4 hidden transition-all duration-300">
+                        
+                        <!-- Demand Shift -->
+                        <div class="border-t border-slate-900 pt-2">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-slate-300">Demand Curve Shift (<span class="text-blue-400">ΔD</span>, kg):</span>
+                                <span class="font-bold text-blue-400" id="shift-d-val">0 kg</span>
+                            </div>
+                            <input type="range" id="shift-d-input" min="-500" max="500" step="50" value="0">
+                            
+                            <!-- Shifter Factor description based on slider position -->
+                            <div class="mt-2 p-2 bg-slate-900/60 rounded text-[9px] text-slate-400 leading-normal border-l-2 border-blue-500">
+                                <span class="font-bold text-blue-400 block mb-0.5">Key Demand Factor:</span>
+                                <span id="demand-factor-text">Market is stable. No shift detected.</span>
+                            </div>
+                        </div>
+
+                        <!-- Supply Shift -->
+                        <div class="border-t border-slate-900 pt-2">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-slate-300">Supply Curve Shift (<span class="text-orange-400">ΔS</span>, kg):</span>
+                                <span class="font-bold text-orange-400" id="shift-s-val">0 kg</span>
+                            </div>
+                            <input type="range" id="shift-s-input" min="-500" max="500" step="50" value="0">
+                            
+                            <!-- Supply Factor description based on slider position -->
+                            <div class="mt-2 p-2 bg-slate-900/60 rounded text-[9px] text-slate-400 leading-normal border-l-2 border-orange-500">
+                                <span class="font-bold text-orange-400 block mb-0.5">Key Supply Factor:</span>
+                                <span id="supply-factor-text">Supply chains operating standard schedules.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: VISUALIZATION AREAS (LAYERS) -->
+                <div class="space-y-3 bg-slate-950/40 p-3 rounded-lg border border-slate-900">
+                    <h3 class="font-bold text-emerald-400 uppercase tracking-wider text-[10px]">
+                        3. Graph Area Overlay Layers
+                    </h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2.5 cursor-pointer text-slate-300 hover:text-white transition-colors">
+                            <input type="checkbox" id="show-tr-checkbox" checked class="rounded border-slate-700 bg-slate-900 text-gold focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+                            <span>Total Revenue (TR, Hatched)</span>
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer text-slate-300 hover:text-white transition-colors">
+                            <input type="checkbox" id="show-cs-checkbox" checked class="rounded border-slate-700 bg-slate-900 text-blue-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-sm bg-emerald-500/20 border border-emerald-500"></span>
+                                Consumer Surplus (CS, Green)
+                            </span>
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer text-slate-300 hover:text-white transition-colors">
+                            <input type="checkbox" id="show-ps-checkbox" checked class="rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-sm bg-rose-500/20 border border-rose-500"></span>
+                                Producer Surplus (PS, Red)
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theory snippet -->
+            <div class="p-2.5 bg-slate-950/80 border-l-2 border-gold rounded-r text-[10px] text-slate-400 leading-normal mt-3">
+                <span class="font-bold text-gold block mb-0.5">Price & Equilibrium Dynamics:</span>
+                When market price exceeds equilibrium ($P > P^*$), a surplus (excess supply) occurs. When price falls below equilibrium ($P < P^*$), a shortage arises. The 403 ₸ Price Floor artificially sets a legal price minimum.
+            </div>
+        </section>
+
+        <!-- Right Column: Results, Live Analysis & Chart -->
+        <section class="lg:col-span-8 flex flex-col justify-between space-y-4">
+            
+            <!-- Valuation Summary & Market Indicators -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-slate-800">
+                <div class="workspace-light p-3 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-amber-500">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Equilibrium Price (P*)</span>
+                    <h3 class="text-base font-black text-amber-700 font-mono" id="eq-price-disp">0 ₸</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5">Supply & Demand Intersect</p>
+                </div>
+
+                <div class="workspace-light p-3 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-blue-600">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Equilibrium Quantity (Q*)</span>
+                    <h3 class="text-base font-black text-blue-600 font-mono" id="eq-qty-disp">0 kg</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5">Optimal Market Volume</p>
+                </div>
+
+                <div class="workspace-light p-3 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-purple-600">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Market State</span>
+                    <h3 class="text-xs font-black text-purple-700 uppercase tracking-tight" id="market-state-disp">Perfect</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5" id="market-state-desc">Volumes perfectly matched</p>
+                </div>
+
+                <div class="workspace-light p-3 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-emerald-600">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Net Operating Profit (π)</span>
+                    <h3 class="text-base font-black text-emerald-600 font-mono" id="profit-disp">0 ₸</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5">Result from Actual Sales</p>
+                </div>
+            </div>
+
+            <!-- Live Economic Analysis Verdict Board -->
+            <div class="workspace-light p-4 rounded-xl text-slate-800">
+                <div class="flex items-center gap-2 mb-1.5 border-b border-slate-100 pb-1">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Microeconomic Market Audit</h4>
+                </div>
+                <div id="verdict-content" class="text-[11px] text-slate-600 leading-relaxed font-medium">
+                    Calculating elasticity parameters and market shock impact...
+                </div>
+            </div>
+
+            <!-- Combined Chart: Supply & Demand Curve Graph -->
+            <div class="workspace-light p-4 rounded-xl flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-2 border-b border-slate-100 pb-1.5">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Supply & Demand Equilibrium Graph</h4>
+                    <span class="text-[9px] text-slate-400 font-mono">Scale: ₸ per kg / Quantity in kg</span>
+                </div>
+                
+                <!-- SVG Chart Container -->
+                <div class="w-full h-56 relative bg-slate-50 rounded border border-slate-100 overflow-hidden">
+                    
+                    <!-- Floating Market Pressure Badge -->
+                    <div id="market-pressure-badge" class="absolute top-2 left-2 px-2.5 py-1 rounded-md text-[9px] font-bold shadow-sm border flex items-center gap-1.5 transition-all duration-300">
+                        <span id="pressure-icon">⚖️</span>
+                        <span id="pressure-text">Market in Equilibrium</span>
+                    </div>
+
+                    <svg viewBox="0 0 650 260" class="w-full h-full select-none" id="svg-market-graph">
+                        <!-- Elements generated by JS -->
+                    </svg>
+                    
+                    <!-- DANGER BANNER ON GRAPH -->
+                    <div id="illegal-price-overlay" class="absolute inset-0 bg-red-950/90 flex flex-col items-center justify-center p-4 text-center hidden">
+                        <span class="text-2xl mb-1">🛑 Violation of RK Regulations!</span>
+                        <h4 class="text-xs font-bold text-red-400 uppercase tracking-wide">Price Below Floor Level (403 ₸)</h4>
+                        <p class="text-[9px] text-slate-300 max-w-sm mt-0.5 leading-normal">
+                            Selling bananas below the minimum legal customs declaration threshold blocks EAEU transit and triggers heavy administrative fines. Price slider is clamped at the statutory floor level.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Custom Legends -->
+                <div class="flex justify-center flex-wrap gap-4 text-[9px] mt-2 font-bold text-slate-500">
+                    <div class="flex items-center gap-1">
+                        <span class="w-3 h-0.5 bg-blue-500 block"></span>
+                        <span>Demand Curve (D)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-3 h-0.5 bg-orange-500 block"></span>
+                        <span>Supply Curve (S)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-3 h-0.5 bg-emerald-500 block"></span>
+                        <span>Current Retail Price</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-3 h-0.5 bg-red-500 block"></span>
+                        <span>RK Price Floor (403 ₸)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 block"></span>
+                        <span>Equilibrium Point E*</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Economic Surplus & Welfare Analysis Table -->
+            <div class="workspace-light p-4 rounded-xl text-slate-800">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Social Welfare & Deadweight Loss Inspection (₸/mo)</h4>
+                    <span class="text-[8px] text-slate-400 font-mono">Surplus Allocation Analysis</span>
+                </div>
+                <div class="overflow-x-auto custom-scroll">
+                    <table class="w-full text-left border-collapse text-[10px] font-mono">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-slate-500 uppercase text-[8px] tracking-wider">
+                                <th class="pb-1.5">Welfare Metric</th>
+                                <th class="pb-1.5 text-right">Value (₸)</th>
+                                <th class="pb-1.5 text-right">Economic Meaning / Interpretation</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td class="py-1.5 text-slate-500 font-bold">Consumer Surplus (CS):</td>
+                                <td class="text-right font-black text-blue-600 font-mono" id="cs-val-disp">0 ₸</td>
+                                <td class="text-right text-slate-500 text-[9px]">Buyer benefit from paying less than their maximum willingness-to-pay.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1.5 text-slate-500 font-bold">Producer Surplus (PS):</td>
+                                <td class="text-right font-black text-amber-600 font-mono" id="ps-val-disp">0 ₸</td>
+                                <td class="text-right text-slate-500 text-[9px]">Net importer margin received above the marginal cost of procurement.</td>
+                            </tr>
+                            <tr class="bg-rose-50/50">
+                                <td class="py-1.5 text-rose-700 font-bold">Deadweight Loss (DWL):</td>
+                                <td class="text-right font-black text-rose-600 font-mono" id="dwl-val-disp">0 ₸</td>
+                                <td class="text-right text-rose-500 text-[9px] font-bold">Economic inefficiency caused by market price or quantity distortions.</td>
+                            </tr>
+                            <tr class="bg-emerald-50">
+                                <td class="py-1.5 text-emerald-800 font-bold">Total Welfare Surplus:</td>
+                                <td class="text-right font-black text-emerald-600 font-mono" id="total-surplus-disp">0 ₸</td>
+                                <td class="text-right text-emerald-500 text-[9px]">Total market utility (CS + PS) generated for the economy.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Technical Footer -->
+    <footer class="text-center text-[10px] text-slate-500 mt-4 border-t border-slate-900/60 pt-2 font-bold tracking-wide">
+        Principles of Economics • Developed for International Business Students, AlmaU Fall Semester 2026
+    </footer>
+
+    <!-- Interactive Simulation Script -->
+    <script>
+        // DOM Elements - Inputs
+        const wholesaleInput = document.getElementById('wholesale-input');
+        const retailInput = document.getElementById('retail-input');
+        const baseQInput = document.getElementById('base-q-input');
+        const shiftersToggle = document.getElementById('shifters-toggle');
+        const shiftersPanel = document.getElementById('shifters-panel');
+        const shiftDInput = document.getElementById('shift-d-input');
+        const shiftSInput = document.getElementById('shift-s-input');
+
+        // Checkboxes for Visualization Areas
+        const showTrCheckbox = document.getElementById('show-tr-checkbox');
+        const showCsCheckbox = document.getElementById('show-cs-checkbox');
+        const showPsCheckbox = document.getElementById('show-ps-checkbox');
+
+        // DOM Elements - Value Displays
+        const wholesaleVal = document.getElementById('wholesale-val');
+        const retailVal = document.getElementById('retail-val');
+        const baseQVal = document.getElementById('base-q-val');
+        const shiftDVal = document.getElementById('shift-d-val');
+        const shiftSVal = document.getElementById('shift-s-val');
+        const demandFactorText = document.getElementById('demand-factor-text');
+        const supplyFactorText = document.getElementById('supply-factor-text');
+
+        // DOM Elements - KPI Blocks
+        const eqPriceDisp = document.getElementById('eq-price-disp');
+        const eqQtyDisp = document.getElementById('eq-qty-disp');
+        const marketStateDisp = document.getElementById('market-state-disp');
+        const marketStateDesc = document.getElementById('market-state-desc');
+        const profitDisp = document.getElementById('profit-disp');
+        const verdictContent = document.getElementById('verdict-content');
+        const illegalPriceOverlay = document.getElementById('illegal-price-overlay');
+
+        // DOM Elements - Welfare Displays
+        const csValDisp = document.getElementById('cs-val-disp');
+        const psValDisp = document.getElementById('ps-val-disp');
+        const dwlValDisp = document.getElementById('dwl-val-disp');
+        const totalSurplusDisp = document.getElementById('total-surplus-disp');
+
+        const svgMarketGraph = document.getElementById('svg-market-graph');
+
+        // Target state variables
+        const MIN_LEGAL_PRICE = 403; // Government Minimum Price Level in Tenge
+
+        // Dynamic demand factors text generator based on value shift
+        function getDemandShifterText(val) {
+            if (val > 250) return "🚀 Rapid income growth in urban centers (Almaty & Astana) shifts demand strongly rightward.";
+            if (val > 50) return "📈 Anticipated fruit price surges in autumn prompt coffee chains to stockpile bananas (rightward shift).";
+            if (val < -250) return "📉 A sharp decline in healthy snacking trends among Gen-Z consumers shifts demand leftward.";
+            if (val < -50) return "⬇️ Seasonal abundance of cheap local apples and berries substitutes bananas out of consumer baskets (leftward shift).";
+            return "⚖️ Consumer preferences and disposable income remain stable. Non-price demand factors in balance.";
+        }
+
+        // Dynamic supply factors text generator based on value shift
+        function getSupplyShifterText(val) {
+            if (val > 250) return "🟢 Government freight subsidies for fruit import logistics shift supply strongly rightward.";
+            if (val > 50) return "🚚 Bumper harvests and reduced export tariffs in Ecuador increase banana supply (rightward shift).";
+            if (val < -250) return "🛑 EAEU border customs delays and stringent phytosanitary checks severely restrict imports (leftward shift).";
+            if (val < -50) return "⚠️ Escalating warehouse lease rates for ripening gas facilities in Kazakhstan (leftward shift).";
+            return "⚖️ Banana shipments into Kazakhstan are arriving on schedule without disruption.";
+        }
+
+        // Recalculation logic
+        function updateModel() {
+            // Read UI values
+            const wholesaleCost = parseFloat(wholesaleInput.value);
+            let retailPrice = parseFloat(retailInput.value);
+            const baseQ = parseFloat(baseQInput.value);
+            
+            const shiftsActive = shiftersToggle.checked;
+            
+            let shiftD = 0;
+            let shiftS = 0;
+
+            if (shiftsActive) {
+                shiftersPanel.classList.remove('hidden');
+                shiftD = parseFloat(shiftDInput.value);
+                shiftS = parseFloat(shiftSInput.value);
+                
+                // Update slider text displays
+                shiftDVal.innerText = (shiftD > 0 ? "+" : "") + shiftD + " kg";
+                shiftSVal.innerText = (shiftS > 0 ? "+" : "") + shiftS + " kg";
+                demandFactorText.innerText = getDemandShifterText(shiftD);
+                supplyFactorText.innerText = getSupplyShifterText(shiftS);
+            } else {
+                shiftersPanel.classList.add('hidden');
+                shiftDVal.innerText = "0 kg";
+                shiftSVal.innerText = "0 kg";
+                demandFactorText.innerText = "Shifters inactive.";
+                supplyFactorText.innerText = "Shifters inactive.";
+            }
+
+            // Check legal pricing limit
+            if (retailPrice < MIN_LEGAL_PRICE) {
+                illegalPriceOverlay.classList.remove('hidden');
+                // Enforce minimum price for economic calculations to represent real barrier
+                retailPrice = MIN_LEGAL_PRICE;
+            } else {
+                illegalPriceOverlay.classList.add('hidden');
+            }
+
+            // Update simple text readouts
+            wholesaleVal.innerText = wholesaleCost + " ₸";
+            retailVal.innerText = retailPrice + " ₸";
+            baseQVal.innerText = baseQ + " kg";
+
+            // MICROECONOMIC EQUATION MODELING:
+            // Demand Equation (Linear): Qd = BaseQ + shiftD - Slope_D * Price
+            // Supply Equation (Linear): Qs = shiftS + Slope_S * (Price - WholesaleCost)
+            const slopeD = 1.25; 
+            const slopeS = 2.0;
+
+            // Choke prices
+            const chokePriceD = (baseQ + shiftD) / slopeD;
+            
+            // Qd and Qs calculations at current retail price
+            const qd = Math.max(0, baseQ + shiftD - slopeD * retailPrice);
+            const qs = Math.max(0, shiftS + slopeS * (retailPrice - wholesaleCost));
+
+            // EQUILIBRIUM SOLVER: Qd = Qs
+            const eqPrice = Math.max(0, (baseQ + shiftD - shiftS + slopeS * wholesaleCost) / (slopeD + slopeS));
+            const eqQty = Math.max(0, baseQ + shiftD - slopeD * eqPrice);
+
+            // Actual volume traded on the market is limited by the short side
+            const actualQty = Math.min(qd, qs);
+            const revenue = actualQty * retailPrice;
+            const cost = actualQty * wholesaleCost;
+            const profit = Math.max(0, revenue - cost);
+
+            // Render KPIs
+            eqPriceDisp.innerText = Math.round(eqPrice).toLocaleString() + " ₸";
+            eqQtyDisp.innerText = Math.round(eqQty).toLocaleString() + " kg";
+            profitDisp.innerText = Math.round(profit).toLocaleString() + " ₸";
+
+            // Market state calculation
+            let stateStr = "Equilibrium";
+            let descStr = "Perfect market alignment";
+            let stateColor = "text-emerald-600";
+            let stateBorder = "border-l-emerald-600";
+
+            const diff = qd - qs;
+            if (Math.abs(diff) < 15) {
+                stateStr = "Equilibrium";
+                descStr = "Prices stable, zero shortage.";
+            } else if (diff > 0) {
+                stateStr = "Shortage";
+                descStr = `Market deficit of ${Math.round(diff).toLocaleString()} kg!`;
+                stateColor = "text-rose-600";
+                stateBorder = "border-l-rose-500";
+            } else {
+                stateStr = "Surplus";
+                descStr = `Excess inventory of ${Math.round(-diff).toLocaleString()} kg!`;
+                stateColor = "text-amber-600";
+                stateBorder = "border-l-amber-500";
+            }
+
+            marketStateDisp.innerText = stateStr;
+            marketStateDisp.className = `text-xs font-black uppercase tracking-tight ${stateColor}`;
+            marketStateDisp.parentElement.className = `workspace-light p-3 rounded-xl text-center flex flex-col justify-center border-l-4 ${stateBorder}`;
+            marketStateDesc.innerText = descStr;
+
+            // Update Market Pressure Badge in Realtime
+            const pressureBadge = document.getElementById('market-pressure-badge');
+            const pressureIcon = document.getElementById('pressure-icon');
+            const pressureText = document.getElementById('pressure-text');
+
+            if (Math.abs(diff) < 15) {
+                pressureBadge.className = "absolute top-2 left-2 px-2.5 py-1 rounded-md text-[9px] font-bold shadow-sm border bg-emerald-50 border-emerald-200 text-emerald-800 flex items-center gap-1.5 transition-all";
+                pressureIcon.innerText = "✅";
+                pressureText.innerText = "Equilibrium: Maximum Welfare";
+            } else if (diff > 0) {
+                pressureBadge.className = "absolute top-2 left-2 px-2.5 py-1 rounded-md text-[9px] font-bold shadow-sm border bg-rose-50 border-rose-200 text-rose-800 flex items-center gap-1.5 animate-pulse transition-all";
+                pressureIcon.innerText = "🔥 SHORTAGE";
+                pressureText.innerText = `Upward Price Pressure ↑ (+${Math.round(diff)} kg)`;
+            } else {
+                pressureBadge.className = "absolute top-2 left-2 px-2.5 py-1 rounded-md text-[9px] font-bold shadow-sm border bg-amber-50 border-amber-200 text-amber-800 flex items-center gap-1.5 animate-pulse transition-all";
+                pressureIcon.innerText = "📦 SURPLUS";
+                pressureText.innerText = `Downward Price Pressure ↓ (-${Math.round(-diff)} kg)`;
+            }
+
+            // WELFARE SURPLUS ACCOUNTING
+            const cs = Math.max(0, 0.5 * (chokePriceD - retailPrice) * qd);
+            const ps = Math.max(0, 0.5 * (retailPrice - wholesaleCost) * qs);
+            const dwl = Math.max(0, 0.5 * Math.abs(eqPrice - retailPrice) * Math.abs(eqQty - actualQty));
+
+            csValDisp.innerText = Math.round(cs).toLocaleString() + " ₸";
+            psValDisp.innerText = Math.round(ps).toLocaleString() + " ₸";
+            dwlValDisp.innerText = Math.round(dwl).toLocaleString() + " ₸";
+            totalSurplusDisp.innerText = Math.round(cs + ps).toLocaleString() + " ₸";
+
+            // Build Dynamic Narrative Description
+            let verdict = "";
+            if (retailPrice === MIN_LEGAL_PRICE) {
+                verdict += `🌟 <strong>Warning! Statutory Price Floor Active:</strong> Retail price is set at the government minimum threshold in Kazakhstan (<strong>${MIN_LEGAL_PRICE} ₸</strong>). At this price level, `;
+            } else {
+                verdict += `📊 At a set retail price of <strong>${retailPrice} ₸/kg</strong> and a wholesale import cost of <strong>${wholesaleCost} ₸/kg</strong>, the retail outlet sells <strong>${Math.round(actualQty).toLocaleString()} kg</strong> of bananas per month. `;
+            }
+
+            if (Math.abs(diff) < 15) {
+                verdict += `Your managerial decision is optimal! Operations are positioned exactly at market equilibrium. Deadweight loss is zero, maximizing market surplus.`;
+            } else if (diff > 0) {
+                verdict += `A <span class="text-rose-600 font-bold">market shortage</span> of <strong>${Math.round(diff).toLocaleString()} kg/mo</strong> has developed due to below-equilibrium pricing. Demand exceeds import supply. Stockouts generate a Deadweight Loss of <strong>${Math.round(dwl).toLocaleString()} ₸/mo</strong>. <span class="text-indigo-600 font-bold">Recommendation: Increase retail price toward equilibrium.</span>`;
+            } else {
+                verdict += `A <span class="text-amber-600 font-bold">market surplus</span> of <strong>${Math.round(-diff).toLocaleString()} kg/mo</strong> has accumulated. Excessive margins suppress realized trade volume, causing inventory spoilage. Missed market efficiency results in a Deadweight Loss of <strong>${Math.round(dwl).toLocaleString()} ₸/mo</strong>. <span class="text-indigo-600 font-bold">Recommendation: Optimize margin and lower retail price.</span>`;
+            }
+
+            verdictContent.innerHTML = verdict;
+
+            // Redraw chart
+            drawMarketGraph(baseQ, shiftD, shiftS, slopeD, slopeS, wholesaleCost, retailPrice, eqPrice, eqQty, qd, qs, actualQty, cs, ps, diff);
+        }
+
+        // Dynamic SVG graph renderer
+        function drawMarketGraph(baseQ, shiftD, shiftS, slopeD, slopeS, wholesaleCost, retailPrice, eqPrice, eqQty, qd, qs, actualQty, csVal, psVal, diff) {
+            svgMarketGraph.innerHTML = '';
+
+            // Axis scaling helpers
+            const maxQtyX = 2200;
+            const maxPriceY = 1600;
+
+            function gx(q) { return 45 + (q / maxQtyX) * 580; }
+            function gy(p) { return 230 - (p / maxPriceY) * 200; }
+
+            const chokePriceD = (baseQ + shiftD) / slopeD;
+            const sStartP = Math.max(0, wholesaleCost - shiftS / slopeS);
+            const sEndQ = Math.max(0, shiftS + slopeS * (maxPriceY - wholesaleCost));
+
+            const pD_at_actual = Math.max(retailPrice, chokePriceD - actualQty / slopeD);
+            const pS_at_actual = Math.min(retailPrice, sStartP + actualQty / slopeS);
+
+            const showTr = showTrCheckbox.checked;
+            const showCs = showCsCheckbox.checked;
+            const showPs = showPsCheckbox.checked;
+
+            // Patterns and Markers
+            const defs = document.createElementNS("http://www.w3.org/2000/svg", "defs");
+            defs.innerHTML = `
+                <pattern id="revenue-hatch" width="8" height="8" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                    <line x1="0" y1="0" x2="0" y2="8" stroke="#c5a059" stroke-width="1.2" opacity="0.45" />
+                </pattern>
+                <marker id="arrow-head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="context-stroke" />
+                </marker>
+            `;
+            svgMarketGraph.appendChild(defs);
+
+            // 1. Consumer Surplus (CS)
+            if (showCs && actualQty > 0 && chokePriceD > retailPrice) {
+                const csPoly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                const p1 = `${gx(0)},${gy(retailPrice)}`;
+                const p2 = `${gx(actualQty)},${gy(retailPrice)}`;
+                const p3 = `${gx(actualQty)},${gy(Math.min(maxPriceY, pD_at_actual))}`;
+                const p4 = `${gx(0)},${gy(Math.min(maxPriceY, chokePriceD))}`;
+                
+                csPoly.setAttribute("points", `${p1} ${p2} ${p3} ${p4}`);
+                csPoly.setAttribute("fill", "rgba(16, 185, 129, 0.12)");
+                csPoly.setAttribute("stroke", "#10b981");
+                csPoly.setAttribute("stroke-width", "1");
+                csPoly.setAttribute("stroke-dasharray", "2,2");
+                svgMarketGraph.appendChild(csPoly);
+
+                const csText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                const labelX = gx(actualQty * 0.28);
+                const labelY = gy(retailPrice + (chokePriceD - retailPrice) * 0.35);
+                csText.setAttribute("x", labelX);
+                csText.setAttribute("y", labelY);
+                csText.setAttribute("fill", "#059669");
+                csText.setAttribute("font-size", "7.5");
+                csText.setAttribute("font-weight", "bold");
+                csText.setAttribute("text-anchor", "middle");
+                csText.textContent = "Surplus CS";
+                svgMarketGraph.appendChild(csText);
+            }
+
+            // 2. Producer Surplus (PS)
+            if (showPs && actualQty > 0 && retailPrice > sStartP) {
+                const psPoly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                const p1 = `${gx(0)},${gy(retailPrice)}`;
+                const p2 = `${gx(actualQty)},${gy(retailPrice)}`;
+                const p3 = `${gx(actualQty)},${gy(Math.max(0, pS_at_actual))}`;
+                const p4 = `${gx(0)},${gy(Math.max(0, sStartP))}`;
+                
+                psPoly.setAttribute("points", `${p1} ${p2} ${p3} ${p4}`);
+                psPoly.setAttribute("fill", "rgba(239, 68, 68, 0.12)");
+                psPoly.setAttribute("stroke", "#ef4444");
+                psPoly.setAttribute("stroke-width", "1");
+                psPoly.setAttribute("stroke-dasharray", "2,2");
+                svgMarketGraph.appendChild(psPoly);
+
+                const psText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                const labelX = gx(actualQty * 0.28);
+                const labelY = gy(sStartP + (retailPrice - sStartP) * 0.45);
+                psText.setAttribute("x", labelX);
+                psText.setAttribute("y", labelY);
+                psText.setAttribute("fill", "#dc2626");
+                psText.setAttribute("font-size", "7.5");
+                psText.setAttribute("font-weight", "bold");
+                psText.setAttribute("text-anchor", "middle");
+                psText.textContent = "Surplus PS";
+                svgMarketGraph.appendChild(psText);
+            }
+
+            // 3. Total Revenue (TR)
+            if (showTr && actualQty > 0) {
+                const trRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                trRect.setAttribute("x", gx(0));
+                trRect.setAttribute("y", gy(retailPrice));
+                trRect.setAttribute("width", gx(actualQty) - gx(0));
+                trRect.setAttribute("height", gy(0) - gy(retailPrice));
+                trRect.setAttribute("fill", "url(#revenue-hatch)");
+                trRect.setAttribute("stroke", "#c5a059");
+                trRect.setAttribute("stroke-width", "1.5");
+                svgMarketGraph.appendChild(trRect);
+
+                const labelX = gx(actualQty * 0.5);
+                const labelY = gy(retailPrice * 0.5);
+
+                const bgRect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                bgRect.setAttribute("x", labelX - 50);
+                bgRect.setAttribute("y", labelY - 7);
+                bgRect.setAttribute("width", 100);
+                bgRect.setAttribute("height", 10);
+                bgRect.setAttribute("fill", "rgba(255, 255, 255, 0.85)");
+                bgRect.setAttribute("rx", "2");
+                svgMarketGraph.appendChild(bgRect);
+
+                const trText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                trText.setAttribute("x", labelX);
+                trText.setAttribute("y", labelY + 1);
+                trText.setAttribute("fill", "#854d0e");
+                trText.setAttribute("font-size", "7.5");
+                trText.setAttribute("font-weight", "extrabold");
+                trText.setAttribute("text-anchor", "middle");
+                trText.textContent = `Revenue TR: ${(Math.round(actualQty * retailPrice)).toLocaleString()} ₸`;
+                svgMarketGraph.appendChild(trText);
+            }
+
+            // Grid lines
+            for (let i = 1; i <= 4; i++) {
+                const qVal = (maxQtyX / 4) * i;
+                const pVal = (maxPriceY / 4) * i;
+
+                const lineV = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                lineV.setAttribute("x1", gx(qVal)); lineV.setAttribute("y1", gy(0));
+                lineV.setAttribute("x2", gx(qVal)); lineV.setAttribute("y2", gy(maxPriceY));
+                lineV.setAttribute("stroke", "#e2e8f0");
+                svgMarketGraph.appendChild(lineV);
+
+                const lineH = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                lineH.setAttribute("x1", gx(0)); lineH.setAttribute("y1", gy(pVal));
+                lineH.setAttribute("x2", gx(maxQtyX)); lineH.setAttribute("y2", gy(pVal));
+                lineH.setAttribute("stroke", "#e2e8f0");
+                svgMarketGraph.appendChild(lineH);
+
+                const txtX = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                txtX.setAttribute("x", gx(qVal)); txtX.setAttribute("y", "244");
+                txtX.setAttribute("fill", "#94a3b8"); txtX.setAttribute("font-size", "7");
+                txtX.setAttribute("text-anchor", "middle");
+                txtX.textContent = `${qVal} kg`;
+                svgMarketGraph.appendChild(txtX);
+
+                const txtY = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                txtY.setAttribute("x", "38"); txtY.setAttribute("y", gy(pVal) + 3);
+                txtY.setAttribute("fill", "#94a3b8"); txtY.setAttribute("font-size", "7");
+                txtY.setAttribute("text-anchor", "end");
+                txtY.textContent = `${pVal} ₸`;
+                svgMarketGraph.appendChild(txtY);
+            }
+
+            // Axes
+            const axisX = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            axisX.setAttribute("x1", "45"); axisX.setAttribute("y1", "230");
+            axisX.setAttribute("x2", "635"); axisX.setAttribute("y2", "230");
+            axisX.setAttribute("stroke", "#475569"); axisX.setAttribute("stroke-width", "1.5");
+            svgMarketGraph.appendChild(axisX);
+
+            const axisY = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            axisY.setAttribute("x1", "45"); axisY.setAttribute("y1", "10");
+            axisY.setAttribute("x2", "45"); axisY.setAttribute("y2", "230");
+            axisY.setAttribute("stroke", "#475569"); axisY.setAttribute("stroke-width", "1.5");
+            svgMarketGraph.appendChild(axisY);
+
+            // Demand Line
+            const dStartQ = baseQ + shiftD;
+            const dEndP = dStartQ / slopeD;
+
+            const demandLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            demandLine.setAttribute("x1", gx(dStartQ)); demandLine.setAttribute("y1", gy(0));
+            demandLine.setAttribute("x2", gx(0)); demandLine.setAttribute("y2", gy(dEndP));
+            demandLine.setAttribute("stroke", "#3b82f6"); demandLine.setAttribute("stroke-width", "2.5");
+            svgMarketGraph.appendChild(demandLine);
+
+            // Supply Line
+            const supplyLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            supplyLine.setAttribute("x1", gx(0)); supplyLine.setAttribute("y1", gy(sStartP));
+            supplyLine.setAttribute("x2", gx(sEndQ)); supplyLine.setAttribute("y2", gy(maxPriceY));
+            supplyLine.setAttribute("stroke", "#f97316"); supplyLine.setAttribute("stroke-width", "2.5");
+            svgMarketGraph.appendChild(supplyLine);
+
+            // Shift Indicators
+            if (shiftersToggle.checked) {
+                if (Math.abs(shiftD) > 20) {
+                    const arrowP = 600;
+                    const startQ = Math.max(0, baseQ - slopeD * arrowP);
+                    const endQ = Math.max(0, baseQ + shiftD - slopeD * arrowP);
+                    
+                    const arrow = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    arrow.setAttribute("d", `M ${gx(startQ)} ${gy(arrowP)} L ${gx(endQ)} ${gy(arrowP)}`);
+                    arrow.setAttribute("stroke", shiftD > 0 ? "#10b981" : "#ef4444");
+                    arrow.setAttribute("stroke-width", "3");
+                    arrow.setAttribute("marker-end", "url(#arrow-head)");
+                    svgMarketGraph.appendChild(arrow);
+                }
+
+                if (Math.abs(shiftS) > 20) {
+                    const arrowP = 900;
+                    const startQ = Math.max(0, slopeS * (arrowP - wholesaleCost));
+                    const endQ = Math.max(0, shiftS + slopeS * (arrowP - wholesaleCost));
+                    
+                    const arrow = document.createElementNS("http://www.w3.org/2000/svg", "path");
+                    arrow.setAttribute("d", `M ${gx(startQ)} ${gy(arrowP)} L ${gx(endQ)} ${gy(arrowP)}`);
+                    arrow.setAttribute("stroke", shiftS > 0 ? "#10b981" : "#ef4444");
+                    arrow.setAttribute("stroke-width", "3");
+                    arrow.setAttribute("marker-end", "url(#arrow-head)");
+                    svgMarketGraph.appendChild(arrow);
+                }
+            }
+
+            // Price Floor Line (403 ₸)
+            const govLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            govLine.setAttribute("x1", gx(0)); govLine.setAttribute("y1", gy(MIN_LEGAL_PRICE));
+            govLine.setAttribute("x2", gx(maxQtyX)); govLine.setAttribute("y2", gy(MIN_LEGAL_PRICE));
+            govLine.setAttribute("stroke", "#ef4444"); govLine.setAttribute("stroke-width", "2");
+            govLine.setAttribute("stroke-dasharray", "3,3");
+            svgMarketGraph.appendChild(govLine);
+
+            const govText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            govText.setAttribute("x", gx(maxQtyX) - 5); govText.setAttribute("y", gy(MIN_LEGAL_PRICE) - 5);
+            govText.setAttribute("fill", "#ef4444"); govText.setAttribute("font-size", "7");
+            govText.setAttribute("font-weight", "bold");
+            govText.setAttribute("text-anchor", "end");
+            govText.textContent = `Price Floor: ${MIN_LEGAL_PRICE} ₸`;
+            svgMarketGraph.appendChild(govText);
+
+            // Current Retail Price Line
+            const userPriceLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            userPriceLine.setAttribute("x1", gx(0)); userPriceLine.setAttribute("y1", gy(retailPrice));
+            userPriceLine.setAttribute("x2", gx(maxQtyX)); userPriceLine.setAttribute("y2", gy(retailPrice));
+            userPriceLine.setAttribute("stroke", "#10b981"); userPriceLine.setAttribute("stroke-width", "1.5");
+            svgMarketGraph.appendChild(userPriceLine);
+
+            const userText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            userText.setAttribute("x", gx(maxQtyX) - 5); userText.setAttribute("y", gy(retailPrice) + 12);
+            userText.setAttribute("fill", "#10b981"); userText.setAttribute("font-size", "7");
+            userText.setAttribute("font-weight", "bold");
+            userText.setAttribute("text-anchor", "end");
+            userText.textContent = `Retail Price: ${retailPrice} ₸`;
+            svgMarketGraph.appendChild(userText);
+
+            // Surplus/Shortage Brackets
+            if (Math.abs(diff) >= 15) {
+                const isShortage = diff > 0;
+                const startQ = Math.min(qd, qs);
+                const endQ = Math.max(qd, qs);
+
+                const gapLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                gapLine.setAttribute("x1", gx(startQ)); gapLine.setAttribute("y1", gy(retailPrice));
+                gapLine.setAttribute("x2", gx(endQ)); gapLine.setAttribute("y2", gy(retailPrice));
+                gapLine.setAttribute("stroke", isShortage ? "#ef4444" : "#f59e0b");
+                gapLine.setAttribute("stroke-width", "2.5");
+                gapLine.setAttribute("stroke-dasharray", "4,4");
+                svgMarketGraph.appendChild(gapLine);
+
+                const cap1 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                cap1.setAttribute("x1", gx(startQ)); cap1.setAttribute("y1", gy(retailPrice) - 4);
+                cap1.setAttribute("x2", gx(startQ)); cap1.setAttribute("y2", gy(retailPrice) + 4);
+                cap1.setAttribute("stroke", isShortage ? "#ef4444" : "#f59e0b");
+                cap1.setAttribute("stroke-width", "1.5");
+                svgMarketGraph.appendChild(cap1);
+
+                const cap2 = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                cap2.setAttribute("x1", gx(endQ)); cap2.setAttribute("y1", gy(retailPrice) - 4);
+                cap2.setAttribute("x2", gx(endQ)); cap2.setAttribute("y2", gy(retailPrice) + 4);
+                cap2.setAttribute("stroke", isShortage ? "#ef4444" : "#f59e0b");
+                cap2.setAttribute("stroke-width", "1.5");
+                svgMarketGraph.appendChild(cap2);
+
+                const gapTextBg = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+                const textWidth = isShortage ? 85 : 85;
+                const gapMidX = gx(startQ + (endQ - startQ) * 0.5);
+                gapTextBg.setAttribute("x", gapMidX - textWidth/2);
+                gapTextBg.setAttribute("y", gy(retailPrice) - 13);
+                gapTextBg.setAttribute("width", textWidth);
+                gapTextBg.setAttribute("height", 9);
+                gapTextBg.setAttribute("fill", "#ffffff");
+                gapTextBg.setAttribute("rx", "2");
+                svgMarketGraph.appendChild(gapTextBg);
+
+                const gapText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                gapText.setAttribute("x", gapMidX);
+                gapText.setAttribute("y", gy(retailPrice) - 6);
+                gapText.setAttribute("fill", isShortage ? "#b91c1c" : "#b45309");
+                gapText.setAttribute("font-size", "7");
+                gapText.setAttribute("font-weight", "extrabold");
+                gapText.setAttribute("text-anchor", "middle");
+                gapText.textContent = isShortage 
+                    ? `Shortage: ${Math.round(diff)} kg` 
+                    : `Surplus: ${Math.round(-diff)} kg`;
+                svgMarketGraph.appendChild(gapText);
+            }
+
+            // Equilibrium Point E*
+            if (eqPrice > 0 && eqQty > 0) {
+                const eqDot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                eqDot.setAttribute("cx", gx(eqQty)); eqDot.setAttribute("cy", gy(eqPrice));
+                eqDot.setAttribute("r", "5.5"); eqDot.setAttribute("fill", "#6366f1");
+                eqDot.setAttribute("class", "pulse-dot");
+                svgMarketGraph.appendChild(eqDot);
+
+                const projX = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                projX.setAttribute("x1", gx(eqQty)); projX.setAttribute("y1", gy(eqPrice));
+                projX.setAttribute("x2", gx(eqQty)); projX.setAttribute("y2", gy(0));
+                projX.setAttribute("stroke", "#6366f1"); projX.setAttribute("stroke-dasharray", "2,2");
+                svgMarketGraph.appendChild(projX);
+
+                const projY = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                projY.setAttribute("x1", gx(eqQty)); projY.setAttribute("y1", gy(eqPrice));
+                projY.setAttribute("x2", gx(0)); projY.setAttribute("y2", gy(eqPrice));
+                projY.setAttribute("stroke", "#6366f1"); projY.setAttribute("stroke-dasharray", "2,2");
+                svgMarketGraph.appendChild(projY);
+            }
+        }
+
+        // Event Listeners
+        const allInputs = [
+            wholesaleInput, retailInput, baseQInput, shiftDInput, shiftSInput, 
+            showTrCheckbox, showCsCheckbox, showPsCheckbox
+        ];
+        allInputs.forEach(inp => inp.addEventListener('input', updateModel));
+        shiftersToggle.addEventListener('change', updateModel);
+
+        // Initial launch
+        updateModel();
+    </script>
+</body>
+</html>
