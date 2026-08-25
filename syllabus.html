@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syllabus | Economics (SE)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            position: relative;
+        }
+
+        .top-left-logo {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            text-decoration: none;
+            background-color: #001e50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #003380;
+        }
+
+        header {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #001e50;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #64748b;
+        }
+
+        /* Навигация по разделам Силлабуса */
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            max-width: 1000px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            color: #001e50;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background-color: #001e50;
+            color: #ffffff;
+            border-color: #001e50;
+        }
+
+        /* Контейнер контента */
+        .content-box {
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            max-width: 1000px;
+            width: 100%;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        h2 {
+            color: #001e50;
+            font-size: 22px;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        p, li {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #475569;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        /* Таблица тематического плана */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #cbd5e1;
+            padding: 10px 12px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f1f5f9;
+            color: #001e50;
+            font-weight: 700;
+        }
+
+        footer {
+            margin-top: auto;
+            font-size: 14px;
+            color: #718096;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <img src="https://ogaydv-prog.github.io/principles-economics/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    <a href="index.html" class="back-button">← Back to Dashboard</a>
+
+    <header>
+        <h1>Course Syllabus</h1>
+        <p class="subtitle">SEE2116  Economics | Software Engineering (3 ECTS)</p>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="openTab('overview')">Overview</button>
+        <button class="tab-btn" onclick="openTab('plan')">15-Week Schedule</button>
+        <button class="tab-btn" onclick="openTab('outcomes')">Learning Outcomes</button>
+        <button class="tab-btn" onclick="openTab('ai')">Academic Integrity & AI</button>
+        <button class="tab-btn" onclick="openTab('policy')">Course Policy</button>
+        <button class="tab-btn" onclick="openTab('evaluation')">Evaluation & Rubrics</button>
+    </div>
+
+    <main class="content-box">
+        <!-- 1. OVERVIEW -->
+        <div id="overview" class="tab-content active">
+            <h2>Course Overview & Details</h2>
+            <p><strong>Course Code & Name:</strong> SEI2116 Principles of Economics</p>
+            <p><strong>Program:</strong> Software Engineering (SE)</p>
+            <p><strong>Credits & Hours:</strong> 3 ECTS (Total: 90 hours | 15 Classroom hours + 15 Online hours + 60 Independent work hours)</p>
+            <p><strong>Instructor:</strong> Dmitriy Ogay, MBA, Professor of the Practice (d.ogay@almau.edu.kz)</p>
+            <p><strong>Description:</strong> The course introduces students to key concepts of micro- and macroeconomics necessary for understanding the modern tech-driven business environment. Special attention is paid to markets, consumer behavior, economic policy, and digital industry applications.</p>
+        </div>
+
+        <!-- 2. 15-WEEK SCHEDULE -->
+        <div id="plan" class="tab-content">
+            <h2>Thematic Plan (15 Weeks | 1 Classroom + 1 Online Hour / Week)</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Wk</th>
+                        <th>Topic / Module</th>
+                        <th>Format</th>
+                        <th>Assessment</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>1</td><td>Introduction to Economics. Micro & Macro. PPF Model.</td><td>1h Class + 1h Online</td><td>PPF Analysis</td></tr>
+                    <tr><td>2</td><td>Market Forces: Demand and Supply. Equilibrium.</td><td>1h Class + 1h Online</td><td>Task (5%)</td></tr>
+                    <tr><td>3</td><td>Elasticity of Demand and Supply.</td><td>1h Class + 1h Online</td><td>Problem Solving (5%)</td></tr>
+                    <tr><td>4</td><td>Theory of Consumer Behavior.</td><td>1h Class + 1h Online</td><td>Case Study</td></tr>
+                    <tr><td>5</td><td>Firm Behavior: Costs & Perfect Competition / Monopoly.</td><td>1h Class + 1h Online</td><td>Case Study (10%)</td></tr>
+                    <tr><td>6</td><td>Oligopoly & Monopolistic Competition.</td><td>1h Class + 1h Online</td><td>Market Task</td></tr>
+                    <tr><td>7</td><td>Public Goods & Market Failures.</td><td>1h Class + 1h Online</td><td>Case Analysis (10%)</td></tr>
+                    <tr><td>8</td><td>Midterm Control 1</td><td>Online Test</td><td>Multiple Choice</td></tr>
+                    <tr><td>9</td><td>Key Concepts of Macroeconomics & SNA.</td><td>1h Class + 1h Online</td><td>Task</td></tr>
+                    <tr><td>10</td><td>Measuring the Cost of Living & Inflation.</td><td>1h Class + 1h Online</td><td>Case Study (10%)</td></tr>
+                    <tr><td>11</td><td>Consumption, Saving & Investment Functions.</td><td>1h Class + 1h Online</td><td>Model Analysis</td></tr>
+                    <tr><td>12</td><td>Unemployment and Monetary System.</td><td>1h Class + 1h Online</td><td>Task</td></tr>
+                    <tr><td>13</td><td>Money Market & Central Bank Policies.</td><td>1h Class + 1h Online</td><td>Case Study (10%)</td></tr>
+                    <tr><td>14</td><td>Fiscal Policy & Government Budget.</td><td>1h Class + 1h Online</td><td>Policy Review</td></tr>
+                    <tr><td>15</td><td>International Trade & Exchange Rates | Midterm 2</td><td>1h Class + 1h Online</td><td>MC2 Test (10%)</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 3. LEARNING OUTCOMES -->
+        <div id="outcomes" class="tab-content">
+            <h2>Expected Learning Outcomes</h2>
+            <ul>
+                <li><strong>LO 1:</strong> Understand national economic measurement methodologies and rating indicators.</li>
+                <li><strong>LO 2:</strong> Explain trends in consumer and firm behavior, demand factors, and market equilibrium.</li>
+                <li><strong>LO 3:</strong> Provide economic assessments of current global market events and digital economics.</li>
+                <li><strong>LO 4:</strong> Analyze macroeconomic fluctuations (inflation, unemployment) and government policies.</li>
+                <li><strong>LO 5:</strong> Evaluate market imperfections and identify rationale for state intervention.</li>
+                <li><strong>LO 6:</strong> Trace relationships between financial markets, tech industries, and national economy.</li>
+            </ul>
+        </div>
+
+        <!-- 4. ACADEMIC INTEGRITY & AI -->
+        <div id="ai" class="tab-content">
+            <h2>Academic Integrity & Artificial Intelligence Policy</h2>
+            <p>Students must adhere strictly to AlmaU Code of Ethics. Independent execution of tasks is required.</p>
+            <p><strong>Allowed AI Usage:</strong></p>
+            <ul>
+                <li>Calculations automation and economic data modeling.</li>
+                <li>Assisting in understanding complex microeconomic models.</li>
+                <li>Grammar refinement and research assistance.</li>
+            </ul>
+            <p><strong>Prohibited AI Usage:</strong> Replacing student critical thinking with automated text generation (e.g., ChatGPT submitting complete essays without original analysis) is considered academic misconduct.</p>
+        </div>
+
+        <!-- 5. COURSE POLICY -->
+        <div id="policy" class="tab-content">
+            <h2>Classroom & Exam Ethics</h2>
+            <ul>
+                <li>At least 70% attendance is mandatory to pass the course.</li>
+                <li>Punctuality and polite academic behavior in classroom and online sessions.</li>
+                <li>Submitting assignments on time via Platonus and official channels.</li>
+                <li>Lateness disrupts classes and leads to missed attendance marks.</li>
+            </ul>
+        </div>
+
+        <!-- 6. EVALUATION -->
+        <div id="evaluation" class="tab-content">
+            <h2>Evaluation & Grading System</h2>
+            <p><strong>Final Grade Calculation:</strong></p>
+            <p style="text-align: center; font-size: 18px; font-weight: bold; color: #001e50; margin: 15px 0;">
+                Final Grade = (Rating RK1 + RK2) / 2 × 0.6 + Final Exam × 0.4
+            </p>
+            <ul>
+                <li><strong>Grade A (95-100%):</strong> 4.0 - Excellent comprehension and analytical skills.</li>
+                <li><strong>Grade B (75-89%):</strong> 2.67-3.33 - Good understanding and solid case solutions.</li>
+                <li><strong>Grade C (60-74%):</strong> 1.67-2.33 - Satisfactory knowledge without deep elaboration.</li>
+                <li><strong>Grade F (0-24%):</strong> 0.0 - Fail.</li>
+            </ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>© Almaty Management University | School of Digital Technologies & Economics 2026</p>
+    </footer>
+
+    <script>
+        function openTab(tabId) {
+            const contents = document.querySelectorAll('.tab-content');
+            const buttons = document.querySelectorAll('.tab-btn');
+            
+            contents.forEach(content => content.classList.remove('active'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+
+</body>
+</html>
