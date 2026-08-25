@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic 1: Basic Principles of Economics | Principles of Economics</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px 20px;
+            position: relative;
+        }
+
+        .top-left-logo {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        /* Кнопка "Назад" к списку топиков */
+        .back-button {
+            position: absolute;
+            top: 35px;
+            right: 30px;
+            text-decoration: none;
+            background-color: #001e50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #003380;
+        }
+
+        header {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #001e50;
+            margin-bottom: 8px;
+            margin-top: 20px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #555555;
+            max-width: 650px;
+            line-height: 1.5;
+            margin: 0 auto;
+        }
+
+        /* Сетка для 5 материалов первого топика */
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 40px;
+        }
+
+        /* Единые стильные карточки с синими рамками */
+        .card {
+            display: inline-block;
+            text-decoration: none;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 170px; 
+            height: 260px; 
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill; /* Идеальная подгонка картинок */
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        /* Эффект увеличения и красивой синей тени при наведении */
+        .card:hover {
+            transform: translateY(-8px) scale(1.04);
+            border-color: #001e50;
+            box-shadow: 0 16px 30px rgba(0, 30, 80, 0.18);
+        }
+
+        footer {
+            margin-top: auto;
+            font-size: 14px;
+            color: #718096;
+            padding-top: 30px;
+            padding-bottom: 20px;
+            text-align: center;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Логотип AlmaU -->
+    <img src="https://ogaydv-prog.github.io/principles-economics/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    
+    <!-- Кнопка возврата к выбору топиков -->
+    <a href="https://ogaydv-prog.github.io/principles-economics/topics.html" class="back-button">← Back to Course Topics</a>
+
+    <header>
+        <h1>Topic 1: Basic Principles of Economics</h1>
+        <p class="subtitle">
+            Interactive presentations, models, and economic simulations
+        </p>
+    </header>
+
+    <main class="grid-container">
+        <!-- 1. Презентация Piktochart -->
+        <a href="https://create.piktochart.com/output/cded5f2b465c-basic-principles-of-economics-2026-pe" target="_blank" rel="noopener" class="card" title="Presentation: Basic Principles">
+            <img src="pic-preza-1.png" alt="Presentation: Basic Principles">
+        </a>
+
+        <!-- 2. Модель кругооборота (Circular Flow) -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/sim-circular-flow-model-pe.html" class="card" title="Simulation: Circular Flow Model">
+            <img src="pic-sim-circular-1.png" alt="Simulation: Circular Flow Model">
+        </a>
+
+        <!-- 3. Симуляция PPF -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/sim-ppf-pe.html" class="card" title="Simulation: Production Possibilities Frontier">
+            <img src="pic-sim-ppf-1.png" alt="Simulation: Production Possibilities Frontier">
+        </a>
+
+        <!-- 4. Экономические и бухгалтерские издержки (EC vs AC) -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/sim-ec-ac-costs-pe.html" class="card" title="Simulation: Economic vs Accounting Costs">
+            <img src="pic-sim-ac-ec-1.png" alt="Simulation: Economic vs Accounting Costs">
+        </a>
+
+        <!-- 5. Предельный анализ (Marginal Analysis) -->
+        <a href="https://ogaydv-prog.github.io/principles-economics/sim-marginal-pe.html" class="card" title="Simulation: Marginal Analysis">
+            <img src="pic-sim-marginal-1.png" alt="Simulation: Marginal Analysis">
+        </a>
+    </main>
+
+    <footer>
+        <p>Developed for International Business Team AlmaU 2026 | Course: Principles of Economics</p>
+        <p>© Almaty Management University | School of Digital Technologies & Economics</p>
+    </footer>
+
+</body>
+</html>
