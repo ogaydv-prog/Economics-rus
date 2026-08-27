@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Topic 2: Market Forces of Supply and Demand | Economics (SE)</title>
+    <title>Тема 2: Рыночные силы спроса и предложения | Экономика</title>
     <style>
         * {
             box-sizing: border-box;
@@ -13,7 +13,7 @@
         }
 
         body {
-            background-color: #ffffff;
+            background-color: #f8fafc;
             color: #333333;
             display: flex;
             flex-direction: column;
@@ -40,15 +40,18 @@
             text-decoration: none;
             background-color: #001e50;
             color: white;
-            padding: 8px 16px;
+            padding: 9px 18px;
             border-radius: 8px;
             font-weight: 600;
             font-size: 14px;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
         }
 
         .back-button:hover {
             background-color: #003380;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 30, 80, 0.25);
         }
 
         header {
@@ -58,7 +61,7 @@
         }
 
         h1 {
-            font-size: 32px;
+            font-size: 30px;
             font-weight: 700;
             color: #001e50;
             margin-bottom: 8px;
@@ -66,14 +69,14 @@
         }
 
         .subtitle {
-            font-size: 16px;
+            font-size: 15px;
             color: #555555;
             max-width: 650px;
             line-height: 1.5;
             margin: 0 auto;
         }
 
-        /* Сетка для 5 карточек материалов */
+        /* Сетка для карточек материалов */
         .grid-container {
             display: flex;
             flex-wrap: wrap;
@@ -85,15 +88,15 @@
             padding-bottom: 40px;
         }
 
-        /* ЕДИНАЯ РАМКА ДЛЯ КАРТОЧЕК */
+        /* Единые стильные карточки */
         .card {
             display: inline-block;
             text-decoration: none;
             background: #ffffff;
-            border: 2px solid #e2e8f0;
+            border: 2px solid #cbd5e1;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             width: 180px; 
             height: 270px; 
@@ -115,7 +118,7 @@
             box-shadow: 0 16px 30px rgba(0, 30, 80, 0.18);
         }
 
-        /* Стили для пустой карточки без ссылки */
+        /* Стили для неактивной карточки */
         .card.disabled {
             cursor: default;
             opacity: 0.85;
@@ -123,8 +126,8 @@
 
         .card.disabled:hover {
             transform: none;
-            border-color: #e2e8f0;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
         footer {
@@ -140,50 +143,50 @@
 </head>
 <body>
 
-    <!-- Исправленный логотип на репозиторий Economics-se -->
-    <img src="https://ogaydv-prog.github.io/Economics-se/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    <!-- Логотип AlmaU с репозитория Economics-rus -->
+    <img src="https://ogaydv-prog.github.io/Economics-rus/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
     
     <!-- Кнопка возврата к списку тем -->
-    <a href="topics.html" class="back-button">← Back to Topics</a>
+    <a href="topics.html" class="back-button">← К темам курса</a>
 
     <header>
-        <h1>Topic 2: Market Forces of Supply and Demand</h1>
+        <h1>Тема 2: Рыночные силы спроса и предложения</h1>
         <p class="subtitle">
-            Select a learning resource below: presentation, simulation, case study, or video lecture.
+            Выберите учебный материал: интерактивная презентация, маршаллианский симулятор, практический кейс или видеолекция.
         </p>
     </header>
 
     <main class="grid-container">
-        <!-- 1. Презентация (Google Drive) -->
-        <a href="https://docs.google.com/presentation/d/13MqsLGTv5iMm7DjokB-ZXyrr13yDnxU3/edit?usp=sharing&ouid=109725301150629205728&rtpof=true&sd=true" 
-           target="_blank" class="card" title="Presentation">
-            <img src="pic-preza-2.png" alt="Presentation">
+        <!-- 1. Презентация (Google Slides) -->
+        <a href="https://docs.google.com/presentation/d/1xLMMi5CgAXEw5cwu57dn5SDxX4eKCYpS/edit?usp=sharing&ouid=109725301150629205728&rtpof=true&sd=true" 
+           target="_blank" rel="noopener noreferrer" class="card" title="Презентация: Рыночные силы">
+            <img src="pic-preza-2.png" alt="Презентация">
         </a>
 
-        <!-- 2. Симулятор рынка -->
-        <a href="sim-demand-supply-analysis-marshall.html" class="card" title="Market Simulation">
-            <img src="pic-sim-demand-supply-2.png" alt="Simulation">
+        <!-- 2. Рыночный симулятор Маршалла -->
+        <a href="sim-demand-supply-marshall-rus.html" class="card" title="Симулятор: Рыночное равновесие Маршалла">
+            <img src="pic-sim-demand-supply-2.png" alt="Симулятор рынка">
         </a>
 
-        <!-- 3. Задача про кофе -->
-        <a href="task-topic2-coffee.html" class="card" title="Coffee Case Task">
-            <img src="pic-task-coffee-2.png" alt="Coffee Task">
+        <!-- 3. Задача про рынок кофе -->
+        <a href="task-coffee-rus.html" class="card" title="Практический кейс: Рынок кофе">
+            <img src="pic-task-coffee-2.png" alt="Кейс Кофе">
         </a>
 
-        <!-- 4. Видео на YouTube -->
-        <a href="https://www.youtube.com/watch?v=kIFBaaPJUO0&t=254s" target="_blank" class="card" title="Video Lecture">
-            <img src="pic-video-2.png" alt="Video Lecture">
+        <!-- 4. Видеолекция на YouTube -->
+        <a href="https://www.youtube.com/watch?v=kIFBaaPJUO0&t=254s" target="_blank" rel="noopener noreferrer" class="card" title="Видеолекция: Спрос и предложение">
+            <img src="pic-video-2.png" alt="Видеолекция">
         </a>
 
-        <!-- 5. Резервная карточка -->
-        <div class="card disabled" title="Coming Soon">
-            <img src="pic-task-2.png" alt="Coming Soon">
+        <!-- 5. Резервная карточка (В разработке) -->
+        <div class="card disabled" title="Скоро в доступе">
+            <img src="pic-task-2.png" alt="В разработке">
         </div>
     </main>
 
     <footer>
-        <p>Developed for Software Engineering Team AlmaU 2026 | Course: Economics</p>
-        <p>© Almaty Management University | School of Digital Technologies & Economics</p>
+        <p>Разработано для студентов AlmaU 2026 | Дисциплина: Экономика</p>
+        <p>© Almaty Management University | Школа цифровых технологий и экономики</p>
     </footer>
 
 </body>
