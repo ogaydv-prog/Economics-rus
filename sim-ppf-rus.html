@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Граница производственных возможностей • SDTE</title>
+    <!-- Google Fonts & Tailwind CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+        /* Unified beautiful modern standard sans-serif font for all headings */
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+        }
+        /* Dark Sidebar Styling */
+        .sidebar-dark {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1.5px solid rgba(197, 160, 89, 0.25);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar-dark:hover {
+            border-color: rgba(197, 160, 89, 0.45);
+        }
+        /* Light Workspace Styling */
+        .workspace-light {
+            background: #ffffff;
+            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+        /* Range slider customized for premium dark theme */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: #334155;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #c5a059;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(197, 160, 89, 0.8);
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.35);
+        }
+        /* Custom scrollbar for tables */
+        .custom-scroll::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        .text-gold {
+            color: #c5a059;
+        }
+        .border-gold {
+            border-color: #c5a059;
+        }
+        /* Soft pulse animation for efficient equilibrium point */
+        @keyframes eq-pulse {
+            0% { r: 6px; stroke-width: 1.5px; opacity: 0.8; }
+            50% { r: 10px; stroke-width: 3.5px; opacity: 1; filter: drop-shadow(0 0 8px #10b981); }
+            100% { r: 6px; stroke-width: 1.5px; opacity: 0.8; }
+        }
+        .pulse-dot {
+            animation: eq-pulse 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 flex flex-col justify-between min-h-screen">
+
+    <header class="sidebar-dark max-w-7xl mx-auto w-full p-4 rounded-2xl text-center mb-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div class="text-left">
+            <h1 class="text-2xl md:text-3xl font-black text-gold tracking-wide uppercase mb-1">
+                Граница производственных возможностей (КПВ)
+            </h1>
+            <p class="text-xs text-slate-400 font-semibold tracking-wider uppercase">
+                Экономика • AlmaU 2026
+            </p>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch w-full flex-grow">
+        
+        <!-- Left Column: Inputs & Model Parameters (Dark sidebar) -->
+        <section class="lg:col-span-4 sidebar-dark p-5 rounded-xl flex flex-col justify-between space-y-4 text-xs">
+            <div>
+                <div class="flex items-center gap-2 border-b border-slate-800 pb-2 mb-3">
+                    <span class="text-lg">⚙️</span>
+                    <h2 class="text-xs font-bold text-gold uppercase tracking-wider">Параметры производства</h2>
+                </div>
+
+                <!-- SECTION 1: CORE OUTPUT POINTS -->
+                <div class="space-y-4 mb-4 bg-slate-950/40 p-3 rounded-lg border border-slate-900">
+                    <h3 class="font-bold text-gold uppercase tracking-wider text-[10px] flex justify-between">
+                        <span>1. Фактический объем выпуска</span>
+                        <span class="text-slate-500 font-normal">Текущий выбор</span>
+                    </h3>
+                    
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Квадрокоптеры / Дроны (X, шт):</span>
+                            <span class="text-gold font-bold" id="valX">0</span>
+                        </div>
+                        <input type="range" id="rangeX" min="0" max="150" value="0">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Высокотехнологичный сегмент гражданского и спасательного назначения.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Проднаборы для Foodbank (Y, шт):</span>
+                            <span class="text-gold font-bold" id="valY">0</span>
+                        </div>
+                        <input type="range" id="rangeY" min="0" max="1500" step="10" value="0">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Социально-ориентированный гуманитарный продукт питания.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: PRODUCTION LIMITS (TECHNOLOGY SHIFT) -->
+                <div class="space-y-4 bg-slate-950/40 p-3 rounded-lg border border-slate-900 mb-4">
+                    <h3 class="font-bold text-sky-400 uppercase tracking-wider text-[10px]">
+                        2. Технологические лимиты (Сдвиг КПВ)
+                    </h3>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Максимум Дронов (Предел X):</span>
+                            <span class="font-bold text-sky-400" id="maxXBadge">100</span>
+                        </div>
+                        <input type="range" id="changeMaxX" min="50" max="150" value="100">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Инвестиции в R&D, микроэлектронику и автоматизацию сборки.</p>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300">Максимум Наборов (Предел Y):</span>
+                            <span class="font-bold text-sky-400" id="maxYBadge">1000</span>
+                        </div>
+                        <input type="range" id="changeMaxY" min="500" max="1500" step="50" value="1000">
+                        <p class="text-[9px] text-slate-500 mt-0.5">Эффективность упаковочных линий и агро-логистических цепочек.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: VISUALIZATION AREAS -->
+                <div class="space-y-3 bg-slate-950/40 p-3 rounded-lg border border-slate-900">
+                    <h3 class="font-bold text-emerald-400 uppercase tracking-wider text-[10px]">
+                        3. Световая индикация на графике
+                    </h3>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2.5 cursor-pointer text-slate-300 hover:text-white transition-colors">
+                            <input type="checkbox" id="show-inefficient-shading" checked class="rounded border-slate-700 bg-slate-900 text-gold focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-sm bg-amber-500/10 border border-amber-500/30"></span>
+                                Область неэффективности (Парето-резерв)
+                            </span>
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer text-slate-300 hover:text-white transition-colors">
+                            <input type="checkbox" id="show-unattainable-shading" checked class="rounded border-slate-700 bg-slate-900 text-gold focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-sm bg-rose-500/10 border border-rose-500/30"></span>
+                                Область недостижимости (Дефицит ресурсов)
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theory snippet -->
+            <div class="p-2.5 bg-slate-950/80 border-l-2 border-gold rounded-r text-[10px] text-slate-400 leading-normal mt-3">
+                <span class="font-bold text-gold block mb-0.5">Предельная трансформация (MRT):</span>
+                Показывает, от какого количества товара Y (наборов) необходимо отказаться ради увеличения выпуска товара X (дрона) на одну единицу. Вогнутость КПВ отражает закон возрастающих альтернативных издержек.
+            </div>
+        </section>
+
+        <!-- Right Column: Results, Live Analysis & Chart (Clean light background) -->
+        <section class="lg:col-span-8 flex flex-col justify-between space-y-4">
+            
+            <!-- Valuation Summary & Market Indicators -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-slate-800">
+                <div id="kpi-efficiency" class="workspace-light p-3 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-amber-500 transition-all">
+                    <span class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Статус эффективности</span>
+                    <h3 class="text-sm md:text-base font-black uppercase tracking-tight" id="status-box">Неэффективно</h3>
+                    <p class="text-[9px] text-slate-400 mt-0.5" id="status-desc">Резервы простаивают</p>
+                </div>
+
+                <div class="workspace-light p-3 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-blue-600">
+                    <span class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Альтерн. издержки (MRT)</span>
+                    <h3 class="text-lg md:text-xl font-black text-blue-600 font-mono" id="mrt-disp">0.00 Y/X</h3>
+                    <p class="text-[9px] text-slate-400 mt-0.5">Проднаборов за 1 дрон</p>
+                </div>
+
+                <div class="workspace-light p-3 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-purple-600">
+                    <span class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Потери эффективности</span>
+                    <h3 class="text-lg md:text-xl font-black text-purple-700 font-mono" id="missed-output-disp">0 %</h3>
+                    <p class="text-[9px] text-slate-400 mt-0.5">От оптимальной границы</p>
+                </div>
+
+                <div class="workspace-light p-3 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-emerald-600">
+                    <span class="text-[10px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5">Максимум Дронов (X*)</span>
+                    <h3 class="text-lg md:text-xl font-black text-emerald-600 font-mono" id="max-possible-x">0 шт</h3>
+                    <p class="text-[9px] text-slate-400 mt-0.5">При текущем объёме Y</p>
+                </div>
+            </div>
+
+            <!-- Live Economic Analysis Verdict Board -->
+            <div class="workspace-light p-4 rounded-xl text-slate-800">
+                <div class="flex items-center gap-2 mb-1.5 border-b border-slate-100 pb-1">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Управленческий аудит использования факторов производства</h4>
+                </div>
+                <div id="verdict-content" class="text-[11px] text-slate-600 leading-relaxed font-medium">
+                    Рассчитываем баланс производства и упущенные альтернативные издержки...
+                </div>
+            </div>
+
+            <!-- Combined Chart: Production Possibilities Graph -->
+            <div class="workspace-light p-4 rounded-xl flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-2 border-b border-slate-100 pb-1.5">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Интерактивный график границы КПВ</h4>
+                    <span class="text-[9px] text-slate-400 font-mono">*Кликните или проведите по полю графика для смены точки</span>
+                </div>
+                
+                <!-- SVG Chart Container with relative overlay for pressure indicator -->
+                <div class="w-full h-64 relative bg-slate-50 rounded border border-slate-100 overflow-hidden">
+                    
+                    <!-- Floating Alert Badge -->
+                    <div id="tech-breakthrough-badge" class="absolute top-2 left-2 px-2.5 py-1 rounded-md text-[9px] font-bold shadow-sm border flex items-center gap-1.5 transition-all duration-300 opacity-0">
+                        <span>🚀</span>
+                        <span>Технологический прорыв!</span>
+                    </div>
+
+                    <svg viewBox="0 0 650 260" class="w-full h-full select-none cursor-crosshair" id="svg-ppf-graph">
+                        <!-- Elements generated by JS -->
+                    </svg>
+                </div>
+
+                <!-- Custom Legends -->
+                <div class="flex justify-center flex-wrap gap-4 text-[9px] mt-2 font-bold text-slate-500">
+                    <div class="flex items-center gap-1">
+                        <span class="w-3 h-0.5 bg-[#00f0ff] block"></span>
+                        <span>Кривая возможностей (КПВ)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-2.5 h-2.5 rounded bg-amber-500/10 border border-amber-500/30 block"></span>
+                        <span>Резервы неэффективности</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-2.5 h-2.5 rounded bg-rose-500/10 border border-rose-500/30 block"></span>
+                        <span>Недостижимая область</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-2.5 h-2.5 rounded-full bg-indigo-500 block"></span>
+                        <span>Текущий выбор (X, Y)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Economic Opportunity Cost Table -->
+            <div class="workspace-light p-4 rounded-xl text-slate-800">
+                <div class="flex justify-between items-center mb-2">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Анализ предельной нормы трансформации и упущенных возможностей (Opportunity Cost)</h4>
+                    <span class="text-[8px] text-slate-400 font-mono">Парето-оптимизация</span>
+                </div>
+                <div class="overflow-x-auto custom-scroll">
+                    <table class="w-full text-left border-collapse text-[10px] font-mono">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-slate-500 uppercase text-[8px] tracking-wider">
+                                <th class="pb-1.5">Производственная метрика</th>
+                                <th class="pb-1.5 text-right">Текущее значение</th>
+                                <th class="pb-1.5 text-right">Предельная цена выбора</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td class="py-1.5 text-slate-500 font-bold">Выпуск Дронов (X):</td>
+                                <td class="text-right font-black text-blue-600 font-mono" id="table-val-x">0 шт</td>
+                                <td class="text-right text-slate-500 text-[9px]">Каждый последующий дрон «стоит» <span id="table-mrt-val" class="font-bold text-indigo-600">0</span> наборов еды.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1.5 text-slate-500 font-bold">Выпуск Проднаборов (Y):</td>
+                                <td class="text-right font-black text-amber-600 font-mono" id="table-val-y">0 шт</td>
+                                <td class="text-right text-slate-500 text-[9px]">Один дополнительный проднабор «стоит» <span id="table-mrt-inverse-val" class="font-bold text-indigo-600">0</span> дронов.</td>
+                            </tr>
+                            <tr class="bg-indigo-50/40">
+                                <td class="py-1.5 text-indigo-800 font-bold">Максимально упущенный выпуск Y (Парето-дефицит):</td>
+                                <td class="text-right font-black text-indigo-700 font-mono" id="table-loss-y">0 шт</td>
+                                <td class="text-right text-indigo-500 text-[9px] font-bold">Столько наборов недополучено при текущем выпуске дронов.</td>
+                            </tr>
+                            <tr class="bg-emerald-50">
+                                <td class="py-1.5 text-emerald-800 font-bold">Коэффициент технологического использования:</td>
+                                <td class="text-right font-black text-emerald-600 font-mono" id="table-utilization">0%</td>
+                                <td class="text-right text-emerald-500 text-[9px]">Индикатор близости к оптимальной границе эффективности.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Technical Footer -->
+    <footer class="text-center text-[10px] text-slate-500 mt-4 border-t border-slate-900/60 pt-2 font-bold tracking-wide">
+        Школа Цифровых Технологий и Экономики, АlmaU. Модель границы производственных возможностей (КПВ).
+    </footer>
+
+    <!-- Interactive Simulation Script -->
+    <script>
+        // DOM Elements - Inputs
+        const rangeX = document.getElementById('rangeX');
+        const rangeY = document.getElementById('rangeY');
+        const changeMaxX = document.getElementById('changeMaxX');
+        const changeMaxY = document.getElementById('changeMaxY');
+        
+        const showInefficientShading = document.getElementById('show-inefficient-shading');
+        const showUnattainableShading = document.getElementById('show-unattainable-shading');
+
+        // DOM Elements - Displays
+        const valX = document.getElementById('valX');
+        const valY = document.getElementById('valY');
+        const maxXBadge = document.getElementById('maxXBadge');
+        const maxYBadge = document.getElementById('maxYBadge');
+
+        const mrtDisp = document.getElementById('mrt-disp');
+        const missedOutputDisp = document.getElementById('missed-output-disp');
+        const maxPossibleXDisp = document.getElementById('max-possible-x');
+
+        // Table Elements
+        const tableValX = document.getElementById('table-val-x');
+        const tableValY = document.getElementById('table-val-y');
+        const tableMrtVal = document.getElementById('table-mrt-val');
+        const tableMrtInverseVal = document.getElementById('table-mrt-inverse-val');
+        const tableLossY = document.getElementById('table-loss-y');
+        const tableUtilization = document.getElementById('table-utilization');
+
+        // Badges and Containers
+        const statusBox = document.getElementById('status-box');
+        const statusDesc = document.getElementById('status-desc');
+        const kpiEfficiency = document.getElementById('kpi-efficiency');
+        const verdictContent = document.getElementById('verdict-content');
+        const techBreakthroughBadge = document.getElementById('tech-breakthrough-badge');
+        const svgPPFGraph = document.getElementById('svg-ppf-graph');
+
+        // Coordinates Mapping Parameters (Squeezed max scale to match limits)
+        const maxScaleX = 150;
+        const maxScaleY = 1500;
+
+        function gx(q) { return 45 + (q / maxScaleX) * 580; } 
+        function gy(p) { return 230 - (p / maxScaleY) * 200; } 
+        function unmapX(px) { return ((px - 45) / 580) * maxScaleX; }
+        document.unmapX = unmapX;
+        function unmapY(py) { return ((230 - py) / 200) * maxScaleY; }
+        document.unmapY = unmapY;
+
+        // Recalculation and simulation logic
+        function updateModel() {
+            // Get inputs
+            const limitX = parseFloat(changeMaxX.value);
+            const limitY = parseFloat(changeMaxY.value);
+            const currentX = parseFloat(rangeX.value);
+            const currentY = parseFloat(rangeY.value);
+
+            // Update simple badges
+            valX.innerText = currentX + ' шт';
+            valY.innerText = currentY + ' шт';
+            maxXBadge.innerText = limitX;
+            maxYBadge.innerText = limitY;
+
+            // Highlight tech shifts
+            const isShifted = (limitX > 100 || limitY > 1000);
+            if (isShifted) {
+                maxXBadge.className = "value-badge shifted text-rose-500 font-bold";
+                maxYBadge.className = "value-badge shifted text-rose-500 font-bold";
+                techBreakthroughBadge.className = "absolute top-2 left-2 px-2.5 py-1 rounded-md text-[9px] font-bold shadow-sm border bg-rose-950 border-rose-500/50 text-rose-300 flex items-center gap-1.5 transition-all opacity-100";
+            } else {
+                maxXBadge.className = "value-badge text-gold font-bold";
+                maxYBadge.className = "value-badge text-gold font-bold";
+                techBreakthroughBadge.className = "absolute top-2 left-2 px-2.5 py-1 rounded-md text-[9px] font-bold shadow-sm border flex items-center gap-1.5 transition-all opacity-0";
+            }
+
+            // Calculations based on concave parabolic function: Y = MaxY * (1 - (X/MaxX)^2)
+            let maxPossibleYAtCurrentX = 0;
+            if (currentX <= limitX) {
+                maxPossibleYAtCurrentX = limitY * (1 - Math.pow(currentX / limitX, 2));
+            }
+
+            // Opportunity cost (MRT): Derivative dY/dX = 2 * (MaxY/MaxX^2) * X
+            // Represents marginal opportunity cost of X in terms of Y
+            const mrtVal = 2 * (limitY / Math.pow(limitX, 2)) * currentX;
+            const mrtInverse = mrtVal > 0 ? (1 / mrtVal) : Infinity;
+
+            mrtDisp.innerText = mrtVal.toFixed(2) + ' Y/X';
+
+            // Find max possible X for current Y: X = MaxX * sqrt(1 - Y/MaxY)
+            let maxPossibleXAtCurrentY = 0;
+            if (currentY <= limitY) {
+                maxPossibleXAtCurrentY = limitX * Math.sqrt(1 - (currentY / limitY));
+            }
+            maxPossibleXDisp.innerText = Math.round(maxPossibleXAtCurrentY) + ' шт';
+
+            // Determine status
+            const tolerance = 15; // Tolerance band in Y-units for being "On the frontier"
+            const diffY = currentY - maxPossibleYAtCurrentX;
+
+            let stateStr = "Неэффективно";
+            let descStr = "Резервы простаивают";
+            let statusColor = "text-amber-600";
+            let borderStyle = "border-l-amber-500";
+            let bgKpiColor = "rgba(245, 158, 11, 0.05)";
+
+            // Resource utilization / efficiency index
+            let efficiencyPct = 0;
+            if (currentX <= limitX && currentY <= limitY) {
+                // Efficiency as a ratio of current production vector length to maximum boundary vector length
+                const currentLen = Math.sqrt(Math.pow(currentX, 2) + Math.pow(currentY / (limitY/limitX), 2));
+                const optY = limitY * (1 - Math.pow(currentX / limitX, 2));
+                const optLen = Math.sqrt(Math.pow(currentX, 2) + Math.pow(optY / (limitY/limitX), 2));
+                efficiencyPct = optLen > 0 ? Math.min(100, (currentLen / optLen) * 100) : 0;
+            } else {
+                efficiencyPct = 100; // Outside limits
+            }
+
+            let missedOutputPct = Math.max(0, 100 - efficiencyPct);
+            missedOutputDisp.innerText = Math.round(missedOutputPct) + ' %';
+
+            if (currentX > limitX || diffY > tolerance) {
+                stateStr = "Недостижимо";
+                descStr = "Ресурсов не хватает";
+                statusColor = "text-rose-600";
+                borderStyle = "border-l-rose-500";
+                bgKpiColor = "rgba(239, 68, 68, 0.05)";
+            } else if (Math.abs(diffY) <= tolerance && currentX <= limitX) {
+                stateStr = "Эффективно";
+                descStr = "Парето-оптимально";
+                statusColor = "text-emerald-600";
+                borderStyle = "border-l-emerald-600";
+                bgKpiColor = "rgba(16, 185, 129, 0.15)";
+            }
+
+            statusBox.innerText = stateStr;
+            statusBox.className = `text-sm md:text-base font-black uppercase tracking-tight ${statusColor}`;
+            statusDesc.innerText = descStr;
+            kpiEfficiency.className = `workspace-light p-3 rounded-xl text-center flex flex-col justify-center border-l-4 ${borderStyle} transition-all`;
+            kpiEfficiency.style.backgroundColor = bgKpiColor;
+
+            // Fill Table details
+            tableValX.innerText = currentX + ' шт';
+            tableValY.innerText = currentY + ' шт';
+            tableMrtVal.innerText = mrtVal.toFixed(2);
+            tableMrtInverseVal.innerText = isFinite(mrtInverse) ? mrtInverse.toFixed(4) : '∞';
+            
+            const lossY = Math.max(0, maxPossibleYAtCurrentX - currentY);
+            tableLossY.innerText = Math.round(lossY) + ' шт';
+            tableUtilization.innerText = Math.round(efficiencyPct) + '%';
+
+            // Render Dynamic Managerial Verdict
+            let verdict = "";
+            if (stateStr === "Недостижимо") {
+                verdict += `⚠️ <strong>Производственный дефицит возможностей:</strong> Комбинация выпуска <strong>(${currentX} шт. дронов и ${currentY} шт. наборов)</strong> в данный момент находится за пределами вашей технологической границы. `;
+                verdict += `Для производства этой партии не хватает оборудования, сырья или квалифицированных сборщиков на предприятии. `;
+                verdict += `<span class="text-rose-600 font-bold">Решение:</span> Чтобы выйти в эту область, необходимо сдвинуть КПВ вверх через технологическое масштабирование (увеличьте пределы X и Y слайдерами ниже).`;
+            } else if (stateStr === "Эффективно") {
+                verdict += `🌟 <strong>Парето-эффективность достигнута!</strong> Ваше текущее распределение ресурсов оптимально. Вы полностью задействовали имеющиеся факторы производства. `;
+                verdict += `Альтернативная стоимость производства 1 дополнительного дрона (MRT) составляет <strong>${mrtVal.toFixed(1)} наборов еды</strong>. `;
+                verdict += `В этой точке любое увеличение выпуска квадрокоптеров жестко вызовет неминуемое сокращение объема социальной помощи проднаборами. Это классический компромисс эффективного бизнеса.`;
+            } else {
+                verdict += `📉 <strong>Недоиспользование ресурсов (Парето-убытки):</strong> Вы находитесь внутри границы. Текущий технологический уровень загружен всего на <strong>${Math.round(efficiencyPct)}%</strong>. `;
+                verdict += `В запасах фирмы простаивают сборочные линии, либо рабочие работают не на полную мощность. Вы теряете возможность бесплатно (без жертв со стороны дронов) собрать ещё <strong class="text-indigo-600">${Math.round(lossY)} шт. проднаборов</strong>. `;
+                verdict += `<span class="text-amber-600 font-bold">Совет менеджеру:</span> Оптимизируйте внутренние процессы плантации или сборочных цехов в РК для движения к Парето-границе.`;
+            }
+            verdictContent.innerHTML = verdict;
+
+            // Draw beautiful SVG elements
+            drawPPFChart(limitX, limitY, currentX, currentY, maxPossibleYAtCurrentX, stateStr);
+        }
+
+        function drawPPFChart(limitX, limitY, currentX, currentY, maxPossibleY, stateStr) {
+            svgPPFGraph.innerHTML = '';
+
+            const showInefficient = showInefficientShading.checked;
+            const showUnattainable = showUnattainableShading.checked;
+
+            // 1. Draw Inefficient Shading
+            if (showInefficient) {
+                let points = [`${gx(0)},${gy(0)}`];
+                for (let xVal = 0; xVal <= limitX; xVal += 5) {
+                    let yVal = limitY * (1 - Math.pow(xVal / limitX, 2));
+                    points.push(`${gx(xVal)},${gy(yVal)}`);
+                }
+                points.push(`${gx(limitX)},${gy(0)}`);
+                const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                poly.setAttribute("points", points.join(" "));
+                poly.setAttribute("fill", "rgba(245, 158, 11, 0.08)");
+                svgPPFGraph.appendChild(poly);
+            }
+
+            // 2. Draw Unattainable Shading
+            if (showUnattainable) {
+                let points = [
+                    `${gx(0)},${gy(maxScaleY)}`,
+                    `${gx(maxScaleX)},${gy(maxScaleY)}`,
+                    `${gx(maxScaleX)},${gy(0)}`,
+                    `${gx(limitX)},${gy(0)}`
+                ];
+                for (let xVal = limitX; xVal >= 0; xVal -= 5) {
+                    let yVal = limitY * (1 - Math.pow(xVal / limitX, 2));
+                    points.push(`${gx(xVal)},${gy(yVal)}`);
+                }
+                points.push(`${gx(0)},${gy(limitY)}`);
+                const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                poly.setAttribute("points", points.join(" "));
+                poly.setAttribute("fill", "rgba(239, 68, 68, 0.08)");
+                svgPPFGraph.appendChild(poly);
+            }
+
+            // Grid background lines
+            for (let i = 1; i <= 4; i++) {
+                const xVal = (maxScaleX / 4) * i;
+                const yVal = (maxScaleY / 4) * i;
+
+                // Vertical Grid
+                const lineV = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                lineV.setAttribute("x1", gx(xVal)); lineV.setAttribute("y1", gy(0));
+                lineV.setAttribute("x2", gx(xVal)); lineV.setAttribute("y2", gy(maxScaleY));
+                lineV.setAttribute("stroke", "#334155"); lineV.setAttribute("stroke-opacity", "0.25");
+                svgPPFGraph.appendChild(lineV);
+
+                // Horizontal Grid
+                const lineH = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                lineH.setAttribute("x1", gx(0)); lineH.setAttribute("y1", gy(yVal));
+                lineH.setAttribute("x2", gx(maxScaleX)); lineH.setAttribute("y2", gy(yVal));
+                lineH.setAttribute("stroke", "#334155"); lineH.setAttribute("stroke-opacity", "0.25");
+                svgPPFGraph.appendChild(lineH);
+
+                // Labels
+                const labelX = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                labelX.setAttribute("x", gx(xVal)); labelX.setAttribute("y", "242");
+                labelX.setAttribute("fill", "#64748b"); labelX.setAttribute("font-size", "7");
+                labelX.setAttribute("text-anchor", "middle");
+                labelX.textContent = `${Math.round(xVal)}`;
+                svgPPFGraph.appendChild(labelX);
+
+                const labelY = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                labelY.setAttribute("x", "38"); labelY.setAttribute("y", gy(yVal) + 3);
+                labelY.setAttribute("fill", "#64748b"); labelY.setAttribute("font-size", "7");
+                labelY.setAttribute("text-anchor", "end");
+                labelY.textContent = `${Math.round(yVal)}`;
+                svgPPFGraph.appendChild(labelY);
+            }
+
+            // Calculate main curve path data dynamically
+            let curvePoints = [];
+            for (let xVal = 0; xVal <= limitX; xVal += 2) {
+                let yVal = limitY * (1 - Math.pow(xVal / limitX, 2));
+                curvePoints.push(`${gx(xVal)},${gy(yVal)}`);
+            }
+            const dPathPPF = "M " + curvePoints.join(" L ");
+
+            // Draw Axes lines
+            const axisX = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            axisX.setAttribute("x1", "45"); axisX.setAttribute("y1", "230");
+            axisX.setAttribute("x2", "635"); axisX.setAttribute("y2", "230");
+            axisX.setAttribute("stroke", "#475569"); axisX.setAttribute("stroke-width", "1.5");
+            svgPPFGraph.appendChild(axisX);
+
+            const axisY = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            axisY.setAttribute("x1", "45"); axisY.setAttribute("y1", "10");
+            axisY.setAttribute("x2", "45"); axisY.setAttribute("y2", "230");
+            axisY.setAttribute("stroke", "#475569"); axisY.setAttribute("stroke-width", "1.5");
+            svgPPFGraph.appendChild(axisY);
+
+            // Draw Main Concave Curve line - Solid Bright Blue Line
+            const pathCurve = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            pathCurve.setAttribute("d", dPathPPF);
+            pathCurve.setAttribute("fill", "none");
+            pathCurve.setAttribute("stroke", "#00f0ff"); // Bright solid cyan-blue
+            pathCurve.setAttribute("stroke-width", "4.5");
+            svgPPFGraph.appendChild(pathCurve);
+
+            // Draw Projection lines for Current Choice Point
+            const projLineX = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            projLineX.setAttribute("x1", gx(currentX)); projLineX.setAttribute("y1", gy(currentY));
+            projLineX.setAttribute("x2", gx(currentX)); projLineX.setAttribute("y2", gy(0));
+            projLineX.setAttribute("stroke", "#6366f1"); projLineX.setAttribute("stroke-dasharray", "2,2");
+            svgPPFGraph.appendChild(projLineX);
+
+            const projLineY = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            projLineY.setAttribute("x1", gx(currentX)); projLineY.setAttribute("y1", gy(currentY));
+            projLineY.setAttribute("x2", gx(0)); projLineY.setAttribute("y2", gy(currentY));
+            projLineY.setAttribute("stroke", "#6366f1"); projLineY.setAttribute("stroke-dasharray", "2,2");
+            svgPPFGraph.appendChild(projLineY);
+
+            // Draw projection labels for the exact current dot value
+            const labelPointX = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            labelPointX.setAttribute("x", gx(currentX)); labelPointX.setAttribute("y", "244");
+            labelPointX.setAttribute("fill", "#4f46e5"); labelPointX.setAttribute("font-size", "7.5");
+            labelPointX.setAttribute("font-weight", "extrabold");
+            labelPointX.setAttribute("text-anchor", "middle");
+            labelPointX.textContent = `X=${Math.round(currentX)}`;
+            svgPPFGraph.appendChild(labelPointX);
+
+            const labelPointY = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            labelPointY.setAttribute("x", "38"); labelPointY.setAttribute("y", gy(currentY) - 5);
+            labelPointY.setAttribute("fill", "#4f46e5"); labelPointY.setAttribute("font-size", "7.5");
+            labelPointY.setAttribute("font-weight", "extrabold");
+            labelPointY.setAttribute("text-anchor", "end");
+            labelPointY.textContent = `Y=${Math.round(currentY)}`;
+            svgPPFGraph.appendChild(labelPointY);
+
+            // Render Current Choice Marker Dot (Changes to Green when efficient)
+            const isOptimal = (stateStr === "Эффективно");
+            const activeDotColor = isOptimal ? "#10b981" : "#4f46e5";
+            const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            dot.setAttribute("cx", gx(currentX));
+            dot.setAttribute("cy", gy(currentY));
+            dot.setAttribute("r", "6");
+            dot.setAttribute("fill", activeDotColor);
+            dot.setAttribute("stroke", "#ffffff");
+            dot.setAttribute("stroke-width", "2");
+            dot.setAttribute("class", "pulse-dot");
+            svgPPFGraph.appendChild(dot);
+        }
+
+        // Handle direct interactive dragging/clicking on SVG plot
+        let isDrawing = false;
+        
+        function handleInteractiveDrag(evt) {
+            const rect = svgPPFGraph.getBoundingClientRect();
+            let clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
+            let clientY = evt.clientY || (evt.touches && evt.touches[0].clientY);
+            if (!clientX || !clientY) return;
+
+            // Convert coordinates
+            const xPx = clientX - rect.left;
+            const yPx = clientY - rect.top;
+
+            const mappedX = unmapX((xPx / rect.width) * 650);
+            const mappedY = unmapY((yPx / rect.height) * 260);
+
+            // Bound values within legitimate slider limits
+            if (mappedX >= 0 && mappedX <= 150 && mappedY >= 0 && mappedY <= 1500) {
+                rangeX.value = Math.round(mappedX);
+                rangeY.value = Math.round(mappedY);
+                updateModel();
+            }
+        }
+
+        // SVG Event binds
+        svgPPFGraph.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            handleInteractiveDrag(e);
+        });
+        svgPPFGraph.addEventListener('mousemove', (e) => {
+            if (isDrawing) handleInteractiveDrag(e);
+        });
+        window.addEventListener('mouseup', () => { isDrawing = false; });
+
+        // Touch devices adaptive support
+        svgPPFGraph.addEventListener('touchstart', (e) => {
+            isDrawing = true;
+            handleInteractiveDrag(e);
+            e.preventDefault();
+        });
+        svgPPFGraph.addEventListener('touchmove', (e) => {
+            if (isDrawing) handleInteractiveDrag(e);
+        });
+        window.addEventListener('touchend', () => { isDrawing = false; });
+
+        // Checkboxes & inputs events triggers
+        const inputsGroup = [rangeX, rangeY, changeMaxX, changeMaxY, showInefficientShading, showUnattainableShading];
+        inputsGroup.forEach(inp => inp.addEventListener('input', updateModel));
+
+        // Initial launch on startup
+        updateModel();
+    </script>
+</body>
+</html>
