@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Симулятор рынка кофе Астаны — Практическое задание </title>
+<!-- Подключение Tailwind CSS для премиальной верстки -->
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+  
+  :root {
+    --bg-dark: #090b0e;
+    --panel-dark: #111418;
+    --border-neon: rgba(16, 185, 129, 0.15);
+    
+    --neon-green: #10b981;    /* Спрос (Demand) - Зеленый по запросу */
+    --neon-red: #ef4444;      /* Предложение (Supply) - Красный по запросу */
+    --neon-orange: #f97316;   /* Избыток / Профицит */
+    --neon-blue: #0ea5e9;     /* Равновесие / Нейтральный синий */
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-dark);
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.03) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.03) 0px, transparent 50%);
+  }
+
+  /* Стилизация ползунков для компактности */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: #1e252b;
+    height: 4px;
+    border-radius: 999px;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.1s ease, background-color 0.1s ease;
+  }
+
+  .demand-thumb::-webkit-slider-thumb {
+    background: var(--neon-green);
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
+  }
+  .demand-thumb::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+  .supply-thumb::-webkit-slider-thumb {
+    background: var(--neon-red);
+    box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+  }
+  .supply-thumb::-webkit-slider-thumb:hover { transform: scale(1.3); }
+
+  /* Анимация пульсации для точки равновесия */
+  @keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+
+  .equilibrium-pulse {
+    animation: pulse-glow 2s infinite;
+  }
+</style>
+</head>
+<body class="text-slate-100 min-h-screen p-3 md:p-4 flex flex-col items-center justify-start overflow-x-hidden">
+
+<div class="w-full max-w-7xl bg-[#111518]/95 border border-emerald-500/10 shadow-[0_0_40px_rgba(16,185,129,0.04)] rounded-xl p-4 md:p-5 backdrop-blur-md">
+  
+  <!-- Заголовок / Шапка со встроенным в правый угол блоком цены -->
+  <div class="relative flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-4 mb-4 gap-4">
+    <div>
+      <span class="text-[10px] font-bold tracking-[0.2em] text-emerald-500 uppercase">Практический кейс</span>
+      <h1 class="text-xl md:text-2xl font-extrabold text-white tracking-tight mt-0.5">Симулятор рынка кофе Астаны</h1>
+      <p class="text-slate-400 text-xs mt-0.5">Экономика | SDTE, осенний семестр 2026</p>
+    </div>
+    
+    <!-- Перенесенный блок управления ценой (вместо логотипа) -->
+    <div class="w-full md:w-auto min-w-[320px] bg-slate-900/90 border border-slate-800 px-4 py-2.5 rounded-xl flex flex-col gap-1.5">
+      <div class="flex justify-between items-center">
+        <span class="text-[10px] uppercase font-bold text-slate-400">Рыночная цена кофе</span>
+        <div id="price-display-val" class="text-lg font-black text-emerald-400 tracking-tight">
+          1 200 ₸
+        </div>
+      </div>
+      <input type="range" id="price-slider" min="500" max="2000" step="10" value="1200" class="w-full demand-thumb">
+    </div>
+  </div>
+
+  <!-- Главный двухколоночный грид -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+    
+    <!-- ЛЕВАЯ КОЛОНКА: Панели управления детерминантами (40% ширины) -->
+    <div class="lg:col-span-5 flex flex-col gap-4">
+      
+      <!-- Блок Спрос (Demand) -->
+      <div class="bg-[#14181c] border-t-4 border-emerald-500 rounded-lg p-3.5 shadow-inner">
+        <div class="flex justify-between items-center mb-1.5">
+          <h3 class="text-xs font-extrabold text-emerald-400 tracking-wider uppercase">Кривая спроса (Demand)</h3>
+          <span class="text-[10px] font-mono text-slate-500">Qd = f(P, D)</span>
+        </div>
+        <div class="font-mono text-[10px] text-slate-400 bg-black/40 px-2.5 py-1 rounded border border-slate-800/60 mb-3">
+          Qd = 52.5 - 0.025·P + 4·(Σw_i·D_i)
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <!-- Слайдер D1 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Популярность спешелти-кофе (D₁)</span>
+              <span id="lbl-w1" class="font-bold text-emerald-400">0.5</span>
+            </div>
+            <input type="range" id="sld-w1" min="0" max="1" step="0.1" value="0.5" class="w-full demand-thumb">
+          </div>
+          <!-- Слайдер D2 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Доходы населения Астаны (D₂)</span>
+              <span id="lbl-w2" class="font-bold text-emerald-400">0.5</span>
+            </div>
+            <input type="range" id="sld-w2" min="0" max="1" step="0.1" value="0.5" class="w-full demand-thumb">
+          </div>
+          <!-- Слайдер D3 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Ожидания роста цен (D₃)</span>
+              <span id="lbl-w3" class="font-bold text-emerald-400">0.5</span>
+            </div>
+            <input type="range" id="sld-w3" min="0" max="1" step="0.1" value="0.5" class="w-full demand-thumb">
+          </div>
+          <!-- Слайдер D4 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Подорожание чая (D₄)</span>
+              <span id="lbl-w4" class="font-bold text-emerald-400">0.5</span>
+            </div>
+            <input type="range" id="sld-w4" min="0" max="1" step="0.1" value="0.5" class="w-full demand-thumb">
+          </div>
+        </div>
+      </div>
+
+      <!-- Блок Предложение (Supply) -->
+      <div class="bg-[#14181c] border-t-4 border-red-500 rounded-lg p-3.5 shadow-inner">
+        <div class="flex justify-between items-center mb-1.5">
+          <h3 class="text-xs font-extrabold text-red-400 tracking-wider uppercase">Кривая предложения (Supply)</h3>
+          <span class="text-[10px] font-mono text-slate-500">Qs = f(P, S)</span>
+        </div>
+        <div class="font-mono text-[10px] text-slate-400 bg-black/40 px-2.5 py-1 rounded border border-slate-800/60 mb-3">
+          Qs = -7.5 + 0.025·P + 4·(Σv_i·S_i)
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <!-- Слайдер S1 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Импорт зерна (S₁)</span>
+              <span id="lbl-v1" class="font-bold text-red-400">0.5</span>
+            </div>
+            <input type="range" id="sld-v1" min="0" max="1" step="0.1" value="0.5" class="w-full supply-thumb">
+          </div>
+          <!-- Слайдер S2 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Технологии суперавтоматов (S₂)</span>
+              <span id="lbl-v2" class="font-bold text-red-400">0.5</span>
+            </div>
+            <input type="range" id="sld-v2" min="0" max="1" step="0.1" value="0.5" class="w-full supply-thumb">
+          </div>
+          <!-- Слайдер S3 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Налоговые каникулы / Субсидии (S₃)</span>
+              <span id="lbl-v3" class="font-bold text-red-400">0.5</span>
+            </div>
+            <input type="range" id="sld-v3" min="0" max="1" step="0.1" value="0.5" class="w-full supply-thumb">
+          </div>
+          <!-- Слайдер S4 -->
+          <div>
+            <div class="flex justify-between text-[11px] text-slate-400 mb-0.5">
+              <span>Количество обжарщиков (S₄)</span>
+              <span id="lbl-v4" class="font-bold text-red-400">0.5</span>
+            </div>
+            <input type="range" id="sld-v4" min="0" max="1" step="0.1" value="0.5" class="w-full supply-thumb">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ПРАВАЯ КОЛОНКА: График и аналитический отчет (60% ширины) -->
+    <div class="lg:col-span-7 flex flex-col gap-4">
+      
+      <!-- Поле графика (Белый журнальный фон, высокая контрастность) -->
+      <div class="bg-white border border-slate-200 shadow-md rounded-lg p-3 relative">
+        <div class="absolute top-3 right-4 flex gap-3 text-[10px] font-bold z-10">
+          <div class="flex items-center gap-1">
+            <span class="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block"></span>
+            <span class="text-slate-700">Спрос (D)</span>
+          </div>
+          <div class="flex items-center gap-1">
+            <span class="w-2.5 h-2.5 bg-red-500 rounded-full inline-block"></span>
+            <span class="text-slate-700">Предложение (S)</span>
+          </div>
+        </div>
+        <!-- Небольшая высота канваса для идеальной посадки по экрану -->
+        <canvas id="marketCanvas" class="w-full h-auto block" width="800" height="320"></canvas>
+      </div>
+
+      <!-- Аналитическая панель результатов -->
+      <div id="insights-panel" class="bg-[#14181c] border-l-4 border-slate-700 rounded-lg p-4 shadow-sm transition-all duration-300">
+        <h4 id="insights-title" class="text-xs font-black tracking-wider uppercase mb-1 text-slate-300">Рыночный анализ</h4>
+        <p id="insights-text" class="text-slate-400 text-xs leading-relaxed">
+          Инициализация экономических данных рынка кофе...
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- Подвал -->
+  <div class="text-center text-[10px] text-slate-600 border-t border-slate-800/60 mt-4 pt-3">
+    Разработано для студентов SDTE | AlmaU  © 2026
+  </div>
+
+</div>
+
+<script>
+  // Слайдеры Спроса
+  const sldW1 = document.getElementById('sld-w1');
+  const sldW2 = document.getElementById('sld-w2');
+  const sldW3 = document.getElementById('sld-w3');
+  const sldW4 = document.getElementById('sld-w4');
+
+  // Слайдеры Предложения
+  const sldV1 = document.getElementById('sld-v1');
+  const sldV2 = document.getElementById('sld-v2');
+  const sldV3 = document.getElementById('sld-v3');
+  const sldV4 = document.getElementById('sld-v4');
+
+  // Управление ценой
+  const priceSlider = document.getElementById('price-slider');
+  const priceDisplay = document.getElementById('price-display-val');
+
+  // График
+  const canvas = document.getElementById('marketCanvas');
+  const ctx = canvas.getContext('2d');
+
+  // Параметры холста (отступы)
+  const pad = { top: 30, right: 50, bottom: 40, left: 70 };
+
+  // Интерактивное состояние перетаскивания
+  let activeDragElement = null; // 'demand_point', 'supply_point', 'price_line'
+
+  // Форматирование значений
+  function fmtMoney(num) {
+    return new Intl.NumberFormat('ru-RU').format(Math.round(num)) + ' ₸';
+  }
+  function fmtQty(num) {
+    return new Intl.NumberFormat('ru-RU').format(Math.round(num * 1000)) + ' чашек';
+  }
+
+  // Расчет математической модели рынка
+  function getMarketState(P) {
+    const w1 = parseFloat(sldW1.value);
+    const w2 = parseFloat(sldW2.value);
+    const w3 = parseFloat(sldW3.value);
+    const w4 = parseFloat(sldW4.value);
+
+    const v1 = parseFloat(sldV1.value);
+    const v2 = parseFloat(sldV2.value);
+    const v3 = parseFloat(sldV3.value);
+    const v4 = parseFloat(sldV4.value);
+
+    // Величины смещения кривых (каждый фактор дает сдвиг до +4 тыс. чашек)
+    const dShift = 4 * (w1 + w2 + w3 + w4);
+    const sShift = 4 * (v1 + v2 + v3 + v4);
+
+    // Уравнения функций
+    const Qd = 52.5 - 0.025 * P + dShift;
+    const Qs = -7.5 + 0.025 * P + sShift;
+
+    // Равновесная точка
+    const P_eq = (60 + dShift - sShift) / 0.05;
+    const Q_eq = 52.5 - 0.025 * P_eq + dShift;
+
+    return {
+      Qd: Math.max(0, Qd),
+      Qs: Math.max(0, Qs),
+      P_eq: Math.round(P_eq),
+      Q_eq: Math.max(0, Q_eq),
+      dShift,
+      sShift
+    };
+  }
+
+  function draw() {
+    const P = parseInt(priceSlider.value);
+    const state = getMarketState(P);
+    const Qd = state.Qd;
+    const Qs = state.Qs;
+    const P_eq = state.P_eq;
+    const Q_eq = state.Q_eq;
+
+    // Обновляем числовые метки у ползунков
+    document.getElementById('lbl-w1').innerText = parseFloat(sldW1.value).toFixed(1);
+    document.getElementById('lbl-w2').innerText = parseFloat(sldW2.value).toFixed(1);
+    document.getElementById('lbl-w3').innerText = parseFloat(sldW3.value).toFixed(1);
+    document.getElementById('lbl-w4').innerText = parseFloat(sldW4.value).toFixed(1);
+
+    document.getElementById('lbl-v1').innerText = parseFloat(sldV1.value).toFixed(1);
+    document.getElementById('lbl-v2').innerText = parseFloat(sldV2.value).toFixed(1);
+    document.getElementById('lbl-v3').innerText = parseFloat(sldV3.value).toFixed(1);
+    document.getElementById('lbl-v4').innerText = parseFloat(sldV4.value).toFixed(1);
+
+    priceDisplay.innerText = fmtMoney(P);
+
+    // Подготовка холста
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const gW = w - pad.left - pad.right;
+    const gH = h - pad.top - pad.bottom;
+
+    // Шкалирование осей: Q от 0 до 50 (тыс. чашек), P от 400 до 2100 (₸)
+    const getX = (q) => pad.left + (q / 50) * gW;
+    const getY = (p) => pad.top + (1 - (p - 400) / 1700) * gH;
+
+    // Обратная трансформация координат для драг-событий
+    const getPriceFromY = (y) => {
+      let relativeY = (y - pad.top) / gH;
+      let price = 400 + (1 - relativeY) * 1700;
+      return Math.min(2000, Math.max(500, Math.round(price)));
+    };
+
+    // 1. Сетка графика (легкие элегантные линии)
+    ctx.strokeStyle = '#f1f5f9';
+    ctx.lineWidth = 1;
+    for (let q_val = 10; q_val <= 50; q_val += 10) {
+      ctx.beginPath();
+      ctx.moveTo(getX(q_val), pad.top);
+      ctx.lineTo(getX(q_val), h - pad.bottom);
+      ctx.stroke();
+    }
+    for (let p_val = 500; p_val <= 2000; p_val += 300) {
+      ctx.beginPath();
+      ctx.moveTo(pad.left, getY(p_val));
+      ctx.lineTo(w - pad.right, getY(p_val));
+      ctx.stroke();
+    }
+
+    // 2. Оси координат
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top - 10);
+    ctx.lineTo(pad.left, h - pad.bottom);
+    ctx.lineTo(w - pad.right + 10, h - pad.bottom);
+    ctx.stroke();
+
+    // 3. Зоны дефицита или избытка (закрашенные полупрозрачные области)
+    if (Math.abs(P - P_eq) > 10) {
+      ctx.fillStyle = P > P_eq ? 'rgba(249, 115, 22, 0.05)' : 'rgba(239, 68, 68, 0.05)';
+      const qStart = Math.min(Qd, Qs);
+      const qEnd = Math.max(Qd, Qs);
+      ctx.fillRect(getX(qStart), getY(P), (qEnd - qStart) / 50 * gW, getY(P_eq) - getY(P));
+    }
+
+    // 4. Отрисовка базовых пунктирных кривых (до сдвига при 0.0)
+    ctx.strokeStyle = 'rgba(16, 185, 129, 0.08)'; 
+    ctx.lineWidth = 1.5; 
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath(); 
+    ctx.moveTo(getX(52.5 - 0.025 * 500), getY(500)); 
+    ctx.lineTo(getX(52.5 - 0.025 * 2000), getY(2000)); 
+    ctx.stroke();
+
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.08)';
+    ctx.beginPath(); 
+    ctx.moveTo(getX(-7.5 + 0.025 * 500), getY(500)); 
+    ctx.lineTo(getX(-7.5 + 0.025 * 2000), getY(2000)); 
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 5. Отрисовка сдвинутых (активных) кривых
+    // Кривая спроса (D) — Ярко-зелёная
+    ctx.strokeStyle = '#10b981';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(getX(52.5 - 0.025 * 500 + state.dShift), getY(500));
+    ctx.lineTo(getX(52.5 - 0.025 * 2000 + state.dShift), getY(2000));
+    ctx.stroke();
+
+    // Кривая предложения (S) — Ярко-красная
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(getX(-7.5 + 0.025 * 500 + state.sShift), getY(500));
+    ctx.lineTo(getX(-7.5 + 0.025 * 2000 + state.sShift), getY(2000));
+    ctx.stroke();
+
+    // 6. Трассировка текущей рыночной цены (горизонтальная пунктирная линия)
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, getY(P));
+    ctx.lineTo(w - pad.right, getY(P));
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Трассировка проекций к осям
+    ctx.strokeStyle = '#cbd5e1';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(getX(Qd), getY(P)); ctx.lineTo(getX(Qd), h - pad.bottom); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(getX(Qs), getY(P)); ctx.lineTo(getX(Qs), h - pad.bottom); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // 7. Интерактивные точки на кривых (крупные и удобные для захвата)
+    // Точка спроса Qd
+    ctx.fillStyle = '#10b981';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(getX(Qd), getY(P), 7, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+
+    // Точка предложения Qs
+    ctx.fillStyle = '#ef4444';
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.arc(getX(Qs), getY(P), 7, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.stroke();
+
+    // 8. Точка равновесия и её индикация
+    const isEquilibrium = Math.abs(P - P_eq) <= 12;
+    if (isEquilibrium) {
+      // Изумрудное свечение при достижении равновесия
+      ctx.fillStyle = '#10b981';
+      ctx.shadowColor = '#10b981';
+      ctx.shadowBlur = 12;
+      ctx.beginPath(); 
+      ctx.arc(getX(Q_eq), getY(P_eq), 9, 0, 2 * Math.PI); 
+      ctx.fill();
+      ctx.shadowBlur = 0; // Сброс эффекта свечения
+    } else {
+      ctx.fillStyle = '#64748b';
+      ctx.beginPath();
+      ctx.arc(getX(Q_eq), getY(P_eq), 4.5, 0, 2 * Math.PI);
+      ctx.fill();
+    }
+
+    // 9. Подписи шкал и осей
+    ctx.fillStyle = '#1e293b';
+    ctx.font = 'bold 11px Inter';
+    ctx.fillText('Цена чашки (P, ₸)', pad.left - 65, pad.top - 12);
+    ctx.fillText('Объем продаж кофе в месяц (Q, тыс. чашек)', w - pad.right - 230, h - pad.bottom + 28);
+
+    // Числа на осях
+    ctx.fillStyle = '#475569';
+    ctx.font = 'bold 10px Inter';
+    ctx.fillText('500', pad.left - 25, getY(500) + 3);
+    ctx.fillText('1 200', pad.left - 32, getY(1200) + 3);
+    ctx.fillText('2 000', pad.left - 32, getY(2000) + 3);
+    
+    ctx.fillText('10', getX(10) - 5, h - pad.bottom + 15);
+    ctx.fillText('30.5', getX(30.5) - 12, h - pad.bottom + 15);
+    ctx.fillText('50', getX(50) - 5, h - pad.bottom + 15);
+
+    // Обозначения кривых спроса и предложения
+    ctx.fillStyle = '#10b981';
+    ctx.font = 'black 12px Inter';
+    ctx.fillText('D', getX(52.5 - 0.025 * 500 + state.dShift) + 8, getY(500) + 3);
+
+    ctx.fillStyle = '#ef4444';
+    ctx.fillText('S', getX(-7.5 + 0.025 * 2000 + state.sShift) + 8, getY(2000) + 3);
+
+    // Текстовая индикация зон дефицита/профицита прямо на холсте
+    if (!isEquilibrium) {
+      if (P > P_eq) {
+        ctx.fillStyle = '#f97316';
+        ctx.font = 'bold 10px Inter';
+        ctx.fillText(`ИЗБЫТОК ПРЕДЛОЖЕНИЯ = ${fmtQty(Qs - Qd)}`, getX(Math.min(Qd, Qs)) + 10, getY(P) - 8);
+      } else {
+        ctx.fillStyle = '#ef4444';
+        ctx.font = 'bold 10px Inter';
+        ctx.fillText(`ДЕФИЦИТ СПРОСА = ${fmtQty(Qd - Qs)}`, getX(Math.min(Qd, Qs)) + 10, getY(P) - 8);
+      }
+    }
+
+    // --- ЛОГИКА АНАЛИТИЧЕСКИХ ВЫВОДОВ ---
+    const iPanel = document.getElementById('insights-panel');
+    const iTitle = document.getElementById('insights-title');
+    const iText = document.getElementById('insights-text');
+
+    iPanel.style.boxShadow = "none";
+    iPanel.style.borderLeftWidth = "4px";
+
+    if (isEquilibrium) {
+      iPanel.style.borderLeftColor = "var(--neon-green)";
+      iPanel.classList.add("equilibrium-pulse");
+      iTitle.style.color = "var(--neon-green)";
+      iTitle.innerText = "РЫНОЧНОЕ РАВНОВЕСИЕ ДОСТИГНУТО! (MARKET EQUILIBRIUM)";
+      iText.innerHTML = `Поздравляем! Рыночные силы спроса и предложения сбалансировали рынок кофе Астаны. При цене <strong>${fmtMoney(P_eq)}</strong> величина спроса в точности равна цене предложения и составляет <strong>${fmtQty(Q_eq)}</strong>. На рынке нет ни дефицита, ни затоваривания. Это наиболее эффективное распределение ресурсов в экономике.`;
+    } else if (P > P_eq) {
+      iPanel.classList.remove("equilibrium-pulse");
+      iPanel.style.borderLeftColor = "var(--neon-orange)";
+      iTitle.style.color = "var(--neon-orange)";
+      iTitle.innerText = `ПРОФИЦИТ РЫНКА (SURPLUS) — СИЛА ПОКУПАТЕЛЯ`;
+      iText.innerHTML = `Установленная цена (<strong>${fmtMoney(P)}</strong>) находится выше равновесного значения в ${fmtMoney(P_eq)}. Кофейни готовы продать <strong>${fmtQty(Qs)}</strong>, но жители готовы купить лишь <strong>${fmtQty(Qd)}</strong>. На рынке образовался избыток в объеме <strong>${fmtQty(Qs - Qd)}</strong>. <br><strong>Управленческое решение:</strong> Кофейни вынуждены снижать цены и устраивать акции. Цена пойдет вниз, стремясь к равновесию.`;
+    } else {
+      iPanel.classList.remove("equilibrium-pulse");
+      iPanel.style.borderLeftColor = "var(--neon-red)";
+      iTitle.style.color = "var(--neon-red)";
+      iTitle.innerText = `ДЕФИЦИТ РЫНКА (SHORTAGE) — СИЛА ПРОДАВЦА`;
+      iText.innerHTML = `Установленная цена (<strong>${fmtMoney(P)}</strong>) занижена относительно равновесного уровня в ${fmtMoney(P_eq)}. Потребители хотят купить <strong>${fmtQty(Qd)}</strong>, но кофейни готовы поставить только <strong>${fmtQty(Qs)}</strong>. Дефицит составляет <strong>${fmtQty(Qd - Qs)}</strong>.<br><strong>Управленческое решение:</strong> Очереди у бариста растут. Покупатели готовы платить больше, поэтому кофейни начнут повышать цены на стаканчик кофе до уровня равновесия.`;
+    }
+  }
+
+  // Обработка клика/перетаскивания на Canvas
+  function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+    
+    // Масштабируем координаты мыши под разрешение Canvas
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+
+  canvas.addEventListener('mousedown', function(e) {
+    const pos = getMousePos(e);
+    const P = parseInt(priceSlider.value);
+    const state = getMarketState(P);
+    const Qd = state.Qd;
+    const Qs = state.Qs;
+
+    // Шкалированные координаты
+    const gW = canvas.width - pad.left - pad.right;
+    const gH = canvas.height - pad.top - pad.bottom;
+    const getX = (q) => pad.left + (q / 50) * gW;
+    const getY = (p) => pad.top + (1 - (p - 400) / 1700) * gH;
+
+    // Рассчитываем расстояния до точек
+    const distD = Math.hypot(pos.x - getX(Qd), pos.y - getY(P));
+    const distS = Math.hypot(pos.x - getX(Qs), pos.y - getY(P));
+
+    if (distD < 16) {
+      activeDragElement = 'demand_point';
+      canvas.style.cursor = 'grabbing';
+    } else if (distS < 16) {
+      activeDragElement = 'supply_point';
+      canvas.style.cursor = 'grabbing';
+    } else if (Math.abs(pos.y - getY(P)) < 12 && pos.x >= pad.left && pos.x <= canvas.width - pad.right) {
+      activeDragElement = 'price_line';
+      canvas.style.cursor = 'grabbing';
+    }
+  });
+
+  window.addEventListener('mousemove', function(e) {
+    if (!activeDragElement) {
+      // Подсветка курсора при наведении на интерактивные элементы
+      const pos = getMousePos(e);
+      const P = parseInt(priceSlider.value);
+      const state = getMarketState(P);
+      const Qd = state.Qd;
+      const Qs = state.Qs;
+
+      const gW = canvas.width - pad.left - pad.right;
+      const gH = canvas.height - pad.top - pad.bottom;
+      const getX = (q) => pad.left + (q / 50) * gW;
+      const getY = (p) => pad.top + (1 - (p - 400) / 1700) * gH;
+
+      const distD = Math.hypot(pos.x - getX(Qd), pos.y - getY(P));
+      const distS = Math.hypot(pos.x - getX(Qs), pos.y - getY(P));
+
+      if (distD < 16 || distS < 16 || (Math.abs(pos.y - getY(P)) < 8 && pos.x >= pad.left && pos.x <= canvas.width - pad.right)) {
+        canvas.style.cursor = 'grab';
+      } else {
+        canvas.style.cursor = 'default';
+      }
+      return;
+    }
+
+    const pos = getMousePos(e);
+    
+    // Переводим координату Y в цену
+    const gH = canvas.height - pad.top - pad.bottom;
+    let relativeY = (pos.y - pad.top) / gH;
+    let price = 400 + (1 - relativeY) * 1700;
+    price = Math.min(2000, Math.max(500, Math.round(price)));
+
+    priceSlider.value = price;
+    draw();
+  });
+
+  window.addEventListener('mouseup', function() {
+    activeDragElement = null;
+    canvas.style.cursor = 'default';
+  });
+
+  // Поддержка сенсорных экранов (Touch)
+  canvas.addEventListener('touchstart', function(e) {
+    const pos = getMousePos(e);
+    const P = parseInt(priceSlider.value);
+    const state = getMarketState(P);
+    const Qd = state.Qd;
+    const Qs = state.Qs;
+
+    const gW = canvas.width - pad.left - pad.right;
+    const gH = canvas.height - pad.top - pad.bottom;
+    const getX = (q) => pad.left + (q / 50) * gW;
+    const getY = (p) => pad.top + (1 - (p - 400) / 1700) * gH;
+
+    const distD = Math.hypot(pos.x - getX(Qd), pos.y - getY(P));
+    const distS = Math.hypot(pos.x - getX(Qs), pos.y - getY(P));
+
+    if (distD < 24) {
+      activeDragElement = 'demand_point';
+    } else if (distS < 24) {
+      activeDragElement = 'supply_point';
+    } else if (Math.abs(pos.y - getY(P)) < 20 && pos.x >= pad.left && pos.x <= canvas.width - pad.right) {
+      activeDragElement = 'price_line';
+    }
+  });
+
+  canvas.addEventListener('touchmove', function(e) {
+    if (!activeDragElement) return;
+    e.preventDefault(); // Предотвращаем прокрутку страницы во время работы с графиком
+    
+    const pos = getMousePos(e);
+    const gH = canvas.height - pad.top - pad.bottom;
+    let relativeY = (pos.y - pad.top) / gH;
+    let price = 400 + (1 - relativeY) * 1700;
+    price = Math.min(2000, Math.max(500, Math.round(price)));
+
+    priceSlider.value = price;
+    draw();
+  });
+
+  canvas.addEventListener('touchend', function() {
+    activeDragElement = null;
+  });
+
+  // Навешиваем обработчики на все ползунки для мгновенного обновления
+  [sldW1, sldW2, sldW3, sldW4, sldV1, sldV2, sldV3, sldV4, priceSlider].forEach(slider => {
+    slider.addEventListener('input', draw);
+  });
+
+  // Первая отрисовка
+  draw();
+</script>
+
+</body>
+</html>
