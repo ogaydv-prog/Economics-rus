@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Видеоматериалы и Лекции | Экономика</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px 20px;
+            position: relative;
+        }
+
+        .top-left-logo {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        /* Кнопка "Назад" на главный дашборд */
+        .back-button {
+            position: absolute;
+            top: 35px;
+            right: 30px;
+            text-decoration: none;
+            background-color: #001e50;
+            color: white;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
+        }
+
+        .back-button:hover {
+            background-color: #003380;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 30, 80, 0.25);
+        }
+
+        header {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 35px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #001e50;
+            margin-bottom: 8px;
+            margin-top: 20px;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #555555;
+            max-width: 650px;
+            line-height: 1.5;
+            margin: 0 auto;
+        }
+
+        /* Контейнер видеокарт */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 480px));
+            gap: 30px;
+            max-width: 1100px;
+            width: 100%;
+            justify-content: center;
+            align-items: stretch;
+            padding-bottom: 40px;
+        }
+
+        /* Карточка видео */
+        .video-card {
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .video-card:hover {
+            transform: translateY(-6px);
+            border-color: #001e50;
+            box-shadow: 0 12px 25px rgba(0, 30, 80, 0.15);
+        }
+
+        .video-card a {
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .thumbnail-container {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* Пропорция 16:9 */
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .thumbnail-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .video-card:hover .thumbnail-container img {
+            transform: scale(1.05);
+        }
+
+        /* Иконка Play поверх превью */
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0, 30, 80, 0.85);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .play-button::after {
+            content: '';
+            display: block;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 10px 0 10px 18px;
+            border-color: transparent transparent transparent #ffffff;
+            margin-left: 4px;
+        }
+
+        .video-card:hover .play-button {
+            background-color: #cc0000; /* Красный цвет YouTube при наведении */
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+
+        .video-info {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .video-tag {
+            font-size: 12px;
+            font-weight: 700;
+            color: #001e50;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .video-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .video-description {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            flex-grow: 1;
+        }
+
+        .video-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: #001e50;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 12px;
+            margin-top: auto;
+        }
+
+        footer {
+            margin-top: auto;
+            font-size: 14px;
+            color: #718096;
+            padding-top: 30px;
+            padding-bottom: 20px;
+            text-align: center;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Логотип AlmaU с репозитория Economics-rus -->
+    <img src="https://ogaydv-prog.github.io/Economics-rus/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    
+    <!-- Кнопка возврата на главный дашборд -->
+    <a href="index.html" class="back-button">← Главный хаб</a>
+
+    <header>
+        <h1>Видеоматериалы и Лекции</h1>
+        <p class="subtitle">
+            Образовательные видеоролики, наглядные разборы экономических концепций и курс лекций
+        </p>
+    </header>
+
+    <main class="grid-container">
+        
+        <!-- 1. Видео London School of Economics -->
+        <div class="video-card">
+            <a href="https://www.youtube.com/watch?v=NdbbcO35arw" target="_blank" rel="noopener noreferrer">
+                <div class="thumbnail-container">
+                    <img src="https://img.youtube.com/vi/NdbbcO35arw/maxresdefault.jpg" alt="Лекция London School of Economics">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-tag">Микроэкономика • LSE</span>
+                    <h2 class="video-title">Введение в микроэкономику: Рынки и базовые принципы</h2>
+                    <p class="video-description">
+                        Наглядный лекционный материал от London School of Economics с дублированным переводом на русский язык. Разбор основных понятий спроса, предложения и рыночного равновесия.
+                    </p>
+                    <div class="video-footer">
+                        <span>Смотреть на YouTube</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <!-- 2. Плейлист Простая Экономика -->
+        <div class="video-card">
+            <a href="https://www.youtube.com/watch?v=htPO1AKhIFY&list=PLGssI1JnCp5tR6B-hCMaA0c-Bgx6ewnS3" target="_blank" rel="noopener noreferrer">
+                <div class="thumbnail-container">
+                    <img src="https://img.youtube.com/vi/htPO1AKhIFY/maxresdefault.jpg" alt="Простая Экономика — Плейлист">
+                    <div class="play-button"></div>
+                </div>
+                <div class="video-info">
+                    <span class="video-tag">Курс лекций • Плейлист</span>
+                    <h2 class="video-title">Простая Экономика: Полный курс коротких лекций</h2>
+                    <p class="video-description">
+                        Цикл увлекательных и понятных видеоуроков на русском языке, объясняющих экономические законы, устройство финансовой системы, поведение фирма и макроэкономические явления.
+                    </p>
+                    <div class="video-footer">
+                        <span>Открыть плейлист</span>
+                        <span>→</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>Разработано для студентов AlmaU 2026 | Дисциплина: Экономика</p>
+        <p>© Almaty Management University | Школа цифровых технологий и экономики</p>
+    </footer>
+
+</body>
+</html>
