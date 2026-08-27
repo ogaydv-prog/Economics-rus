@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Topics | Economics (SE)</title>
+    <title>Темы курса | Экономика</title>
     <style>
         * {
             box-sizing: border-box;
@@ -13,13 +13,13 @@
         }
 
         body {
-            background-color: #ffffff;
+            background-color: #f8fafc;
             color: #333333;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 15px 20px;
+            padding: 20px;
             position: relative;
         }
 
@@ -35,26 +35,29 @@
         /* Кнопка "Назад" на главный дашборд */
         .back-button {
             position: absolute;
-            top: 35px;
+            top: 30px;
             right: 30px;
             text-decoration: none;
             background-color: #001e50;
             color: white;
-            padding: 8px 16px;
+            padding: 9px 18px;
             border-radius: 8px;
             font-weight: 600;
             font-size: 14px;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
         }
 
         .back-button:hover {
             background-color: #003380;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 30, 80, 0.25);
         }
 
         header {
             text-align: center;
             margin-top: 10px;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
         h1 {
@@ -62,7 +65,7 @@
             font-weight: 700;
             color: #001e50;
             margin-bottom: 8px;
-            margin-top: 20px;
+            margin-top: 15px;
         }
 
         .subtitle {
@@ -73,36 +76,38 @@
             margin: 0 auto;
         }
 
-        /* Сетка для 14 карточек */
+        /* Единая сетка для 14 карточек */
         .grid-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            max-width: 1400px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 24px;
+            max-width: 1350px;
             width: 100%;
-            justify-content: center;
+            justify-items: center;
             align-items: center;
             padding-bottom: 40px;
         }
 
-        /* ЕДИНАЯ РАМКА ДЛЯ ВСЕХ 14 КАРТОЧЕК */
+        /* ЕДИНАЯ РАМКА И СТАНДАРТ ПО ВЫСОТЕ/ШИРИНЕ ДЛЯ ВСЕХ 14 КАРТОЧЕК */
         .card {
-            display: inline-block;
+            display: block;
             text-decoration: none;
             background: #ffffff;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 160px; 
-            height: 250px; 
+            width: 100%;
+            max-width: 185px;
+            height: 255px; /* Выравнивает все карточки по единой высоте */
+            position: relative;
         }
 
         .card img {
             width: 100%;
             height: 100%;
-            object-fit: fill;
+            object-fit: fill; /* Растягивает и выравнивает изображения ровно по рамке */
             display: block;
             transition: transform 0.3s ease;
         }
@@ -110,7 +115,7 @@
         .card:hover {
             transform: translateY(-8px) scale(1.03);
             border-color: #001e50;
-            box-shadow: 0 16px 30px rgba(0, 30, 80, 0.15);
+            box-shadow: 0 16px 30px rgba(0, 30, 80, 0.2);
         }
 
         footer {
@@ -126,41 +131,41 @@
 </head>
 <body>
 
-    <!-- Исправленный логотип на новый репозиторий -->
-    <img src="https://ogaydv-prog.github.io/Economics-se/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    <!-- Логотип AlmaU с репозитория Economics-rus -->
+    <img src="https://ogaydv-prog.github.io/Economics-rus/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
     
-    <!-- Кнопка возврата на главный дашборд нового репозитория -->
-    <a href="index.html" class="back-button">← Back to Dashboard</a>
+    <!-- Кнопка возврата на главный дашборд -->
+    <a href="index.html" class="back-button">← Главный хаб</a>
 
     <header>
-        <h1>Course Topics</h1>
+        <h1>Темы курса</h1>
         <p class="subtitle">
-            Explore the fundamental topics of Economics for Software Engineering
+            Интерактивные учебные модули и материалы по дисциплине «Экономика»
         </p>
     </header>
 
     <main class="grid-container">
-        <!-- 14 карточек -->
-        <a href="topic1.html" class="card" title="Topic 1"><img src="pic-top1.png" alt="Topic 1"></a>
-        <a href="topic2.html" class="card" title="Topic 2"><img src="pic-top2.png" alt="Topic 2"></a>
-        <a href="topic3.html" class="card" title="Topic 3"><img src="pic-top3.png" alt="Topic 3"></a>
-        <a href="#" class="card" title="Topic 4"><img src="pic-top4.png" alt="Topic 4"></a>
-        <a href="#" class="card" title="Topic 5"><img src="pic-top5.png" alt="Topic 5"></a>
-        <a href="#" class="card" title="Topic 6"><img src="pic-top6.png" alt="Topic 6"></a>
-        <a href="#" class="card" title="Topic 7"><img src="pic-top7.png" alt="Topic 7"></a>
+        <!-- 14 карточек с русскоязычными изображениями -->
+        <a href="topic1.html" class="card" title="Тема 1"><img src="pic-top1-rus.png" alt="Тема 1"></a>
+        <a href="topic2.html" class="card" title="Тема 2"><img src="pic-top2-rus.png" alt="Тема 2"></a>
+        <a href="topic3.html" class="card" title="Тема 3"><img src="pic-top3-rus.png" alt="Тема 3"></a>
+        <a href="topic4.html" class="card" title="Тема 4"><img src="pic-top4-rus.png" alt="Тема 4"></a>
+        <a href="topic5.html" class="card" title="Тема 5"><img src="pic-top5-rus.png" alt="Тема 5"></a>
+        <a href="topic6.html" class="card" title="Тема 6"><img src="pic-top6-rus.png" alt="Тема 6"></a>
+        <a href="topic7.html" class="card" title="Тема 7"><img src="pic-top7-rus.png" alt="Тема 7"></a>
         
-        <a href="#" class="card" title="Topic 8"><img src="pic-top8.png" alt="Topic 8"></a>
-        <a href="#" class="card" title="Topic 9"><img src="pic-top9.png" alt="Topic 9"></a>
-        <a href="#" class="card" title="Topic 10"><img src="pic-top10.png" alt="Topic 10"></a>
-        <a href="#" class="card" title="Topic 11"><img src="pic-top11.png" alt="Topic 11"></a>
-        <a href="#" class="card" title="Topic 12"><img src="pic-top12.png" alt="Topic 12"></a>
-        <a href="#" class="card" title="Topic 13"><img src="pic-top13.png" alt="Topic 13"></a>
-        <a href="#" class="card" title="Topic 14"><img src="pic-top14.png" alt="Topic 14"></a>
+        <a href="topic8.html" class="card" title="Тема 8"><img src="pic-top8-rus.png" alt="Тема 8"></a>
+        <a href="topic9.html" class="card" title="Тема 9"><img src="pic-top9-rus.png" alt="Тема 9"></a>
+        <a href="topic10.html" class="card" title="Тема 10"><img src="pic-top10-rus.png" alt="Тема 10"></a>
+        <a href="topic11.html" class="card" title="Тема 11"><img src="pic-top11-rus.png" alt="Тема 11"></a>
+        <a href="topic12.html" class="card" title="Тема 12"><img src="pic-top12-rus.png" alt="Тема 12"></a>
+        <a href="topic13.html" class="card" title="Тема 13"><img src="pic-top13-rus.png" alt="Тема 13"></a>
+        <a href="topic14.html" class="card" title="Тема 14"><img src="pic-top14-rus.png" alt="Тема 14"></a>
     </main>
 
     <footer>
-        <p>Developed for Software Engineering Team AlmaU 2026 | Course: Economics</p>
-        <p>© Almaty Management University | School of Digital Technologies & Economics</p>
+        <p>Разработано для студентов AlmaU 2026 | Дисциплина: Экономика</p>
+        <p>© Almaty Management University | Школа цифровых технологий и экономики</p>
     </footer>
 
 </body>
