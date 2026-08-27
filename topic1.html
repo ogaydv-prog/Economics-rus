@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Topic 1: Basic Principles of Economics | Economics (SE)</title>
+    <title>Тема 1: Основные принципы экономики | Экономика</title>
     <style>
         * {
             box-sizing: border-box;
@@ -13,7 +13,7 @@
         }
 
         body {
-            background-color: #ffffff;
+            background-color: #f8fafc;
             color: #333333;
             display: flex;
             flex-direction: column;
@@ -32,7 +32,7 @@
             object-fit: contain;
         }
 
-        /* Кнопка "Назад" к списку топиков */
+        /* Кнопка "Назад" к списку тем */
         .back-button {
             position: absolute;
             top: 35px;
@@ -40,15 +40,18 @@
             text-decoration: none;
             background-color: #001e50;
             color: white;
-            padding: 8px 16px;
+            padding: 9px 18px;
             border-radius: 8px;
             font-weight: 600;
             font-size: 14px;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
         }
 
         .back-button:hover {
             background-color: #003380;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 30, 80, 0.25);
         }
 
         header {
@@ -85,29 +88,29 @@
             padding-bottom: 40px;
         }
 
-        /* Единые стильные карточки с синими рамками */
+        /* Единые стильные карточки */
         .card {
             display: inline-block;
             text-decoration: none;
             background: #ffffff;
-            border: 2px solid #e2e8f0;
+            border: 2px solid #cbd5e1;
             border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 170px; 
+            width: 180px; 
             height: 260px; 
         }
 
         .card img {
             width: 100%;
             height: 100%;
-            object-fit: fill; /* Идеальная подгонка картинок */
+            object-fit: fill; /* Идеальная подгонка превью по рамке */
             display: block;
             transition: transform 0.3s ease;
         }
 
-        /* Эффект увеличения и красивой синей тени при наведении */
+        /* Эффект при наведении */
         .card:hover {
             transform: translateY(-8px) scale(1.04);
             border-color: #001e50;
@@ -127,49 +130,49 @@
 </head>
 <body>
 
-    <!-- Исправленный логотип на новый репозиторий -->
-    <img src="https://ogaydv-prog.github.io/Economics-se/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    <!-- Логотип AlmaU с репозитория Economics-rus -->
+    <img src="https://ogaydv-prog.github.io/Economics-rus/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
     
-    <!-- Кнопка возврата к выбору топиков внутри нового репозитория -->
-    <a href="topics.html" class="back-button">← Back to Course Topics</a>
+    <!-- Кнопка возврата к выбору тем -->
+    <a href="topics.html" class="back-button">← К темам курса</a>
 
     <header>
-        <h1>Topic 1: Basic Principles of Economics</h1>
+        <h1>Тема 1: Основные принципы экономики</h1>
         <p class="subtitle">
-            Interactive presentations, models, and economic simulations
+            Интерактивная презентация, визуальные модели и симуляторы экономических процессов
         </p>
     </header>
 
     <main class="grid-container">
-        <!-- 1. Презентация Piktochart -->
-        <a href="https://create.piktochart.com/output/6eed712df2e1-basic-principles-of-economics-2026-se" target="_blank" rel="noopener" class="card" title="Presentation: Basic Principles">
-            <img src="pic-preza-1.png" alt="Presentation: Basic Principles">
+        <!-- 1. Презентация Google Slides -->
+        <a href="https://docs.google.com/presentation/d/1knIWR5Pd-gFz790ltg_flg4nKx9j0AX5/edit?usp=sharing&ouid=109725301150629205728&rtpof=true&sd=true" target="_blank" rel="noopener" class="card" title="Презентация: Основные принципы экономики">
+            <img src="pic-preza-1-rus.png" alt="Презентация: Основные принципы экономики">
         </a>
 
         <!-- 2. Модель кругооборота (Circular Flow) -->
-        <a href="sim-circular-flow-model-pe.html" class="card" title="Simulation: Circular Flow Model">
-            <img src="pic-sim-circular-1.png" alt="Simulation: Circular Flow Model">
+        <a href="sim-circular-flow-rus.html" class="card" title="Симуляция: Модель кругооборота">
+            <img src="pic-sim-circular-1-rus.png" alt="Симуляция: Модель кругооборота">
         </a>
 
-        <!-- 3. Симуляция PPF -->
-        <a href="sim-ppf-pe.html" class="card" title="Simulation: Production Possibilities Frontier">
-            <img src="pic-sim-ppf-1.png" alt="Simulation: Production Possibilities Frontier">
+        <!-- 3. Симуляция КПВ (PPF) -->
+        <a href="sim-ppf-rus.html" class="card" title="Симуляция: Кривая производственных возможностей (КПВ)">
+            <img src="pic-sim-ppf-1-rus.png" alt="Симуляция: Кривая производственных возможностей (КПВ)">
         </a>
 
         <!-- 4. Экономические и бухгалтерские издержки (EC vs AC) -->
-        <a href="sim-ec-ac-costs-pe.html" class="card" title="Simulation: Economic vs Accounting Costs">
-            <img src="pic-sim-ac-ec-1.png" alt="Simulation: Economic vs Accounting Costs">
+        <a href="sim-ac-econ-costs-rus.html" class="card" title="Симуляция: Бухгалтерские и экономические издержки">
+            <img src="pic-sim-ac-ec-1-rus.png" alt="Симуляция: Бухгалтерские и экономические издержки">
         </a>
 
         <!-- 5. Предельный анализ (Marginal Analysis) -->
-        <a href="sim-marginal-pe.html" class="card" title="Simulation: Marginal Analysis">
-            <img src="pic-sim-marginal-1.png" alt="Simulation: Marginal Analysis">
+        <a href="sim-marginal-rus.html" class="card" title="Симуляция: Предельный анализ">
+            <img src="pic-sim-marginal-1-rus.png" alt="Симуляция: Предельный анализ">
         </a>
     </main>
 
     <footer>
-        <p>Developed for Software Engineering Team AlmaU 2026 | Course: Economics</p>
-        <p>© Almaty Management University | School of Digital Technologies & Economics</p>
+        <p>Разработано для студентов AlmaU 2026 | Дисциплина: Экономика</p>
+        <p>© Almaty Management University | Школа цифровых технологий и экономики</p>
     </footer>
 
 </body>
