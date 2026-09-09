@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elasticity of Demand Analysis</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; color: #f1f5f9; font-family: 'Inter', sans-serif; min-height: 100vh; }
+        .chart-container { background: #1e293b; border-radius: 12px; border: 1px solid #334155; width: 100%; height: 255px; }
+        .axis { stroke: #94a3b8; stroke-width: 1.5; }
+        .grid { stroke: #334155; stroke-dasharray: 2; stroke-width: 0.5; }
+        .curve-d { fill: none; stroke: #38bdf8; stroke-width: 2.5; }
+        .curve-tr { fill: none; stroke: #fb923c; stroke-width: 2.5; }
+        .pulse { animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { r: 6; } 50% { r: 10; fill: #22c55e; } 100% { r: 6; } }
+    </style>
+</head>
+<body class="p-3 flex flex-col justify-between">
+
+    <!-- HEADER WITH LANGUAGE TOGGLE -->
+    <header class="bg-slate-900 p-4 rounded-xl border border-slate-700 mb-3 flex justify-between items-center shadow-lg">
+        <div>
+            <h1 class="text-lg font-bold text-white tracking-wide" id="txt-header-title">Quantitative Demand & Revenue Analysis</h1>
+            <p class="text-xs text-red-500 font-extrabold uppercase tracking-wider" id="txt-header-sub">Principles of Economics • AlmaU</p>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <!-- Переключатель языка RU / EN -->
+            <div class="flex items-center bg-slate-800 border border-slate-700 rounded-lg p-1">
+                <button id="lang-ru" onclick="setLanguage('ru')" class="px-2.5 py-1 text-xs font-bold rounded transition-all bg-sky-500 text-white">RU</button>
+                <button id="lang-en" onclick="setLanguage('en')" class="px-2.5 py-1 text-xs font-bold rounded transition-all text-slate-400 hover:text-white">EN</button>
+            </div>
+
+            <!-- Блок коэффициента эластичности -->
+            <div id="edBox" class="px-4 py-2 bg-slate-800 rounded-lg border border-slate-700 text-right">
+                <p class="text-[10px] uppercase text-slate-400 font-semibold" id="txt-ed-label">Elasticity Coeff. (Ed)</p>
+                <p id="edVal" class="text-base font-black text-white">-1.00</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex gap-3 flex-1">
+        <!-- SIDEBAR CONTROLS -->
+        <aside class="w-72 bg-slate-900 p-5 rounded-xl border border-slate-700 flex flex-col justify-between shadow-xl">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs font-bold text-slate-300">
+                        <span id="txt-lbl-price">Subscription Price</span>: <span id="pVal" class="text-sky-400 font-bold">250k ₸</span>
+                    </label>
+                    <input type="range" id="pRange" min="0" max="500000" step="5000" value="250000" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-500 mt-2">
+                </div>
+                
+                <div class="space-y-2 text-xs bg-slate-950/50 p-3 rounded-lg border border-slate-800">
+                    <p class="flex justify-between text-slate-300">
+                        <span id="txt-lbl-q">Sales Volume (Q)</span>: <span id="qDisplay" class="font-bold text-white">250</span>
+                    </p>
+                    <p class="flex justify-between text-slate-300">
+                        <span id="txt-lbl-tr">Total Revenue (TR)</span>: <span id="trDisplay" class="font-bold text-orange-400">62.50M ₸</span>
+                    </p>
+                </div>
+
+                <button id="toggleArea" class="w-full py-2.5 bg-slate-800 hover:bg-sky-900 text-slate-200 rounded-lg text-xs font-bold transition border border-slate-700">Toggle Revenue Area</button>
+
+                <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 text-[11px] leading-relaxed">
+                    <span class="font-bold block mb-1 text-sky-400" id="txt-zone-title">Zone Analysis:</span>
+                    <p id="statusDesc" class="text-slate-300">Optimal pricing point with unit elasticity.</p>
+                </div>
+            </div>
+
+            <!-- FOOTER INSIDE SIDEBAR -->
+            <div class="mt-4 pt-3 border-t border-slate-800 text-[10px] text-slate-500 text-center" id="txt-footer">
+                Interactive Learning Tool • Developed for AlmaU Students
+            </div>
+        </aside>
+
+        <!-- CHARTS SECTION -->
+        <main class="flex-1 grid grid-rows-2 gap-3">
+            <svg id="chartD" viewBox="0 0 600 245" class="chart-container"></svg>
+            <svg id="chartTR" viewBox="0 0 600 245" class="chart-container"></svg>
+        </main>
+    </div>
+
+<script>
+    const pRange = document.getElementById('pRange'), pVal = document.getElementById('pVal'), 
+          qDisp = document.getElementById('qDisplay'), trDisp = document.getElementById('trDisplay'),
+          chartD = document.getElementById('chartD'), chartTR = document.getElementById('chartTR'),
+          edVal = document.getElementById('edVal'), edBox = document.getElementById('edBox'),
+          statusDesc = document.getElementById('statusDesc'),
+          toggleArea = document.getElementById('toggleArea');
+    
+    let showArea = false;
+    let currentLang = 'ru';
+
+    const translations = {
+        ru: {
+            headerTitle: "Количественный анализ спроса и выручки",
+            headerSub: "Экономика | Микроэкономика • Школа Цифровых Технологий и Экономики",
+            edLabel: "Коэфф. эластичности (Ed)",
+            lblPrice: "Цена подписки",
+            lblQ: "Объем продаж (Q)",
+            lblTR: "Валовая выручка (TR)",
+            btnToggleArea: "Показать/Скрыть площадь TR",
+            zoneTitle: "Анализ ценовой зоны:",
+            footer: "Интерактивный учебный модуль • Разработано для студентов AlmaU",
+            kSuffix: "тыс. ₸",
+            mSuffix: "млн ₸",
+            unitSuffix: "шт.",
+            elasticStatus: "Эластичный участок (|Ed| > 1)",
+            elasticDesc: "Снижение цены приведет к росту общей выручки (процентный прирост объема продаж превышает процент снижения цены).",
+            inelasticStatus: "Неэластичный участок (|Ed| < 1)",
+            inelasticDesc: "Повышение цены приведет к росту общей выручки (процентное падение продаж меньше процентного повышения цены).",
+            unitaryStatus: "Единичная эластичность (|Ed| = 1)",
+            unitaryDesc: "Точка максимума общей выручки (TR). Дальнейшее изменение цены не приведет к росту выручки.",
+            trMaxTitle: "Точка максимума выручки (TR)"
+        },
+        en: {
+            headerTitle: "Quantitative Demand & Revenue Analysis",
+            headerSub: "Economics | Microeconomics • SDTE",
+            edLabel: "Elasticity Coeff. (Ed)",
+            lblPrice: "Subscription Price",
+            lblQ: "Sales Volume (Q)",
+            lblTR: "Total Revenue (TR)",
+            btnToggleArea: "Toggle Revenue Area",
+            zoneTitle: "Zone Analysis:",
+            footer: "Interactive Learning Tool • Developed for AlmaU Students",
+            kSuffix: "k ₸",
+            mSuffix: "M ₸",
+            unitSuffix: "units",
+            elasticStatus: "Elastic Range (|Ed| > 1)",
+            elasticDesc: "Cutting price will increase total revenue (percentage gain in quantity demanded exceeds the percentage loss in price).",
+            inelasticStatus: "Inelastic Range (|Ed| < 1)",
+            inelasticDesc: "Raising price will increase total revenue (percentage drop in sales quantity is smaller than the price increase).",
+            unitaryStatus: "Unit Elasticity (|Ed| = 1)",
+            unitaryDesc: "Point of maximum total revenue (TR). Further price changes will not increase total revenue.",
+            trMaxTitle: "TR Maximization Point"
+        }
+    };
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        const t = translations[lang];
+
+        const btnRu = document.getElementById('lang-ru');
+        const btnEn = document.getElementById('lang-en');
+        if (lang === 'ru') {
+            btnRu.className = "px-2.5 py-1 text-xs font-bold rounded transition-all bg-sky-500 text-white";
+            btnEn.className = "px-2.5 py-1 text-xs font-bold rounded transition-all text-slate-400 hover:text-white";
+        } else {
+            btnEn.className = "px-2.5 py-1 text-xs font-bold rounded transition-all bg-sky-500 text-white";
+            btnRu.className = "px-2.5 py-1 text-xs font-bold rounded transition-all text-slate-400 hover:text-white";
+        }
+
+        document.getElementById('txt-header-title').innerText = t.headerTitle;
+        document.getElementById('txt-header-sub').innerText = t.headerSub;
+        document.getElementById('txt-ed-label').innerText = t.edLabel;
+        document.getElementById('txt-lbl-price').innerText = t.lblPrice;
+        document.getElementById('txt-lbl-q').innerText = t.lblQ;
+        document.getElementById('txt-lbl-tr').innerText = t.lblTR;
+        document.getElementById('toggleArea').innerText = t.btnToggleArea;
+        document.getElementById('txt-zone-title').innerText = t.zoneTitle;
+        document.getElementById('txt-footer').innerText = t.footer;
+
+        render();
+    }
+
+    function render() {
+        const t = translations[currentLang];
+        const p = parseInt(pRange.value);
+        const q = 500 - (0.001 * p);
+        const tr = p * q;
+        const ed = -0.001 * (p / (q || 0.1));
+        
+        pVal.textContent = (p/1000).toFixed(0) + " " + t.kSuffix;
+        qDisp.textContent = Math.round(q) + " " + t.unitSuffix;
+        trDisp.textContent = (tr/1000000).toFixed(2) + " " + t.mSuffix;
+        edVal.textContent = ed.toFixed(2);
+
+        let statusText = "", descText = "";
+        if (ed < -1.05) {
+            edBox.className = "px-4 py-2 bg-blue-900/50 rounded-lg border border-blue-700 text-right";
+            edVal.className = "text-base font-black text-blue-400";
+            statusText = t.elasticStatus;
+            descText = t.elasticDesc;
+        } else if (ed > -0.95) {
+            edBox.className = "px-4 py-2 bg-red-900/50 rounded-lg border border-red-700 text-right";
+            edVal.className = "text-base font-black text-red-400";
+            statusText = t.inelasticStatus;
+            descText = t.inelasticDesc;
+        } else {
+            edBox.className = "px-4 py-2 bg-green-900/50 rounded-lg border border-green-700 text-right";
+            edVal.className = "text-base font-black text-green-400";
+            statusText = t.unitaryStatus;
+            descText = t.unitaryDesc;
+        }
+        statusDesc.textContent = descText;
+
+        const x = 50 + (q / 500) * 500; 
+        const yD = 200 - (p / 500000) * 170; 
+        const yTR = 200 - (tr / 70000000) * 170;
+
+        const drawGrid = (isTR) => `
+            ${Array.from({length: 11}, (_, i) => `<line x1="50" y1="${30 + i*17}" x2="550" y2="${30 + i*17}" class="grid"/>`).join('')}
+            ${Array.from({length: 11}, (_, i) => `<line x1="${50 + i*50}" y1="30" x2="${50 + i*50}" y2="200" class="grid"/>`).join('')}
+            <line x1="50" y1="200" x2="550" y2="200" class="axis"/> <line x1="50" y1="30" x2="50" y2="200" class="axis"/>
+            ${Array.from({length: 11}, (_, i) => `<text x="10" y="${205 - i*17}" font-size="9" fill="#94a3b8">${(isTR ? i*7 : i*50).toFixed(0)}${isTR ? (currentLang === 'ru' ? 'млн' : 'M') : (currentLang === 'ru' ? 'тыс' : 'k')}</text>`).join('')}
+            ${Array.from({length: 11}, (_, i) => `<text x="${40 + i*50}" y="218" font-size="9" fill="#94a3b8">${i*50}</text>`).join('')}
+        `;
+
+        chartD.innerHTML = `${drawGrid(false)}
+            ${showArea ? `<rect x="50" y="${yD}" width="${x-50}" height="${200-yD}" fill="rgba(56, 189, 248, 0.25)"/>` : ''}
+            <path d="M 50 30 L 550 200" class="curve-d"/>
+            <text x="250" y="45" font-size="12" font-weight="bold" fill="#38bdf8">${statusText}</text>
+            <line x1="${x}" y1="200" x2="${x}" y2="${yD}" stroke="#94a3b8" stroke-dasharray="4"/>
+            <line x1="50" y1="${yD}" x2="${x}" y2="${yD}" stroke="#94a3b8" stroke-dasharray="4"/>
+            <circle cx="${x}" cy="${yD}" r="7" fill="${ed < -1.05 ? '#3b82f6' : (ed > -0.95 ? '#ef4444' : '#22c55e')}" class="${Math.abs(ed + 1) < 0.05 ? 'pulse' : ''}"/>`;
+
+        chartTR.innerHTML = `${drawGrid(true)}
+            <path d="M 50 200 Q 300 -110 550 200" class="curve-tr"/>
+            <text x="220" y="25" font-size="12" font-weight="bold" fill="#fb923c">${t.trMaxTitle}</text>
+            <line x1="${x}" y1="200" x2="${x}" y2="${yTR}" stroke="#94a3b8" stroke-dasharray="4"/>
+            <circle cx="${x}" cy="${yTR}" r="7" fill="#fb923c" class="${Math.abs(ed + 1) < 0.05 ? 'pulse' : ''}"/>`;
+    }
+
+    pRange.addEventListener('input', render);
+    toggleArea.addEventListener('click', () => { showArea = !showArea; render(); });
+    
+    window.onload = function() {
+        setLanguage('ru');
+    };
+</script>
+</body>
+</html>

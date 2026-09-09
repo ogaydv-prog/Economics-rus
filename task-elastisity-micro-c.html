@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Микроэкономика | Лабораторный практикум</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0b0f13;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.05) 0px, transparent 50%);
+  }
+
+  input[type="number"], textarea, input[type="text"], input[type="password"] {
+    background-color: #151b22;
+    border: 1px solid #30363d;
+    color: #f0f6fc;
+    border-radius: 8px;
+    padding: 8px 12px;
+    outline: none;
+    transition: all 0.2s;
+  }
+  input[type="number"]:focus, textarea:focus, input[type="text"]:focus, input[type="password"]:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  }
+
+  input[type="range"].vintage-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: #151b22;
+    height: 12px;
+    border-radius: 4px;
+    border: 1px solid #30363d;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+  input[type="range"].vintage-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 32px;
+    background: linear-gradient(to right, #8a95a5 0%, #cfd8dc 30%, #b0bec5 45%, #ef4444 48%, #ef4444 52%, #b0bec5 55%, #cfd8dc 70%, #8a95a5 100%);
+    border: 1.5px solid #0b0f13;
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition: transform 0.1s ease;
+  }
+  input[type="range"].vintage-slider::-webkit-slider-thumb:hover { transform: scale(1.08); }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .tab-btn { border-bottom: 2px solid transparent; transition: all 0.2s; }
+  .tab-btn.active { border-bottom: 2px solid #10b981; color: #10b981; font-weight: 700; }
+</style>
+</head>
+<body class="text-slate-100 min-h-screen p-3 md:p-6 flex flex-col items-center justify-start overflow-x-hidden">
+
+<div class="w-full max-w-7xl bg-[#111518]/95 border border-emerald-500/10 shadow-[0_0_50px_rgba(16,185,129,0.05)] rounded-2xl p-4 md:p-6 backdrop-blur-md">
+  
+  <!-- Шапка симулятора -->
+  <div class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-5 mb-5 gap-4">
+    <div>
+      <span class="text-[10px] font-bold tracking-[0.25em] text-emerald-400 uppercase">Микроэкономика | Практический модуль</span>
+      <h1 class="text-xl md:text-2xl font-black text-white tracking-tight mt-1">Моделирование рынка малого бизнеса и эластичность</h1>
+      <p class="text-slate-400 text-xs mt-0.5">Настройте параметры товара, постройте рыночные кривые и найдите пик выручки</p>
+    </div>
+    
+    <!-- Переключение вкладок -->
+    <div class="flex items-center gap-2 bg-[#151b22] p-1.5 rounded-xl border border-slate-800">
+      <button onclick="switchTab('tab-lab')" id="btn-tab-lab" class="tab-btn active px-3 py-1.5 text-xs font-bold rounded-lg text-slate-300">Кабинет группы</button>
+      <button onclick="switchTab('tab-teacher')" id="btn-tab-teacher" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-rose-400 flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+        Преподаватель
+      </button>
+    </div>
+  </div>
+
+  <!-- ВКЛАДКА 1: ЛАБОРАТОРИЯ (СТУДЕНТЫ) -->
+  <div id="tab-lab" class="tab-content active">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <!-- ЛЕВАЯ ПАНЕЛЬ: Ввод данных (35% ширины) -->
+      <div class="lg:col-span-4 flex flex-col gap-4">
+        
+        <!-- Описание продукта -->
+        <div class="bg-[#14181c] border border-slate-800 rounded-xl p-4 shadow-inner space-y-3">
+          <h3 class="text-xs font-black text-indigo-400 tracking-wider uppercase flex items-center gap-2">
+            <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+            Описание вашего товара / услуги
+          </h3>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Наименование товара</label>
+            <input type="text" id="inp-product" value="Сет суши 'Филадельфия'" class="w-full text-xs font-medium">
+          </div>
+          <div>
+            <label class="block text-[11px] text-slate-400 mb-1">Характеристика товара и клиенты</label>
+            <textarea id="inp-desc" rows="2" class="w-full text-xs resize-none">Популярный сет в локальной точке доставки. Основная аудитория — студенты и офисные сотрудники.</textarea>
+          </div>
+        </div>
+
+        <!-- Шаг 1: Базовое равновесие -->
+        <div class="bg-[#14181c] border border-slate-800 rounded-xl p-4 shadow-inner">
+          <h3 class="text-xs font-black text-emerald-400 tracking-wider uppercase mb-3 flex items-center gap-2">
+            <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+            Шаг 1. Точка равновесия E<sub>0</sub>
+          </h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] text-slate-400">Базовая цена P<sub>0</sub> (₸)</label>
+              <input type="number" id="inp-p0" value="2500" min="1" max="50000" class="text-xs">
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] text-slate-400">Базовый объем Q<sub>0</sub> (шт)</label>
+              <input type="number" id="inp-q0" value="500" min="1" max="10000" class="text-xs">
+            </div>
+          </div>
+        </div>
+
+        <!-- Шаг 2: Границы рынка -->
+        <div class="bg-[#14181c] border border-slate-800 rounded-xl p-4 shadow-inner">
+          <h3 class="text-xs font-black text-sky-400 tracking-wider uppercase mb-3 flex items-center gap-2">
+            <span class="w-2 h-2 bg-sky-400 rounded-full"></span>
+            Шаг 2. Ограничения рынка
+          </h3>
+          <div class="grid grid-cols-2 gap-3">
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] text-slate-400" title="Цена, при которой продажи упадут до нуля">Цена ухода P<sub>max</sub> (₸)</label>
+              <input type="number" id="inp-pmax" value="5000" min="1" max="100000" class="text-xs">
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[11px] text-slate-400" title="Минимальная цена начала предложения">Мин. цена P<sub>min</sub> (₸)</label>
+              <input type="number" id="inp-pmin" value="500" min="0" max="50000" class="text-xs">
+            </div>
+          </div>
+        </div>
+
+        <!-- Шаг 3: Ползунок цены -->
+        <div class="bg-[#14181c] border border-emerald-500/20 rounded-xl p-4 shadow-inner">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-xs font-black text-amber-400 tracking-wider uppercase">Шаг 3. Симуляция цены</h3>
+            <span id="price-badge" class="text-sm font-black text-emerald-400">2 500 ₸</span>
+          </div>
+          
+          <div class="py-2">
+            <input type="range" id="price-slider" min="0" max="6000" value="2500" class="w-full vintage-slider">
+          </div>
+          
+          <div class="grid grid-cols-2 gap-2 mt-2 text-[11px] text-slate-400">
+            <div class="bg-black/30 p-2 rounded-lg border border-slate-800">
+              <span class="block text-slate-500 uppercase text-[9px]">Продажи (Qd)</span>
+              <span id="stat-q" class="text-white font-bold text-xs">500 шт.</span>
+            </div>
+            <div class="bg-black/30 p-2 rounded-lg border border-slate-800">
+              <span class="block text-slate-500 uppercase text-[9px]">Выручка (TR)</span>
+              <span id="stat-tr" class="text-amber-400 font-bold text-xs font-mono">1 250 000 ₸</span>
+            </div>
+          </div>
+
+          <button id="toggleArea" class="w-full mt-3 py-1.5 px-3 bg-emerald-950/60 hover:bg-emerald-900 border border-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-all">
+            Скрыть зону выручки
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ПРАВАЯ ПАНЕЛЬ: Уравнения, График и Блок выводов (65% ширины) -->
+      <div class="lg:col-span-8 flex flex-col gap-4">
+        
+        <!-- Блок уравнений с подробным пояснением параметров -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- Уравнение спроса -->
+          <div class="bg-[#14181c] border-l-4 border-emerald-500 p-3 rounded-r-xl flex flex-col justify-between">
+            <div>
+              <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Уравнение спроса</span>
+              <div id="eq-demand" class="text-xs font-mono font-bold text-slate-200 mt-0.5">Q<sub>d</sub> = a - b·P</div>
+              <p class="text-[8.5px] text-slate-400 mt-1.5 leading-tight" id="desc-demand">
+                a: макс. спрос при P=0.<br>b: потерь штук на каждый 1 ₸ цены.
+              </p>
+            </div>
+            <span class="text-[9px] text-slate-400 block mt-2 pt-1 border-t border-slate-800">Эластичность E<sub>d</sub>: <span id="eq-ed-val" class="font-bold text-emerald-400">-</span></span>
+          </div>
+
+          <!-- Уравнение предложения -->
+          <div class="bg-[#14181c] border-l-4 border-rose-500 p-3 rounded-r-xl flex flex-col justify-between">
+            <div>
+              <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Уравнение предложения</span>
+              <div id="eq-supply" class="text-xs font-mono font-bold text-slate-200 mt-0.5">Q<sub>s</sub> = c + d·P</div>
+              <p class="text-[8.5px] text-slate-400 mt-1.5 leading-tight" id="desc-supply">
+                c: база выпуска при P=0.<br>d: прирост штук на каждый 1 ₸ цены.
+              </p>
+            </div>
+            <span class="text-[9px] text-slate-400 block mt-2 pt-1 border-t border-slate-800">Реакция d: <span id="eq-d-val" class="font-bold text-rose-400">-</span></span>
+          </div>
+
+          <!-- Оптимум выручки -->
+          <div class="bg-[#14181c] border-l-4 border-amber-500 p-3 rounded-r-xl flex flex-col justify-between">
+            <div>
+              <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Оптимум цены (|E<sub>d</sub>| = 1)</span>
+              <div id="eq-optimum" class="text-xs font-mono font-bold text-amber-400 mt-0.5">P<sub>opt</sub> = -</div>
+              <p class="text-[8.5px] text-slate-400 mt-1.5 leading-tight">
+                Точка перехода от эластичного спроса к неэластичному.
+              </p>
+            </div>
+            <span class="text-[9px] text-slate-400 block mt-2 pt-1 border-t border-slate-800">Пик выручки: <span id="eq-max-tr" class="font-bold text-slate-300">-</span></span>
+          </div>
+        </div>
+
+        <!-- Графический холст -->
+        <div class="bg-[#14181c] border border-slate-800 shadow-xl rounded-xl p-3 relative overflow-hidden">
+          <div class="flex flex-wrap gap-3 text-[10px] font-extrabold mb-2">
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-emerald-500 rounded-full inline-block"></span><span class="text-slate-300">Спрос (Demand)</span></div>
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-rose-500 rounded-full inline-block"></span><span class="text-slate-300">Предложение (Supply)</span></div>
+            <div class="flex items-center gap-1.5"><span class="w-3 h-3 border-2 border-amber-400 rounded-full bg-[#14181c] inline-block"></span><span class="text-slate-300">Равновесие E<sub>0</sub></span></div>
+            <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 bg-indigo-400 rounded-full inline-block"></span><span class="text-slate-300">Оптимум Max TR</span></div>
+          </div>
+          
+          <div class="w-full">
+            <canvas id="trackerCanvas" class="w-full h-auto block cursor-crosshair"></canvas>
+          </div>
+          <div class="text-[9px] text-slate-500 text-right mt-1">
+            *Вы можете менять цену, перетаскивая курсор или палец непосредственно по графику!
+          </div>
+        </div>
+
+        <!-- Поле для ответа студентов и генерация токена -->
+        <div class="bg-[#14181c] border border-slate-800 rounded-xl p-4 shadow-inner space-y-3">
+          <h3 class="text-xs font-black text-sky-400 tracking-wider uppercase flex items-center gap-2">
+            <span class="w-2 h-2 bg-sky-400 rounded-full"></span>
+            Шаг 4. Управленческий вывод команды
+          </h3>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Проведите симуляцию цены. Опишите: до какого уровня целесообразно менять цену вашего товара? Каков характер спроса в текущей точке и почему снижение/повышение цены изменит выручку?
+          </p>
+          <textarea id="inp-decision" rows="3" placeholder="Введите развернутый вывод вашей команды..." class="w-full text-xs resize-none"></textarea>
+          
+          <div class="flex flex-col sm:flex-row items-center gap-3 pt-1">
+            <button onclick="generateToken()" class="w-full sm:w-auto px-6 py-2.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors shadow-lg">
+              Зафиксировать и создать токен
+            </button>
+            <div id="token-box" class="hidden flex-1 w-full flex items-center gap-2">
+              <input type="text" id="output-token" readonly class="w-full text-xs font-mono text-emerald-300 bg-black/40 select-all cursor-pointer" onclick="this.select()" title="Кликните для выбора">
+              <span class="text-[10px] text-slate-400 shrink-0">Скопируйте токен для преподавателя</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ВКЛАДКА 2: ПАНЕЛЬ ПРЕПОДАВАТЕЛЯ (ПИН: 2026) -->
+  <div id="tab-teacher" class="tab-content">
+    <div id="teacher-login" class="max-w-sm mx-auto bg-[#14181c] p-6 rounded-xl border border-slate-800 text-center mt-12 shadow-2xl">
+      <svg class="w-12 h-12 text-rose-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"></path></svg>
+      <h3 class="text-white font-bold mb-4">Панель преподавателя</h3>
+      <input type="password" id="inp-pin" placeholder="Введите ПИН-код" class="w-full text-center font-mono text-lg mb-4 tracking-widest">
+      <button onclick="unlockTeacherPanel()" class="w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider">Войти в панель</button>
+    </div>
+
+    <div id="teacher-dashboard" class="hidden space-y-4">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Ввод токена -->
+        <div class="lg:col-span-4 bg-[#14181c] p-5 rounded-xl border border-slate-800 space-y-3">
+          <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Проверка ответа студента</h3>
+          <p class="text-[11px] text-slate-400">Вставьте зашифрованный токен команды:</p>
+          <textarea id="inp-decode-token" rows="5" placeholder="Вставьте токен сюда..." class="w-full text-xs font-mono resize-none"></textarea>
+          <button onclick="decodeToken()" class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg text-xs uppercase tracking-wider">Расшифровать и оценить</button>
+        </div>
+
+        <!-- Результат проверки -->
+        <div class="lg:col-span-8">
+          <div id="teacher-result" class="hidden bg-[#14181c] p-5 rounded-xl border border-slate-800 space-y-4">
+            <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+              <div>
+                <span class="text-[9px] font-bold text-indigo-400 uppercase tracking-widest">Название товара</span>
+                <h2 id="res-product" class="text-lg font-bold text-white mt-0.5">Товар</h2>
+                <p id="res-desc" class="text-xs text-slate-400 mt-1 italic">Описание...</p>
+              </div>
+              <div class="text-right">
+                <span class="block text-[9px] text-slate-500 uppercase">Установленная цена</span>
+                <span id="res-price" class="font-black text-xl text-sky-400 font-mono">0 ₸</span>
+              </div>
+            </div>
+
+            <!-- Авто-рецензия алгоритма -->
+            <div id="auto-grade-box" class="p-4 rounded-xl border-l-4">
+              <h4 class="text-xs font-bold uppercase tracking-wider mb-1" id="grade-title">Вердикт системы</h4>
+              <p class="text-xs text-slate-200 leading-relaxed" id="grade-text">Текст...</p>
+              <div class="flex gap-6 mt-3 pt-3 border-t border-white/10 text-xs font-mono">
+                <span class="text-slate-400">Истинный P_opt: <span id="math-opt-price" class="text-white font-bold">0</span></span>
+                <span class="text-slate-400">Максимальная TR: <span id="math-opt-tr" class="text-white font-bold">0</span></span>
+              </div>
+            </div>
+
+            <!-- Текст студентов -->
+            <div>
+              <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Обоснование студентов:</span>
+              <div class="bg-black/40 p-3 rounded-lg border border-slate-800 text-xs text-slate-300 leading-relaxed whitespace-pre-wrap font-sans" id="res-decision"></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Подвал -->
+  <div class="text-center text-[10px] text-slate-600 border-t border-slate-800/60 mt-6 pt-3">
+    Интерактивный практикум по микроэкономике | AlmaU GSB © 2026
+  </div>
+
+</div>
+
+<script>
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    
+    if (tabId === 'tab-lab') {
+      document.getElementById('btn-tab-lab').classList.add('active');
+      resizeCanvas();
+    } else {
+      document.getElementById('btn-tab-teacher').classList.add('active');
+    }
+  }
+
+  const inpP0 = document.getElementById('inp-p0');
+  const inpQ0 = document.getElementById('inp-q0');
+  const inpPmax = document.getElementById('inp-pmax');
+  const inpPmin = document.getElementById('inp-pmin');
+
+  const priceSlider = document.getElementById('price-slider');
+  const priceBadge = document.getElementById('price-badge');
+  const toggleAreaBtn = document.getElementById('toggleArea');
+
+  const eqDemand = document.getElementById('eq-demand');
+  const eqSupply = document.getElementById('eq-supply');
+  const eqOptimum = document.getElementById('eq-optimum');
+  const eqMaxTr = document.getElementById('eq-max-tr');
+  const eqEdVal = document.getElementById('eq-ed-val');
+  const eqDVal = document.getElementById('eq-d-val');
+  const descDemand = document.getElementById('desc-demand');
+  const descSupply = document.getElementById('desc-supply');
+
+  const statQ = document.getElementById('stat-q');
+  const statTr = document.getElementById('stat-tr');
+
+  const canvas = document.getElementById('trackerCanvas');
+  const ctx = canvas.getContext('2d');
+  
+  const pad = { top: 25, right: 35, bottom: 40, left: 95 };
+  let showArea = true;
+  let isDraggingPrice = false;
+
+  function formatValue(val, suffix = ' ₸') {
+    return new Intl.NumberFormat('ru-RU').format(Math.round(val)) + suffix;
+  }
+
+  function calculateModel() {
+    const P0 = parseFloat(inpP0.value) || 0;
+    const Q0 = parseFloat(inpQ0.value) || 0;
+    const Pmax = parseFloat(inpPmax.value) || 0;
+    const Pmin = parseFloat(inpPmin.value) || 0;
+
+    if (Pmax <= P0 || Pmin >= P0 || P0 <= 0 || Q0 <= 0 || Pmax <= 0 || Pmin < 0) {
+      return { error: "Проверьте условия: P_max > P_0 > P_min >= 0" };
+    }
+
+    const b = Q0 / (Pmax - P0);
+    const a = Q0 + b * P0;
+
+    const d = Q0 / (P0 - Pmin);
+    const c = Q0 - d * P0;
+
+    const P_opt = a / (2 * b);
+    const Q_opt = a - b * P_opt;
+    const TR_max = P_opt * Q_opt;
+
+    return { a, b, c, d, P_opt, Q_opt, TR_max, P0, Q0, Pmax, Pmin };
+  }
+
+  function resizeCanvas() {
+    const container = canvas.parentElement;
+    canvas.width = container.clientWidth;
+    canvas.height = Math.max(260, container.clientWidth * 0.42);
+    update();
+  }
+
+  function getPriceFromY(mouseY, maxValP, gH) {
+    let relativeY = (mouseY - pad.top) / gH;
+    let price = (1 - relativeY) * maxValP;
+    return Math.max(0, Math.round(price));
+  }
+
+  function drawLabel(baseText, subText, valueText, x, y, color = '#94a3b8', font = '10px Inter', subFont = '8px Inter') {
+    ctx.fillStyle = color;
+    ctx.font = font;
+    ctx.fillText(baseText, x, y);
+    let currentX = x + ctx.measureText(baseText).width;
+    if (subText) {
+      ctx.font = subFont;
+      ctx.fillText(subText, currentX, y + 3);
+      currentX += ctx.measureText(subText).width;
+    }
+    if (valueText) {
+      ctx.font = font;
+      ctx.fillText(valueText, currentX, y);
+    }
+  }
+
+  function update() {
+    const model = calculateModel();
+
+    if (model.error) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
+
+    priceSlider.max = Math.round(model.Pmax * 1.15);
+    const P = Math.min(parseFloat(priceSlider.value), model.Pmax * 1.15);
+    priceBadge.innerText = formatValue(P);
+
+    const Qd = Math.max(0, model.a - model.b * P);
+    const Qs = Math.max(0, model.c + model.d * P);
+    const TR = P * Qd;
+    const Ed = Qd > 0 ? -(model.b * (P / Qd)) : -Infinity;
+
+    eqDemand.innerHTML = `Q<sub>d</sub> = ${Math.round(model.a)} - ${model.b.toFixed(3)}·P`;
+    eqSupply.innerHTML = `Q<sub>s</sub> = ${Math.round(model.c)} + ${model.d.toFixed(3)}·P`;
+    
+    descDemand.innerHTML = `a = ${Math.round(model.a)} шт (спрос при P=0)<br>b = ${model.b.toFixed(3)} (потерь шт/₸)`;
+    descSupply.innerHTML = `c = ${Math.round(model.c)} шт (выпуск при P=0)<br>d = ${model.d.toFixed(3)} (прирост шт/₸)`;
+
+    eqEdVal.innerText = Ed === -Infinity ? '∞' : Ed.toFixed(2);
+    eqDVal.innerText = model.d.toFixed(3);
+    eqOptimum.innerHTML = `P<sub>opt</sub> = ` + formatValue(model.P_opt);
+    eqMaxTr.innerText = formatValue(model.TR_max);
+
+    statQ.innerText = formatValue(Qd, ' шт.');
+    statTr.innerText = formatValue(TR);
+
+    drawGraphics(P, Qd, Qs, TR, Ed, model);
+  }
+
+  function drawGraphics(P, Qd, Qs, TR, Ed, model) {
+    const w = canvas.width;
+    const h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const gW = w - pad.left - pad.right;
+    const gH = h - pad.top - pad.bottom;
+
+    const maxValQ = Math.max(model.a, model.Q0 * 2) * 1.05;
+    const maxValP = Math.max(model.Pmax, model.P_opt * 2) * 1.15;
+
+    const getX = (q) => pad.left + (q / maxValQ) * gW;
+    const getY = (p) => pad.top + (1 - p / maxValP) * gH;
+
+    ctx.strokeStyle = '#1e293b';
+    ctx.lineWidth = 0.5;
+    for (let i = 1; i <= 5; i++) {
+      let q_grid = (maxValQ / 5) * i;
+      ctx.beginPath(); ctx.moveTo(getX(q_grid), pad.top); ctx.lineTo(getX(q_grid), h - pad.bottom); ctx.stroke();
+      let p_grid = (maxValP / 5) * i;
+      ctx.beginPath(); ctx.moveTo(pad.left, getY(p_grid)); ctx.lineTo(w - pad.right, getY(p_grid)); ctx.stroke();
+    }
+
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top - 10); ctx.lineTo(pad.left, h - pad.bottom); ctx.lineTo(w - pad.right + 10, h - pad.bottom);
+    ctx.stroke();
+
+    if (showArea && Qd > 0) {
+      let fillCol = 'rgba(16, 185, 129, 0.12)';
+      if (Math.abs(Ed) > 1.05) fillCol = 'rgba(56, 189, 248, 0.12)';
+      if (Math.abs(Ed) < 0.95) fillCol = 'rgba(244, 63, 94, 0.12)';
+      
+      ctx.fillStyle = fillCol;
+      ctx.fillRect(pad.left, getY(P), getX(Qd) - pad.left, h - pad.bottom - getY(P));
+      ctx.strokeStyle = Math.abs(Ed) > 1.05 ? '#38bdf8' : (Math.abs(Ed) < 0.95 ? '#f43f5e' : '#10b981');
+      ctx.lineWidth = 1;
+      ctx.strokeRect(pad.left, getY(P), getX(Qd) - pad.left, h - pad.bottom - getY(P));
+    }
+
+    ctx.strokeStyle = '#10b981'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(getX(model.a), getY(0)); ctx.lineTo(getX(0), getY(model.Pmax)); ctx.stroke();
+
+    ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(getX(0), getY(model.Pmin));
+    const pRight = maxValP;
+    const qRight = model.c + model.d * pRight;
+    ctx.lineTo(getX(qRight), getY(pRight)); ctx.stroke();
+
+    ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(pad.left, getY(P)); ctx.lineTo(w - pad.right, getY(P)); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#1e293b'; ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(getX(model.Q0), getY(model.P0), 5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+
+    if (Qd > 0) {
+      ctx.fillStyle = '#10b981'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(getX(Qd), getY(P), 5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+    }
+
+    ctx.fillStyle = '#818cf8'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(getX(model.Q_opt), getY(model.P_opt), 5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+
+    drawLabel('Цена ', '(P)', pad.left - 85, pad.top - 10, '#cbd5e1', 'bold 10px Inter');
+    drawLabel('Объём ', '(Q)', w - pad.right - 50, h - pad.bottom + 25, '#cbd5e1', 'bold 10px Inter');
+
+    drawLabel('P', 'max', '', pad.left - 40, getY(model.Pmax) + 3, '#94a3b8');
+    drawLabel('P', '0', '', pad.left - 30, getY(model.P0) + 3, '#94a3b8');
+    drawLabel('P', 'opt', '', pad.left - 35, getY(model.P_opt) + 3, '#818cf8');
+
+    window.lastMaxValP = maxValP;
+    window.lastGH = gH;
+  }
+
+  function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+
+  canvas.addEventListener('mousedown', (e) => { if (getMousePos(e).x >= pad.left) isDraggingPrice = true; });
+  window.addEventListener('mousemove', (e) => {
+    if (!isDraggingPrice) return;
+    priceSlider.value = getPriceFromY(getMousePos(e).y, window.lastMaxValP, window.lastGH);
+    update();
+  });
+  window.addEventListener('mouseup', () => { isDraggingPrice = false; });
+
+  canvas.addEventListener('touchstart', (e) => { if (getMousePos(e).x >= pad.left) isDraggingPrice = true; });
+  canvas.addEventListener('touchmove', (e) => {
+    if (!isDraggingPrice) return;
+    e.preventDefault();
+    priceSlider.value = getPriceFromY(getMousePos(e).y, window.lastMaxValP, window.lastGH);
+    update();
+  }, { passive: false });
+  canvas.addEventListener('touchend', () => { isDraggingPrice = false; });
+
+  [inpP0, inpQ0, inpPmax, inpPmin, priceSlider].forEach(el => el.addEventListener('input', update));
+  
+  toggleAreaBtn.addEventListener('click', function() {
+    showArea = !showArea;
+    this.innerText = showArea ? "Скрыть зону выручки" : "Показать зону выручки";
+    update();
+  });
+
+  function generateToken() {
+    const data = {
+      product: document.getElementById('inp-product').value,
+      desc: document.getElementById('inp-desc').value,
+      P0: inpP0.value, Q0: inpQ0.value, Pmax: inpPmax.value, Pmin: inpPmin.value,
+      finalP: priceSlider.value,
+      decision: document.getElementById('inp-decision').value
+    };
+
+    if(!data.product || !data.decision) {
+      alert("Заполните название продукта и управленческое заключение!");
+      return;
+    }
+
+    const token = btoa(encodeURIComponent(JSON.stringify(data)));
+    document.getElementById('token-box').classList.remove('hidden');
+    document.getElementById('output-token').value = token;
+  }
+
+  function unlockTeacherPanel() {
+    if (document.getElementById('inp-pin').value === "2026") {
+      document.getElementById('teacher-login').classList.add('hidden');
+      document.getElementById('teacher-dashboard').classList.remove('hidden');
+    } else {
+      alert("Неверный ПИН-код (используйте 2026)");
+    }
+  }
+
+  function decodeToken() {
+    const token = document.getElementById('inp-decode-token').value.trim();
+    if (!token) return;
+
+    try {
+      const data = JSON.parse(decodeURIComponent(atob(token)));
+      
+      const P0 = parseFloat(data.P0), Q0 = parseFloat(data.Q0), Pmax = parseFloat(data.Pmax);
+      const b = Q0 / (Pmax - P0);
+      const a = Q0 + b * P0;
+      const P_opt = a / (2 * b);
+      const Q_opt = a - b * P_opt;
+      const TR_max = P_opt * Q_opt;
+      const finalP = parseFloat(data.finalP);
+
+      document.getElementById('teacher-result').classList.remove('hidden');
+      document.getElementById('res-product').innerText = data.product;
+      document.getElementById('res-desc').innerText = data.desc;
+      document.getElementById('res-price').innerText = formatValue(finalP);
+      document.getElementById('res-decision').innerText = data.decision;
+      
+      document.getElementById('math-opt-price').innerText = formatValue(P_opt);
+      document.getElementById('math-opt-tr').innerText = formatValue(TR_max);
+
+      const gradeBox = document.getElementById('auto-grade-box');
+      const gradeTitle = document.getElementById('grade-title');
+      const gradeText = document.getElementById('grade-text');
+      const deviation = Math.abs(finalP - P_opt) / P_opt;
+
+      if (finalP >= Pmax) {
+        gradeBox.className = "p-4 rounded-xl border-l-4 bg-rose-950/40 border-rose-500";
+        gradeTitle.innerText = "Критическая ошибка (Спрос уничтожен)";
+        gradeTitle.className = "text-xs font-bold uppercase tracking-wider mb-1 text-rose-400";
+        gradeText.innerText = `Цена (${formatValue(finalP)}) превысила порог ухода (P_max = ${formatValue(Pmax)}). Продажи упали до нуля.`;
+      } else if (deviation <= 0.03) {
+        gradeBox.className = "p-4 rounded-xl border-l-4 bg-emerald-950/40 border-emerald-500";
+        gradeTitle.innerText = "Отлично! Оптимум найден";
+        gradeTitle.className = "text-xs font-bold uppercase tracking-wider mb-1 text-emerald-400";
+        gradeText.innerText = "Студенты математически точно нашли точку единичной эластичности (|Ed| = 1), максимизировав выручку компании.";
+      } else if (finalP > P_opt) {
+        gradeBox.className = "p-4 rounded-xl border-l-4 bg-amber-950/40 border-amber-500";
+        gradeTitle.innerText = "Субоптимально: Переоценка";
+        gradeTitle.className = "text-xs font-bold uppercase tracking-wider mb-1 text-amber-400";
+        gradeText.innerText = `Команда остановилась в зоне эластичного спроса (|Ed| > 1). Цену следовало снижать ближе к P_opt (${formatValue(P_opt)}).`;
+      } else {
+        gradeBox.className = "p-4 rounded-xl border-l-4 bg-amber-950/40 border-amber-500";
+        gradeTitle.innerText = "Субоптимально: Недополученная выручка";
+        gradeTitle.className = "text-xs font-bold uppercase tracking-wider mb-1 text-amber-400";
+        gradeText.innerText = `Команда остановилась в зоне неэластичного спроса (|Ed| < 1). Цену следовало смело поднимать в сторону P_opt (${formatValue(P_opt)}).`;
+      }
+
+    } catch (e) {
+      alert("Ошибка расшифровки токена. Убедитесь, что скопировали строку целиком.");
+    }
+  }
+
+  window.addEventListener('load', resizeCanvas);
+  window.addEventListener('resize', resizeCanvas);
+</script>
+
+</body>
+</html>

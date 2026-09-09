@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Demand Total Revenue Test</title>
+    <!-- Chart.js и Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #0d1117;
+            color: white;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #151922;
+            height: 8px;
+            border-radius: 4px;
+            outline: none;
+            border: 1px solid #2d3748;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 24px;
+            border-radius: 2px;
+            background: linear-gradient(
+                to right, 
+                #3a3a3a 0%, 
+                #a2a2a2 15%, 
+                #ffffff 45%, 
+                #ff1744 46%, 
+                #ff1744 54%, 
+                #ffffff 55%, 
+                #a2a2a2 85%, 
+                #3a3a3a 100%
+            );
+            border: 1px solid #111111;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+            transition: transform 0.1s, filter 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.08);
+            filter: brightness(1.1);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 14px;
+            height: 24px;
+            border-radius: 2px;
+            background: linear-gradient(
+                to right, 
+                #3a3a3a 0%, 
+                #a2a2a2 15%, 
+                #ffffff 45%, 
+                #ff1744 46%, 
+                #ff1744 54%, 
+                #ffffff 55%, 
+                #a2a2a2 85%, 
+                #3a3a3a 100%
+            );
+            border: 1px solid #111111;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.8);
+            transition: transform 0.1s, filter 0.1s;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.08);
+            filter: brightness(1.1);
+        }
+    </style>
+</head>
+<body class="p-2 min-h-screen flex flex-col justify-between">
+
+<div class="max-w-[1300px] w-full mx-auto flex-1 flex flex-col justify-between">
+    <!-- Заголовок и переключатель языка -->
+    <div class="flex justify-between items-center mb-1.5 px-2 relative">
+        <div class="w-20"></div> <!-- Заглушка для центрирования -->
+        <div class="text-center">
+            <h1 class="text-xl md:text-2xl font-bold text-[#0052ff] tracking-wide leading-tight" id="txt-title">Total Revenue Test</h1>
+            <p class="text-[10px] text-[#9aa4b2]" id="txt-subtitle"> Economics/Microeconomics • Quantitative Demand Analysis</p>
+        </div>
+        <!-- Переключатель языка RU / EN -->
+        <div class="flex items-center bg-[#161b22] border border-[#22303c] rounded-lg p-0.5">
+            <button id="lang-ru" onclick="setLanguage('ru')" class="px-2 py-0.5 text-[10px] font-bold rounded transition-all bg-[#00ffd0] text-black">RU</button>
+            <button id="lang-en" onclick="setLanguage('en')" class="px-2 py-0.5 text-[10px] font-bold rounded transition-all text-[#9aa4b2] hover:text-white">EN</button>
+        </div>
+    </div>
+
+    <!-- KPI показатели -->
+    <div class="grid grid-cols-4 gap-2 mb-2">
+        <div class="bg-[#161b22] p-1.5 rounded-lg text-center border border-[#22303c] shadow-sm">
+            <div class="text-[9px] text-[#95a0ad] uppercase font-semibold" id="kpi-cost">Min. Viable Cost Kazakhstan</div>
+            <div class="text-base font-bold text-[#800020] mt-0.5">403 ₸</div>
+        </div>
+        <div class="bg-[#161b22] p-1.5 rounded-lg text-center border border-[#22303c] shadow-sm">
+            <div class="text-[9px] text-[#95a0ad] uppercase font-semibold" id="kpi-elasticity">Elasticity</div>
+            <div class="text-base font-bold mt-0.5 transition-colors duration-300" id="elasticityBox">0.00</div>
+        </div>
+        <div class="bg-[#161b22] p-1.5 rounded-lg text-center border border-[#22303c] shadow-sm">
+            <div class="text-[9px] text-[#95a0ad] uppercase font-semibold" id="kpi-mr">MR Zone</div>
+            <div class="text-base font-bold mt-0.5 transition-colors duration-300" id="mrZone">-</div>
+        </div>
+        <div class="bg-[#161b22] p-1.5 rounded-lg text-center border border-[#22303c] shadow-sm">
+            <div class="text-[9px] text-[#95a0ad] uppercase font-semibold" id="kpi-delta">Revenue Δ</div>
+            <div class="text-base font-bold text-[#00ffd0] mt-0.5" id="revenueDelta">0%</div>
+        </div>
+    </div>
+
+    <!-- Основная рабочая область -->
+    <div class="grid grid-cols-2 gap-3 mb-2">
+        <!-- Левая панель: Параметры рынка -->
+        <div class="bg-[#161b22] rounded-xl p-3 border border-[#22303c] flex flex-col justify-between shadow-lg h-full">
+            <div>
+                <h2 class="text-xs font-bold text-[#00ffd0] uppercase tracking-wider mb-2" id="lbl-market-params">Market Parameters</h2>
+                
+                <!-- Кнопки сезонов -->
+                <label class="text-[10px] text-[#aeb7c2] block mb-1 font-medium" id="lbl-season">Season</label>
+                <div class="grid grid-cols-4 gap-1.5 mb-2">
+                    <button id="btn-spring" onclick="selectSeason(0.7, 1.00, 'spring')" class="py-1 rounded-lg text-base bg-[#232a34] hover:bg-[#2d3744] border border-transparent transition-all" title="Spring (Ed: 0.7)">🌸</button>
+                    <button id="btn-summer" onclick="selectSeason(1.2, 0.60, 'summer')" class="py-1 rounded-lg text-base bg-[#232a34] hover:bg-[#2d3744] border border-transparent transition-all" title="Summer (Ed: 1.2)">☀️</button>
+                    <button id="btn-autumn" onclick="selectSeason(0.9, 1.15, 'autumn')" class="py-1 rounded-lg text-base bg-[#232a34] hover:bg-[#2d3744] border border-transparent transition-all" title="Autumn (Ed: 0.9)">🍂</button>
+                    <button id="btn-winter" onclick="selectSeason(0.5, 1.35, 'winter')" class="py-1 rounded-lg text-base bg-[#232a34] hover:bg-[#2d3744] border border-transparent transition-all" title="Winter (Ed: 0.5)">❄️</button>
+                </div>
+
+                <input type="hidden" id="elasticity" value="-0.7">
+                <input type="hidden" id="seasonFactor" value="1.00">
+
+                <!-- Слайдеры параметров -->
+                <div class="space-y-1.5">
+                    <div>
+                        <div class="flex justify-between text-[10px] text-[#aeb7c2] font-medium">
+                            <span id="lbl-p1">Current Banana Price</span>
+                            <span class="text-[#00ffd0] font-bold"><span id="lbl-price1">700</span> ₸/kg</span>
+                        </div>
+                        <input type="range" id="price1" min="403" max="2000" step="1" value="700" class="w-full mt-0.5" oninput="calculate()">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-[10px] text-[#aeb7c2] font-medium">
+                            <span id="lbl-q1">Current Demand Quantity</span>
+                            <span class="text-[#00ffd0] font-bold"><span id="lbl-qty1">12000</span> <span class="unit-q">kg/mo</span></span>
+                        </div>
+                        <input type="range" id="qty1" min="500" max="14000" step="100" value="12000" class="w-full mt-0.5" oninput="calculate()">
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-[10px] text-[#aeb7c2] font-medium">
+                            <span id="lbl-p2">New Banana Price</span>
+                            <span class="text-[#00ffd0] font-bold"><span id="lbl-price2">650</span> ₸/kg</span>
+                        </div>
+                        <input type="range" id="price2" min="403" max="2000" step="1" value="650" class="w-full mt-0.5" oninput="calculate()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая панель: Результаты теста -->
+        <div class="bg-[#161b22] rounded-xl p-3 border border-[#22303c] flex flex-col justify-between shadow-lg h-full">
+            <div>
+                <h2 class="text-xs font-bold text-[#00ffd0] uppercase tracking-wider mb-2" id="lbl-test-results">Test Results</h2>
+                <div class="space-y-1">
+                    <div class="bg-[#1f2630] rounded-lg p-1.5 text-[11px] flex justify-between" id="r1"></div>
+                    <div class="bg-[#1f2630] rounded-lg p-1.5 text-[11px] flex justify-between" id="r2"></div>
+                    <div class="bg-[#1f2630] rounded-lg p-1.5 text-[11px] flex justify-between" id="r3"></div>
+                    <div class="bg-[#1f2630] rounded-lg p-1.5 text-[11px] flex justify-between" id="r4"></div>
+                    <div class="bg-[#1f2630] rounded-lg p-1.5 text-[11px] flex justify-between" id="r5"></div>
+                    <div class="bg-[#1f2630] rounded-lg p-1.5 text-[11px] flex justify-between" id="r6"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Графики -->
+    <div class="grid grid-cols-2 gap-3">
+        <!-- Левый график: Выручка -->
+        <div class="bg-[#161b22] border border-[#22303c] rounded-xl p-2 shadow-md flex flex-col justify-between h-[215px]">
+            <canvas id="revenueChart" class="max-h-[200px] h-[200px] w-full"></canvas>
+        </div>
+        <!-- Правый график: Спидометр эластичности -->
+        <div class="bg-[#161b22] border border-[#22303c] rounded-xl p-2 shadow-md flex flex-col justify-between items-center h-[215px]">
+            <span class="text-[10px] text-[#95a0ad] uppercase font-bold tracking-wider pt-0.5" id="lbl-gauge-title">Demand Elasticity Gauge</span>
+            <svg id="elasticityGauge" viewBox="0 0 200 120" class="w-full max-h-[145px]">
+                <defs>
+                    <filter id="needleShadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feDropShadow dx="1" dy="2" stdDeviation="1.5" flood-color="#000000" flood-opacity="0.7"/>
+                    </filter>
+                    <linearGradient id="needleChrome" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+                        <stop offset="40%" stop-color="#d1d5db" stop-opacity="0.85"/>
+                        <stop offset="100%" stop-color="#4b5563" stop-opacity="0.95"/>
+                    </linearGradient>
+                </defs>
+
+                <path d="M 30 95 A 70 70 0 0 1 135 34.38" fill="none" stroke="#ff1744" stroke-width="12" stroke-linecap="round" />
+                <path d="M 135 34.38 A 70 70 0 0 1 170 95" fill="none" stroke="#0052ff" stroke-width="12" stroke-linecap="round" />
+                <path d="M 132.8 38.0 A 70 70 0 0 1 137.2 30.5" fill="none" stroke="#00c853" stroke-width="14" />
+                
+                <g id="gaugeTicks"></g>
+
+                <circle cx="100" cy="95" r="5" fill="#232a34" stroke="#00ffd0" stroke-width="1.5" />
+                <path id="gaugeNeedle" d="M 97.5 95 L 100 28 L 102.5 95 Z" fill="#00ffd0" filter="url(#needleShadow)" transform="rotate(0, 100, 95)" style="transition: transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1.15), fill 0.4s ease;" />
+                <text id="gaugeVal" x="100" y="116" font-size="18" font-weight="bold" fill="#00ffd0" text-anchor="middle" style="transition: fill 0.4s ease;">0.00</text>
+            </svg>
+            <div class="bg-[#1f2630] rounded-lg p-1.5 text-[10px] w-full text-center border-l-4 border-[#00ffd0]" id="r8"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let revenueChart;
+    let currentLang = 'ru'; // По умолчанию русский язык
+
+    const translations = {
+        ru: {
+            title: "Тест показателей общей выручки",
+            subtitle: "Экономика | Микроэкономика • Количественный анализ спроса",
+            cost: "Мин. окупаемая цена (РК)",
+            elasticity: "Эластичность",
+            mr: "Зона MR",
+            delta: "Изм. выручки Δ",
+            marketParams: "Параметры рынка",
+            season: "Сезон",
+            p1: "Текущая цена бананов",
+            q1: "Текущий объем спроса",
+            p2: "Новая цена бананов",
+            unitQ: "кг/мес",
+            testResults: "Результаты теста",
+            r1: "Исходная выручка (TR1):",
+            r2: "Новый объем продаж (Q2):",
+            r3: "Новая выручка (TR2):",
+            r4: "Изменение выручки (₸):",
+            r5: "Изменение выручки (%):",
+            r6: "Цена ед. эластичности (MR≈0):",
+            gaugeTitle: "Спидометр эластичности спроса",
+            chartBefore: "До изменения",
+            chartAfter: "После изменения",
+            chartLabel: "Выручка (₸)",
+            elastic: "E > 1 (Эластичный)",
+            unitary: "E = 1 (Единичный)",
+            inelastic: "E < 1 (Неэластичный)",
+            recLowCost: "⚠️ Цена упала ниже мин. окупаемости (403 ₸)",
+            recEffective: "📈 Эффективно: изменение цены увеличивает TR",
+            recIneffective: "📉 Неэффективно: изменение цены снижает TR",
+            titleSpring: "Весна (Ed: 0.7)",
+            titleSummer: "Лето (Ed: 1.2)",
+            titleAutumn: "Осень (Ed: 0.9)",
+            titleWinter: "Зима (Ed: 0.5)"
+        },
+        en: {
+            title: "Total Revenue Test",
+            subtitle: "Economics | Microeconomics• Quantitative Demand Analysis",
+            cost: "Min. Viable Cost Kazakhstan",
+            elasticity: "Elasticity",
+            mr: "MR Zone",
+            delta: "Revenue Δ",
+            marketParams: "Market Parameters",
+            season: "Season",
+            p1: "Current Banana Price",
+            q1: "Current Demand Quantity",
+            p2: "New Banana Price",
+            unitQ: "kg/mo",
+            testResults: "Test Results",
+            r1: "Initial Revenue (TR1):",
+            r2: "New Sales Volume (Q2):",
+            r3: "New Revenue (TR2):",
+            r4: "Revenue Change (₸):",
+            r5: "Revenue Change (%):",
+            r6: "Unit Elastic Price (MR≈0):",
+            gaugeTitle: "Demand Elasticity Gauge",
+            chartBefore: "Before Change",
+            chartAfter: "After Change",
+            chartLabel: "Revenue (₸)",
+            elastic: "E > 1 (Elastic)",
+            unitary: "E = 1 (Unitary)",
+            inelastic: "E < 1 (Inelastic)",
+            recLowCost: "⚠️ Price dropped below Min. Viable Cost (403 ₸)",
+            recEffective: "📈 Effective: price change increases TR",
+            recIneffective: "📉 Ineffective: price change decreases TR",
+            titleSpring: "Spring (Ed: 0.7)",
+            titleSummer: "Summer (Ed: 1.2)",
+            titleAutumn: "Autumn (Ed: 0.9)",
+            titleWinter: "Winter (Ed: 0.5)"
+        }
+    };
+
+    window.onload = function() {
+        generateGaugeDetails();
+        setLanguage('ru'); // Стартуем с русского языка
+    };
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        const t = translations[lang];
+
+        // Переключение кнопок переключателя
+        const btnRu = document.getElementById("lang-ru");
+        const btnEn = document.getElementById("lang-en");
+        if (lang === 'ru') {
+            btnRu.className = "px-2 py-0.5 text-[10px] font-bold rounded transition-all bg-[#00ffd0] text-black";
+            btnEn.className = "px-2 py-0.5 text-[10px] font-bold rounded transition-all text-[#9aa4b2] hover:text-white";
+        } else {
+            btnEn.className = "px-2 py-0.5 text-[10px] font-bold rounded transition-all bg-[#00ffd0] text-black";
+            btnRu.className = "px-2 py-0.5 text-[10px] font-bold rounded transition-all text-[#9aa4b2] hover:text-white";
+        }
+
+        // Обновление статических текстов
+        document.getElementById("txt-title").innerText = t.title;
+        document.getElementById("txt-subtitle").innerText = t.subtitle;
+        document.getElementById("kpi-cost").innerText = t.cost;
+        document.getElementById("kpi-elasticity").innerText = t.elasticity;
+        document.getElementById("kpi-mr").innerText = t.mr;
+        document.getElementById("kpi-delta").innerText = t.delta;
+        document.getElementById("lbl-market-params").innerText = t.marketParams;
+        document.getElementById("lbl-season").innerText = t.season;
+        document.getElementById("lbl-p1").innerText = t.p1;
+        document.getElementById("lbl-q1").innerText = t.q1;
+        document.getElementById("lbl-p2").innerText = t.p2;
+        document.getElementById("lbl-test-results").innerText = t.testResults;
+        document.getElementById("lbl-gauge-title").innerText = t.gaugeTitle;
+
+        document.getElementById("btn-spring").title = t.titleSpring;
+        document.getElementById("btn-summer").title = t.titleSummer;
+        document.getElementById("btn-autumn").title = t.titleAutumn;
+        document.getElementById("btn-winter").title = t.titleWinter;
+
+        calculate();
+    }
+
+    function generateGaugeDetails() {
+        const ticksGroup = document.getElementById("gaugeTicks");
+        if (!ticksGroup) return;
+        ticksGroup.innerHTML = "";
+
+        const cx = 100, cy = 95, R_inner = 64, R_outer = 81;
+
+        for (let val = -1.0; val <= 2.05; val += 0.1) {
+            const roundedVal = Math.round(val * 10) / 10;
+            const angleDegrees = (roundedVal - 0.5) * 60;
+            const angleRad = angleDegrees * Math.PI / 180;
+
+            let tickLen = 3, strokeW = 0.6, strokeColor = "rgba(149, 160, 173, 0.45)";
+
+            if (Math.abs(roundedVal % 1) < 0.01) {
+                tickLen = 9; strokeW = 1.6; strokeColor = "#ffffff";
+                const lx = cx + R_outer * Math.sin(angleRad);
+                const ly = cy - R_outer * Math.cos(angleRad);
+
+                const labelText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                labelText.setAttribute("x", lx);
+                labelText.setAttribute("y", ly + 3.5);
+                labelText.setAttribute("font-size", "10");
+                labelText.setAttribute("fill", "#95a0ad");
+                labelText.setAttribute("text-anchor", "middle");
+                labelText.setAttribute("font-weight", "bold");
+                labelText.textContent = roundedVal;
+                ticksGroup.appendChild(labelText);
+
+            } else if (Math.abs((roundedVal * 2) % 1) < 0.01) {
+                tickLen = 6; strokeW = 1.1; strokeColor = "rgba(201, 209, 217, 0.8)";
+            }
+
+            const x1 = cx + R_inner * Math.sin(angleRad);
+            const y1 = cy - R_inner * Math.cos(angleRad);
+            const x2 = cx + (R_inner - tickLen) * Math.sin(angleRad);
+            const y2 = cy - (R_inner - tickLen) * Math.cos(angleRad);
+
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+            line.setAttribute("stroke", strokeColor);
+            line.setAttribute("stroke-width", strokeW);
+            ticksGroup.appendChild(line);
+        }
+    }
+
+    function selectSeason(elasticity, factor, btnId) {
+        document.getElementById("elasticity").value = -Math.abs(elasticity);
+        document.getElementById("seasonFactor").value = factor;
+
+        document.getElementById("price1").value = 700;
+        document.getElementById("qty1").value = 12000;
+        document.getElementById("price2").value = 700;
+
+        const buttons = ['spring', 'summer', 'autumn', 'winter'];
+        buttons.forEach(id => {
+            const btn = document.getElementById('btn-' + id);
+            if (id === btnId) {
+                btn.classList.remove('bg-[#232a34]', 'text-white');
+                btn.classList.add('bg-[#00ffd0]', 'text-black', 'scale-[1.03]', 'border-[#00ffd0]');
+            } else {
+                btn.classList.remove('bg-[#00ffd0]', 'text-black', 'scale-[1.03]', 'border-[#00ffd0]');
+                btn.classList.add('bg-[#232a34]', 'text-white');
+            }
+        });
+
+        calculate();
+    }
+
+    function calculate(){
+        const t = translations[currentLang];
+        const seasonFactor = parseFloat(document.getElementById("seasonFactor").value);
+        const price1 = parseFloat(document.getElementById("price1").value);
+        const qty1kg = parseFloat(document.getElementById("qty1").value);
+        const baseElasticity = parseFloat(document.getElementById("elasticity").value);
+        const price2 = parseFloat(document.getElementById("price2").value);
+
+        document.getElementById("lbl-price1").innerText = price1.toLocaleString();
+        document.getElementById("lbl-qty1").innerText = qty1kg.toLocaleString() + " " + t.unitQ;
+        document.getElementById("lbl-price2").innerText = price2.toLocaleString();
+
+        const adjustedQty1 = qty1kg * seasonFactor;
+        const revenue1 = price1 * adjustedQty1;
+        const priceChange = (price2 - price1) / price1;
+        const qtyChange = baseElasticity * priceChange;
+        const adjustedQty2 = Math.max(0, adjustedQty1 * (1 + qtyChange));
+        const revenue2 = adjustedQty2 * price2;
+        const revenueDiff = revenue2 - revenue1;
+        const revenuePercent = ((revenue2 - revenue1) / revenue1) * 100;
+
+        const baseQtyActual = 12000 * seasonFactor;
+        const basePrice = 700;
+        const b_slope = Math.abs(baseElasticity) * baseQtyActual / basePrice;
+        
+        let dynamicElasticity = 0;
+        if (adjustedQty2 > 0) {
+            dynamicElasticity = b_slope * price2 / adjustedQty2;
+        } else {
+            dynamicElasticity = 4.0;
+        }
+
+        if (isNaN(dynamicElasticity) || !isFinite(dynamicElasticity)) {
+            dynamicElasticity = 0.0;
+        }
+
+        const unitElasticPrice = Math.max(403, price1 * (1 - (1 / Math.abs(baseElasticity)) * 0.1));
+
+        let zone = "";
+        if (dynamicElasticity > 1.005) {
+            zone = t.elastic;
+        } else if (dynamicElasticity >= 0.995 && dynamicElasticity <= 1.005) {
+            zone = t.unitary;
+        } else {
+            zone = t.inelastic;
+        }
+
+        const elBox = document.getElementById("elasticityBox");
+        elBox.innerHTML = dynamicElasticity.toFixed(2);
+        
+        if (dynamicElasticity < 0.995) {
+            elBox.className = "text-base font-bold mt-0.5 text-[#ff1744]";
+        } else if (dynamicElasticity >= 0.995 && dynamicElasticity <= 1.005) {
+            elBox.className = "text-base font-bold mt-0.5 text-[#00c853]";
+        } else {
+            elBox.className = "text-base font-bold mt-0.5 text-[#0052ff]";
+        }
+
+        const mrBox = document.getElementById("mrZone");
+        mrBox.innerHTML = zone;
+        if (dynamicElasticity < 0.995) {
+            mrBox.className = "text-base font-bold mt-0.5 text-[#ff1744]";
+        } else if (dynamicElasticity >= 0.995 && dynamicElasticity <= 1.005) {
+            mrBox.className = "text-base font-bold mt-0.5 text-[#00c853]";
+        } else {
+            mrBox.className = "text-base font-bold mt-0.5 text-[#0052ff]";
+        }
+
+        document.getElementById("revenueDelta").innerHTML = (revenuePercent >= 0 ? "+" : "") + revenuePercent.toFixed(1) + "%";
+
+        // Результаты теста с динамическим переводом
+        document.getElementById("r1").innerHTML = `<span>${t.r1}</span> <strong class="text-white">${Math.round(revenue1).toLocaleString()} ₸</strong>`;
+        document.getElementById("r2").innerHTML = `<span>${t.r2}</span> <strong class="text-white">${Math.round(adjustedQty2).toLocaleString()} ${t.unitQ}</strong>`;
+        document.getElementById("r3").innerHTML = `<span>${t.r3}</span> <strong class="text-white">${Math.round(revenue2).toLocaleString()} ₸</strong>`;
+
+        const cls = revenueDiff >= 0 ? "text-[#00c853]" : "text-[#ff1744]";
+        document.getElementById("r4").innerHTML = `<span>${t.r4}</span> <strong class="${cls}">${Math.round(revenueDiff).toLocaleString()} ₸</strong>`;
+        document.getElementById("r5").innerHTML = `<span>${t.r5}</span> <strong class="${cls}">${(revenuePercent >= 0 ? "+" : "") + revenuePercent.toFixed(2)}%</strong>`;
+        document.getElementById("r6").innerHTML = `<span>${t.r6}</span> <strong class="text-[#00ffd0]">${Math.round(unitElasticPrice)} ₸/кг</strong>`;
+
+        let recommendation = "";
+        const r8Block = document.getElementById("r8");
+        if (price2 < 403) {
+            recommendation = `<span class='text-[#ffd54f] font-bold'>${t.recLowCost}</span>`;
+            r8Block.className = "bg-[#1f2630] rounded-lg p-1.5 text-[10px] w-full text-center border-l-4 border-[#ffd54f]";
+        } else if (revenueDiff > 0) {
+            recommendation = `<span class='text-[#00c853] font-bold'>${t.recEffective}</span>`;
+            r8Block.className = "bg-[#1f2630] rounded-lg p-1.5 text-[10px] w-full text-center border-l-4 border-[#00c853]";
+        } else {
+            recommendation = `<span class='text-[#ff1744] font-bold'>${t.recIneffective}</span>`;
+            r8Block.className = "bg-[#1f2630] rounded-lg p-1.5 text-[10px] w-full text-center border-l-4 border-[#ff1744]";
+        }
+        r8Block.innerHTML = recommendation;
+
+        buildRevenueChart(revenue1, revenue2, revenueDiff);
+        updateGauge(dynamicElasticity);
+    }
+
+    function buildRevenueChart(revenue1, revenue2, revenueDiff){
+        const t = translations[currentLang];
+        const ctx = document.getElementById("revenueChart");
+        if (revenueChart) {
+            revenueChart.destroy();
+        }
+
+        let bgColors = ["rgba(0, 255, 208, 0.4)", "rgba(0, 255, 208, 0.7)"];
+        let borderColors = ["#00ffd0", "#00ffd0"];
+
+        if (revenueDiff > 0) {
+            bgColors = ["rgba(255, 23, 68, 0.5)", "rgba(0, 200, 83, 0.75)"];
+            borderColors = ["#ff1744", "#00c853"];
+        } else if (revenueDiff < 0) {
+            bgColors = ["rgba(0, 200, 83, 0.5)", "rgba(255, 23, 68, 0.75)"];
+            borderColors = ["#00c853", "#ff1744"];
+        }
+
+        revenueChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: [t.chartBefore, t.chartAfter],
+                datasets: [{
+                    label: t.chartLabel,
+                    data: [revenue1, revenue2],
+                    backgroundColor: bgColors,
+                    borderColor: borderColors,
+                    borderWidth: 1.5,
+                    borderRadius: 4,
+                    barThickness: 70
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false },
+                        ticks: { color: "#8b949e", font: { size: 9 } }
+                    },
+                    y: {
+                        grid: { color: "rgba(255, 255, 255, 0.05)" },
+                        ticks: { color: "#8b949e", font: { size: 9 } }
+                    }
+                }
+            }
+        });
+    }
+
+    function updateGauge(absE) {
+        const needle = document.getElementById("gaugeNeedle");
+        const valText = document.getElementById("gaugeVal");
+
+        const clampedVal = Math.min(Math.max(absE, -1), 2);
+        const rotationAngle = ((clampedVal + 1) / 3 * 180) - 90;
+
+        needle.setAttribute("transform", `rotate(${rotationAngle}, 100, 95)`);
+        valText.textContent = absE.toFixed(2);
+
+        let activeColor = "#0052ff";
+        if (absE < 0.995) {
+            activeColor = "#ff1744";
+        } else if (absE >= 0.995 && absE <= 1.005) {
+            activeColor = "#00c853";
+        }
+
+        needle.setAttribute("fill", activeColor);
+        valText.setAttribute("fill", activeColor);
+    }
+</script>
+
+</body>
+</html>
