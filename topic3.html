@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тема 3: Эластичность спроса и предложения | Экономика</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f8fafc;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px 20px;
+            position: relative;
+        }
+
+        .top-left-logo {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        /* Кнопка "Назад" к списку тем */
+        .back-button {
+            position: absolute;
+            top: 35px;
+            right: 30px;
+            text-decoration: none;
+            background-color: #001e50;
+            color: white;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
+        }
+
+        .back-button:hover {
+            background-color: #003380;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 30, 80, 0.25);
+        }
+
+        header {
+            text-align: center;
+            margin-top: 10px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #001e50;
+            margin-bottom: 8px;
+            margin-top: 20px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #555555;
+            max-width: 650px;
+            line-height: 1.5;
+            margin: 0 auto;
+        }
+
+        /* Сетка для карточек материалов */
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            max-width: 1200px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 40px;
+        }
+
+        /* Единые стильные карточки */
+        .card {
+            display: inline-block;
+            text-decoration: none;
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 180px; 
+            height: 270px; 
+            position: relative;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        /* Эффект при наведении */
+        .card:hover {
+            transform: translateY(-8px) scale(1.03);
+            border-color: #001e50;
+            box-shadow: 0 16px 30px rgba(0, 30, 80, 0.18);
+        }
+
+        footer {
+            margin-top: auto;
+            font-size: 14px;
+            color: #718096;
+            padding-top: 30px;
+            padding-bottom: 20px;
+            text-align: center;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Логотип AlmaU с репозитория Economics-rus -->
+    <img src="https://ogaydv-prog.github.io/Economics-rus/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    
+    <!-- Кнопка возврата к списку тем -->
+    <a href="topics.html" class="back-button">← К темам курса</a>
+
+    <header>
+        <h1>Тема 3: Эластичность спроса и предложения</h1>
+        <p class="subtitle">
+            Выберите учебный материал: интерактивная презентация, аналитические симуляторы эластичности, практический кейс или видеолекции.
+        </p>
+    </header>
+
+    <main class="grid-container">
+        <!-- 1. Презентация (Google Slides) -->
+        <a href="https://docs.google.com/presentation/d/1xLMMi5CgAXEw5cwu57dn5SDxX4eKCYpS/edit?usp=sharing&rtpof=true&sd=true" 
+           target="_blank" rel="noopener noreferrer" class="card" title="Презентация: Эластичность">
+            <img src="pic-preza3-pe.png" alt="Презентация">
+        </a>
+
+        <!-- 2. Симулятор 1: Эластичность на рынке спорта -->
+        <a href="sim-elastisity-sport-rus.html" class="card" title="Симулятор: Эластичность (Спорт)">
+            <img src="pic-sim-elastisity-sport-pe.png" alt="Симулятор спорта">
+        </a>
+
+        <!-- 3. Симулятор 2: Эластичность на рынке бананов -->
+        <a href="sim-elastisity-bananas-rus.html" class="card" title="Симулятор: Тест выручки (Бананы)">
+            <img src="pic-sim-elastisity-bananas-pe.png" alt="Симулятор бананов">
+        </a>
+
+        <!-- 4. Практический кейс / Задача -->
+        <a href="task-elastisity-micro-c.html" class="card" title="Практический кейс: Эластичность">
+            <img src="pic-task-coffee-pe.png" alt="Кейс эластичности">
+        </a>
+
+        <!-- 5. Видеоматериалы (video3.html) -->
+        <a href="video3.html" class="card" title="Видеолекции: Эластичность">
+            <img src="pic-video3-pe.png" alt="Видеолекции">
+        </a>
+    </main>
+
+    <footer>
+        <p>Разработано для студентов AlmaU 2026 | Дисциплина: Экономика</p>
+        <p>© Almaty Management University | Школа цифровых технологий и экономики</p>
+    </footer>
+
+</body>
+</html>
