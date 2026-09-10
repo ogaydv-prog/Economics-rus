@@ -205,9 +205,16 @@
             </div>
           </div>
 
+          <!-- 🛑 БЛОК ВВОДА ВЫВОДА С ЗАЩИТОЙ ОТ ВСТАВКИ 🛑 -->
           <div>
-            <label class="block text-xs text-slate-400 mb-1">Управленческий вывод (Обоснуйте выбранную цену и наличие товаров-заменителей в РК):</label>
-            <textarea id="inp-decision" rows="3" placeholder="Укажите: почему именно эта цена максимизирует выручку? Какие субституты (заменители) влияют на эластичность вашего товара на рынке Казахстана?" class="w-full text-xs resize-none"></textarea>
+            <div class="flex justify-between items-center mb-1">
+              <label class="block text-xs text-slate-400">Управленческий вывод команды (обоснование цены):</label>
+              <span id="paste-warn" class="hidden text-[10px] font-bold text-rose-400 animate-pulse">⚠️ Вставка из буфера запрещена! Вводите текст вручную.</span>
+            </div>
+            <textarea id="inp-decision" rows="3" 
+              onpaste="showPasteWarning(event)"
+              placeholder="Укажите: почему именно эта цена максимизирует выручку? Какие субституты (заменители) влияют на эластичность вашего товара на рынке Казахстана?" 
+              class="w-full text-xs resize-none"></textarea>
           </div>
 
           <div class="flex flex-col sm:flex-row items-center gap-3 pt-1">
@@ -478,6 +485,14 @@
 
   function formatValue(val, suffix = ' ₸') {
     return new Intl.NumberFormat('ru-RU').format(Math.round(val)) + suffix;
+  }
+
+  // 🛑 ФУНКЦИЯ БЛОКИРОВКИ ВСТАВКИ ИЗ БУФЕРА
+  function showPasteWarning(e) {
+    e.preventDefault();
+    const warn = document.getElementById('paste-warn');
+    warn.classList.remove('hidden');
+    setTimeout(() => warn.classList.add('hidden'), 4000);
   }
 
   function unlockTeacherPanel() {
