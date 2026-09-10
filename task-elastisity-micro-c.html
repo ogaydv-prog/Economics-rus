@@ -58,7 +58,7 @@
 </head>
 <body class="text-slate-100 min-h-screen p-3 md:p-6 flex flex-col items-center justify-start overflow-x-hidden">
 
-<!-- ЭКРАН БЛОКИРОВКИ ПО ВРЕМЕНИ (АСТАНА / UTC+5) -->
+<!-- ЭКРАН БЛОКИРОВКИ ПО ВРЕМЕНИ -->
 <div id="lock-screen" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 flex flex-col items-center justify-center p-4 text-center">
   <div class="bg-slate-900 border border-slate-800 p-8 rounded-2xl max-w-md w-full shadow-2xl relative overflow-hidden">
     <div class="w-14 h-14 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 font-bold text-2xl shadow-inner">⏳</div>
@@ -78,9 +78,9 @@
   
   <div class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-5 mb-5 gap-4">
     <div>
-      <span class="text-[10px] font-bold tracking-[0.25em] text-emerald-400 uppercase">ALMAU  2026 | Школа экономики и цифровых технологий</span>
+      <span class="text-[10px] font-bold tracking-[0.25em] text-emerald-400 uppercase">ALMAU SDTE 2026 | Школа экономики и цифровых технологий</span>
       <h1 class="text-xl md:text-2xl font-black text-white tracking-tight mt-1">Практикум по дисциплине «Экономика»</h1>
-      <p class="text-slate-400 text-xs mt-0.5">Исследование эластичности спроса, предложения и оптимизация выручки (TR)</p>
+      <p class="text-slate-400 text-xs mt-0.5">Анализ эластичности спроса и оптимизация валовой выручки (TR)</p>
     </div>
     
     <div class="flex items-center gap-2 bg-[#151b22] p-1.5 rounded-xl border border-slate-800">
@@ -117,21 +117,18 @@
         </div>
 
         <div class="bg-[#14181c] border border-slate-800 rounded-xl p-4 space-y-2 shadow-inner">
-          <div class="flex justify-between items-center">
-            <span class="text-[9px] text-amber-400 font-mono uppercase tracking-widest block">Персональный бизнес-кейс:</span>
-            <span id="badge-elasticity-type" class="text-[9px] px-2 py-0.5 rounded font-bold uppercase bg-slate-800 text-slate-400">--</span>
-          </div>
+          <span class="text-[9px] text-amber-400 font-mono uppercase tracking-widest block">Персональный бизнес-кейс:</span>
           <h4 id="biz-title" class="text-sm font-bold text-white">-- Выберите студента --</h4>
-          <p id="biz-desc" class="text-xs text-slate-400 leading-relaxed">Выберите ФИО из списка выше для загрузки условий.</p>
+          <p id="biz-desc" class="text-xs text-slate-400 leading-relaxed">Выберите ФИО из списка выше для загрузки уникальных параметров рынка из практики РК.</p>
         </div>
 
         <div class="bg-[#14181c] border border-slate-800 rounded-xl p-4 relative shadow-inner">
           <span class="absolute top-2 right-2 text-[9px] bg-emerald-900/60 text-emerald-300 px-2 py-0.5 rounded font-mono">Google Cloud Server</span>
-          <h3 class="text-xs font-black text-emerald-400 tracking-wider uppercase mb-3">Условия рынка (с сервера)</h3>
+          <h3 class="text-xs font-black text-emerald-400 tracking-wider uppercase mb-3">Параметры вашего рынка</h3>
           <div class="grid grid-cols-2 gap-3 text-xs font-mono">
             <div><span class="text-slate-500 block text-[9px]">P₀ (Базовая цена):</span><input type="number" id="inp-p0" readonly class="w-full bg-black/50 text-slate-400 cursor-not-allowed"></div>
             <div><span class="text-slate-500 block text-[9px]">Q₀ (Базовый объем):</span><input type="number" id="inp-q0" readonly class="w-full bg-black/50 text-slate-400 cursor-not-allowed"></div>
-            <div><span class="text-slate-500 block text-[9px]">P_max (Цена ухода):</span><input type="number" id="inp-pmax" readonly class="w-full bg-black/50 text-slate-400 cursor-not-allowed"></div>
+            <div><span class="text-slate-500 block text-[9px]">P_max (Предельная цена):</span><input type="number" id="inp-pmax" readonly class="w-full bg-black/50 text-slate-400 cursor-not-allowed"></div>
             <div><span class="text-slate-500 block text-[9px]">P_min (Мин. цена):</span><input type="number" id="inp-pmin" readonly class="w-full bg-black/50 text-slate-400 cursor-not-allowed"></div>
           </div>
         </div>
@@ -173,16 +170,16 @@
 
         <div class="bg-[#14181c] border border-slate-800 shadow-xl rounded-xl p-3 space-y-3 relative overflow-hidden">
           <div class="flex justify-between items-center text-[10px] font-bold border-b border-slate-800 pb-2">
-            <span class="text-emerald-400 uppercase tracking-wider">1. Рыночные кривые спроса (D) и предложения (S)</span>
-            <span class="text-slate-500 font-normal">* Управляйте ценой мышкой по Canvas или ползунком</span>
+            <span class="text-emerald-400 uppercase tracking-wider">1. Кривые спроса (D) и предложения (S)</span>
+            <span class="text-slate-500 font-normal">* Управляйте ценой ползунком</span>
           </div>
           <div class="w-full">
             <canvas id="demandCanvas" class="w-full h-auto block cursor-crosshair"></canvas>
           </div>
 
           <div class="flex justify-between items-center text-[10px] font-bold border-b border-slate-800 pb-2 pt-2">
-            <span class="text-amber-400 uppercase tracking-wider">2. Динамика Валовой Выручки TR(P) = P · Qd(P)</span>
-            <span class="text-slate-400 font-mono">Пик TR = Единичная эластичность (|Ed| = 1)</span>
+            <span class="text-amber-400 uppercase tracking-wider">2. Зависимость Валовой Выручки TR(P) = P · Qd(P)</span>
+            <span class="text-slate-400 font-mono">Найдите точку максимума TR</span>
           </div>
           <div class="w-full">
             <canvas id="trCanvas" class="w-full h-auto block"></canvas>
@@ -190,17 +187,17 @@
         </div>
 
         <div class="bg-[#14181c] border border-slate-800 rounded-xl p-4 space-y-4 shadow-inner">
-          <h3 class="text-xs font-black text-sky-400 tracking-wider uppercase">Самостоятельный анализ и расчёт</h3>
+          <h3 class="text-xs font-black text-sky-400 tracking-wider uppercase">Самостоятельный расчёт и экономический вывод</h3>
           
           <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
             <div>
               <label class="block text-slate-400 mb-1">Рассчитанный коэффициент эластичности (|Ed|):</label>
-              <input type="number" step="0.01" id="calc-ed" placeholder="Например: 1.15" class="w-full font-mono">
+              <input type="number" step="0.01" id="calc-ed" placeholder="Рассчитайте: |(ΔQ/Q) / (ΔP/P)|" class="w-full font-mono">
             </div>
             <div>
-              <label class="block text-slate-400 mb-1">Характер спроса при вашей цене:</label>
+              <label class="block text-slate-400 mb-1">Определенный тип спроса при вашей цене:</label>
               <select id="calc-type" class="w-full font-bold text-slate-200">
-                <option value="">-- Выберите тип --</option>
+                <option value="">-- Самостоятельно определите --</option>
                 <option value="Эластичный (|Ed| > 1)">Эластичный (|Ed| > 1)</option>
                 <option value="Неэластичный (|Ed| < 1)">Неэластичный (|Ed| < 1)</option>
                 <option value="Единичная эластичность (|Ed| = 1)">Единичная эластичность (|Ed| = 1)</option>
@@ -209,8 +206,8 @@
           </div>
 
           <div>
-            <label class="block text-xs text-slate-400 mb-1">Управленческий вывод команды (обоснование цены):</label>
-            <textarea id="inp-decision" rows="3" placeholder="Опишите, почему выбранная цена максимизирует выручку и какова реакция покупателей..." class="w-full text-xs resize-none"></textarea>
+            <label class="block text-xs text-slate-400 mb-1">Управленческий вывод (Обоснуйте выбранную цену и наличие товаров-заменителей в РК):</label>
+            <textarea id="inp-decision" rows="3" placeholder="Укажите: почему именно эта цена максимизирует выручку? Какие субституты (заменители) влияют на эластичность вашего товара на рынке Казахстана?" class="w-full text-xs resize-none"></textarea>
           </div>
 
           <div class="flex flex-col sm:flex-row items-center gap-3 pt-1">
@@ -247,10 +244,7 @@
 </div>
 
 <script>
-  // 🔗 ВАША ССЫЛКА НА GOOGLE APPS SCRIPT
   const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby5xeajQBEXDDjDfvzXhYSmv_FAGjRC6A6NBr6tN17GYT-HjilY71svfrnOtsCTnhCYdg/exec";
-
-  // ПИН-код преподавателя
   const TEACHER_PIN = "SE12092026";
   const START_TIME = new Date("2026-09-11T11:00:00+05:00").getTime();
 
@@ -278,14 +272,6 @@
     "Мухтар Бекасыл Асылбекулы", "Нурканат Алиар", "Нұрбек Нүркен Анарбекұлы", "Нұрғали Айсана",
     "Сейтқасым Әкежан Серікұлы", "Смайылова Жасмин Рысбекқызы", "Тильдахметов Алмат Зайнуллаұлы", "Убниев Бекзат Нурсипатович",
     "Шаймухамбетов Алим Асланулы"
-  ];
-
-  const businessCases = [
-    { title: "Кофейня спешелти в центре Алматы", desc: "Продажа авторских напитков. Высокая конкуренция, студенты и фрилансеры.", category: "Эластичный спрос" },
-    { title: "Социальный формовой хлеб (пекарня)", desc: "Продукт первой необходимости. Базовое потребление стабильно.", category: "Неэластичный спрос" },
-    { title: "Локальный бренд оверсайз худи", desc: "Швейное производство в Алматы. Продажи через Instagram и маркетплейсы.", category: "Эластичный спрос" },
-    { title: "Сеть АЗС (Бензин АИ-92)", desc: "Топливо для автотранспорта. Зависимость от ежедневных поездок горожан.", category: "Неэластичный спрос" },
-    { title: "Фитнес-клуб формата 'у дома'", desc: "Месячные абонементы в спальном районе Алматы.", category: "Эластичный спрос" }
   ];
 
   let currentModel = {};
@@ -331,18 +317,11 @@
     const student = document.getElementById('select-student').value;
     if (!student) return;
 
-    const seed = cyrb128(student);
-    const caseIndex = seed % businessCases.length;
-    const biz = businessCases[caseIndex];
-
-    document.getElementById('biz-title').innerText = biz.title;
-    document.getElementById('biz-desc').innerText = biz.desc;
-    document.getElementById('badge-elasticity-type').innerText = biz.category;
-
     try {
       const resp = await fetch(`${GOOGLE_SCRIPT_URL}?action=getParams&student=${encodeURIComponent(student)}`);
       const data = await resp.json();
 
+      document.getElementById('biz-title').innerText = data.title;
       document.getElementById('inp-p0').value = data.P0;
       document.getElementById('inp-q0').value = data.Q0;
       document.getElementById('inp-pmax').value = data.Pmax;
@@ -353,10 +332,11 @@
       const d = data.Q0 / (data.P0 - data.Pmin);
       const c = data.Q0 - d * data.P0;
 
-      currentModel = { a, b, c, d, P0: data.P0, Q0: data.Q0, Pmax: data.Pmax, Pmin: data.Pmin, title: biz.title };
+      currentModel = { a, b, c, d, P0: data.P0, Q0: data.Q0, Pmax: data.Pmax, Pmin: data.Pmin, title: data.title };
 
       const slider = document.getElementById('price-slider');
-      slider.max = Math.round(data.Pmax * 1.12);
+      slider.min = Math.round(data.Pmin);
+      slider.max = Math.round(data.Pmax);
       slider.value = data.P0;
 
       updateSimulation();
@@ -388,7 +368,7 @@
     const canvas = document.getElementById('demandCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = canvas.parentElement.clientWidth;
-    canvas.height = 200;
+    canvas.height = 180;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -396,19 +376,19 @@
     const gW = canvas.width - pad.left - pad.right;
     const gH = canvas.height - pad.top - pad.bottom;
 
-    const maxP = currentModel.Pmax * 1.12;
+    const maxP = currentModel.Pmax * 1.05;
     const maxQ = currentModel.a * 1.05;
 
     const getX = (q) => pad.left + (q / maxQ) * gW;
     const getY = (p) => pad.top + (1 - p / maxP) * gH;
 
-    ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(pad.left, pad.top - 5); ctx.lineTo(pad.left, canvas.height - pad.bottom); ctx.lineTo(canvas.width - pad.right, canvas.height - pad.bottom); ctx.stroke();
 
     ctx.strokeStyle = '#10b981'; ctx.lineWidth = 3;
     ctx.beginPath(); ctx.moveTo(getX(currentModel.a), getY(0)); ctx.lineTo(getX(0), getY(currentModel.Pmax)); ctx.stroke();
 
-    ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 2.5;
+    ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(getX(0), getY(currentModel.Pmin)); ctx.lineTo(getX(currentModel.c + currentModel.d * maxP), getY(maxP)); ctx.stroke();
 
     if (Qd > 0) {
@@ -425,7 +405,7 @@
     const canvas = document.getElementById('trCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = canvas.parentElement.clientWidth;
-    canvas.height = 150;
+    canvas.height = 140;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -440,7 +420,7 @@
     const getX = (p) => pad.left + (p / maxP) * gW;
     const getY = (tr) => pad.top + (1 - tr / (maxTR * 1.1)) * gH;
 
-    ctx.strokeStyle = '#475569'; ctx.lineWidth = 1;
+    ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
     ctx.beginPath(); ctx.moveTo(pad.left, pad.top); ctx.lineTo(pad.left, canvas.height - pad.bottom); ctx.lineTo(canvas.width - pad.right, canvas.height - pad.bottom); ctx.stroke();
 
     ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2.5;
@@ -457,7 +437,7 @@
     let curQ = Math.max(0, currentModel.a - currentModel.b * currentP);
     let curTR = currentP * curQ;
     ctx.fillStyle = '#f59e0b'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
-    ctx.beginPath(); ctx.arc(getX(currentP), getY(curTR), 5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(getX(currentP), getY(currentP * curQ), 5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
 
     ctx.fillStyle = '#cbd5e1'; ctx.font = '10px Inter';
     ctx.fillText('Выручка (TR)', pad.left - 60, pad.top - 5);
@@ -471,7 +451,7 @@
     const calcType = document.getElementById('calc-type').value;
 
     if(!decision || !calcEd || !calcType) {
-      alert("Пожалуйста, заполните расчет эластичности, выберите тип спроса и напишите вывод!");
+      alert("Пожалуйста, заполните ваш расчет коэффициента, выберите тип спроса и опишите обоснование с факторами рынка РК!");
       return;
     }
 
