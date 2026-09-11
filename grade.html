@@ -16,35 +16,14 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #0f172a;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #475569;
-        }
-        .fade-enter {
-            opacity: 0;
-            transform: translateY(12px);
-        }
-        .fade-enter-active {
-            opacity: 1;
-            transform: translateY(0);
-            transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        #finalScoreCircle {
-            transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
+        .fade-enter { opacity: 0; transform: translateY(12px); }
+        .fade-enter-active { opacity: 1; transform: translateY(0); transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        #finalScoreCircle { transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
@@ -91,7 +70,7 @@
                     Личный кабинет успеваемости
                 </h2>
                 <p class="text-sm sm:text-base text-slate-400">
-                    Введите ваше полное ФИО для просмотра оценок, баллов и наглядной аналитики.
+                    Введите ваше полное ФИО для просмотра оценок, баллов, аналитики и комментария преподавателя.
                 </p>
             </div>
 
@@ -103,7 +82,7 @@
                         <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">ФИО Студента</label>
                         <div class="relative">
                             <i class="fa-solid fa-user absolute left-4 top-3.5 text-slate-500"></i>
-                            <input type="text" id="student-search-input" onkeydown="handleSearchKeyDown(event)" placeholder="Например: Азизбеков Максат Арманович" 
+                            <input type="text" id="student-search-input" onkeydown="handleSearchKeyDown(event)" placeholder="Например: Долинин Тимур Евгеньевич" 
                                 class="w-full pl-11 pr-24 py-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
                             <button onclick="searchStudentGrade()" class="absolute right-2 top-2 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">
                                 Найти
@@ -129,6 +108,17 @@
                     </div>
                 </div>
 
+                <!-- Teacher Comment Banner -->
+                <div class="p-6 border-b border-slate-800 bg-indigo-950/20">
+                    <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-comment-dots text-indigo-400"></i>
+                        Вердикт и комментарий преподавателя (СРСП-1)
+                    </h4>
+                    <div id="sr-teacher-comment" class="text-sm text-slate-200 font-medium leading-relaxed bg-slate-950/80 p-4 rounded-xl border border-indigo-900/40">
+                        —
+                    </div>
+                </div>
+
                 <!-- Dashboard Graphs Grid -->
                 <div class="p-6 border-b border-slate-800 bg-slate-950/30">
                     <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2">
@@ -137,7 +127,6 @@
                     </h4>
                     
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <!-- Widget 1: Attendance -->
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center">
                             <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                                 <i class="fa-solid fa-calendar-check"></i> Посещаемость (10%)
@@ -148,7 +137,6 @@
                             <div class="text-sm font-bold text-emerald-400 mt-2" id="val-att-text">0%</div>
                         </div>
 
-                        <!-- Widget 2: Continuous Assessment -->
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center">
                             <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                                 <i class="fa-solid fa-bolt"></i> Текущий контроль (30%)
@@ -159,7 +147,6 @@
                             <div class="text-sm font-bold text-blue-400 mt-2" id="val-act-text">Активность, СРСП1, СРСП2</div>
                         </div>
 
-                        <!-- Widget 3: Midterm Controls -->
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center">
                             <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                                 <i class="fa-solid fa-pen-ruler"></i> Рубежные контроли (20%)
@@ -170,7 +157,6 @@
                             <div class="text-sm font-bold text-amber-400 mt-2" id="val-ex-text">РК1 и РК2</div>
                         </div>
 
-                        <!-- Widget 4: Final Progress -->
                         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center justify-center relative overflow-hidden">
                             <span class="text-[10px] font-bold text-violet-400 uppercase tracking-wider mb-3 flex items-center gap-1">
                                 <i class="fa-solid fa-circle-nodes"></i> Итоговый балл
@@ -202,10 +188,10 @@
                         <div class="text-base font-bold text-teal-400" id="sr-val-activities">0 / 100</div>
                         <p class="text-[8px] text-slate-500">Вес: <strong class="text-teal-400">10%</strong></p>
                     </div>
-                    <div class="p-3 text-center space-y-1">
-                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">СРСП 1</h4>
-                        <div class="text-base font-bold text-blue-400" id="sr-val-ca1">0 / 100</div>
-                        <p class="text-[8px] text-slate-500">Вес: <strong class="text-blue-400">10%</strong></p>
+                    <div class="p-3 text-center space-y-1 bg-indigo-950/40">
+                        <h4 class="text-[9px] font-semibold text-indigo-300 uppercase tracking-wider">СРСП 1</h4>
+                        <div class="text-base font-black text-indigo-400" id="sr-val-ca1">0 / 100</div>
+                        <p class="text-[8px] text-indigo-300 font-bold">Вес: 10%</p>
                     </div>
                     <div class="p-3 text-center space-y-1">
                         <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">РК 1</h4>
@@ -229,22 +215,6 @@
                     </div>
                 </div>
 
-                <!-- Expanded detailed attendance table -->
-                <div class="p-6 border-b border-slate-800 bg-slate-950/20">
-                    <button onclick="toggleStudentAttDetails()" class="w-full flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider hover:text-slate-200 transition-colors">
-                        <span class="flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-emerald-400"></i>
-                            Детализация посещаемости (15 Недель x 2 Часа: 1ч Офлайн + 1ч Онлайн)
-                        </span>
-                        <span id="student-att-toggle-icon" class="text-[10px] bg-slate-800 px-2.5 py-1 rounded border border-slate-700 transition-all">Развернуть ▾</span>
-                    </button>
-                    <div id="student-att-details" class="hidden mt-4 pt-4 border-t border-slate-800/60">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="student-att-list-grid">
-                            <!-- Dynamic checklist status -->
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Bottom info box -->
                 <div class="bg-indigo-950/20 px-6 py-4 flex items-start space-x-3">
                     <i class="fa-solid fa-circle-info text-indigo-400 text-lg mt-0.5"></i>
@@ -262,7 +232,7 @@
                 <i class="fa-solid fa-user-slash text-rose-500 text-2xl mb-2.5"></i>
                 <h4 class="text-sm font-bold text-rose-400">Студент не найден</h4>
                 <p class="text-xs text-slate-400 mt-1 leading-relaxed">
-                    Проверьте правильность написания ФИО (например: <strong class="text-slate-300">Азизбеков Максат Арманович</strong>).
+                    Проверьте правильность написания ФИО (например: <strong class="text-slate-300">Долинин Тимур Евгеньевич</strong>).
                 </p>
             </div>
         </div>
@@ -332,183 +302,46 @@
                 </div>
             </div>
 
-            <!-- Group Analytics Chart -->
-            <div class="bg-slate-900 rounded-2xl border border-slate-800 p-6 shadow-2xl">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-                    <div>
-                        <h3 class="text-base font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-chart-column text-indigo-400"></i>
-                            Графический обзор успеваемости группы
-                        </h3>
-                        <p class="text-xs text-slate-400 mt-1">
-                            Сравнительный анализ по элементам: Посещаемость, Активность, СРСП, РК, Экзамен и Итог.
-                        </p>
+            <!-- Main Interactive Table Grid -->
+            <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden flex flex-col shadow-2xl">
+                <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="relative w-full sm:w-72">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-500"></i>
+                        <input type="text" id="teacher-search-input" placeholder="Поиск студента..." 
+                            class="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-600">
                     </div>
-                    <div class="flex flex-wrap items-center gap-3 text-[11px] font-semibold">
-                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span><span class="text-slate-300">Пос</span></div>
-                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-teal-500"></span><span class="text-slate-300">Акт</span></div>
-                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-blue-500"></span><span class="text-slate-300">СРСП1</span></div>
-                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-500"></span><span class="text-slate-300">РК1</span></div>
-                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-indigo-500"></span><span class="text-slate-300">СРСП2</span></div>
-                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-orange-500"></span><span class="text-slate-300">РК2</span></div>
-                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-500"></span><span class="text-slate-300">Экз</span></div>
-                        <div class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-violet-500"></span><span class="text-slate-300">Итог</span></div>
-                    </div>
-                </div>
-                <div class="relative w-full h-80">
-                    <canvas id="groupPerformanceChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Main Interactive Table Grid & Inputs -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
-                <!-- Gradebook table (2/3 width) -->
-                <div class="lg:col-span-2 flex flex-col space-y-6">
-                    <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden flex flex-col shadow-2xl">
-                        <!-- Table controls -->
-                        <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <div class="relative w-full sm:w-72">
-                                <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-500"></i>
-                                <input type="text" id="teacher-search-input" placeholder="Поиск студента..." 
-                                    class="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-600">
-                            </div>
-                            <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
-                                <button onclick="exportToCSV()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-md transition-colors flex items-center space-x-2">
-                                    <i class="fa-solid fa-file-excel"></i>
-                                    <span>Экспорт Excel</span>
-                                </button>
-                                <button onclick="confirmReset()" class="px-4 py-2.5 bg-rose-950/40 text-rose-400 hover:bg-rose-900/40 rounded-xl text-xs font-semibold transition-colors flex items-center space-x-2 border border-rose-900/40">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                    <span>Сброс всей группы</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Main Grid Table -->
-                        <div class="overflow-x-auto custom-scrollbar">
-                            <table class="w-full text-left border-collapse min-w-[780px]">
-                                <thead>
-                                    <tr class="border-b border-slate-800 bg-slate-900/40 text-slate-400 text-[9px] font-bold uppercase tracking-wider">
-                                        <th class="py-3.5 px-3">ФИО Студента</th>
-                                        <th class="py-3.5 px-1.5 text-center w-14">Пос (10%)</th>
-                                        <th class="py-3.5 px-1.5 text-center w-14">Акт (10%)</th>
-                                        <th class="py-3.5 px-1.5 text-center w-14">СРСП1 (10%)</th>
-                                        <th class="py-3.5 px-1.5 text-center w-14">РК1 (10%)</th>
-                                        <th class="py-3.5 px-1.5 text-center w-14">СРСП2 (10%)</th>
-                                        <th class="py-3.5 px-1.5 text-center w-14">РК2 (10%)</th>
-                                        <th class="py-3.5 px-1.5 text-center w-14">Экз (40%)</th>
-                                        <th class="py-3.5 px-2 text-right w-14 bg-indigo-950/20">Итог</th>
-                                        <th class="py-3.5 px-2 text-center w-12">Оценка</th>
-                                        <th class="py-3.5 px-1.5 text-center w-8"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="students-table-body" class="divide-y divide-slate-800/40">
-                                    <!-- Dynamic rows -->
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- Empty state banner -->
-                        <div id="empty-state" class="hidden flex flex-col items-center justify-center py-12 px-4 text-center">
-                            <div class="p-4 bg-slate-950 rounded-full text-slate-500 mb-3 text-3xl">
-                                <i class="fa-solid fa-user-slash"></i>
-                            </div>
-                            <h4 class="text-sm font-semibold text-slate-300">Журнал группы пуст</h4>
-                            <p class="text-xs text-slate-500 mt-1">Добавьте студентов вручную или импортируйте список.</p>
-                        </div>
-                        
-                        <!-- Real-time editing tips -->
-                        <div class="bg-indigo-950/10 p-4 border-t border-slate-800/80 text-xs text-indigo-300 flex items-center space-x-3.5">
-                            <i class="fa-solid fa-circle-info text-indigo-400 text-lg"></i>
-                            <p><strong>Учет посещаемости:</strong> Нажмите на % в колонке "Пос", чтобы открыть поурочный чек-лист на 15 недель!</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Sidebar widgets (1/3 width) -->
-                <div class="space-y-6">
-                    
-                    <!-- Mass Import widget -->
-                    <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 shadow-2xl">
-                        <h3 class="text-sm font-bold text-white mb-3.5 flex items-center space-x-2">
-                            <i class="fa-solid fa-file-import text-indigo-400"></i>
-                            <span>Массовый импорт студентов</span>
-                        </h3>
-                        <p class="text-[11px] text-slate-400 mb-3 leading-relaxed">
-                            Каждая строка импортируется как новое ФИО в текущую группу. Все оценки изначально равны 0.
-                        </p>
-                        <textarea id="bulk-import-area" rows="4" placeholder="Иванов Иван Иванович&#10;Петров Петр Петрович" 
-                            class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-700 font-mono"></textarea>
-                        
-                        <button onclick="runBulkImport()" class="w-full mt-3 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl text-xs transition-colors flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/15">
-                            <i class="fa-solid fa-users-medical"></i>
-                            <span>Импортировать в текущую группу</span>
+                    <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
+                        <button onclick="exportToCSV()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-md transition-colors flex items-center space-x-2">
+                            <i class="fa-solid fa-file-excel"></i>
+                            <span>Экспорт Excel</span>
                         </button>
                     </div>
-
-                    <!-- Single Student Insert Form -->
-                    <div class="bg-slate-900 rounded-2xl border border-slate-800 p-5 shadow-2xl">
-                        <h3 class="text-sm font-bold text-white mb-3.5 flex items-center space-x-2">
-                            <i class="fa-solid fa-user-plus text-blue-400"></i>
-                            <span>Добавить студента</span>
-                        </h3>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-[10px] font-bold text-slate-400 mb-1">ФИО Студента</label>
-                                <input type="text" id="add-student-name" placeholder="Введите ФИО" 
-                                    class="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-700">
-                            </div>
-                            <div class="grid grid-cols-4 gap-2">
-                                <div>
-                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Посещаемость">Пос</label>
-                                    <input type="number" id="add-student-attendance" min="0" max="100" placeholder="0" 
-                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Активность">Акт</label>
-                                    <input type="number" id="add-student-activities" min="0" max="100" placeholder="0" 
-                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="СРСП 1">СРСП1</label>
-                                    <input type="number" id="add-student-ca1" min="0" max="100" placeholder="0" 
-                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Рубежный контроль 1">РК1</label>
-                                    <input type="number" id="add-student-mc1" min="0" max="100" placeholder="0" 
-                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="СРСП 2">СРСП2</label>
-                                    <input type="number" id="add-student-ca2" min="0" max="100" placeholder="0" 
-                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
-                                <div>
-                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Рубежный контроль 2">РК2</label>
-                                    <input type="number" id="add-student-mc2" min="0" max="100" placeholder="0" 
-                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
-                                <div class="col-span-2">
-                                    <label class="block text-[8px] font-bold text-slate-400 mb-1" title="Экзамен">Экзамен (40%)</label>
-                                    <input type="number" id="add-student-exam" min="0" max="100" placeholder="0" 
-                                        class="w-full px-1.5 py-1.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 text-center focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                </div>
-                            </div>
-                            <button onclick="addSingleStudent()" class="w-full mt-2 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-xl text-xs transition-colors flex items-center justify-center space-x-2 border border-slate-700">
-                                <i class="fa-solid fa-plus"></i>
-                                <span>Сохранить в журнал</span>
-                            </button>
-                        </div>
-                    </div>
-
                 </div>
 
+                <div class="overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left border-collapse min-w-[780px]">
+                        <thead>
+                            <tr class="border-b border-slate-800 bg-slate-900/40 text-slate-400 text-[9px] font-bold uppercase tracking-wider">
+                                <th class="py-3.5 px-3">ФИО Студента</th>
+                                <th class="py-3.5 px-1.5 text-center w-14">Пос (10%)</th>
+                                <th class="py-3.5 px-1.5 text-center w-14">Акт (10%)</th>
+                                <th class="py-3.5 px-1.5 text-center w-16 bg-indigo-950/30 text-indigo-300">СРСП1 (10%)</th>
+                                <th class="py-3.5 px-1.5 text-center w-14">РК1 (10%)</th>
+                                <th class="py-3.5 px-1.5 text-center w-14">СРСП2 (10%)</th>
+                                <th class="py-3.5 px-1.5 text-center w-14">РК2 (10%)</th>
+                                <th class="py-3.5 px-1.5 text-center w-14">Экз (40%)</th>
+                                <th class="py-3.5 px-2 text-right w-14 bg-indigo-950/20">Итог</th>
+                                <th class="py-3.5 px-2 text-center w-12">Оценка</th>
+                                <th class="py-3.5 px-3 text-left">Комментарий к СРСП-1</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body" class="divide-y divide-slate-800/40">
+                            <!-- Dynamic rows -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
         </div>
-
     </main>
 
     <!-- Instructor Authentication Modal -->
@@ -532,145 +365,107 @@
         </div>
     </div>
 
-    <!-- Confirm Reset Dialog Modal -->
-    <div id="confirm-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
-        <div class="bg-slate-900 p-6 rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-slate-800 transform scale-95 transition-transform duration-200">
-            <div class="h-12 w-12 bg-rose-500/10 text-rose-500 rounded-full flex items-center justify-center text-xl mb-4 border border-rose-500/20">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <h3 class="text-lg font-bold text-white">Вы уверены?</h3>
-            <p class="text-slate-400 text-xs mt-2">Это действие полностью обнулит данные всех студентов в текущей группе. Отменить это действие невозможно.</p>
-            <div class="mt-6 flex justify-end space-x-3">
-                <button onclick="closeConfirmModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl text-xs transition-colors">Отмена</button>
-                <button onclick="resetAllData()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-xs transition-colors shadow-lg shadow-rose-600/30">Сбросить данные</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Detailed Attendance Checklist Modal -->
-    <div id="attendance-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
-        <div class="bg-slate-900 p-6 rounded-2xl max-w-md w-full mx-4 shadow-2xl border border-slate-800 transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh]">
-            <div class="flex justify-between items-center pb-3.5 border-b border-slate-800">
-                <div class="flex items-center space-x-3">
-                    <div class="h-10 w-10 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center text-lg border border-emerald-500/20">
-                        <i class="fa-solid fa-calendar-days"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-extrabold text-white" id="att-modal-student-name">Детализация посещаемости</h3>
-                        <p class="text-[10px] text-slate-400">Отметьте часы (30 часов всего: 15ч Офлайн + 15ч Онлайн)</p>
-                    </div>
-                </div>
-                <button onclick="closeAttendanceModal()" class="text-slate-400 hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <!-- List content -->
-            <div class="flex-grow overflow-y-auto custom-scrollbar my-4 pr-1">
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 mb-4 flex justify-between items-center">
-                    <span class="text-xs text-slate-400 font-semibold">Итоговая посещаемость:</span>
-                    <div class="flex items-center space-x-2">
-                        <span id="att-modal-percent" class="text-emerald-400 font-extrabold text-sm">0%</span>
-                        <span id="att-modal-hours" class="text-slate-500 text-xs font-medium">(0 из 30 ч)</span>
-                    </div>
-                </div>
-                
-                <div class="space-y-2" id="attendance-dates-grid">
-                    <!-- Dynamic hour checklist -->
-                </div>
-            </div>
-
-            <!-- Bottom action drawer -->
-            <div class="pt-4 border-t border-slate-800 flex justify-between items-center">
-                <div class="flex space-x-1.5">
-                    <button onclick="toggleAllAttendance(true)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-[10px] transition-all border border-slate-700">
-                        Выбрать все
-                    </button>
-                    <button onclick="toggleAllAttendance(false)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-[10px] transition-all border border-slate-700">
-                        Очистить все
-                    </button>
-                </div>
-                <button onclick="saveAttendanceDetails()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-colors shadow-lg shadow-emerald-600/30 flex items-center space-x-1.5">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    <span>Сохранить</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- Alert Toast notifications -->
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2"></div>
 
-    <!-- Footer Area -->
-    <footer class="bg-slate-950 border-t border-slate-900 py-6 text-center text-xs text-slate-500">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-3">
-            <p>© 2026 ALMAU Школа цифровых технологий и экономики. Все права защищены.</p>
-            <p class="text-slate-600">Формула: Пос (10%) | Акт (10%) | СРСП1 (10%) | РК1 (10%) | СРСП2 (10%) | РК2 (10%) | Экзамен (40%)</p>
-        </div>
-    </footer>
-
     <script>
-        // Списки студентов двух русскоязычных групп с обнуленными оценками
-        const rawGroup1Names = [
-            "Азизбеков Максат Арманович", "Акимжанов Муслимбек Бекзодұлы", "Алпыспаев Мирас Жалғасұлы", "Амирханов Даулет Сакенович",
-            "Ахметов Андрей Витальевич", "Әкімхан Рамазан Қайратұлы", "Байдалы Айсер Сабырханұлы", "Байдукова Арина Андреевна",
-            "Бекешев Дінмухамед Ермекұлы", "Гуков Арман Андрейұлы", "Долинин Тимур Евгеньевич", "Есіркеп Аян Бақытжанұлы",
-            "Жалбаслар Дәулет Русланұлы", "Жарылгасынова Жасмин Максатовна", "Казымов Руслан", "Кариева Карина Армановна",
-            "Коваленко Илья Викторович", "Конысбаев Айбек Ермаханович", "Кошантаев Бексултан Маратович", "Масалимов Олжас Ержанович",
-            "Медиханов Тимур Фархадович", "Морбекова Камилла Ескендеровна", "Мусаев Ернур Русланович", "Нұржанқызы Балнұр",
-            "Омаров Болат Айдосович", "Рамазанов Арсен Дауренұлы", "Рахимбекова Сагыныш Рахимбековна", "Ровнов Владислав Александрович",
-            "Сәтпек Нұрлыбек Асланбекұлы", "Тастемір Шамиил Қайратұлы", "Тәжібай Мухаммедазиз Мұхтарұлы", "Терехов Вячеслав Константинович",
-            "Титовский Андрей Сергеевич", "Тұрсымбай Асқар Сүлейменұлы", "Уразалиев Сагит Ильдарович", "Филипенко Александр Юрьевич",
-            "Хашимова Саида Ренатовна", "Хохлов Алексей Игоревич", "Юсупова Ильнара Дамировна", "Яппаров Эмир Фанильевич"
+        // Перерассчитанные массивы для Группы 1 и Группы 2 без штрафа -10 за повторные клики
+        const initialGroup1 = [
+            { id: "g1-st-1", name: "Азизбеков Максат Арманович", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-2", name: "Акимжанов Муслимбек Бекзодұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-3", name: "Алпыспаев Мирас Жалғасұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-4", name: "Амирханов Даулет Сакенович", attendance: 0, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Грубейший подлог / Списано): Выбрал кейс 'Кофейня', а в текст вставил скопированный фрагмент про хлеб!" },
+            { id: "g1-st-5", name: "Ахметов Андрей Витальевич", attendance: 0, activities: 0, ca1: 95, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Самостоятельный авторский анализ рынка фитнес-услуг Алматы с разбором онлайн-занятий и воркаут-площадок." },
+            { id: "g1-st-6", name: "Әкімхан Рамазан Қайратұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-7", name: "Байдалы Айсер Сабырханұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-8", name: "Байдукова Арина Андреевна", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Качественный разбор прямой и косвенной конкуренции спешелти-кофейни." },
+            { id: "g1-st-9", name: "Бекешев Дінмухамед Ермекұлы", attendance: 0, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Прямое копирование сгенерированного академического текста ChatGPT." },
+            { id: "g1-st-10", name: "Гуков Арман Андрейұлы", attendance: 0, activities: 0, ca1: 96, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "96/100 (Глубокий авторский анализ): Отличный живой авторский разбор с примерами продуктов первой необходимости (баурсаки, пирожки, лепешки)." },
+            { id: "g1-st-11", name: "Долинин Тимур Евгеньевич", attendance: 0, activities: 0, ca1: 97, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "97/100 (Высочайший академический уровень): Глубокий самостоятельный разбор ценовой эластичности и четкое разграничение рынка спешелти-кофе и масс-маркета." },
+            { id: "g1-st-12", name: "Есіркеп Аян Бақытжанұлы", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Качественные самостоятельные выводы по кофейням у дома и спешелти-точкам." },
+            { id: "g1-st-13", name: "Жалбаслар Дәулет Русланұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-14", name: "Жарылгасынова Жасмин Максатовна", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Грамотное объяснение краткосрочной неэластичности бензина АИ-92." },
+            { id: "g1-st-15", name: "Казымов Руслан", attendance: 0, activities: 0, ca1: 60, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Крайне поверхностная отписка в полстрочки (55 символов), слабый разбор." },
+            { id: "g1-st-16", name: "Кариева Карина Армановна", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-17", name: "Коваленко Илья Викторович", attendance: 0, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Вставлен стандартный шаблон заготовки с формулой." },
+            { id: "g1-st-18", name: "Конысбаев Айбек Ермаханович", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-19", name: "Кошантаев Бексултан Маратович", attendance: 0, activities: 0, ca1: 96, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "96/100 (Глубокий математический анализ): Самостоятельный расчет процентного изменения показателей (+17.56% цена, -12.64% объемы) и детальный анализ рынка кофе." },
+            { id: "g1-st-20", name: "Масалимов Олжас Ержанович", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-21", name: "Медиханов Тимур Фархадович", attendance: 0, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирован готовый текст шаблонной заготовки." },
+            { id: "g1-st-22", name: "Морбекова Камилла Ескендеровна", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Грамотный экономический анализ предельной выручки (MR = 0)." },
+            { id: "g1-st-23", name: "Мусаев Ернур Русланович", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-24", name: "Нұржанқызы Балнұр", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-25", name: "Омаров Болат Айдосович", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-26", name: "Рамазанов Арсен Дауренұлы", attendance: 0, activities: 0, ca1: 95, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Живой самостоятельный экономический разбор фитнес-индустрии и спортивных альтернатив." },
+            { id: "g1-st-27", name: "Рахимбекова Сагыныш Рахимбековна", attendance: 0, activities: 0, ca1: 60, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Поверхностное суждение в 2 предложения, некорректно указана базовая цена." },
+            { id: "g1-st-28", name: "Ровнов Владислав Александрович", attendance: 0, activities: 0, ca1: 95, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Качественный разбор кофейного рынка Алматы с примерами брендов (Coffee Boom, Zebra, Compass)." },
+            { id: "g1-st-29", name: "Сәтпек Нұрлыбек Асланбекұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-30", name: "Тастемір Шамиил Қайратұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-31", name: "Тәжібай Мухаммедазиз Мұхтарұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-32", name: "Терехов Вячеслав Константинович", attendance: 0, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Прямое списание + Противоречие): В форме введена цена 2268 ₸, а в текст скопирована 2051 ₸ из чужого ответа." },
+            { id: "g1-st-33", name: "Титовский Андрей Сергеевич", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-34", name: "Тұрсымбай Асқар Сүлейменұлы", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Простой, но полностью честный авторский текст без применения ИИ." },
+            { id: "g1-st-35", name: "Уразалиев Сагит Ильдарович", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-36", name: "Филипенко Александр Юрьевич", attendance: 0, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Типовой структурированный текст, полностью сгенерированный нейросетью." },
+            { id: "g1-st-37", name: "Хашимова Саида Ренатовна", attendance: 0, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Формальный списанный текст заготовки из чата." },
+            { id: "g1-st-38", name: "Хохлов Алексей Игоревич", attendance: 0, activities: 0, ca1: 60, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Формальный короткий ответ без детального анализа субститутов и факторов эластичности." },
+            { id: "g1-st-39", name: "Юсупова Ильнара Дамировна", attendance: 0, activities: 0, ca1: 95, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Точный самостоятельный вывод формулы P_max/2 = 349 ₸ и качественный анализ субститутов (тандырный хлеб)." },
+            { id: "g1-st-40", name: "Яппаров Эмир Фанильевич", attendance: 0, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Книжный сгенерированный нейросетью текст." }
         ];
 
-        const rawGroup2Names = [
-            "Абдрайм Еркежан Беркинбайкызы", "Абдулла Нұрислам Бауыржанұлы", "Абраев Радмир Ниязович", "АКБАРАЛИЕВ ФАХРИДИН АЛИШЕРОВИЧ",
-            "Амангелді Айдос Даулетұлы", "Асанғалиева Әсия Арманқызы", "Асланов Алишер Асланович", "Ахметов Танирберген Дауренулы",
-            "Әбілдаев Нұрым Тәліпханұлы", "Әділ Гүлсезім Әсетқызы", "Биманов Алишер Бакытович", "Власова Валерия Семеновна",
-            "Дүйсенбай Әлімхан Дәулетұлы", "Избасар Даниял Тауржанұлы", "Йылмаз Мухаммедали", "Кадирханов Жангир Адилетович",
-            "Кенжегузин Санжар Ерланұлы", "Кенжегулов Нургазы Сергазыевич", "Коробов Илья Александрович", "Кочетов Руслан Юрьевич",
-            "Кукушкин Юрий Кириллович", "Қабылбек Жантөре Батырбекұлы", "Ли Аделина Сергеевна", "Мажитов Султан Канатович",
-            "Мазат Ерсұлтан Ердосұлы", "Мамаев Станислав Алексеевич", "Молдыбай Амина Айратқызы", "Мусаева Элина Князьевна",
-            "Мухтар Бекасыл Асылбекулы", "Нурканат Алиар", "Нұрбек Нүркен Анарбекұлы", "Нұрғали Айсана",
-            "Сейтқасым Әкежан Серікұлы", "Смайылова Жасмин Рысбекқызы", "Тильдахметов Алмат Зайнуллаұлы", "Убниев Бекзат Нурсипатович",
-            "Шаймухамбетов Алим Асланулы"
+        const initialGroup2 = [
+            { id: "g2-st-1", name: "Абдрайм Еркежан Беркинбайкызы", attendance: 0, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирована стандартная заготовка фразировки, ходившая в студенческом чате." },
+            { id: "g2-st-2", name: "Абдулла Нұрислам Бауыржанұлы", attendance: 0, activities: 0, ca1: 98, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "98/100 (Выдающийся глубокий анализ): Выдающийся индивидуальный экономический разбор с глубокой привязкой к законам РК (СЗПТ, АЗРК, предельная маржа 15%, Продкорпорация)." },
+            { id: "g2-st-3", name: "Абраев Радмир Ниязович", attendance: 0, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Текст полностью сгенерирован ИИ с характерной академической канцелярией." },
+            { id: "g2-st-4", name: "АКБАРАЛИЕВ ФАХРИДИН АЛИШЕРОВИЧ", attendance: 0, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирован размытый шаблон заготовки из студенческого чата." },
+            { id: "g2-st-5", name: "Амангелді Айдос Даулетұлы", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельный честный вывод про валовую выручку и альтернативы." },
+            { id: "g2-st-6", name: "Асанғалиева Әсия Арманқызы", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельное прямое обоснование оптимальной цены вершины параболы выручки." },
+            { id: "g2-st-7", name: "Асланов Алишер Асланович", attendance: 0, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Поверхностная списанная шаблонная заготовка." },
+            { id: "g2-st-8", name: "Ахметов Танирберген Дауренулы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-9", name: "Әбілдаев Нұрым Тәліпханұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-10", name: "Әділ Гүлсезім Әсетқызы", attendance: 0, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирована распространенная шаблонная заготовка." },
+            { id: "g2-st-11", name: "Биманов Алишер Бакытович", attendance: 0, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Внаглую подставлен сгенерированный ИИ-текст с пояснительными скобками." },
+            { id: "g2-st-12", name: "Власова Валерия Семеновна", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Детальный авторский разбор маркетплейсов Kaspi, Temu, OZON, LC Waikiki." },
+            { id: "g2-st-13", name: "Дүйсенбай Әлімхан Дәулетұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-14", name: "Избасар Даниял Тауржанұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-15", name: "Йылмаз Мухаммедали", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Авторский разбор маркетплейсов Kaspi, Wildberries и Pinduoduo." },
+            { id: "g2-st-16", name: "Кадирханов Жангир Адилетович", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-17", name: "Кенжегузин Санжар Ерланұлы", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Логичное самостоятельное объяснение перетока клиентов фитнес-клубов." },
+            { id: "g2-st-18", name: "Кенжегулов Нургазы Сергазыевич", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-19", name: "Коробов Илья Александрович", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-20", name: "Кочетов Руслан Юрьевич", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-21", name: "Кукушкин Юрий Кириллович", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-22", name: "Қабылбек Жантөре Батырбекұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-23", name: "Ли Аделина Сергеевна", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Живой авторский анализ локальных брендов одежды и конкуренции с маркетплейсами." },
+            { id: "g2-st-24", name: "Мажитов Султан Канатович", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-25", name: "Мазат Ерсұлтан Ердосұлы", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельный расчет TR = 1.036.564 ₸ и единичной эластичности." },
+            { id: "g2-st-26", name: "Мамаев Станислав Алексеевич", attendance: 0, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирован готовый текст-шаблон из общего студенческого чата." },
+            { id: "g2-st-27", name: "Молдыбай Амина Айратқызы", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Авторский разбор ценообразования и конкуренции с Zara и H&M." },
+            { id: "g2-st-28", name: "Мусаева Элина Князьевна", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Искренний авторский текст от себя с детальным объяснением пика параболы." },
+            { id: "g2-st-29", name: "Мухтар Бекасыл Асылбекулы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-30", name: "Нурканат Алиар", attendance: 0, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Вставлен огромный сгенерированный фрагмент из ChatGPT (1056 символов)." },
+            { id: "g2-st-31", name: "Нұрбек Нүркен Анарбекұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-32", name: "Нұрғали Айсана", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Логичный разбор альтернатив АИ-92 (автогаз, такси, электромобили)." },
+            { id: "g2-st-33", name: "Сейтқасым Әкежан Серікұлы", attendance: 0, activities: 0, ca1: 60, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Поверхностная отписка в 1 предложение (158 символов), не указаны факторы спроса." },
+            { id: "g2-st-34", name: "Смайылова Жасмин Рысбекқызы", attendance: 0, activities: 0, ca1: 95, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Точные самостоятельные вычисления прироста выручки (+29% цена, TR = 7.59 млн ₸)." },
+            { id: "g2-st-35", name: "Тильдахметов Алмат Зайнуллаұлы", attendance: 0, activities: 0, ca1: 97, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "97/100 (Высочайший академический уровень): Глубочайший вывод линейной функции спроса Q(P) вручную и точный расчет погрешности округления." },
+            { id: "g2-st-36", name: "Убниев Бекзат Нурсипатович", attendance: 0, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Вставлен готовый шаблон из чата без индивидуального разбора." },
+            { id: "g2-st-37", name: "Шаймухамбетов Алим Асланулы", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Детальный расчет прироста выручки (+9.8%, 8.30 млн ₸)." }
         ];
-
-        const initialGroup1 = rawGroup1Names.map((name, i) => ({
-            id: `g1-st-${i + 1}`,
-            name: name,
-            attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0,
-            attendanceHours: Array(30).fill(false)
-        }));
-
-        const initialGroup2 = rawGroup2Names.map((name, i) => ({
-            id: `g2-st-${i + 1}`,
-            name: name,
-            attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0,
-            attendanceHours: Array(30).fill(false)
-        }));
-
-        const ATTENDANCE_DATES = Array.from({ length: 15 }, (_, i) => `Неделя ${i + 1}`);
 
         let currentGroupKey = 'g1';
-        let database = { g1: [], g2: [] };
+        let database = { g1: initialGroup1, g2: initialGroup2 };
         let students = [];
         
         let personalAttChart = null;
         let personalActChart = null;
         let personalExamChart = null;
-        let groupChart = null;
         let isTeacherMode = false;
         
-        // Пароль доступа к панели преподавателя для русскоязычного потока
         const correctPassword = 'SERUS-12122026';
-        let activeEditingStudentId = null;
-        let tempAttendanceHours = [];
 
         window.onload = function() {
             loadDatabase();
-            initGroupChart();
             updateDashboardData();
             
             document.getElementById('teacher-search-input').addEventListener('input', function(e) {
@@ -678,27 +473,19 @@
             });
         };
 
-        function ensureAttendanceHours(student) {
-            if (!student.hasOwnProperty('attendanceHours') || !Array.isArray(student.attendanceHours) || student.attendanceHours.length !== 30) {
-                student.attendanceHours = Array(30).fill(false);
-            }
-        }
-
         function loadDatabase() {
-            const saved = localStorage.getItem('almau_economics_se_rus_groups_v2');
+            const saved = localStorage.getItem('almau_economics_se_rus_groups_v5');
             if (saved) {
                 database = JSON.parse(saved);
             } else {
                 database = { g1: initialGroup1, g2: initialGroup2 };
             }
-            database.g1.forEach(s => ensureAttendanceHours(s));
-            database.g2.forEach(s => ensureAttendanceHours(s));
             students = database[currentGroupKey];
         }
 
         function saveDatabase() {
             database[currentGroupKey] = students;
-            localStorage.setItem('almau_economics_se_rus_groups_v2', JSON.stringify(database));
+            localStorage.setItem('almau_economics_se_rus_groups_v5', JSON.stringify(database));
         }
 
         function switchGroup(groupKey) {
@@ -776,8 +563,8 @@
                 const gradeInfo = getLetterGrade(finalScore);
 
                 document.getElementById('sr-name').textContent = matchedStudent.name;
+                document.getElementById('sr-teacher-comment').textContent = matchedStudent.comment || "Работа не сдана.";
                 
-                // Находим группу
                 const isG1 = database.g1.some(s => s.id === matchedStudent.id);
                 document.getElementById('sr-group-badge').textContent = isG1 ? 'Группа Eko 1362131-35- СН' : 'Группа Eko 1362131-37-CH';
                 
@@ -794,7 +581,6 @@
                 document.getElementById('sr-val-mc2').textContent = `${matchedStudent.mc2 || 0}`;
                 document.getElementById('sr-val-exam').textContent = `${matchedStudent.exam || 0}`;
 
-                renderStudentAttendanceDetails(matchedStudent);
                 renderPersonalCharts(matchedStudent, finalScore, gradeInfo.letter);
 
                 resultCard.classList.remove('hidden');
@@ -812,9 +598,7 @@
         }
 
         function handleSearchKeyDown(event) {
-            if (event.key === 'Enter') {
-                searchStudentGrade();
-            }
+            if (event.key === 'Enter') searchStudentGrade();
         }
 
         function renderPersonalCharts(student, total, letter) {
@@ -906,9 +690,7 @@
         }
 
         function handleAuthKeyDown(event) {
-            if (event.key === 'Enter') {
-                verifyTeacherPassword();
-            }
+            if (event.key === 'Enter') verifyTeacherPassword();
         }
 
         function updateViewMode() {
@@ -960,17 +742,10 @@
 
         function renderTeacherTable(filterQuery = '') {
             const tbody = document.getElementById('students-table-body');
-            const emptyState = document.getElementById('empty-state');
             tbody.innerHTML = '';
 
             const query = filterQuery.toLowerCase().trim();
             const filtered = students.filter(s => s.name.toLowerCase().includes(query));
-
-            if (filtered.length === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-            }
 
             filtered.forEach(student => {
                 const finalScore = calculateWeightedScore(
@@ -982,100 +757,28 @@
                 const row = document.createElement('tr');
                 row.className = "hover:bg-slate-900/60 transition-colors border-b border-slate-800/40";
                 row.innerHTML = `
-                    <td class="py-2.5 px-3 font-medium text-slate-100">
-                        <input type="text" value="${student.name}" onchange="updateStudentName('${student.id}', this.value)" 
-                            class="bg-transparent font-bold text-slate-200 border-b border-transparent hover:border-slate-700 focus:border-indigo-500 focus:outline-none w-full text-xs">
+                    <td class="py-2.5 px-3 font-medium text-slate-100 text-xs">
+                        <strong>${student.name}</strong>
                     </td>
-                    <td class="py-2.5 px-1">
-                        <button onclick="openAttendanceModal('${student.id}')" id="att-trigger-${student.id}"
-                            class="px-1 py-1 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 focus:ring-1 focus:ring-indigo-500 rounded-lg text-emerald-400 text-xs font-bold w-full transition-all flex items-center justify-center gap-1" title="Поурочный чек-лист посещаемости">
-                            <span>${student.attendance}%</span>
-                            <i class="fa-solid fa-pencil text-[8px] text-slate-500"></i>
-                        </button>
-                    </td>
-                    <td class="py-2.5 px-1">
-                        <input type="number" min="0" max="100" value="${student.activities || 0}" 
-                            onchange="updateStudentGrade('${student.id}', 'activities', this.value)"
-                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-teal-300 text-xs font-semibold transition-all">
-                    </td>
-                    <td class="py-2.5 px-1">
-                        <input type="number" min="0" max="100" value="${student.ca1 || 0}" 
-                            onchange="updateStudentGrade('${student.id}', 'ca1', this.value)"
-                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-slate-100 text-xs font-semibold transition-all">
-                    </td>
-                    <td class="py-2.5 px-1">
-                        <input type="number" min="0" max="100" value="${student.mc1 || 0}" 
-                            onchange="updateStudentGrade('${student.id}', 'mc1', this.value)"
-                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-amber-300 text-xs font-semibold transition-all">
-                    </td>
-                    <td class="py-2.5 px-1">
-                        <input type="number" min="0" max="100" value="${student.ca2 || 0}" 
-                            onchange="updateStudentGrade('${student.id}', 'ca2', this.value)"
-                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-slate-100 text-xs font-semibold transition-all">
-                    </td>
-                    <td class="py-2.5 px-1">
-                        <input type="number" min="0" max="100" value="${student.mc2 || 0}" 
-                            onchange="updateStudentGrade('${student.id}', 'mc2', this.value)"
-                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-orange-300 text-xs font-semibold transition-all">
-                    </td>
-                    <td class="py-2.5 px-1">
-                        <input type="number" min="0" max="100" value="${student.exam || 0}" 
-                            onchange="updateStudentGrade('${student.id}', 'exam', this.value)"
-                            class="w-full text-center py-1 bg-slate-950 border border-slate-800 hover:border-slate-700 focus:border-indigo-500 rounded-lg text-rose-300 text-xs font-semibold transition-all">
-                    </td>
-                    <td class="py-2.5 px-2 text-right font-extrabold text-violet-400 bg-indigo-950/10">
-                        <span id="final-score-${student.id}">${finalScore}</span>
-                    </td>
+                    <td class="py-2.5 px-1 text-center font-bold text-emerald-400 text-xs">${student.attendance}%</td>
+                    <td class="py-2.5 px-1 text-center text-teal-300 text-xs">${student.activities || 0}</td>
+                    <td class="py-2.5 px-1 text-center bg-indigo-950/40 font-black text-indigo-400 text-sm">${student.ca1 || 0}</td>
+                    <td class="py-2.5 px-1 text-center text-amber-300 text-xs">${student.mc1 || 0}</td>
+                    <td class="py-2.5 px-1 text-center text-slate-300 text-xs">${student.ca2 || 0}</td>
+                    <td class="py-2.5 px-1 text-center text-orange-300 text-xs">${student.mc2 || 0}</td>
+                    <td class="py-2.5 px-1 text-center text-rose-300 text-xs">${student.exam || 0}</td>
+                    <td class="py-2.5 px-2 text-right font-extrabold text-violet-400 bg-indigo-950/10 text-xs">${finalScore}</td>
                     <td class="py-2.5 px-2 text-center">
-                        <span id="letter-${student.id}" class="inline-flex items-center justify-center px-2 py-0.5 text-[11px] font-bold rounded-lg border ${gradeInfo.class} w-10">
+                        <span class="inline-flex items-center justify-center px-2 py-0.5 text-[11px] font-bold rounded-lg border ${gradeInfo.class} w-10">
                             ${gradeInfo.letter}
                         </span>
                     </td>
-                    <td class="py-2.5 px-1 text-center">
-                        <button onclick="deleteStudent('${student.id}')" class="p-1 text-slate-500 hover:text-rose-400 rounded-lg hover:bg-rose-500/10 transition-colors" title="Удалить">
-                            <i class="fa-regular fa-trash-can text-xs"></i>
-                        </button>
+                    <td class="py-2.5 px-3 text-slate-300 text-[11px] italic leading-tight">
+                        ${student.comment || "Работа не сдана"}
                     </td>
                 `;
                 tbody.appendChild(row);
             });
-        }
-
-        function updateStudentName(id, newName) {
-            const student = students.find(s => s.id === id);
-            if (student && newName.trim() !== '') {
-                student.name = newName.trim();
-                saveDatabase();
-                updateStats();
-                updateGroupChart();
-            }
-        }
-
-        function updateStudentGrade(id, field, value) {
-            let numVal = parseInt(value);
-            if (isNaN(numVal)) numVal = 0;
-            if (numVal < 0) numVal = 0;
-            if (numVal > 100) numVal = 100;
-
-            const student = students.find(s => s.id === id);
-            if (student) {
-                student[field] = numVal;
-                saveDatabase();
-                
-                const finalScore = calculateWeightedScore(
-                    student.attendance, student.activities, student.ca1,
-                    student.mc1, student.ca2, student.mc2, student.exam
-                );
-                document.getElementById(`final-score-${id}`).textContent = finalScore;
-                
-                const gradeInfo = getLetterGrade(finalScore);
-                const letterBadge = document.getElementById(`letter-${id}`);
-                letterBadge.textContent = gradeInfo.letter;
-                letterBadge.className = `inline-flex items-center justify-center px-2 py-0.5 text-[11px] font-bold rounded-lg border ${gradeInfo.class} w-10`;
-                
-                updateStats();
-                updateGroupChart();
-            }
         }
 
         function updateStats() {
@@ -1118,347 +821,9 @@
             }
         }
 
-        function initGroupChart() {
-            const ctx = document.getElementById('groupPerformanceChart').getContext('2d');
-            groupChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: [],
-                    datasets: [
-                        { label: 'Пос', data: [], backgroundColor: 'rgba(16, 185, 129, 0.85)', borderRadius: 2, maxBarThickness: 6 },
-                        { label: 'Акт', data: [], backgroundColor: 'rgba(20, 184, 166, 0.85)', borderRadius: 2, maxBarThickness: 6 },
-                        { label: 'СРСП1', data: [], backgroundColor: 'rgba(59, 130, 246, 0.85)', borderRadius: 2, maxBarThickness: 6 },
-                        { label: 'РК1', data: [], backgroundColor: 'rgba(245, 158, 11, 0.85)', borderRadius: 2, maxBarThickness: 6 },
-                        { label: 'СРСП2', data: [], backgroundColor: 'rgba(99, 102, 241, 0.85)', borderRadius: 2, maxBarThickness: 6 },
-                        { label: 'РК2', data: [], backgroundColor: 'rgba(249, 115, 22, 0.85)', borderRadius: 2, maxBarThickness: 6 },
-                        { label: 'Экз', data: [], backgroundColor: 'rgba(244, 63, 94, 0.85)', borderRadius: 2, maxBarThickness: 6 },
-                        { label: 'Итог', data: [], backgroundColor: 'rgba(139, 92, 246, 0.85)', borderRadius: 2, maxBarThickness: 8 }
-                    ]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 9 } } },
-                        y: { min: 0, max: 100, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8', font: { size: 9 } } }
-                    }
-                }
-            });
-        }
-
-        function updateGroupChart() {
-            if (!groupChart) return;
-
-            const sorted = [...students].sort((a, b) => a.name.localeCompare(b.name));
-            const names = sorted.map(s => s.name.split(' ')[0]);
-
-            groupChart.data.labels = names;
-            groupChart.data.datasets[0].data = sorted.map(s => s.attendance);
-            groupChart.data.datasets[1].data = sorted.map(s => s.activities || 0);
-            groupChart.data.datasets[2].data = sorted.map(s => s.ca1 || 0);
-            groupChart.data.datasets[3].data = sorted.map(s => s.mc1 || 0);
-            groupChart.data.datasets[4].data = sorted.map(s => s.ca2 || 0);
-            groupChart.data.datasets[5].data = sorted.map(s => s.mc2 || 0);
-            groupChart.data.datasets[6].data = sorted.map(s => s.exam || 0);
-            groupChart.data.datasets[7].data = sorted.map(s => calculateWeightedScore(s.attendance, s.activities, s.ca1, s.mc1, s.ca2, s.mc2, s.exam));
-
-            groupChart.update();
-        }
-
         function updateDashboardData() {
             renderTeacherTable();
             updateStats();
-            updateGroupChart();
-        }
-
-        function toggleStudentAttDetails() {
-            const container = document.getElementById('student-att-details');
-            const toggleIcon = document.getElementById('student-att-toggle-icon');
-            if (container.classList.contains('hidden')) {
-                container.classList.remove('hidden');
-                toggleIcon.textContent = "Свернуть ▴";
-            } else {
-                container.classList.add('hidden');
-                toggleIcon.textContent = "Развернуть ▾";
-            }
-        }
-
-        function renderStudentAttendanceDetails(student) {
-            ensureAttendanceHours(student);
-            const grid = document.getElementById('student-att-list-grid');
-            grid.innerHTML = '';
-
-            ATTENDANCE_DATES.forEach((date, dateIdx) => {
-                const h1 = student.attendanceHours[dateIdx * 2];
-                const h2 = student.attendanceHours[dateIdx * 2 + 1];
-
-                const dateRow = document.createElement('div');
-                dateRow.className = "bg-slate-900/60 border border-slate-800/80 rounded-xl p-3 flex items-center justify-between text-xs";
-                
-                dateRow.innerHTML = `
-                    <span class="font-bold text-slate-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-calendar-day text-slate-500 text-[11px]"></i>
-                        ${date}
-                    </span>
-                    <div class="flex items-center space-x-2">
-                        <span class="px-2 py-1 rounded font-semibold text-[10px] flex items-center gap-1 ${h1 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-950 text-slate-600 border border-slate-800'}">
-                            Офлайн (1ч): ${h1 ? '<i class="fa-solid fa-check text-[9px]"></i>' : '<i class="fa-solid fa-xmark text-[9px]"></i>'}
-                        </span>
-                        <span class="px-2 py-1 rounded font-semibold text-[10px] flex items-center gap-1 ${h2 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-950 text-slate-600 border border-slate-800'}">
-                            Онлайн (1ч): ${h2 ? '<i class="fa-solid fa-check text-[9px]"></i>' : '<i class="fa-solid fa-xmark text-[9px]"></i>'}
-                        </span>
-                    </div>
-                `;
-                grid.appendChild(dateRow);
-            });
-        }
-
-        function openAttendanceModal(studentId) {
-            const student = students.find(s => s.id === studentId);
-            if (!student) return;
-
-            activeEditingStudentId = studentId;
-            ensureAttendanceHours(student);
-            tempAttendanceHours = [...student.attendanceHours];
-
-            document.getElementById('att-modal-student-name').textContent = student.name;
-            updateAttendanceModalStats();
-
-            const grid = document.getElementById('attendance-dates-grid');
-            grid.innerHTML = '';
-
-            ATTENDANCE_DATES.forEach((date, dateIdx) => {
-                const h1Idx = dateIdx * 2;
-                const h2Idx = dateIdx * 2 + 1;
-
-                const row = document.createElement('div');
-                row.className = "bg-slate-900 border border-slate-800/80 p-3 rounded-xl flex items-center justify-between";
-                
-                row.innerHTML = `
-                    <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
-                        <span class="h-5 w-5 rounded bg-slate-950 flex items-center justify-center text-[10px] text-slate-500">${dateIdx + 1}</span>
-                        ${date}
-                    </span>
-                    <div class="flex items-center space-x-3">
-                        <button onclick="toggleTempHour(${h1Idx})" id="temp-chk-${h1Idx}" class="px-3 py-1.5 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1.5">
-                            Офлайн (1ч)
-                        </button>
-                        <button onclick="toggleTempHour(${h2Idx})" id="temp-chk-${h2Idx}" class="px-3 py-1.5 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1.5">
-                            Онлайн (1ч)
-                        </button>
-                    </div>
-                `;
-                grid.appendChild(row);
-                updateTempHourButtonUI(h1Idx, 'Офлайн');
-                updateTempHourButtonUI(h2Idx, 'Онлайн');
-            });
-
-            const modal = document.getElementById('attendance-modal');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('div').classList.remove('scale-95');
-            }, 10);
-        }
-
-        function closeAttendanceModal() {
-            const modal = document.getElementById('attendance-modal');
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
-            activeEditingStudentId = null;
-        }
-
-        function toggleTempHour(idx) {
-            tempAttendanceHours[idx] = !tempAttendanceHours[idx];
-            const typeLabel = (idx % 2 === 0) ? 'Офлайн' : 'Онлайн';
-            updateTempHourButtonUI(idx, typeLabel);
-            updateAttendanceModalStats();
-        }
-
-        function updateTempHourButtonUI(idx, label = '') {
-            const btn = document.getElementById(`temp-chk-${idx}`);
-            if (!btn) return;
-            const isChecked = tempAttendanceHours[idx];
-            if (isChecked) {
-                btn.className = "px-3 py-1.5 rounded-lg text-[10px] font-bold bg-emerald-500/10 border-emerald-500/30 text-emerald-400 border transition-all flex items-center gap-1";
-                btn.innerHTML = `<i class="fa-solid fa-check"></i> ${label}`;
-            } else {
-                btn.className = "px-3 py-1.5 rounded-lg text-[10px] font-bold bg-slate-950 border-slate-800 text-slate-500 border transition-all flex items-center gap-1";
-                btn.innerHTML = `<i class="fa-solid fa-xmark"></i> ${label}`;
-            }
-        }
-
-        function toggleAllAttendance(status) {
-            for (let i = 0; i < 30; i++) {
-                tempAttendanceHours[i] = status;
-                const typeLabel = (i % 2 === 0) ? 'Офлайн' : 'Онлайн';
-                updateTempHourButtonUI(i, typeLabel);
-            }
-            updateAttendanceModalStats();
-        }
-
-        function updateAttendanceModalStats() {
-            const checkedCount = tempAttendanceHours.filter(Boolean).length;
-            const percent = Math.round((checkedCount / 30) * 100);
-            document.getElementById('att-modal-percent').textContent = `${percent}%`;
-            document.getElementById('att-modal-hours').textContent = `(${checkedCount} из 30 ч)`;
-        }
-
-        function saveAttendanceDetails() {
-            if (!activeEditingStudentId) return;
-
-            const student = students.find(s => s.id === activeEditingStudentId);
-            if (student) {
-                student.attendanceHours = [...tempAttendanceHours];
-                const checkedCount = student.attendanceHours.filter(Boolean).length;
-                student.attendance = Math.round((checkedCount / 30) * 100);
-
-                saveDatabase();
-                
-                const finalScore = calculateWeightedScore(
-                    student.attendance, student.activities, student.ca1,
-                    student.mc1, student.ca2, student.mc2, student.exam
-                );
-                document.getElementById(`final-score-${student.id}`).textContent = finalScore;
-                
-                const gradeInfo = getLetterGrade(finalScore);
-                const letterBadge = document.getElementById(`letter-${student.id}`);
-                letterBadge.textContent = gradeInfo.letter;
-                letterBadge.className = `inline-flex items-center justify-center px-2 py-0.5 text-[11px] font-bold rounded-lg border ${gradeInfo.class} w-10`;
-                
-                const attTriggerBtn = document.getElementById(`att-trigger-${student.id}`);
-                if (attTriggerBtn) {
-                    attTriggerBtn.innerHTML = `<span>${student.attendance}%</span><i class="fa-solid fa-pencil text-[8px] text-slate-500"></i>`;
-                }
-
-                updateStats();
-                updateGroupChart();
-                closeAttendanceModal();
-                showToast(`Посещаемость обновлена: ${student.name}.`, 'success');
-            }
-        }
-
-        function addSingleStudent() {
-            const nameInput = document.getElementById('add-student-name');
-            const attInput = document.getElementById('add-student-attendance');
-            const actInput = document.getElementById('add-student-activities');
-            const ca1Input = document.getElementById('add-student-ca1');
-            const mc1Input = document.getElementById('add-student-mc1');
-            const ca2Input = document.getElementById('add-student-ca2');
-            const mc2Input = document.getElementById('add-student-mc2');
-            const exmInput = document.getElementById('add-student-exam');
-
-            const name = nameInput.value.trim();
-            if (!name) {
-                showToast('Укажите ФИО студента!', 'error');
-                return;
-            }
-
-            const newStudent = {
-                id: currentGroupKey + '-st-' + Date.now(),
-                name,
-                attendance: Math.max(0, Math.min(100, parseInt(attInput.value) || 0)),
-                activities: Math.max(0, Math.min(100, parseInt(actInput.value) || 0)),
-                ca1: Math.max(0, Math.min(100, parseInt(ca1Input.value) || 0)),
-                mc1: Math.max(0, Math.min(100, parseInt(mc1Input.value) || 0)),
-                ca2: Math.max(0, Math.min(100, parseInt(ca2Input.value) || 0)),
-                mc2: Math.max(0, Math.min(100, parseInt(mc2Input.value) || 0)),
-                exam: Math.max(0, Math.min(100, parseInt(exmInput.value) || 0)),
-                attendanceHours: Array(30).fill(false)
-            };
-
-            ensureAttendanceHours(newStudent);
-            students.unshift(newStudent);
-            saveDatabase();
-            updateDashboardData();
-
-            nameInput.value = '';
-            attInput.value = '';
-            actInput.value = '';
-            ca1Input.value = '';
-            mc1Input.value = '';
-            ca2Input.value = '';
-            mc2Input.value = '';
-            exmInput.value = '';
-
-            showToast(`Студент ${name} добавлен в текущую группу!`, 'success');
-        }
-
-        function runBulkImport() {
-            const textarea = document.getElementById('bulk-import-area');
-            const text = textarea.value.trim();
-
-            if (!text) {
-                showToast('Введите ФИО студентов (по одному в строке)!', 'error');
-                return;
-            }
-
-            const lines = text.split('\n');
-            let counter = 0;
-
-            lines.forEach(line => {
-                const cleanName = line.trim();
-                if (cleanName) {
-                    const newSt = {
-                        id: currentGroupKey + '-st-' + Date.now() + Math.random().toString(36).substr(2, 4),
-                        name: cleanName,
-                        attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0,
-                        attendanceHours: Array(30).fill(false)
-                    };
-                    ensureAttendanceHours(newSt);
-                    students.push(newSt);
-                    counter++;
-                }
-            });
-
-            if (counter > 0) {
-                saveDatabase();
-                updateDashboardData();
-                textarea.value = '';
-                showToast(`Успешно импортировано: ${counter} студентов`, 'success');
-            } else {
-                showToast('Не найдено валидных строк для импорта', 'error');
-            }
-        }
-
-        function deleteStudent(id) {
-            const index = students.findIndex(s => s.id === id);
-            if (index !== -1) {
-                const name = students[index].name;
-                students.splice(index, 1);
-                saveDatabase();
-                updateDashboardData();
-                showToast(`Студент ${name} удален из журнала.`, 'info');
-            }
-        }
-
-        function confirmReset() {
-            const modal = document.getElementById('confirm-modal');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('div').classList.remove('scale-95');
-            }, 10);
-        }
-
-        function closeConfirmModal() {
-            const modal = document.getElementById('confirm-modal');
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
-        }
-
-        function resetAllData() {
-            students = [];
-            saveDatabase();
-            updateDashboardData();
-            closeConfirmModal();
-            showToast('Журнал текущей группы сброшен.', 'info');
         }
 
         function exportToCSV() {
@@ -1468,12 +833,12 @@
             }
 
             let csvContent = "\uFEFF";
-            csvContent += "ФИО Студента;Посещаемость (10%);Активность (10%);СРСП 1 (10%);РК 1 (10%);СРСП 2 (10%);РК 2 (10%);Экзамен (40%);Итоговый балл;Оценка\n";
+            csvContent += "ФИО Студента;Посещаемость;Активность;СРСП 1;РК 1;СРСП 2;РК 2;Экзамен;Итоговый балл;Оценка;Комментарий преподавателя\n";
 
             students.forEach(s => {
                 const final = calculateWeightedScore(s.attendance, s.activities, s.ca1, s.mc1, s.ca2, s.mc2, s.exam);
                 const letter = getLetterGrade(final).letter;
-                csvContent += `"${s.name.replace(/"/g, '""')}";${s.attendance};${s.activities || 0};${s.ca1 || 0};${s.mc1 || 0};${s.ca2 || 0};${s.mc2 || 0};${s.exam || 0};${final};${letter}\n`;
+                csvContent += `"${s.name.replace(/"/g, '""')}";${s.attendance};${s.activities || 0};${s.ca1 || 0};${s.mc1 || 0};${s.ca2 || 0};${s.mc2 || 0};${s.exam || 0};${final};${letter};"${(s.comment || '').replace(/"/g, '""')}"\n`;
             });
 
             const groupNameTitle = currentGroupKey === 'g1' ? 'Eko_1362131-35-CH' : 'Eko_1362131-37-CH';
@@ -1507,10 +872,7 @@
             }
 
             toast.className = `${bgClass} border px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2.5 text-xs font-semibold transform translate-y-2 opacity-0 transition-all duration-300 max-w-sm`;
-            toast.innerHTML = `
-                <i class="fa-solid ${iconClass} text-sm"></i>
-                <span>${message}</span>
-            `;
+            toast.innerHTML = `<i class="fa-solid ${iconClass} text-sm"></i><span>${message}</span>`;
 
             container.appendChild(toast);
             
@@ -1520,9 +882,7 @@
 
             setTimeout(() => {
                 toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
+                setTimeout(() => { toast.remove(); }, 300);
             }, 3500);
         }
     </script>
