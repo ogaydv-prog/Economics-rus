@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theory of Consumer Choice | Economics</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0b0f13;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(239, 68, 68, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(37, 99, 235, 0.08) 0px, transparent 50%);
+  }
+
+  input[type="range"].vintage-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: #151b22;
+    height: 8px;
+    border-radius: 4px;
+    border: 1px solid #30363d;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+  input[type="range"].vintage-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 24px;
+    background: linear-gradient(to right, #8a95a5 0%, #cfd8dc 30%, #b0bec5 45%, #ef4444 48%, #ef4444 52%, #b0bec5 55%, #cfd8dc 70%, #8a95a5 100%);
+    border: 1.5px solid #0b0f13;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition: transform 0.1s ease;
+  }
+  input[type="range"].vintage-slider::-webkit-slider-thumb:hover { transform: scale(1.08); }
+
+  .tab-btn {
+    transition: all 0.2s ease;
+  }
+  .tab-btn.active {
+    background-color: #dc2626;
+    color: #ffffff;
+    box-shadow: 0 0 15px rgba(220, 38, 38, 0.4);
+  }
+
+  .title-red {
+    color: #f87171;
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+  }
+</style>
+</head>
+<body class="text-slate-100 min-h-screen p-2 md:p-4 flex flex-col items-center justify-center overflow-x-hidden">
+
+<div class="w-full max-w-7xl bg-[#111518]/95 border border-red-500/10 shadow-[0_0_50px_rgba(239,68,68,0.05)] rounded-2xl p-3 md:p-5 backdrop-blur-md flex flex-col gap-4">
+  
+  <!-- ШАПКА, ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА И ВКЛАДКИ -->
+  <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-[#14181c] border border-slate-800 rounded-xl p-4 shadow-inner">
+    <div>
+      <div class="flex items-center gap-2">
+        <span id="txt-badge-chapter" class="text-[10px] font-extrabold tracking-[0.2em] text-red-400 uppercase block">Микроэкономика | Глава 21</span>
+        <span id="txt-badge-hub" class="bg-red-500/10 text-red-400 text-[9px] px-2 py-0.5 rounded border border-red-500/20 font-mono">Интерактивный дашборд</span>
+      </div>
+      <!-- КРАСНЫЙ ЗАГОЛОВОК -->
+      <h1 id="txt-main-title" class="text-xl md:text-2xl font-black tracking-tight mt-0.5 title-red">Теория потребительского выбора</h1>
+      <p id="txt-main-subtitle" class="text-slate-400 text-xs mt-0.5">Оптимизация, кривые безразличия и бюджетные ограничения</p>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto justify-between lg:justify-end">
+      <!-- Вкладки навигации -->
+      <div class="flex flex-wrap gap-1.5 bg-black/40 p-1.5 rounded-lg border border-slate-800">
+        <button onclick="switchTab('equilibrium')" id="tab-equilibrium" class="tab-btn active px-3 py-1.5 rounded-md text-xs font-bold text-slate-300 hover:text-white">
+          1. <span id="txt-tab1">Равновесие потребителя</span>
+        </button>
+        <button onclick="switchTab('effects')" id="tab-effects" class="tab-btn px-3 py-1.5 rounded-md text-xs font-bold text-slate-300 hover:text-white">
+          2. <span id="txt-tab2">Эффекты дохода и замещения</span>
+        </button>
+        <button onclick="switchTab('labor')" id="tab-labor" class="tab-btn px-3 py-1.5 rounded-md text-xs font-bold text-slate-300 hover:text-white">
+          3. <span id="txt-tab3">Предложение труда</span>
+        </button>
+        <button onclick="switchTab('saving')" id="tab-saving" class="tab-btn px-3 py-1.5 rounded-md text-xs font-bold text-slate-300 hover:text-white">
+          4. <span id="txt-tab4">Межвременной выбор</span>
+        </button>
+      </div>
+
+      <!-- Переключатель языков -->
+      <button onclick="toggleLanguage()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-red-400 border border-red-500/30 font-black rounded-lg text-xs transition-all shadow-md flex items-center gap-1">
+        🌐 <span id="lang-btn">RU / EN</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ОСНОВНОЙ КОНТЕНТ -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+    
+    <!-- ЛЕВАЯ КОЛОНКА -->
+    <div class="lg:col-span-4 flex flex-col gap-3 justify-between">
+      
+      <!-- ПАНЕЛЬ УПРАВЛЕНИЯ -->
+      <div id="controls-container" class="bg-[#14181c] border border-slate-800 rounded-xl p-4 shadow-inner space-y-4 flex-1">
+        <!-- JS Инжекция -->
+      </div>
+
+      <!-- АНАЛИТИЧЕСКИЕ ПОКАЗАТЕЛИ -->
+      <div class="bg-[#14181c] border border-slate-800 rounded-xl p-3.5 shadow-inner">
+        <h3 id="txt-metrics-title" class="text-[11px] font-black text-red-400 tracking-wider uppercase mb-2">Ключевые теоретические показатели</h3>
+        <div class="grid grid-cols-2 gap-2 font-mono">
+          <div class="bg-black/40 p-2.5 rounded-lg border border-slate-800/80">
+            <span id="txt-lbl-price-ratio" class="block text-slate-500 uppercase text-[8.5px] font-bold font-sans">Соотношение цен ($P_X / P_Y$)</span>
+            <span id="stat-price-ratio" class="text-sm font-black text-red-400">1.00</span>
+          </div>
+          <div class="bg-black/40 p-2.5 rounded-lg border border-slate-800/80">
+            <span id="txt-lbl-mrs" class="block text-slate-500 uppercase text-[8.5px] font-bold font-sans">Предельная норма замещения ($MRS$)</span>
+            <span id="stat-mrs" class="text-sm font-black text-blue-400">1.00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- БЛОК АКАДЕМИЧЕСКОГО ОБЪЯСНЕНИЯ -->
+      <div id="explanation-box" class="bg-[#14181c] border-l-4 border-red-500 rounded-r-xl p-3.5 transition-all duration-300 shadow-inner flex flex-col justify-center">
+        <h4 id="exp-title" class="text-xs font-bold uppercase tracking-wider text-red-400 mb-1">Анализ состояния</h4>
+        <p id="exp-text" class="text-xs text-slate-300 leading-relaxed font-sans">
+          Загрузка описания...
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ПРАВАЯ КОЛОНКА: График Canvas -->
+    <div class="lg:col-span-8 flex flex-col gap-3">
+      <div class="bg-[#14181c] border border-slate-800 shadow-xl rounded-xl p-4 flex-1 flex flex-col justify-between relative min-h-[480px]">
+        
+        <!-- Заголовок графика и легенда -->
+        <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
+          <span id="chart-title" class="text-xs font-bold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+            <span class="w-2.5 h-2.5 bg-red-500 rounded-full inline-block shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
+            <span id="txt-chart-header">Пространство выбора потребителя</span>
+          </span>
+          <div class="flex items-center gap-4 text-[10px] font-bold text-slate-400">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-red-500 inline-block"></span> <span id="leg-budget">Бюджетное ограничение</span></span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-0.5 bg-blue-500 inline-block"></span> <span id="leg-indifference">Кривая безразличия</span></span>
+            <span class="flex items-center gap-1.5"><span class="w-2 h-2 bg-emerald-400 rounded-full inline-block"></span> <span id="leg-optimum">Точка оптимума</span></span>
+          </div>
+        </div>
+
+        <!-- Контейнер холста -->
+        <div class="flex-1 w-full h-full relative flex items-center justify-center">
+          <canvas id="mainCanvas" class="w-full h-full block"></canvas>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  let currentLang = 'ru';
+  let currentTab = 'equilibrium';
+  
+  // Переменные состояния
+  let income = 100;
+  let priceA = 10;
+  let priceB = 10;
+  let pointAlongBudget = 0.5;
+  let utilityLevel = 50;
+
+  let incSubPriceA = 10;
+  let incSubPriceA_new = 5;
+
+  let wageRate = 15;
+
+  let interestRate = 10;
+  let period1Income = 100;
+  let period2Income = 50;
+
+  const canvas = document.getElementById('mainCanvas');
+  const ctx = canvas.getContext('2d');
+  const pad = { top: 30, right: 35, bottom: 45, left: 55 };
+
+  const i18n = {
+    ru: {
+      chapter: "Экономика | Микроэкономика",
+      hub: "Интерактивный дашборд",
+      title: "Теория потребительского выбора",
+      subtitle: "Оптимизация, кривые безразличия и бюджетные ограничения",
+      tab1: "Равновесие потребителя",
+      tab2: "Эффекты дохода и замещения",
+      tab3: "Предложение труда",
+      tab4: "Межвременной выбор",
+      metricsTitle: "Ключевые теоретические показатели",
+      priceRatioLbl: "Соотношение цен ($P_X / P_Y$)",
+      mrsLbl: "Предельная норма замещения ($MRS$)",
+      legBudget: "Бюджетная линия",
+      legIndifference: "Кривая безразличия",
+      legOptimum: "Точка оптимума",
+      modelParams: "Параметры модели",
+      incomeLbl: "Доход ($I$)",
+      priceXLbl: "Цена товара X ($P_X$)",
+      priceYLbl: "Цена товара Y ($P_Y$)",
+      movePointLbl: "Перемещение по бюджетной линии",
+      shiftULbl: "Сдвиг кривой безразличия ($U$)",
+      optimumTitle: "Равновесие потребителя (Оптимальный выбор)",
+      optimumText: "<strong>Достигнут оптимум потребителя!</strong> В этой точке ярко-красная бюджетная линия касательна к наивысшей доступной ярко-синей кривой безразличия.<br><br><strong>Условие первого порядка:</strong><br>$$MRS = \\frac{MU_X}{MU_Y} = \\frac{P_X}{P_Y} = ",
+      suboptimumTitle: "Неоптимальный набор",
+      suboptimumText: "Потребитель выбирает набор, где $MRS = ",
+      suboptimumText2: "$, а соотношение цен $= ",
+      suboptimumText3: "$. Отрегулируйте слайдер или сдвиньте уровень $U$ для достижения касания ($MRS = P_X/P_Y$).",
+      chartTitleEquil: "Карта безразличия и бюджетное ограничение",
+      chartTitleEffects: "Разложение общего эффекта изменения цены",
+      chartTitleLabor: "Выбор между трудом и досугом",
+      chartTitleSaving: "Выбор между текущим и будущим потреблением",
+      effectsTitle: "Управление изменением цены",
+      initialPriceX: "Первоначальная цена $P_X$",
+      newPriceX: "Новая цена $P_X$ (Снижение цены)",
+      effectsDesc: "Снижение цены $P_X$ поворачивает красную бюджетную линию наружу. График демонстрирует расщепление общего эффекта на:<br>1. <strong>Эффект замещения:</strong> Движение вдоль первоначальной синей кривой $I_1$ в точку B.<br>2. <strong>Эффект дохода:</strong> Переход на более высокую синюю кривую полезности $I_2$ в точку C.",
+      laborTitle: "Параметры рынка труда",
+      wageRateLbl: "Ставка заработной платы ($w$ / час)",
+      laborDesc: "Рост ставки зарплаты поворачивает бюджетную линию вверх. Повышение $w$ увеличивает альтернативную стоимость досуга (Эффект замещения), но одновременно повышает покупательную способность (Эффект дохода).",
+      savingTitle: "Межвременной выбор",
+      interestRateLbl: "Процентная ставка ($r$)",
+      savingDesc: "Наклон бюджетного ограничения равен $-(1+r)$. Более высокая процентная ставка делает будущее потребление относительно дешевле текущего.",
+      axisGoodX: "Количество товара X",
+      axisGoodY: "Количество товара Y",
+      axisLeisure: "Часы досуга (L)",
+      axisConsumption: "Потребление ($)",
+      axisC1: "Потребление в 1-м периоде ($C_1$)",
+      axisC2: "Потребление во 2-м периоде ($C_2$)",
+      pointA: "A (Исходный оптимум)",
+      pointB: "B (Эффект замещения)",
+      pointC: "C (Новый оптимум)",
+      optWork: "ч. работы",
+      planSaving: "План сбережений"
+    },
+    en: {
+      chapter: "Economics | Microeconomics",
+      hub: "Interactive Dashboard",
+      title: "The Theory of Consumer Choice",
+      subtitle: "Optimization, Indifference Curves & Budget Constraints",
+      tab1: "Consumer Equilibrium",
+      tab2: "Income & Substitution Effects",
+      tab3: "Labor Supply",
+      tab4: "Intertemporal Choice",
+      metricsTitle: "Key Theoretical Indicators",
+      priceRatioLbl: "Price Ratio Slope ($P_X / P_Y$)",
+      mrsLbl: "Marginal Rate of Sub. ($MRS$)",
+      legBudget: "Budget Constraint",
+      legIndifference: "Indifference Curve",
+      legOptimum: "Optimum Point",
+      modelParams: "Model Parameters",
+      incomeLbl: "Income ($I$)",
+      priceXLbl: "Price of Good X ($P_X$)",
+      priceYLbl: "Price of Good Y ($P_Y$)",
+      movePointLbl: "Move Point along Budget",
+      shiftULbl: "Shift Indifference Curve ($U$)",
+      optimumTitle: "Consumer Equilibrium (Optimal Choice)",
+      optimumText: "<strong>Consumer Optimum Achieved!</strong> At this point, the red budget line is perfectly tangent to the highest attainable blue indifference curve.<br><br><strong>First-Order Condition:</strong><br>$$MRS = \\frac{MU_X}{MU_Y} = \\frac{P_X}{P_Y} = ",
+      suboptimumTitle: "Suboptimal Bundle",
+      suboptimumText: "The consumer is currently purchasing a bundle where $MRS = ",
+      suboptimumText2: "$, and Price Ratio $= ",
+      suboptimumText3: "$. Adjust the slider or shift $U$ to achieve tangency ($MRS = P_X/P_Y$).",
+      chartTitleEquil: "Indifference Map & Budget Constraint",
+      chartTitleEffects: "Income & Substitution Effects Decomposition",
+      chartTitleLabor: "Work-Leisure Trade-off & Labor Supply",
+      chartTitleSaving: "Consumption Today vs. Tomorrow",
+      effectsTitle: "Price Shift Controls",
+      initialPriceX: "Initial Price $P_X$",
+      newPriceX: "New Price $P_X$ (Price Reduction)",
+      effectsDesc: "A drop in $P_X$ rotates the red budget constraint outward. The decomposition shows:<br>1. <strong>Substitution Effect:</strong> Shift along blue $I_1$ to point B.<br>2. <strong>Income Effect:</strong> Shift to higher blue curve $I_2$ at point C.",
+      laborTitle: "Labor Market Controls",
+      wageRateLbl: "Wage Rate ($w$ / hour)",
+      laborDesc: "Increases in wage rates rotate the budget line upward. Higher wages increase the opportunity cost of leisure (Substitution Effect), but increase purchasing power (Income Effect).",
+      savingTitle: "Intertemporal Choices",
+      interestRateLbl: "Interest Rate ($r$)",
+      savingDesc: "The budget constraint slope is $-(1+r)$. Higher interest rates tilt the budget line, making future consumption relatively cheaper than current consumption.",
+      axisGoodX: "Quantity of Good X",
+      axisGoodY: "Quantity of Good Y",
+      axisLeisure: "Hours of Leisure (L)",
+      axisConsumption: "Consumption ($)",
+      axisC1: "Consumption 1st Period ($C_1$)",
+      axisC2: "Consumption 2nd Period ($C_2$)",
+      pointA: "A (Initial Optimum)",
+      pointB: "B (Subst. Effect)",
+      pointC: "C (New Optimum)",
+      optWork: "h Work",
+      planSaving: "Optimal Saving Plan"
+    }
+  };
+
+  function toggleLanguage() {
+    currentLang = currentLang === 'ru' ? 'en' : 'ru';
+    updateLanguageUI();
+    renderControls();
+    update();
+  }
+
+  function updateLanguageUI() {
+    const t = i18n[currentLang];
+    document.getElementById('txt-badge-chapter').innerText = t.chapter;
+    document.getElementById('txt-badge-hub').innerText = t.hub;
+    document.getElementById('txt-main-title').innerText = t.title;
+    document.getElementById('txt-main-subtitle').innerText = t.subtitle;
+    document.getElementById('txt-tab1').innerText = t.tab1;
+    document.getElementById('txt-tab2').innerText = t.tab2;
+    document.getElementById('txt-tab3').innerText = t.tab3;
+    document.getElementById('txt-tab4').innerText = t.tab4;
+    document.getElementById('txt-metrics-title').innerText = t.metricsTitle;
+    document.getElementById('txt-lbl-price-ratio').innerText = t.priceRatioLbl;
+    document.getElementById('txt-lbl-mrs').innerText = t.mrsLbl;
+    document.getElementById('leg-budget').innerText = t.legBudget;
+    document.getElementById('leg-indifference').innerText = t.legIndifference;
+    document.getElementById('leg-optimum').innerText = t.legOptimum;
+  }
+
+  function switchTab(tabName) {
+    currentTab = tabName;
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+    
+    renderControls();
+    resizeCanvas();
+  }
+
+  function renderControls() {
+    const container = document.getElementById('controls-container');
+    const t = i18n[currentLang];
+    
+    if (currentTab === 'equilibrium') {
+      document.getElementById('txt-chart-header').innerText = t.chartTitleEquil;
+      container.innerHTML = `
+        <h3 class="text-xs font-black text-red-400 tracking-wider uppercase mb-3">${t.modelParams}</h3>
+        
+        <div class="space-y-3">
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">${t.incomeLbl}</span>
+              <span class="text-red-400 font-mono" id="val-income">$${income}</span>
+            </div>
+            <input type="range" min="40" max="200" value="${income}" class="vintage-slider" oninput="income=+this.value; update();">
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">${t.priceXLbl}</span>
+              <span class="text-red-400 font-mono" id="val-px">$${priceA}</span>
+            </div>
+            <input type="range" min="5" max="25" value="${priceA}" class="vintage-slider" oninput="priceA=+this.value; update();">
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">${t.priceYLbl}</span>
+              <span class="text-red-400 font-mono" id="val-py">$${priceB}</span>
+            </div>
+            <input type="range" min="5" max="25" value="${priceB}" class="vintage-slider" oninput="priceB=+this.value; update();">
+          </div>
+
+          <hr class="border-slate-800 my-2">
+
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">${t.movePointLbl}</span>
+              <span class="text-sky-400 font-mono" id="val-point">${(pointAlongBudget*100).toFixed(0)}%</span>
+            </div>
+            <input type="range" min="0.05" max="0.95" step="0.01" value="${pointAlongBudget}" class="vintage-slider" oninput="pointAlongBudget=+this.value; update();">
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">${t.shiftULbl}</span>
+              <span class="text-blue-400 font-mono" id="val-u">${utilityLevel}</span>
+            </div>
+            <input type="range" min="20" max="100" value="${utilityLevel}" class="vintage-slider" oninput="utilityLevel=+this.value; update();">
+          </div>
+        </div>
+      `;
+    } else if (currentTab === 'effects') {
+      document.getElementById('txt-chart-header').innerText = t.chartTitleEffects;
+      container.innerHTML = `
+        <h3 class="text-xs font-black text-red-400 tracking-wider uppercase mb-3">${t.effectsTitle}</h3>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">${t.initialPriceX}</span>
+              <span class="text-red-400 font-mono">$${incSubPriceA}</span>
+            </div>
+            <input type="range" min="8" max="20" value="${incSubPriceA}" class="vintage-slider" oninput="incSubPriceA=+this.value; update();">
+          </div>
+
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">${t.newPriceX}</span>
+              <span class="text-red-400 font-mono">$${incSubPriceA_new}</span>
+            </div>
+            <input type="range" min="3" max="15" value="${incSubPriceA_new}" class="vintage-slider" oninput="incSubPriceA_new=+this.value; update();">
+          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed font-sans">
+            ${t.effectsDesc}
+          </p>
+        </div>
+      `;
+    } else if (currentTab === 'labor') {
+      document.getElementById('txt-chart-header').innerText = t.chartTitleLabor;
+      container.innerHTML = `
+        <h3 class="text-xs font-black text-red-400 tracking-wider uppercase mb-3">${t.laborTitle}</h3>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">${t.wageRateLbl}</span>
+              <span class="text-red-400 font-mono">$${wageRate}</span>
+            </div>
+            <input type="range" min="5" max="50" value="${wageRate}" class="vintage-slider" oninput="wageRate=+this.value; update();">
+          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed font-sans">
+            ${t.laborDesc}
+          </p>
+        </div>
+      `;
+    } else if (currentTab === 'saving') {
+      document.getElementById('txt-chart-header').innerText = t.chartTitleSaving;
+      container.innerHTML = `
+        <h3 class="text-xs font-black text-red-400 tracking-wider uppercase mb-3">${t.savingTitle}</h3>
+        <div class="space-y-4">
+          <div>
+            <div class="flex justify-between text-xs font-bold mb-1">
+              <span class="text-slate-300">${t.interestRateLbl}</span>
+              <span class="text-red-400 font-mono">${interestRate}%</span>
+            </div>
+            <input type="range" min="0" max="50" value="${interestRate}" class="vintage-slider" oninput="interestRate=+this.value; update();">
+          </div>
+          <p class="text-[11px] text-slate-400 leading-relaxed font-sans">
+            ${t.savingDesc}
+          </p>
+        </div>
+      `;
+    }
+  }
+
+  function resizeCanvas() {
+    const container = canvas.parentElement;
+    canvas.width = container.clientWidth;
+    canvas.height = container.clientHeight;
+    update();
+  }
+
+  function update() {
+    if (document.getElementById('val-income')) document.getElementById('val-income').innerText = `$${income}`;
+    if (document.getElementById('val-px')) document.getElementById('val-px').innerText = `$${priceA}`;
+    if (document.getElementById('val-py')) document.getElementById('val-py').innerText = `$${priceB}`;
+    if (document.getElementById('val-point')) document.getElementById('val-point').innerText = `${(pointAlongBudget*100).toFixed(0)}%`;
+    if (document.getElementById('val-u')) document.getElementById('val-u').innerText = utilityLevel;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (currentTab === 'equilibrium') {
+      renderConsumerEquilibrium();
+    } else if (currentTab === 'effects') {
+      renderIncomeSubstitutionEffects();
+    } else if (currentTab === 'labor') {
+      renderLaborSupply();
+    } else if (currentTab === 'saving') {
+      renderIntertemporalChoice();
+    }
+  }
+
+  function renderConsumerEquilibrium() {
+    const t = i18n[currentLang];
+    const w = canvas.width;
+    const h = canvas.height;
+    const gW = w - pad.left - pad.right;
+    const gH = h - pad.top - pad.bottom;
+
+    const maxA = 25; 
+    const maxB = 25; 
+
+    const getX = (a) => pad.left + (a / maxA) * gW;
+    const getY = (b) => pad.top + (1 - b / maxB) * gH;
+
+    drawAxes(getX, getY, maxA, maxB, t.axisGoodX, t.axisGoodY);
+
+    const interceptX = income / priceA;
+    const interceptY = income / priceB;
+
+    // КРАСНАЯ БЮДЖЕТНАЯ ЛИНИЯ
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(getX(0), getY(interceptY));
+    ctx.lineTo(getX(interceptX), getY(0));
+    ctx.stroke();
+
+    const optX = income / (2 * priceA);
+    const optY = income / (2 * priceB);
+    const optU = Math.sqrt(optX * optY) * 10;
+
+    const currentX = interceptX * pointAlongBudget;
+    const currentY = interceptY * (1 - pointAlongBudget);
+
+    const currentMRS = currentY / currentX;
+    const priceRatio = priceA / priceB;
+
+    document.getElementById('stat-price-ratio').innerText = priceRatio.toFixed(2);
+    document.getElementById('stat-mrs').innerText = isFinite(currentMRS) ? currentMRS.toFixed(2) : "—";
+
+    // ЯРКО-СИНЯЯ КРИВАЯ БЕЗРАЗЛИЧИЯ
+    ctx.strokeStyle = '#2563eb';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    let started = false;
+    for (let xVal = 0.5; xVal <= maxA; xVal += 0.2) {
+      let yVal = Math.pow(utilityLevel / 10, 2) / xVal;
+      if (yVal <= maxB) {
+        if (!started) { ctx.moveTo(getX(xVal), getY(yVal)); started = true; }
+        else { ctx.lineTo(getX(xVal), getY(yVal)); }
+      }
+    }
+    ctx.stroke();
+
+    const distToOptimum = Math.hypot(currentX - optX, currentY - optY);
+    const isOptimum = distToOptimum < 0.6 && Math.abs(utilityLevel - optU) < 4;
+
+    const expTitle = document.getElementById('exp-title');
+    const expText = document.getElementById('exp-text');
+    const expBox = document.getElementById('explanation-box');
+
+    if (isOptimum) {
+      const now = Date.now() / 300;
+      const pulseRadius = 7 + Math.sin(now) * 3;
+
+      ctx.save();
+      ctx.fillStyle = '#10b981';
+      ctx.shadowColor = '#10b981';
+      ctx.shadowBlur = 20;
+      ctx.beginPath();
+      ctx.arc(getX(optX), getY(optY), pulseRadius, 0, 2 * Math.PI);
+      ctx.fill();
+      ctx.restore();
+
+      expBox.className = "bg-[#14181c] border-l-4 border-emerald-500 rounded-r-xl p-3.5 transition-all duration-300 shadow-inner flex flex-col justify-center";
+      expTitle.className = "text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1";
+      expTitle.innerText = t.optimumTitle;
+      expText.innerHTML = `${t.optimumText}${priceRatio.toFixed(2)}$$`;
+    } else {
+      ctx.fillStyle = '#f59e0b';
+      ctx.beginPath();
+      ctx.arc(getX(currentX), getY(currentY), 6, 0, 2 * Math.PI);
+      ctx.fill();
+
+      expBox.className = "bg-[#14181c] border-l-4 border-amber-500 rounded-r-xl p-3.5 transition-all duration-300 shadow-inner flex flex-col justify-center";
+      expTitle.className = "text-xs font-bold uppercase tracking-wider text-amber-400 mb-1";
+      expTitle.innerText = t.suboptimumTitle;
+      expText.innerHTML = `${t.suboptimumText}${currentMRS.toFixed(2)}${t.suboptimumText2}${priceRatio.toFixed(2)}${t.suboptimumText3}`;
+    }
+
+    requestAnimationFrame(update);
+  }
+
+  function renderIncomeSubstitutionEffects() {
+    const t = i18n[currentLang];
+    const w = canvas.width;
+    const h = canvas.height;
+    const gW = w - pad.left - pad.right;
+    const gH = h - pad.top - pad.bottom;
+
+    const maxA = 30;
+    const maxB = 25;
+    const getX = (a) => pad.left + (a / maxA) * gW;
+    const getY = (b) => pad.top + (1 - b / maxB) * gH;
+
+    drawAxes(getX, getY, maxA, maxB, t.axisGoodX, t.axisGoodY);
+
+    const origX = income / incSubPriceA;
+    const origY = income / priceB;
+
+    // Исходная бюджетная линия
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(getX(0), getY(origY));
+    ctx.lineTo(getX(origX), getY(0));
+    ctx.stroke();
+
+    // Новая бюджетная линия (Красная)
+    const newX = income / incSubPriceA_new;
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(getX(0), getY(origY));
+    ctx.lineTo(getX(newX), getY(0));
+    ctx.stroke();
+
+    const optA_x = income / (2 * incSubPriceA);
+    const optA_y = income / (2 * priceB);
+
+    const optC_x = income / (2 * incSubPriceA_new);
+    const optC_y = income / (2 * priceB);
+
+    const optB_x = optA_x * Math.sqrt(incSubPriceA / incSubPriceA_new);
+    const optB_y = optA_y * Math.sqrt(incSubPriceA_new / incSubPriceA);
+
+    drawLabeledPoint(ctx, getX(optA_x), getY(optA_y), t.pointA, '#2563eb');
+    drawLabeledPoint(ctx, getX(optB_x), getY(optB_y), t.pointB, '#f59e0b');
+    drawLabeledPoint(ctx, getX(optC_x), getY(optC_y), t.pointC, '#10b981');
+
+    document.getElementById('stat-price-ratio').innerText = (incSubPriceA_new / priceB).toFixed(2);
+    document.getElementById('stat-mrs').innerText = (incSubPriceA / priceB).toFixed(2);
+  }
+
+  function renderLaborSupply() {
+    const t = i18n[currentLang];
+    const w = canvas.width;
+    const h = canvas.height;
+    const gW = w - pad.left - pad.right;
+    const gH = h - pad.top - pad.bottom;
+
+    const maxL = 24;
+    const maxC = 500;
+
+    const getX = (l) => pad.left + (l / maxL) * gW;
+    const getY = (c) => pad.top + (1 - c / maxC) * gH;
+
+    drawAxes(getX, getY, maxL, maxC, t.axisLeisure, t.axisConsumption);
+
+    const maxConsumption = maxL * wageRate;
+
+    // Красная бюджетная линия
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(getX(maxL), getY(0));
+    ctx.lineTo(getX(0), getY(maxConsumption));
+    ctx.stroke();
+
+    const optL = 12;
+    const optC = (maxL - optL) * wageRate;
+
+    drawLabeledPoint(ctx, getX(optL), getY(optC), `${t.legOptimum} (${24-optL} ${t.optWork})`, '#10b981');
+
+    document.getElementById('stat-price-ratio').innerText = wageRate.toFixed(2);
+    document.getElementById('stat-mrs').innerText = wageRate.toFixed(2);
+  }
+
+  function renderIntertemporalChoice() {
+    const t = i18n[currentLang];
+    const w = canvas.width;
+    const h = canvas.height;
+    const gW = w - pad.left - pad.right;
+    const gH = h - pad.top - pad.bottom;
+
+    const maxC1 = 200;
+    const maxC2 = 250;
+
+    const getX = (c1) => pad.left + (c1 / maxC1) * gW;
+    const getY = (c2) => pad.top + (1 - c2 / maxC2) * gH;
+
+    drawAxes(getX, getY, maxC1, maxC2, t.axisC1, t.axisC2);
+
+    const r = interestRate / 100;
+    const maxFirstPeriod = period1Income + period2Income / (1 + r);
+    const maxSecondPeriod = period1Income * (1 + r) + period2Income;
+
+    // Красная бюджетная линия
+    ctx.strokeStyle = '#ef4444';
+    ctx.lineWidth = 3.5;
+    ctx.beginPath();
+    ctx.moveTo(getX(0), getY(maxSecondPeriod));
+    ctx.lineTo(getX(maxFirstPeriod), getY(0));
+    ctx.stroke();
+
+    const optC1 = maxFirstPeriod / 2;
+    const optC2 = maxSecondPeriod / 2;
+
+    drawLabeledPoint(ctx, getX(optC1), getY(optC2), t.planSaving, '#10b981');
+
+    document.getElementById('stat-price-ratio').innerText = (1 + r).toFixed(2);
+    document.getElementById('stat-mrs').innerText = (1 + r).toFixed(2);
+  }
+
+  function drawAxes(getX, getY, maxX, maxY, xLabel, yLabel) {
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 1;
+
+    for (let i = 0; i <= 5; i++) {
+      let xVal = (maxX / 5) * i;
+      let yVal = (maxY / 5) * i;
+
+      ctx.beginPath();
+      ctx.moveTo(getX(xVal), getY(0));
+      ctx.lineTo(getX(xVal), getY(maxY));
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(getX(0), getY(yVal));
+      ctx.lineTo(getX(maxX), getY(yVal));
+      ctx.stroke();
+
+      ctx.fillStyle = '#64748b';
+      ctx.font = '10px Inter';
+      ctx.fillText(xVal.toFixed(0), getX(xVal) - 6, getY(0) + 16);
+      ctx.fillText(yVal.toFixed(0), getX(0) - 28, getY(yVal) + 4);
+    }
+
+    ctx.strokeStyle = '#475569';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(getX(0), getY(maxY));
+    ctx.lineTo(getX(0), getY(0));
+    ctx.lineTo(getX(maxX), getY(0));
+    ctx.stroke();
+
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = 'bold 11px Inter';
+    ctx.fillText(xLabel, canvas.width / 2 - 40, canvas.height - 10);
+    
+    ctx.save();
+    ctx.translate(15, canvas.height / 2 + 30);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(yLabel, 0, 0);
+    ctx.restore();
+  }
+
+  function drawLabeledPoint(context, x, y, label, color) {
+    context.fillStyle = color;
+    context.beginPath();
+    context.arc(x, y, 5.5, 0, 2 * Math.PI);
+    context.fill();
+
+    context.fillStyle = '#ffffff';
+    context.font = 'bold 10px Inter';
+    context.fillText(label, x + 8, y - 8);
+  }
+
+  window.addEventListener('load', () => {
+    updateLanguageUI();
+    switchTab('equilibrium');
+    window.addEventListener('resize', resizeCanvas);
+  });
+</script>
+
+</body>
+</html>

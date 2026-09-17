@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Теория потребительского поведения | Utility Maximizing Rule</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #030712; color: #f8fafc; }
+        .vintage-panel { background: #0f172a; border: 2px solid #1e293b; border-radius: 20px; box-shadow: 0 20px 40px -15px rgba(0,0,0,0.7); }
+        .kpi-block { background: linear-gradient(135deg, #0b1329 0%, #172554 100%); border: 1px solid #1e3a8a; }
+        .btn-glow { box-shadow: 0 4px 20px rgba(14, 165, 233, 0.3); }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-sky-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="bg-slate-900/90 border-b border-slate-800 py-3.5 px-6 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3.5">
+                <div class="h-11 w-11 bg-gradient-to-tr from-sky-500 via-indigo-500 to-emerald-400 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-sky-500/20 border border-white/20">
+                    MU
+                </div>
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-sky-400" id="header-subtitle">Utility Maximizing Rule | AlmaU SDTE</span>
+                    <h1 class="text-lg sm:text-xl font-black text-white" id="header-title">Теория потребительского поведения</h1>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <!-- Language Switcher Button -->
+                <div class="flex items-center bg-slate-950 border border-slate-800 p-1 rounded-xl">
+                    <button onclick="setLanguage('ru')" id="lang-btn-ru" class="px-3 py-1 rounded-lg text-xs font-bold transition bg-sky-600 text-white">RU</button>
+                    <button onclick="setLanguage('en')" id="lang-btn-en" class="px-3 py-1 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">EN</button>
+                </div>
+
+                <span class="text-xs font-bold text-slate-300 bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800">
+                    <span id="label-variant">Вариант:</span> <span id="variant-number-badge" class="text-sky-400 font-black">№1</span>
+                </span>
+                
+                <button onclick="nextVariant()" class="px-4 py-1.5 bg-sky-600 hover:bg-sky-500 text-white text-xs font-bold rounded-xl transition btn-glow flex items-center gap-1.5">
+                    <i class="fa-solid fa-rotate"></i> <span id="btn-next-variant">Следующий вариант (Сброс)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 flex-grow space-y-6">
+
+        <!-- Dynamic Control & KPI Block -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div class="kpi-block p-4 rounded-2xl flex flex-col justify-between">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider" id="kpi-label-budget">Бюджет Потребителя</span>
+                <p class="text-2xl font-black text-white mt-1" id="kpi-budget">$10 / $10</p>
+                <div class="w-full bg-slate-950 h-2 rounded-full overflow-hidden mt-2 border border-slate-800">
+                    <div id="budget-bar" class="bg-emerald-400 h-full w-full transition-all duration-300"></div>
+                </div>
+            </div>
+
+            <!-- БЛОК 1: ОБЩАЯ ПОЛЕЗНОСТЬ (TU) -->
+            <div class="kpi-block p-4 rounded-2xl border-l-4 border-l-emerald-400">
+                <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider" id="kpi-label-tu">1. Общая Полезность (TU)</span>
+                <p class="text-3xl font-black text-white mt-1" id="kpi-tu">0 utils</p>
+                <span class="text-[10px] text-slate-400" id="kpi-tu-sub">Сумма полезности всех выбранных товаров</span>
+            </div>
+
+            <!-- БЛОК 2: ПРЕДЕЛЬНАЯ ПОЛЕЗНОСТЬ (MU) -->
+            <div class="kpi-block p-4 rounded-2xl border-l-4 border-l-sky-400">
+                <span class="text-[11px] font-bold text-sky-400 uppercase tracking-wider" id="kpi-label-mu">2. Предельная Полезность (MU)</span>
+                <div class="flex justify-between items-end mt-1">
+                    <div>
+                        <span class="text-[10px] text-slate-400 block" id="kpi-label-mu-a">Товар A (посл.):</span>
+                        <span class="text-xl font-bold text-sky-300" id="kpi-mu-a">-</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 block" id="kpi-label-mu-b">Товар B (посл.):</span>
+                        <span class="text-xl font-bold text-sky-300" id="kpi-mu-b">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kpi-block p-4 rounded-2xl flex flex-col justify-between border-l-4 border-l-indigo-500">
+                <span class="text-[11px] font-bold text-indigo-300 uppercase tracking-wider" id="kpi-label-status">Статус Игры</span>
+                <p class="text-xs font-bold text-slate-200" id="game-status-text">Сделайте первый выбор товаров</p>
+                <button onclick="checkOptimum()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition shadow-lg shadow-emerald-600/20" id="btn-check">
+                    Проверить выбор!
+                </button>
+            </div>
+        </div>
+
+        <!-- Interactive Game Workspace -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+            <!-- Basket Controls (Слева) -->
+            <div class="custom-card bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-6">
+                <h3 class="text-sm font-bold text-white border-b border-slate-800 pb-3 flex items-center justify-between">
+                    <span id="title-basket">Корзина Покупателя</span>
+                    <span class="text-xs text-slate-400 font-normal" id="sub-basket">Нажимайте + / -</span>
+                </h3>
+
+                <!-- Product A Control -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold text-white" id="name-prod-a">Product A</span>
+                        <span class="text-xs font-bold text-sky-400" id="price-a-display">Цена: $1</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <button onclick="changeQty('A', -1)" class="h-9 w-9 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-lg transition">-</button>
+                        <span class="text-2xl font-black text-white" id="qty-a-display">0</span>
+                        <button onclick="changeQty('A', 1)" class="h-9 w-9 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-lg text-lg transition">+</button>
+                    </div>
+                </div>
+
+                <!-- Product B Control -->
+                <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold text-white" id="name-prod-b">Product B</span>
+                        <span class="text-xs font-bold text-sky-400" id="price-b-display">Цена: $2</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <button onclick="changeQty('B', -1)" class="h-9 w-9 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-lg transition">-</button>
+                        <span class="text-2xl font-black text-white" id="qty-b-display">0</span>
+                        <button onclick="changeQty('B', 1)" class="h-9 w-9 bg-sky-600 hover:bg-sky-500 text-white font-bold rounded-lg text-lg transition">+</button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/60 p-3.5 rounded-xl border border-slate-800 text-[11px] text-slate-400 space-y-1">
+                    <p id="hint-text"><strong>Цель:</strong> Использовать бюджет полностью и получить максимальную общую полезность (TU).</p>
+                </div>
+            </div>
+
+            <!-- Table (Справа - Изумрудно-голубой премиум стиль) -->
+            <div class="lg:col-span-2 vintage-panel p-6 shadow-2xl text-white">
+                <div class="text-center mb-4">
+                    <h2 class="text-lg font-black tracking-wider uppercase text-sky-400" id="tbl-main-title">Utility Maximizing Rule Table</h2>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-center border-collapse">
+                        <thead>
+                            <tr class="text-sm font-black border-b-2 border-sky-500/40 text-slate-200">
+                                <th class="py-2.5 px-2" id="th-unit">Unit of product</th>
+                                <th class="py-2.5 px-2" colspan="2">
+                                    Product A <br> <span id="tbl-header-pa" class="text-xs font-bold text-sky-400">price 1 $</span>
+                                </th>
+                                <th class="py-2.5 px-2" colspan="2">
+                                    Product B <br> <span id="tbl-header-pb" class="text-xs font-bold text-emerald-400">price 2 $</span>
+                                </th>
+                            </tr>
+                            <tr class="text-xs font-bold border-b border-slate-800 text-slate-400 uppercase tracking-wider">
+                                <th class="py-2"></th>
+                                <th class="py-2 px-1" id="th-mu-a">Marginal Utility</th>
+                                <th class="py-2 px-1" id="th-mup-a">MU per dollar</th>
+                                <th class="py-2 px-1" id="th-mu-b">Marginal Utility</th>
+                                <th class="py-2 px-1" id="th-mup-b">MU per dollar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="utility-table-body" class="font-bold text-base divide-y divide-slate-800/60">
+                            <!-- Dynamic Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 border-t border-slate-800 py-3.5 text-center text-xs text-slate-500">
+        © Almaty Management University | SDTE 2026
+    </footer>
+
+    <script>
+        let currentLang = 'ru';
+
+        const dictionary = {
+            ru: {
+                headerSubtitle: "Utility Maximizing Rule | AlmaU GSB",
+                headerTitle: "Теория потребительского поведения",
+                labelVariant: "Вариант:",
+                btnNextVariant: "Следующий вариант (Сброс)",
+                kpiBudget: "Бюджет Потребителя",
+                kpiTu: "1. Общая Полезность (TU)",
+                kpiTuSub: "Сумма полезности всех выбранных товаров",
+                kpiMu: "2. Предельная Полезность (MU)",
+                kpiMuA: "Товар A (посл.):",
+                kpiMuB: "Товар B (посл.):",
+                kpiStatus: "Статус Игры",
+                btnCheck: "Проверить выбор!",
+                titleBasket: "Корзина Покупателя",
+                subBasket: "Нажимайте + / -",
+                priceLabel: "Цена:",
+                hintText: "<strong>Цель:</strong> Использовать бюджет полностью и получить максимальную общую полезность (TU).",
+                tblMainTitle: "Таблица правила максимизации полезности",
+                thUnit: "Единица товара",
+                thMu: "Предельная полезность",
+                thMup: "MU на 1 доллар",
+                statusStart: "Сделайте первый выбор товаров",
+                statusFull: "Бюджет израсходован полностью! Можно проверять.",
+                statusRem: "Осталось бюджета: $",
+                alertSuccess: "🎉 БРАВО! Вы нашли оптимальный набор потребителя!\n\nКуплено: Товар A = {a} шт., Товар B = {b} шт.\nМаксимальная полезность TU = {tu} utils.\nПравило равновесия MU_A/P_A = MU_B/P_B соблюдено!",
+                alertFail: "⚠️ Вариант не является оптимумом.\n\nВаша полезность: {tu} utils (Потрачено ${spent}).\nМаксимально возможная полезность: {maxTu} utils.\n\nПодсказка: Сравните значения MU/P для последних купленных единиц обоих товаров!"
+            },
+            en: {
+                headerSubtitle: "Utility Maximizing Rule | AlmaU GSB",
+                headerTitle: "Theory of Consumer Behavior",
+                labelVariant: "Variant:",
+                btnNextVariant: "Next Variant (Reset)",
+                kpiBudget: "Consumer Budget",
+                kpiTu: "1. Total Utility (TU)",
+                kpiTuSub: "Sum of utility of all selected products",
+                kpiMu: "2. Marginal Utility (MU)",
+                kpiMuA: "Product A (last):",
+                kpiMuB: "Product B (last):",
+                kpiStatus: "Game Status",
+                btnCheck: "Check Choice!",
+                titleBasket: "Consumer Basket",
+                subBasket: "Click + / -",
+                priceLabel: "Price:",
+                hintText: "<strong>Goal:</strong> Spend the entire budget and achieve the maximum Total Utility (TU).",
+                tblMainTitle: "Utility Maximizing Rule Table",
+                thUnit: "Unit of product",
+                thMu: "Marginal Utility",
+                thMup: "MU per dollar",
+                statusStart: "Make your first choice of products",
+                statusFull: "Budget spent completely! Ready to check.",
+                statusRem: "Remaining budget: $",
+                alertSuccess: "🎉 BRAVO! You found the optimal consumer bundle!\n\nPurchased: Product A = {a} pcs, Product B = {b} pcs.\nMaximum Total Utility TU = {tu} utils.\nEquimarginal rule MU_A/P_A = MU_B/P_B satisfied!",
+                alertFail: "⚠️ Selected bundle is not optimal.\n\nYour Total Utility: {tu} utils (Spent ${spent}).\nMaximum possible Utility: {maxTu} utils.\n\nHint: Compare MU/P values for the last purchased units of both goods!"
+            }
+        };
+
+        const variants = [
+            {
+                id: 1,
+                nameRu: "№1 (Исходный)",
+                nameEn: "#1 (Original)",
+                priceA: 1,
+                priceB: 2,
+                budget: 10,
+                muA: [10, 8, 7, 6, 5, 4, 3],
+                muB: [24, 20, 18, 16, 12, 6, 4]
+            },
+            {
+                id: 2,
+                nameRu: "№2 (Цены A=$2, B=$4)",
+                nameEn: "#2 (Prices A=$2, B=$4)",
+                priceA: 2,
+                priceB: 4,
+                budget: 16,
+                muA: [16, 14, 12, 10, 8, 6, 4],
+                muB: [40, 32, 28, 24, 16, 12, 8]
+            },
+            {
+                id: 3,
+                nameRu: "№3 (Паритет A=$2, B=$2)",
+                nameEn: "#3 (Parity A=$2, B=$2)",
+                priceA: 2,
+                priceB: 2,
+                budget: 12,
+                muA: [18, 15, 12, 9, 6, 3, 1],
+                muB: [22, 18, 14, 10, 6, 2, 1]
+            },
+            {
+                id: 4,
+                nameRu: "№4 (Премиум B=$5)",
+                nameEn: "#4 (Premium B=$5)",
+                priceA: 1,
+                priceB: 5,
+                budget: 15,
+                muA: [8, 7, 6, 5, 4, 3, 2],
+                muB: [50, 45, 35, 25, 15, 10, 5]
+            },
+            {
+                id: 5,
+                nameRu: "№5 (Бюджет $8)",
+                nameEn: "#5 (Budget $8)",
+                priceA: 1,
+                priceB: 2,
+                budget: 8,
+                muA: [12, 10, 8, 6, 4, 2, 1],
+                muB: [20, 16, 12, 8, 4, 2, 1]
+            },
+            {
+                id: 6,
+                nameRu: "№6 (Эконом A=$1, B=$3)",
+                nameEn: "#6 (Economy A=$1, B=$3)",
+                priceA: 1,
+                priceB: 3,
+                budget: 11,
+                muA: [9, 8, 7, 6, 5, 4, 2],
+                muB: [30, 27, 21, 15, 9, 6, 3]
+            },
+            {
+                id: 7,
+                nameRu: "№7 (Сбалансированный $14)",
+                nameEn: "#7 (Balanced $14)",
+                priceA: 2,
+                priceB: 3,
+                budget: 14,
+                muA: [14, 12, 10, 8, 6, 4, 2],
+                muB: [27, 24, 18, 15, 9, 6, 3]
+            },
+            {
+                id: 8,
+                nameRu: "№8 (Полезность B=$3)",
+                nameEn: "#8 (High Utility B=$3)",
+                priceA: 1,
+                priceB: 3,
+                budget: 12,
+                muA: [11, 9, 8, 6, 5, 3, 1],
+                muB: [36, 30, 24, 18, 12, 6, 3]
+            },
+            {
+                id: 9,
+                nameRu: "№9 (Широкий бюджет $20)",
+                nameEn: "#9 (Wide Budget $20)",
+                priceA: 2,
+                priceB: 4,
+                budget: 20,
+                muA: [20, 18, 15, 12, 9, 6, 3],
+                muB: [48, 40, 32, 24, 16, 8, 4]
+            },
+            {
+                id: 10,
+                nameRu: "№10 (A=$3, B=$4)",
+                nameEn: "#10 (A=$3, B=$4)",
+                priceA: 3,
+                priceB: 4,
+                budget: 18,
+                muA: [21, 18, 15, 12, 9, 6, 3],
+                muB: [32, 28, 24, 20, 12, 8, 4]
+            }
+        ];
+
+        let currentVariantIdx = 0;
+        let selectedA = 0;
+        let selectedB = 0;
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const bRu = document.getElementById('lang-btn-ru');
+            const bEn = document.getElementById('lang-btn-en');
+
+            if (lang === 'en') {
+                bEn.className = 'px-3 py-1 rounded-lg text-xs font-bold transition bg-sky-600 text-white';
+                bRu.className = 'px-3 py-1 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
+            } else {
+                bRu.className = 'px-3 py-1 rounded-lg text-xs font-bold transition bg-sky-600 text-white';
+                bEn.className = 'px-3 py-1 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
+            }
+
+            const t = dictionary[lang];
+            document.getElementById('header-subtitle').textContent = t.headerSubtitle;
+            document.getElementById('header-title').textContent = t.headerTitle;
+            document.getElementById('label-variant').textContent = t.labelVariant;
+            document.getElementById('btn-next-variant').textContent = t.btnNextVariant;
+            document.getElementById('kpi-label-budget').textContent = t.kpiBudget;
+            document.getElementById('kpi-label-tu').textContent = t.kpiTu;
+            document.getElementById('kpi-tu-sub').textContent = t.kpiTuSub;
+            document.getElementById('kpi-label-mu').textContent = t.kpiMu;
+            document.getElementById('kpi-label-mu-a').textContent = t.kpiMuA;
+            document.getElementById('kpi-label-mu-b').textContent = t.kpiMuB;
+            document.getElementById('kpi-label-status').textContent = t.kpiStatus;
+            document.getElementById('btn-check').textContent = t.btnCheck;
+            document.getElementById('title-basket').textContent = t.titleBasket;
+            document.getElementById('sub-basket').textContent = t.subBasket;
+            document.getElementById('hint-text').innerHTML = t.hintText;
+            document.getElementById('tbl-main-title').textContent = t.tblMainTitle;
+            document.getElementById('th-unit').textContent = t.thUnit;
+            document.getElementById('th-mu-a').textContent = t.thMu;
+            document.getElementById('th-mu-b').textContent = t.thMu;
+            document.getElementById('th-mup-a').textContent = t.thMup;
+            document.getElementById('th-mup-b').textContent = t.thMup;
+
+            loadVariant(currentVariantIdx);
+        }
+
+        function loadVariant(idx) {
+            currentVariantIdx = idx;
+            const v = variants[idx];
+
+            const name = currentLang === 'ru' ? v.nameRu : v.nameEn;
+            const priceText = dictionary[currentLang].priceLabel;
+
+            document.getElementById('variant-number-badge').textContent = name;
+            document.getElementById('price-a-display').textContent = `${priceText} $${v.priceA}`;
+            document.getElementById('price-b-display').textContent = `${priceText} $${v.priceB}`;
+            document.getElementById('tbl-header-pa').textContent = `price ${v.priceA} $`;
+            document.getElementById('tbl-header-pb').textContent = `price ${v.priceB} $`;
+
+            // Build Table
+            const tbody = document.getElementById('utility-table-body');
+            tbody.innerHTML = '';
+
+            for (let i = 0; i < v.muA.length; i++) {
+                const unit = i + 1;
+                const muA = v.muA[i];
+                const muPerDollarA = (muA / v.priceA).toFixed(Number.isInteger(muA / v.priceA) ? 0 : 1);
+                
+                const muB = v.muB[i];
+                const muPerDollarB = (muB / v.priceB).toFixed(Number.isInteger(muB / v.priceB) ? 0 : 1);
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/50 transition";
+                tr.innerHTML = `
+                    <td class="py-2.5 font-black text-slate-300">${unit}</td>
+                    <td class="py-2.5 px-1 text-slate-200">${muA}</td>
+                    <td class="py-2.5 px-1 text-sky-400 font-black">${muPerDollarA}</td>
+                    <td class="py-2.5 px-1 text-slate-200">${muB}</td>
+                    <td class="py-2.5 px-1 text-emerald-400 font-black">${muPerDollarB}</td>
+                `;
+                tbody.appendChild(tr);
+            }
+
+            updateUI();
+        }
+
+        function changeQty(prod, delta) {
+            const v = variants[currentVariantIdx];
+            if (prod === 'A') {
+                const nextA = selectedA + delta;
+                if (nextA >= 0 && nextA <= v.muA.length) {
+                    const cost = (nextA * v.priceA) + (selectedB * v.priceB);
+                    if (cost <= v.budget || delta < 0) selectedA = nextA;
+                }
+            } else {
+                const nextB = selectedB + delta;
+                if (nextB >= 0 && nextB <= v.muB.length) {
+                    const cost = (selectedA * v.priceA) + (nextB * v.priceB);
+                    if (cost <= v.budget || delta < 0) selectedB = nextB;
+                }
+            }
+            updateUI();
+        }
+
+        function updateUI() {
+            const v = variants[currentVariantIdx];
+            const t = dictionary[currentLang];
+            const spent = (selectedA * v.priceA) + (selectedB * v.priceB);
+            const rem = v.budget - spent;
+
+            document.getElementById('qty-a-display').textContent = selectedA;
+            document.getElementById('qty-b-display').textContent = selectedB;
+            document.getElementById('kpi-budget').textContent = `$${spent} / $${v.budget}`;
+
+            const pct = (spent / v.budget) * 100;
+            const bBar = document.getElementById('budget-bar');
+            bBar.style.width = pct + '%';
+            bBar.className = spent === v.budget ? 'bg-emerald-400 h-full transition-all' : 'bg-sky-400 h-full transition-all';
+
+            // Calculate Total Utility (TU)
+            let tuA = 0;
+            for (let i = 0; i < selectedA; i++) tuA += v.muA[i];
+
+            let tuB = 0;
+            for (let i = 0; i < selectedB; i++) tuB += v.muB[i];
+
+            const totalTU = tuA + tuB;
+            document.getElementById('kpi-tu').textContent = `${totalTU} utils`;
+
+            // Calculate Marginal Utilities (MU of last unit)
+            const muA_last = selectedA > 0 ? v.muA[selectedA - 1] : '-';
+            const muB_last = selectedB > 0 ? v.muB[selectedB - 1] : '-';
+
+            document.getElementById('kpi-mu-a').textContent = muA_last !== '-' ? `${muA_last} (MU/P: ${muA_last / v.priceA})` : '-';
+            document.getElementById('kpi-mu-b').textContent = muB_last !== '-' ? `${muB_last} (MU/P: ${muB_last / v.priceB})` : '-';
+
+            if (spent === 0) {
+                document.getElementById('game-status-text').textContent = t.statusStart;
+            } else if (spent === v.budget) {
+                document.getElementById('game-status-text').textContent = t.statusFull;
+            } else {
+                document.getElementById('game-status-text').textContent = `${t.statusRem}${rem}`;
+            }
+        }
+
+        function checkOptimum() {
+            const v = variants[currentVariantIdx];
+            const t = dictionary[currentLang];
+            const spent = (selectedA * v.priceA) + (selectedB * v.priceB);
+
+            let maxTU = 0;
+            let bestA = 0;
+            let bestB = 0;
+
+            for (let a = 0; a <= v.muA.length; a++) {
+                for (let b = 0; b <= v.muB.length; b++) {
+                    const cost = (a * v.priceA) + (b * v.priceB);
+                    if (cost <= v.budget) {
+                        let currentTU = 0;
+                        for (let i = 0; i < a; i++) currentTU += v.muA[i];
+                        for (let j = 0; j < b; j++) currentTU += v.muB[j];
+
+                        if (currentTU > maxTU) {
+                            maxTU = currentTU;
+                            bestA = a;
+                            bestB = b;
+                        }
+                    }
+                }
+            }
+
+            let currentTU = 0;
+            for (let i = 0; i < selectedA; i++) currentTU += v.muA[i];
+            for (let j = 0; j < selectedB; j++) currentTU += v.muB[j];
+
+            if (currentTU === maxTU && spent === v.budget) {
+                let msg = t.alertSuccess.replace('{a}', selectedA).replace('{b}', selectedB).replace('{tu}', maxTU);
+                alert(msg);
+            } else {
+                let msg = t.alertFail.replace('{tu}', currentTU).replace('{spent}', spent).replace('{maxTu}', maxTU);
+                alert(msg);
+            }
+        }
+
+        function nextVariant() {
+            selectedA = 0;
+            selectedB = 0;
+            let nextIdx = (currentVariantIdx + 1) % variants.length;
+            loadVariant(nextIdx);
+        }
+
+        window.onload = function() {
+            setLanguage('ru');
+        };
+    </script>
+</body>
+</html>

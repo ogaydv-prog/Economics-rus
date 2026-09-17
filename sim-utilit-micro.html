@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Микроэкономика | Теория полезности</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0b0f13;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.05) 0px, transparent 50%);
+  }
+
+  input[type="range"].vintage-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: #151b22;
+    height: 10px;
+    border-radius: 4px;
+    border: 1px solid #30363d;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+  input[type="range"].vintage-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 28px;
+    background: linear-gradient(to right, #8a95a5 0%, #cfd8dc 30%, #b0bec5 45%, #ef4444 48%, #ef4444 52%, #b0bec5 55%, #cfd8dc 70%, #8a95a5 100%);
+    border: 1.5px solid #0b0f13;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition: transform 0.1s ease;
+  }
+  input[type="range"].vintage-slider::-webkit-slider-thumb:hover { transform: scale(1.08); }
+</style>
+</head>
+<body class="text-slate-100 min-h-screen p-2 md:p-4 flex flex-col items-center justify-center overflow-x-hidden">
+
+<div class="w-full max-w-7xl bg-[#111518]/95 border border-emerald-500/10 shadow-[0_0_50px_rgba(16,185,129,0.05)] rounded-2xl p-3 md:p-5 backdrop-blur-md">
+  
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+    
+    <!-- ЛЕВАЯ КОЛОНКА: Заголовок + Слайдер + Аналитика (35% ширины) -->
+    <div class="lg:col-span-4 flex flex-col gap-3 justify-between">
+      
+      <!-- Компактный заголовок -->
+      <div class="bg-[#14181c] border border-slate-800 rounded-xl p-3.5 shadow-inner">
+        <span class="text-[9px] font-bold tracking-[0.2em] text-emerald-400 uppercase block">Микроэкономика</span>
+        <h1 class="text-base font-black text-white tracking-tight mt-0.5">Совокупная (TU) и предельная (MU) полезность</h1>
+        <p class="text-slate-400 text-[11px] mt-0.5 leading-snug">Иллюстрация Первого закона Госсена</p>
+      </div>
+      
+      <!-- Слайдер (0 до 10 ед.) -->
+      <div class="bg-[#14181c] border border-slate-800 rounded-xl p-3.5 shadow-inner space-y-2">
+        <div class="flex justify-between items-center">
+          <h3 class="text-xs font-black text-emerald-400 tracking-wider uppercase">Объем (Q)</h3>
+          <span id="slider-q-display" class="text-xs font-black text-emerald-400 font-mono">0 ед.</span>
+        </div>
+        
+        <div class="py-1">
+          <input type="range" id="q-slider" min="0" max="10" value="0" step="1" class="w-full vintage-slider">
+        </div>
+        
+        <div class="flex justify-between text-[9px] text-slate-500 font-mono">
+          <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+        </div>
+      </div>
+
+      <!-- Метрики -->
+      <div class="bg-[#14181c] border border-slate-800 rounded-xl p-3.5 shadow-inner">
+        <h3 class="text-[11px] font-black text-sky-400 tracking-wider uppercase mb-2">Текущие показатели</h3>
+        
+        <div class="grid grid-cols-2 gap-2">
+          <div class="bg-black/40 p-2.5 rounded-lg border border-slate-800/80">
+            <span class="block text-slate-500 uppercase text-[8.5px] font-bold">Совокупная TU</span>
+            <span id="stat-tu" class="text-base font-black text-purple-400 font-mono">0</span>
+            <span class="text-[8px] text-slate-500 block">всего утилов</span>
+          </div>
+          
+          <div class="bg-black/40 p-2.5 rounded-lg border border-slate-800/80">
+            <span class="block text-slate-500 uppercase text-[8.5px] font-bold">Предельная MU</span>
+            <span id="stat-mu" class="text-base font-black text-rose-400 font-mono">—</span>
+            <span class="text-[8px] text-slate-500 block">прирост от ед.</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Динамическое объяснение -->
+      <div id="explanation-box" class="bg-[#14181c] border-l-4 border-slate-500 rounded-r-xl p-3.5 transition-all duration-300 shadow-inner flex-1 flex flex-col justify-center">
+        <h4 id="exp-title" class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Q = 0: Начальное состояние</h4>
+        <p id="exp-text" class="text-[11px] text-slate-300 leading-relaxed">
+          Потребление еще не началось. Совокупная полезность равна 0.
+        </p>
+      </div>
+
+    </div>
+
+    <!-- ПРАВАЯ КОЛОНКА: ДВА ВЫТЯНУТЫХ ГРАФИКА (65% ширины) -->
+    <div class="lg:col-span-8 flex flex-col gap-3">
+      
+      <!-- График 1: TU -->
+      <div class="bg-[#14181c] border border-slate-800 shadow-xl rounded-xl p-3 flex-1 flex flex-col justify-between">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-xs font-bold text-purple-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 bg-purple-500 rounded-full inline-block"></span>
+            (а) График совокупной полезности (Total Utility, TU)
+          </span>
+          <span class="text-[9px] text-slate-500">Пик TU при MU = 0</span>
+        </div>
+        <div class="flex-1 w-full flex items-center">
+          <canvas id="tuCanvas" class="w-full h-full block"></canvas>
+        </div>
+      </div>
+
+      <!-- График 2: MU -->
+      <div class="bg-[#14181c] border border-slate-800 shadow-xl rounded-xl p-3 flex-1 flex flex-col justify-between">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+            <span class="w-2 h-2 bg-rose-500 rounded-full inline-block"></span>
+            (б) График предельной полезности (Marginal Utility, MU)
+          </span>
+          <span class="text-[9px] text-slate-500">Закон убывающей полезности</span>
+        </div>
+        <div class="flex-1 w-full flex items-center">
+          <canvas id="muCanvas" class="w-full h-full block"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  // Данные расширены до Q = 10
+  const utilityData = [
+    { q: 0,  tu: 0,  mu: null },
+    { q: 1,  tu: 10, mu: 10 },
+    { q: 2,  tu: 18, mu: 8 },
+    { q: 3,  tu: 24, mu: 6 },
+    { q: 4,  tu: 28, mu: 4 },
+    { q: 5,  tu: 30, mu: 2 },
+    { q: 6,  tu: 30, mu: 0 },
+    { q: 7,  tu: 28, mu: -2 },
+    { q: 8,  tu: 24, mu: -4 },
+    { q: 9,  tu: 18, mu: -6 },
+    { q: 10, tu: 10, mu: -8 }
+  ];
+
+  const qSlider = document.getElementById('q-slider');
+  const sliderQDisplay = document.getElementById('slider-q-display');
+  const statTu = document.getElementById('stat-tu');
+  const statMu = document.getElementById('stat-mu');
+
+  const expBox = document.getElementById('explanation-box');
+  const expTitle = document.getElementById('exp-title');
+  const expText = document.getElementById('exp-text');
+
+  const tuCanvas = document.getElementById('tuCanvas');
+  const muCanvas = document.getElementById('muCanvas');
+  const tuCtx = tuCanvas.getContext('2d');
+  const muCtx = muCanvas.getContext('2d');
+
+  const pad = { top: 15, right: 25, bottom: 25, left: 40 };
+
+  function updateExplanations(q) {
+    const item = utilityData[q];
+    
+    sliderQDisplay.innerText = `${q} ед.`;
+    statTu.innerText = item.tu;
+    statMu.innerText = item.mu !== null ? (item.mu > 0 ? `+${item.mu}` : item.mu) : '—';
+
+    if (q === 0) {
+      expBox.className = "bg-[#14181c] border-l-4 border-slate-500 rounded-r-xl p-3.5 transition-all duration-300 shadow-inner flex-1 flex flex-col justify-center";
+      expTitle.className = "text-xs font-bold uppercase tracking-wider text-slate-400 mb-1";
+      expTitle.innerText = "Q = 0: Начальное состояние";
+      expText.innerText = "Потребление еще не началось. Совокупная полезность равна 0. Потребитель испытывает максимальную потребность.";
+    } else if (q >= 1 && q <= 4) {
+      expBox.className = "bg-[#14181c] border-l-4 border-emerald-500 rounded-r-xl p-3.5 transition-all duration-300 shadow-inner flex-1 flex flex-col justify-center";
+      expTitle.className = "text-xs font-bold uppercase tracking-wider text-emerald-400 mb-1";
+      expTitle.innerText = `Q = {q}: Убывающая предельная полезность`;
+      expText.innerHTML = `При добавлении {q}-й единицы блага TU растет до <strong>${item.tu}</strong> утилов. Однако добавочная полезность MU снижается до <strong>+${item.mu}</strong>, так как потребность утоляется.`;
+    } else if (q === 5) {
+      expBox.className = "bg-[#14181c] border-l-4 border-amber-500 rounded-r-xl p-3.5 transition-all duration-300 shadow-inner flex-1 flex flex-col justify-center";
+      expTitle.className = "text-xs font-bold uppercase tracking-wider text-amber-400 mb-1";
+      expTitle.innerText = "Q = 5: Приближение к пику";
+      expText.innerHTML = `Совокупная полезность TU приближается к пику (<strong>${item.tu}</strong> утилов). Пятая единица принесла совсем немного добавочной полезности (MU = +2).`;
+    } else if (q === 6) {
+      expBox.className = "bg-[#14181c] border-l-4 border-sky-500 rounded-r-xl p-3.5 transition-all duration-300 shadow-inner flex-1 flex flex-col justify-center";
+      expTitle.className = "text-xs font-bold uppercase tracking-wider text-sky-400 mb-1";
+      expTitle.innerText = "Q = 6: Полное насыщение (MU = 0)";
+      expText.innerHTML = `Точка полного насыщения! Предельная полезность MU = 0. Шестая единица не добавляет полезности, TU на абсолютном максимуме (<strong>${item.tu}</strong>).`;
+    } else {
+      expBox.className = "bg-[#14181c] border-l-4 border-rose-500 rounded-r-xl p-3.5 transition-all duration-300 shadow-inner flex-1 flex flex-col justify-center";
+      expTitle.className = "text-xs font-bold uppercase tracking-wider text-rose-400 mb-1";
+      expTitle.innerText = `Q = {q}: Перенасыщение (MU < 0)`;
+      expText.innerHTML = `Перенасыщение! Предельная полезность отрицательна (MU = ${item.mu}$). Дальнейшее потребление приносит вред/дискомфорт, снижая TU до <strong>${item.tu}</strong> утилов.`;
+    }
+  }
+
+  function resizeCanvases() {
+    const container = tuCanvas.parentElement;
+    const width = container.clientWidth;
+    const height = Math.max(170, Math.min(220, window.innerHeight * 0.32));
+
+    tuCanvas.width = width;
+    tuCanvas.height = height;
+    muCanvas.width = width;
+    muCanvas.height = height;
+
+    render();
+  }
+
+  function render() {
+    const selectedQ = parseInt(qSlider.value);
+    updateExplanations(selectedQ);
+
+    drawTUChart(selectedQ);
+    drawMUChart(selectedQ);
+  }
+
+  function drawTUChart(selectedQ) {
+    const w = tuCanvas.width;
+    const h = tuCanvas.height;
+    tuCtx.clearRect(0, 0, w, h);
+
+    const gW = w - pad.left - pad.right;
+    const gH = h - pad.top - pad.bottom;
+
+    const maxQ = 10;
+    const maxTU = 35;
+
+    const getX = (q) => pad.left + (q / maxQ) * gW;
+    const getY = (tu) => pad.top + (1 - tu / maxTU) * gH;
+
+    // Сетка Y
+    tuCtx.strokeStyle = '#1e293b';
+    tuCtx.lineWidth = 0.5;
+    for (let tuVal = 0; tuVal <= 30; tuVal += 10) {
+      tuCtx.beginPath();
+      tuCtx.moveTo(pad.left, getY(tuVal));
+      tuCtx.lineTo(w - pad.right, getY(tuVal));
+      tuCtx.stroke();
+
+      tuCtx.fillStyle = '#64748b';
+      tuCtx.font = '9px Inter';
+      tuCtx.fillText(tuVal, pad.left - 20, getY(tuVal) + 3);
+    }
+
+    // Сетка X
+    for (let qVal = 0; qVal <= maxQ; qVal++) {
+      tuCtx.beginPath();
+      tuCtx.moveTo(getX(qVal), pad.top);
+      tuCtx.lineTo(getX(qVal), h - pad.bottom);
+      tuCtx.stroke();
+    }
+
+    // Оси
+    tuCtx.strokeStyle = '#475569';
+    tuCtx.lineWidth = 1;
+    tuCtx.beginPath();
+    tuCtx.moveTo(pad.left, pad.top - 5);
+    tuCtx.lineTo(pad.left, h - pad.bottom);
+    tuCtx.lineTo(w - pad.right + 5, h - pad.bottom);
+    tuCtx.stroke();
+
+    // Столбики полезностей
+    for (let i = 1; i <= selectedQ; i++) {
+      const qX = getX(i);
+      const qPrevX = getX(i - 1);
+      const barWidth = qX - qPrevX;
+      const topY = getY(utilityData[i].tu);
+      const baseY = h - pad.bottom;
+
+      tuCtx.fillStyle = 'rgba(168, 85, 247, 0.15)';
+      tuCtx.fillRect(qPrevX, topY, barWidth, baseY - topY);
+      
+      tuCtx.strokeStyle = 'rgba(168, 85, 247, 0.3)';
+      tuCtx.strokeRect(qPrevX, topY, barWidth, baseY - topY);
+    }
+
+    // Кривая TU
+    tuCtx.strokeStyle = '#c084fc';
+    tuCtx.lineWidth = 3;
+    tuCtx.beginPath();
+    for (let i = 0; i < utilityData.length; i++) {
+      let x = getX(utilityData[i].q);
+      let y = getY(utilityData[i].tu);
+      if (i === 0) tuCtx.moveTo(x, y);
+      else tuCtx.lineTo(x, y);
+    }
+    tuCtx.stroke();
+
+    // Проекция текущей точки
+    const currItem = utilityData[selectedQ];
+    const currX = getX(currItem.q);
+    const currY = getY(currItem.tu);
+
+    tuCtx.strokeStyle = '#f59e0b';
+    tuCtx.lineWidth = 1;
+    tuCtx.setLineDash([3, 3]);
+    tuCtx.beginPath();
+    tuCtx.moveTo(currX, h - pad.bottom);
+    tuCtx.lineTo(currX, currY);
+    tuCtx.lineTo(pad.left, currY);
+    tuCtx.stroke();
+    tuCtx.setLineDash([]);
+
+    // Точки
+    for (let i = 0; i < utilityData.length; i++) {
+      let x = getX(utilityData[i].q);
+      let y = getY(utilityData[i].tu);
+
+      if (i === selectedQ) {
+        tuCtx.fillStyle = '#f59e0b';
+        tuCtx.strokeStyle = '#ffffff';
+        tuCtx.lineWidth = 2;
+        tuCtx.beginPath();
+        tuCtx.arc(x, y, 5.5, 0, 2 * Math.PI);
+        tuCtx.fill();
+        tuCtx.stroke();
+      } else {
+        tuCtx.fillStyle = '#a855f7';
+        tuCtx.beginPath();
+        tuCtx.arc(x, y, 3, 0, 2 * Math.PI);
+        tuCtx.fill();
+      }
+    }
+
+    // Метка Y
+    tuCtx.fillStyle = '#c084fc';
+    tuCtx.font = 'bold 9px Inter';
+    tuCtx.fillText('TU (утилы)', pad.left - 35, pad.top - 5);
+  }
+
+  function drawMUChart(selectedQ) {
+    const w = muCanvas.width;
+    const h = muCanvas.height;
+    muCtx.clearRect(0, 0, w, h);
+
+    const gW = w - pad.left - pad.right;
+    const gH = h - pad.top - pad.bottom;
+
+    const maxQ = 10;
+    const minMU = -10;
+    const maxMU = 12;
+
+    const getX = (q) => pad.left + (q / maxQ) * gW;
+    const getY = (mu) => pad.top + (1 - (mu - minMU) / (maxMU - minMU)) * gH;
+
+    const yZero = getY(0);
+
+    // Сетка Y
+    muCtx.strokeStyle = '#1e293b';
+    muCtx.lineWidth = 0.5;
+    for (let muVal = -8; muVal <= 10; muVal += 4) {
+      muCtx.beginPath();
+      muCtx.moveTo(pad.left, getY(muVal));
+      muCtx.lineTo(w - pad.right, getY(muVal));
+      muCtx.stroke();
+
+      muCtx.fillStyle = '#64748b';
+      muCtx.font = '9px Inter';
+      muCtx.fillText(muVal, pad.left - 20, getY(muVal) + 3);
+    }
+
+    // Сетка X & Подписи Q
+    for (let qVal = 0; qVal <= maxQ; qVal++) {
+      muCtx.beginPath();
+      muCtx.moveTo(getX(qVal), pad.top);
+      muCtx.lineTo(getX(qVal), h - pad.bottom);
+      muCtx.stroke();
+
+      muCtx.fillStyle = (qVal === selectedQ) ? '#f59e0b' : '#94a3b8';
+      muCtx.font = (qVal === selectedQ) ? 'bold 10px Inter' : '9px Inter';
+      muCtx.fillText(qVal, getX(qVal) - 3, h - pad.bottom + 14);
+    }
+
+    // Ось X (MU = 0)
+    muCtx.strokeStyle = '#64748b';
+    muCtx.lineWidth = 1;
+    muCtx.beginPath();
+    muCtx.moveTo(pad.left, yZero);
+    muCtx.lineTo(w - pad.right + 5, yZero);
+    muCtx.stroke();
+
+    // Ось Y
+    muCtx.beginPath();
+    muCtx.moveTo(pad.left, pad.top - 5);
+    muCtx.lineTo(pad.left, h - pad.bottom);
+    muCtx.stroke();
+
+    // Кривая MU
+    muCtx.strokeStyle = '#fb7185';
+    muCtx.lineWidth = 3;
+    muCtx.beginPath();
+    for (let i = 1; i < utilityData.length; i++) {
+      let x = getX(utilityData[i].q);
+      let y = getY(utilityData[i].mu);
+      if (i === 1) muCtx.moveTo(x, y);
+      else muCtx.lineTo(x, y);
+    }
+    muCtx.stroke();
+
+    // Проекция текущей точки
+    if (selectedQ > 0) {
+      const currItem = utilityData[selectedQ];
+      const currX = getX(currItem.q);
+      const currY = getY(currItem.mu);
+
+      muCtx.strokeStyle = '#f59e0b';
+      muCtx.lineWidth = 1;
+      muCtx.setLineDash([3, 3]);
+      muCtx.beginPath();
+      muCtx.moveTo(currX, yZero);
+      muCtx.lineTo(currX, currY);
+      muCtx.lineTo(pad.left, currY);
+      muCtx.stroke();
+      muCtx.setLineDash([]);
+    }
+
+    // Точки
+    for (let i = 1; i < utilityData.length; i++) {
+      let x = getX(utilityData[i].q);
+      let y = getY(utilityData[i].mu);
+
+      if (i === selectedQ) {
+        muCtx.fillStyle = '#f59e0b';
+        muCtx.strokeStyle = '#ffffff';
+        muCtx.lineWidth = 2;
+        muCtx.beginPath();
+        muCtx.arc(x, y, 5.5, 0, 2 * Math.PI);
+        muCtx.fill();
+        muCtx.stroke();
+      } else {
+        muCtx.fillStyle = '#f43f5e';
+        muCtx.beginPath();
+        muCtx.arc(x, y, 3, 0, 2 * Math.PI);
+        muCtx.fill();
+      }
+    }
+
+    // Метки
+    muCtx.fillStyle = '#fb7185';
+    muCtx.font = 'bold 9px Inter';
+    muCtx.fillText('MU (утилы)', pad.left - 35, pad.top - 5);
+
+    muCtx.fillStyle = '#cbd5e1';
+    muCtx.font = 'bold 9px Inter';
+    muCtx.fillText('Количество Q (ед.)', w - pad.right - 80, h - pad.bottom + 14);
+  }
+
+  qSlider.addEventListener('input', render);
+  window.addEventListener('load', resizeCanvases);
+  window.addEventListener('resize', resizeCanvases);
+</script>
+
+</body>
+</html>
