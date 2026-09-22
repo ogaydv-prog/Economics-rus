@@ -127,15 +127,88 @@
             text-align: center;
             line-height: 1.6;
         }
+
+        /* === АДАПТАЦИЯ ДЛЯ СМАРТФОНОВ И ПЛАНШЕТОВ === */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px 15px;
+            }
+
+            .top-bar-mobile {
+                display: flex;
+                width: 100%;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 15px;
+            }
+
+            .top-left-logo {
+                position: relative;
+                top: 0;
+                left: 0;
+                width: 48px;
+                height: 48px;
+            }
+
+            .back-button {
+                position: relative;
+                top: 0;
+                right: 0;
+                padding: 7px 14px;
+                font-size: 13px;
+            }
+
+            header {
+                margin-top: 0;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 26px;
+                margin-top: 0;
+            }
+
+            .subtitle {
+                font-size: 14px;
+                padding: 0 10px;
+            }
+
+            /* Карточки перестраиваются по 2 в ряд */
+            .grid-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                justify-content: center;
+                padding-bottom: 25px;
+            }
+
+            .card {
+                width: calc(50% - 6px);
+                max-width: none;
+                height: auto;
+                aspect-ratio: 185 / 255; /* Сохраняем пропорции оригинальных карточек */
+            }
+        }
+
+        @media (max-width: 360px) {
+            /* 1 карточка в ряд на совсем узких экранах */
+            .card {
+                width: 100%;
+                max-width: 220px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Логотип AlmaU с репозитория Economics-rus -->
-    <img src="https://ogaydv-prog.github.io/Economics-rus/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
-    
-    <!-- Кнопка возврата на главный дашборд -->
-    <a href="index.html" class="back-button">← Главный хаб</a>
+    <!-- Верхняя панель для мобильных (логотип слева, кнопка справа) -->
+    <div class="top-bar-mobile">
+        <!-- Логотип AlmaU с репозитория Economics-rus -->
+        <img src="https://ogaydv-prog.github.io/Economics-rus/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+        
+        <!-- Кнопка возврата на главный дашборд -->
+        <a href="index.html" class="back-button">← Главный хаб</a>
+    </div>
 
     <header>
         <h1>Темы курса</h1>
