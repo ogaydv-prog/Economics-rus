@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Интерактивный хаб курса Экономика | AlmaU </title>
+    <title>Интерактивный хаб курса Экономика | AlmaU</title>
     <style>
         * {
             box-sizing: border-box;
@@ -120,6 +120,54 @@
             text-align: center;
             line-height: 1.6;
         }
+
+        /* === АДАПТАЦИЯ ДЛЯ СМАРТФОНОВ И ПЛАНШЕТОВ === */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px 15px;
+            }
+
+            .top-left-logo {
+                position: relative;
+                top: 0;
+                left: 0;
+                margin: 10px auto 10px auto;
+                display: block;
+            }
+
+            header {
+                margin-top: 0;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 26px;
+                margin-top: 5px;
+            }
+
+            .subtitle {
+                font-size: 13px !important;
+                padding: 0 10px;
+            }
+
+            .grid-container {
+                gap: 12px;
+                padding-bottom: 20px;
+            }
+
+            .card {
+                width: calc(50% - 6px);
+                height: auto;
+                aspect-ratio: 190 / 250;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .card {
+                width: 100%;
+                max-width: 230px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -130,8 +178,8 @@
     <header>
         <h1>ЭКОНОМИКА</h1>
         <p class="subtitle">
-            Интерактивный образовательный портал | Школа Цифровых Технологий и Экономики  <br>
-             AlmaU 2026 
+            Интерактивный образовательный портал | Школа Цифровых Технологий и Экономики <br>
+            AlmaU 2026 
         </p>
     </header>
 
@@ -143,10 +191,10 @@
 
         <!-- 2. Силлабус -->
         <a href="syllabus.html" class="card" title="Силлабус и программа курса">
-            <img src="pic-sillabus-rus.png" alt="Силлабус">
+            <img src="pic-syllabus-rus.png" alt="Силлабус">
         </a>
 
-        <!-- 3. Учебники (Ссылка на новый файл на Google Диске) -->
+        <!-- 3. Учебники -->
         <a href="https://drive.google.com/file/d/1JaaFr7DnzFRNhBwd49AMFlXhXln8_B5a/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="card" title="Учебники и основная литература">
             <img src="pic-books-rus.png" alt="Учебники и литература">
         </a>
@@ -162,22 +210,21 @@
         </a>
 
         <!-- 6. Видеоматериалы -->
-        <!-- 6. Видеоматериалы (Открывает новый видео-хаб video.html) -->
-<a href="video.html" class="card" title="Видеолекции и видеоматериалы">
-    <img src="pic-video-rus.png" alt="Видеоматериалы">
-</a>
+        <a href="video.html" class="card" title="Видеолекции и видеоматериалы">
+            <img src="pic-video-rus.png" alt="Видеоматериалы">
+        </a>
 
-        <!-- 7. Рубежный контроль 1 (Скоро) -->
+        <!-- 7. Рубежный контроль 1 -->
         <div class="card disabled" title="Рубежный контроль 1 — Скоро">
             <img src="pic-mc1-rus.png" alt="Рубежный контроль 1">
         </div>
 
-        <!-- 8. Рубежный контроль 2 (Скоро) -->
+        <!-- 8. Рубежный контроль 2 -->
         <div class="card disabled" title="Рубежный контроль 2 — Скоро">
             <img src="pic-mc2-rus.png" alt="Рубежный контроль 2">
         </div>
 
-        <!-- 9. Финальный экзамен (Скоро) -->
+        <!-- 9. Финальный экзамен -->
         <div class="card disabled" title="Финальный экзамен — Подготовка">
             <img src="pic-exam-rus.png" alt="Финальный экзамен">
         </div>
