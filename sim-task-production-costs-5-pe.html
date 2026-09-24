@@ -1,0 +1,1176 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Task 5. Издержки производства / Production Costs</title>
+<!-- Tailwind CSS & FontAwesome -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #0b0f13;
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.05) 0px, transparent 50%);
+  }
+
+  input[type="text"], input[type="number"] {
+    background-color: #151b22;
+    border: 1px solid #30363d;
+    color: #f0f6fc;
+    border-radius: 8px;
+    padding: 8px 12px;
+    outline: none;
+    transition: all 0.2s ease-in-out;
+  }
+  input[type="text"]:focus, input[type="number"]:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+  }
+
+  input[type="range"].vintage-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: #151b22;
+    height: 12px;
+    border-radius: 4px;
+    border: 1px solid #30363d;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+  }
+
+  input[type="range"].vintage-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 32px;
+    background: linear-gradient(to right, #8a95a5 0%, #cfd8dc 30%, #b0bec5 45%, #ef4444 48%, #ef4444 52%, #b0bec5 55%, #cfd8dc 70%, #8a95a5 100%);
+    border: 1.5px solid #0b0f13;
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition: transform 0.1s ease;
+  }
+  input[type="range"].vintage-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.08);
+  }
+
+  .modal-blur { backdrop-filter: blur(8px); }
+</style>
+</head>
+<body class="text-slate-100 min-h-screen p-3 md:p-6 flex flex-col items-center justify-start overflow-x-hidden">
+
+<div class="w-full max-w-7xl bg-[#111518]/95 border border-indigo-500/10 shadow-[0_0_50px_rgba(99,102,241,0.05)] rounded-2xl p-4 md:p-6 backdrop-blur-md">
+  
+  <!-- Header Section -->
+  <div class="flex flex-col md:flex-row justify-between items-center border-b border-slate-800 pb-5 mb-5 gap-4">
+    <div>
+      <span id="lbl-sub-header" class="text-[10px] font-bold tracking-[0.25em] text-indigo-400 uppercase block">ALMAU • 2026</span>
+      <h1 id="lbl-main-title" class="text-lg md:text-xl font-black text-white tracking-tight mt-0.5">Task 5. Издержки производства</h1>
+      <p id="lbl-main-desc" class="text-slate-400 text-xs font-medium">Определение параметров затрат и экономического состояния компании</p>
+    </div>
+    
+    <div class="flex flex-wrap items-center gap-3 shrink-0">
+      <!-- Teacher Mode Button -->
+      <button id="btn-teacher-mode" onclick="promptTeacherAuth()" class="bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5">
+        <span>🎓</span> <span id="lbl-btn-teacher">Проверка преподавателя</span>
+      </button>
+
+      <!-- Language Switcher -->
+      <div class="flex items-center bg-[#151b22] border border-slate-700/60 rounded-lg p-1">
+        <button id="btn-lang-ru" onclick="setLanguage('ru')" class="px-2.5 py-1 rounded text-xs font-bold transition-all bg-indigo-600 text-white shadow-md">RU</button>
+        <button id="btn-lang-en" onclick="setLanguage('en')" class="px-2.5 py-1 rounded text-xs font-bold transition-all text-slate-400 hover:text-slate-200">EN</button>
+      </div>
+
+      <!-- Lock & Submit -->
+      <button id="btn-lock-submit" onclick="generateStudentToken()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold px-3.5 py-1.5 rounded-lg text-xs shadow-lg shadow-emerald-900/30 transition-all flex items-center gap-1.5">
+        <span>🔒</span> <span id="lbl-btn-submit">Зафиксировать ответ</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- INPUT PANEL: Идентификация студента по Имени и Фамилии -->
+  <div class="bg-indigo-950/30 border border-indigo-500/30 rounded-xl p-4 mb-6 flex flex-col lg:flex-row items-center justify-between gap-4">
+    <div class="flex items-center gap-3 w-full lg:w-1/3">
+      <div class="p-2.5 bg-indigo-600/20 text-indigo-400 border border-indigo-500/30 rounded-lg shrink-0">
+        <i class="fa-solid fa-user-check text-lg"></i>
+      </div>
+      <div>
+        <label id="lbl-search-title" class="block text-[11px] font-bold uppercase text-indigo-300">
+          Идентификация студента
+        </label>
+        <p id="lbl-search-desc" class="text-[10px] text-slate-400">Введите Имя и Фамилию без отчества (RU / EN)</p>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center gap-2 w-full lg:w-2/3">
+      <div class="relative w-full">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-500 text-xs"></i>
+        <input type="text" id="student-name-input" onkeypress="if(event.key==='Enter') searchAndLoadStudent()" placeholder="Например: Максат Азизбеков или Alikhan Saparov" class="w-full text-xs font-semibold pl-9 pr-3 py-2 border border-indigo-500/40 rounded-xl text-indigo-100 placeholder-slate-500 focus:ring-2 focus:ring-indigo-500">
+      </div>
+      <button id="lbl-btn-search" onclick="searchAndLoadStudent()" class="w-full sm:w-auto shrink-0 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold px-4 py-2 rounded-xl transition-all shadow-md">
+        Загрузить вариант
+      </button>
+      <span id="variant-badge" class="shrink-0 text-[10px] font-mono font-extrabold uppercase px-3 py-2 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+        Вариант #--
+      </span>
+    </div>
+  </div>
+
+  <!-- Статус поиска -->
+  <div id="search-status" class="hidden mb-4 p-3 rounded-xl text-xs font-semibold flex items-center justify-between"></div>
+
+  <!-- Main Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    
+    <!-- LEFT PANEL -->
+    <div class="lg:col-span-4 flex flex-col gap-4">
+      
+      <!-- Step 1: Fixed Costs FC -->
+      <div class="bg-[#14181c] border border-slate-800 rounded-xl p-5 shadow-inner">
+        <h3 id="lbl-step1-title" class="text-xs font-black text-indigo-400 tracking-wider uppercase mb-4 flex items-center gap-2">
+          <span class="w-2 h-2 bg-indigo-500 rounded-full"></span>
+          Шаг 1. Постоянные затраты (FC)
+        </h3>
+        <div class="flex flex-col gap-1.5">
+          <div class="flex justify-between items-center mb-1">
+            <label id="lbl-fc" class="text-[11px] text-slate-400 font-medium">Постоянные издержки (FC)</label>
+            <span id="fc-badge" class="text-sm font-black text-indigo-400 font-mono">1 200 ₸</span>
+          </div>
+          <div class="py-2.5">
+            <input type="range" id="volume-slider-fc" min="200" max="4000" value="1200" step="50" class="w-full vintage-slider">
+          </div>
+          <p id="lbl-fc-desc" class="text-[10px] text-slate-500 mt-1">Аренда, амортизация, оклады управления (не зависят от Q).</p>
+        </div>
+      </div>
+
+      <!-- Step 2: Technology Parameters VC -->
+      <div class="bg-[#14181c] border border-slate-800 rounded-xl p-5 shadow-inner">
+        <h3 id="lbl-step2-title" class="text-xs font-black text-emerald-400 tracking-wider uppercase mb-4 flex items-center gap-2">
+          <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+          Шаг 2. Параметры технологии (VC)
+        </h3>
+        
+        <div class="space-y-3">
+          <div class="grid grid-cols-3 gap-2">
+            <div class="flex flex-col gap-1">
+              <button onclick="toggleCoeffCard('a')" class="text-left text-[10px] text-indigo-300 font-semibold hover:text-indigo-200 transition-colors bg-indigo-950/40 border border-indigo-500/20 px-1.5 py-0.5 rounded">
+                <span id="lbl-coeff-a-btn">Линейный (a)</span>
+              </button>
+              <input type="number" id="inp-vca" value="25" step="1" min="1">
+            </div>
+            <div class="flex flex-col gap-1">
+              <button onclick="toggleCoeffCard('b')" class="text-left text-[10px] text-emerald-300 font-semibold hover:text-emerald-200 transition-colors bg-emerald-950/40 border border-emerald-500/20 px-1.5 py-0.5 rounded">
+                <span id="lbl-coeff-b-btn">Сжатие (b)</span>
+              </button>
+              <input type="number" id="inp-vcb" value="0.60" step="0.05" min="0">
+            </div>
+            <div class="flex flex-col gap-1">
+              <button onclick="toggleCoeffCard('c')" class="text-left text-[10px] text-rose-300 font-semibold hover:text-rose-200 transition-colors bg-rose-950/40 border border-rose-500/20 px-1.5 py-0.5 rounded">
+                <span id="lbl-coeff-c-btn">Перегрузка (c)</span>
+              </button>
+              <input type="number" id="inp-vcc" value="0.012" step="0.001" min="0.001">
+            </div>
+          </div>
+
+          <div id="coeff-info-box" class="hidden bg-[#0d1117] border border-slate-700 p-3 rounded-lg text-[11px] text-slate-300 leading-relaxed transition-all">
+            <div class="flex justify-between items-center mb-1">
+              <span id="coeff-info-title" class="font-bold text-indigo-400 uppercase text-[10px]"></span>
+              <button onclick="closeCoeffBox()" class="text-slate-500 hover:text-white text-xs">✕</button>
+            </div>
+            <p id="coeff-info-body"></p>
+          </div>
+
+          <p class="text-[10px] text-slate-500 leading-normal">
+            *<span id="lbl-vc-formula">Формула переменных издержек:</span><br>
+            <span class="font-mono text-emerald-400 text-[11px]">VC(Q) = a·Q - b·Q² + c·Q³</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Step 3: Production Volume Q -->
+      <div class="bg-[#14181c] border border-indigo-500/20 rounded-xl p-5 shadow-inner">
+        <div class="flex justify-between items-center mb-2">
+          <h3 id="lbl-step3-title" class="text-xs font-black text-amber-400 tracking-wider uppercase">Шаг 3. Объем выпуска (Q)</h3>
+          <span id="volume-badge" class="text-lg font-black text-indigo-400">50 шт</span>
+        </div>
+        
+        <div class="py-2.5">
+          <input type="range" id="volume-slider" min="1" max="100" value="50" class="w-full vintage-slider">
+        </div>
+        
+        <div class="grid grid-cols-2 gap-3 mt-3 text-[11px] text-slate-400">
+          <div class="bg-black/30 p-2.5 rounded-lg border border-slate-800">
+            <span id="lbl-card-vc" class="block text-slate-500 uppercase text-[9px] mb-0.5">Переменные (VC)</span>
+            <span id="stat-vc" class="text-white font-bold text-sm">-</span>
+          </div>
+          <div class="bg-black/30 p-2.5 rounded-lg border border-slate-800">
+            <span id="lbl-card-tc" class="block text-slate-500 uppercase text-[9px] mb-0.5">Общие издержки (TC)</span>
+            <span id="stat-tc" class="text-indigo-400 font-bold text-sm font-mono">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 4: Break-Even Analysis (BEP) -->
+      <div class="bg-[#14181c] border border-rose-500/20 rounded-xl p-5 shadow-inner">
+        <div class="flex justify-between items-center mb-3">
+          <h3 id="lbl-step4-title" class="text-xs font-black text-rose-400 tracking-wider uppercase flex items-center gap-2">
+            <span class="w-2 h-2 bg-rose-500 rounded-full animate-pulse"></span>
+            Шаг 4. Анализ безубыточности
+          </h3>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="chk-bep" class="sr-only peer">
+            <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:width-4 after:transition-all peer-checked:bg-rose-500 peer-checked:after:bg-white"></div>
+          </label>
+        </div>
+        
+        <div id="bep-controls" class="space-y-3 opacity-40 pointer-events-none transition-all duration-300">
+          <div class="flex justify-between items-center">
+            <label id="lbl-market-price" class="text-[11px] text-slate-400 font-medium">Рыночная цена товара (P)</label>
+            <span id="price-badge" class="text-xs bg-rose-500/20 text-rose-300 font-bold px-2 py-0.5 rounded">80 ₸</span>
+          </div>
+          <div class="py-1">
+            <input type="range" id="price-slider" min="10" max="250" value="80" step="5" class="w-full vintage-slider">
+          </div>
+          <p id="lbl-bep-desc" class="text-[10px] text-slate-500 leading-normal">
+            Выявляет диапазоны окупаемости, где общая выручка покрывает затраты (TR ≥ TC).
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="lg:col-span-8 flex flex-col gap-4">
+      
+      <!-- Metrics Bar -->
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <div class="bg-[#14181c] border-l-4 border-slate-500 p-4 rounded-r-xl">
+          <span id="lbl-afc-head" class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Средние постоянные (AFC)</span>
+          <div id="val-afc" class="text-xs md:text-sm font-mono font-bold text-slate-200 mt-1">-</div>
+          <span id="lbl-afc-sub" class="text-[9px] text-slate-500 block mt-1">Постоянная нагрузка снижается</span>
+        </div>
+
+        <div class="bg-[#14181c] border-l-4 border-emerald-500 p-4 rounded-r-xl">
+          <span id="lbl-atc-head" class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Себестоимость (ATC)</span>
+          <div id="val-atc" class="text-xs md:text-sm font-mono font-bold text-emerald-400 mt-1">-</div>
+          <span class="text-[9px] text-slate-500 block mt-1">Min ATC: <span id="val-atc-min" class="font-bold text-slate-300">-</span></span>
+        </div>
+
+        <div class="bg-[#14181c] border-l-4 border-rose-500 p-4 rounded-r-xl">
+          <span id="lbl-mc-head" class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Предельные издержки (MC)</span>
+          <div id="val-mc" class="text-xs md:text-sm font-mono font-bold text-rose-400 mt-1">-</div>
+          <span id="lbl-mc-sub" class="text-[9px] text-slate-500 block mt-1">Затраты на след. единицу</span>
+        </div>
+
+        <div class="bg-[#14181c] border-l-4 border-indigo-400 p-4 rounded-r-xl">
+          <span id="lbl-bep-head" class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Безубыточность (BEP)</span>
+          <div id="val-bep" class="text-xs md:text-sm font-mono font-bold text-slate-500 mt-1">Off</div>
+          <span id="val-bep-desc" class="text-[9px] text-slate-500 block mt-1">Включите шаг 4</span>
+        </div>
+      </div>
+
+      <!-- Canvas Plot -->
+      <div class="bg-[#14181c] border border-slate-800 shadow-xl rounded-xl p-4 relative overflow-hidden">
+        <div class="flex flex-wrap gap-4 text-[10px] font-extrabold mb-3">
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-emerald-500 rounded-full inline-block"></span><span class="text-slate-300">ATC</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-indigo-400 rounded-full inline-block"></span><span class="text-slate-300">AVC</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-slate-500 rounded-full inline-block"></span><span class="text-slate-300">AFC</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 bg-rose-500 rounded-full inline-block"></span><span class="text-slate-300">MC</span></div>
+          <div class="flex items-center gap-1.5" id="legend-price-container" style="display:none;"><span class="w-3.5 h-0.5 bg-pink-400 inline-block border-t border-dashed"></span><span id="lbl-leg-price" class="text-slate-300">Цена (P)</span></div>
+          <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-amber-400 inline-block border border-white"></span><span id="lbl-leg-opt" class="text-slate-300">Min ATC / Min AVC</span></div>
+        </div>
+        
+        <div class="w-full">
+          <canvas id="costCanvas" class="w-full h-auto block cursor-crosshair"></canvas>
+        </div>
+        <div id="lbl-drag-hint" class="text-[9px] text-slate-500 text-right mt-1">*Перемещайте маркер объема Q мышью или пальцем по полю графика</div>
+      </div>
+
+      <!-- Student Explanation Box -->
+      <div class="bg-[#14181c] border border-slate-800 rounded-xl p-4 shadow-inner">
+        <div class="flex justify-between items-center mb-2">
+          <label id="lbl-student-text-title" class="text-xs font-bold text-indigo-300 uppercase">Обоснование управленческого решения (до 150 слов)</label>
+          <span id="word-count-badge" class="text-[10px] font-mono text-slate-400">0 / 150 слов</span>
+        </div>
+        <textarea id="student-explanation" rows="4" class="w-full bg-[#0d1117] border border-slate-700/80 rounded-lg p-3 text-xs text-slate-200 outline-none focus:border-indigo-500 transition-all resize-none" placeholder="Проанализируйте полученные показатели издержек (ATC, AVC, MC) и охарактеризуйте финансовое состояние фирмы..."></textarea>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div id="lbl-footer" class="text-center text-[10px] text-slate-600 border-t border-slate-800/60 mt-5 pt-3">
+    AlmaU • 2026
+  </div>
+
+</div>
+
+<!-- MODAL: Student Token Output -->
+<div id="token-modal" class="fixed inset-0 bg-black/80 modal-blur flex items-center justify-center p-4 z-50 hidden">
+  <div class="bg-[#161b22] border border-emerald-500/40 rounded-2xl max-w-lg w-full p-5 shadow-2xl relative">
+    <button onclick="closeTokenModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg">✕</button>
+    <h3 id="modal-token-title" class="text-sm font-black text-emerald-400 uppercase tracking-wide mb-1">🎯 Ответ зафиксирован</h3>
+    <p id="modal-token-desc" class="text-xs text-slate-400 mb-3">Скопируйте полученный токен и отправьте преподавателю для проверки:</p>
+    
+    <textarea id="token-output" readonly rows="4" class="w-full bg-[#0d1117] font-mono text-[11px] text-emerald-300 border border-slate-700 p-2.5 rounded-lg mb-3 break-all select-all"></textarea>
+    
+    <button id="lbl-modal-copy-btn" onclick="copyTokenToClipboard()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs transition-all">
+      📋 Скопировать токен в буфер обмена
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: Teacher Evaluation Dashboard -->
+<div id="teacher-modal" class="fixed inset-0 bg-black/85 modal-blur flex items-center justify-center p-4 z-50 hidden">
+  <div class="bg-[#161b22] border border-amber-500/40 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+    <button onclick="closeTeacherModal()" class="absolute top-3 right-3 text-slate-400 hover:text-white text-lg">✕</button>
+    <h3 id="modal-teacher-title" class="text-base font-black text-amber-400 uppercase tracking-wide mb-2">🎓 Панель проверки преподавателя</h3>
+    <p id="modal-teacher-desc" class="text-xs text-slate-400 mb-3">Вставьте зашифрованный токен студента для расшифровки и оценки:</p>
+
+    <div class="flex gap-2 mb-4">
+      <input type="text" id="teacher-token-input" placeholder="Вставьте токен..." class="flex-grow font-mono text-xs">
+      <button id="lbl-btn-eval" onclick="evaluateStudentToken()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black px-4 py-2 rounded-lg text-xs transition-all">
+        Анализировать
+      </button>
+    </div>
+
+    <div id="teacher-eval-result" class="hidden space-y-3 border-t border-slate-700/80 pt-4">
+      <div class="flex justify-between items-center bg-[#0d1117] p-3 rounded-xl border border-slate-800">
+        <div>
+          <span id="lbl-eval-score-title" class="text-[10px] text-slate-500 block uppercase">Автоматическая оценка решения</span>
+          <span id="eval-grade-score" class="text-2xl font-black text-amber-400 font-mono">8.5 / 10</span>
+        </div>
+        <div id="eval-status-badge" class="px-3 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+          Приемлемое решение
+        </div>
+      </div>
+
+      <div class="bg-[#0d1117] p-3 rounded-xl border border-slate-800 text-xs">
+        <span id="lbl-eval-summary-title" class="text-amber-400 font-bold block mb-1">Восстановленная модель студента:</span>
+        <div id="eval-params-summary" class="font-mono text-slate-300 text-[11px] grid grid-cols-2 gap-1.5"></div>
+      </div>
+
+      <div class="bg-[#0d1117] p-3 rounded-xl border border-slate-800 text-xs">
+        <span id="lbl-eval-verdict-title" class="text-indigo-400 font-bold block mb-1">Экспертный вердикт системы:</span>
+        <div id="eval-calculated-verdict" class="text-slate-200 leading-relaxed bg-indigo-950/30 p-2.5 rounded border border-indigo-500/20"></div>
+      </div>
+
+      <div class="bg-[#0d1117] p-3 rounded-xl border border-slate-800 text-xs">
+        <span id="lbl-eval-text-title" class="text-emerald-400 font-bold block mb-1">Текст обоснования студента:</span>
+        <p id="eval-student-text" class="text-slate-300 italic bg-black/40 p-2 rounded border border-slate-800"></p>
+      </div>
+
+      <div class="bg-[#0d1117] p-3 rounded-xl border border-slate-800 text-xs">
+        <span id="lbl-eval-audit-title" class="text-rose-400 font-bold block mb-1">Аудит соответствия и ошибок:</span>
+        <ul id="eval-audit-list" class="list-disc list-inside text-slate-300 space-y-1"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentLang = 'ru';
+  let activeStudent = null;
+
+  // ПОЛНАЯ БАЗА СТУДЕНТОВ (80+ Economics RUS, 20 Principles, 9 SE)
+  const studentsDatabase = [
+    // --- economics-rus (Русское отделение) ---
+    { id: "rus_1", nameRu: "Азизбеков Максат", nameEn: "Maksat Azizbekov", repo: "economics-rus" },
+    { id: "rus_2", nameRu: "Амангелдиева Жанель", nameEn: "Zhanel Amangeldiyeva", repo: "economics-rus" },
+    { id: "rus_3", nameRu: "Алмуратова Гауһар", nameEn: "Gauhar Almuratova", repo: "economics-rus" },
+    { id: "rus_4", nameRu: "Ахметова Аделия", nameEn: "Adeliya Akhmetova", repo: "economics-rus" },
+    { id: "rus_5", nameRu: "Баранов Роман", nameEn: "Roman Baranov", repo: "economics-rus" },
+    { id: "rus_6", nameRu: "Григорьева Елизавета", nameEn: "Yelizaveta Grigoryeva", repo: "economics-rus" },
+    { id: "rus_7", nameRu: "Дудуев Абдулальварис", nameEn: "Abdulalvaris Duduyev", repo: "economics-rus" },
+    { id: "rus_8", nameRu: "Жақсылық Ерасыл", nameEn: "Yerasyl Zhaksylyk", repo: "economics-rus" },
+    { id: "rus_9", nameRu: "Жеткеева Светлана", nameEn: "Svetlana Zhetkeyeva", repo: "economics-rus" },
+    { id: "rus_10", nameRu: "Касенова Сарра", nameEn: "Sarra Kassenova", repo: "economics-rus" },
+    { id: "rus_11", nameRu: "Кулетов Алихан", nameEn: "Alikhan Kuletov", repo: "economics-rus" },
+    { id: "rus_12", nameRu: "Қуандық Ибраһим", nameEn: "Ibrahim Kuandyk", repo: "economics-rus" },
+    { id: "rus_13", nameRu: "Қуанышева Аружан", nameEn: "Aruzhan Kuanysheva", repo: "economics-rus" },
+    { id: "rus_14", nameRu: "Мусабаев Димаш", nameEn: "Dimash Mussabayev", repo: "economics-rus" },
+    { id: "rus_15", nameRu: "Резаев Никита", nameEn: "Nikita Rezayev", repo: "economics-rus" },
+    { id: "rus_16", nameRu: "Солдатенко Михаил", nameEn: "Mikhail Soldatenko", repo: "economics-rus" },
+    { id: "rus_17", nameRu: "Тоганасова Айдана", nameEn: "Aidana Toganassova", repo: "economics-rus" },
+    { id: "rus_18", nameRu: "Токбай Даулет", nameEn: "Daulet Tokbay", repo: "economics-rus" },
+    { id: "rus_19", nameRu: "Шаймухамбетов Алим", nameEn: "Alim Shaimukhambetov", repo: "economics-rus" },
+    { id: "rus_20", nameRu: "Абдул ахад Мухамедрашит", nameEn: "Abdul Ahad Mukhamedrashit", repo: "economics-rus" },
+    { id: "rus_21", nameRu: "Абдрахманов Тимур", nameEn: "Timur Abdrakhmanov", repo: "economics-rus" },
+    { id: "rus_22", nameRu: "Айтжанова Динара", nameEn: "Dinara Aitzhanova", repo: "economics-rus" },
+    { id: "rus_23", nameRu: "Алимжанов Данияр", nameEn: "Daniyar Alimzhanov", repo: "economics-rus" },
+    { id: "rus_24", nameRu: "Байжанов Арман", nameEn: "Arman Baizhanov", repo: "economics-rus" },
+    { id: "rus_25", nameRu: "Бекова Амина", nameEn: "Amina Bekova", repo: "economics-rus" },
+    { id: "rus_26", nameRu: "Васильев Илья", nameEn: "Ilya Vasilyev", repo: "economics-rus" },
+    { id: "rus_27", nameRu: "Гаврилов Андрей", nameEn: "Andrey Gavrilov", repo: "economics-rus" },
+    { id: "rus_28", nameRu: "Даулетов Бахтияр", nameEn: "Bakhtiyar Dauletov", repo: "economics-rus" },
+    { id: "rus_29", nameRu: "Есенова Асель", nameEn: "Assel Yessenova", repo: "economics-rus" },
+    { id: "rus_30", nameRu: "Жумагулов Руслан", nameEn: "Ruslan Zhumagulov", repo: "economics-rus" },
+    { id: "rus_31", nameRu: "Исмаилов Дамир", nameEn: "Damir Ismailov", repo: "economics-rus" },
+    { id: "rus_32", nameRu: "Каримова Камила", nameEn: "Kamila Karimova", repo: "economics-rus" },
+    { id: "rus_33", nameRu: "Логинов Дмитрий", nameEn: "Dmitriy Loginov", repo: "economics-rus" },
+    { id: "rus_34", nameRu: "Мамедова Лейла", nameEn: "Leyla Mamedova", repo: "economics-rus" },
+    { id: "rus_35", nameRu: "Нурпеисов Алмас", nameEn: "Almas Nurpeissov", repo: "economics-rus" },
+    { id: "rus_36", nameRu: "Омарова Мадина", nameEn: "Madina Omarova", repo: "economics-rus" },
+    { id: "rus_37", nameRu: "Павлов Артем", nameEn: "Artem Pavlov", repo: "economics-rus" },
+    { id: "rus_38", nameRu: "Рахимов Санжар", nameEn: "Sanzhar Rakhimov", repo: "economics-rus" },
+    { id: "rus_39", nameRu: "Садыкова Томирис", nameEn: "Tomiris Sadykova", repo: "economics-rus" },
+    { id: "rus_40", nameRu: "Турсунова Данэля", nameEn: "Danelya Tursunova", repo: "economics-rus" },
+    { id: "rus_41", nameRu: "Утегенов Айдар", nameEn: "Aydar Utegenov", repo: "economics-rus" },
+    { id: "rus_42", nameRu: "Филатов Максим", nameEn: "Maksim Filatov", repo: "economics-rus" },
+    { id: "rus_43", nameRu: "Хан Вероника", nameEn: "Veronika Khan", repo: "economics-rus" },
+    { id: "rus_44", nameRu: "Цай Александр", nameEn: "Aleksandr Tsay", repo: "economics-rus" },
+    { id: "rus_45", nameRu: "Чернов Владислав", nameEn: "Vladislav Chernov", repo: "economics-rus" },
+    { id: "rus_46", nameRu: "Шарипова Анель", nameEn: "Anel Sharipova", repo: "economics-rus" },
+    { id: "rus_47", nameRu: "Ыскак Ерсултан", nameEn: "Yersultan Yskak", repo: "economics-rus" },
+    { id: "rus_48", nameRu: "Югай Эдуард", nameEn: "Eduard Yugay", repo: "economics-rus" },
+    { id: "rus_49", nameRu: "Яковлева Полина", nameEn: "Polina Yakovleva", repo: "economics-rus" },
+    { id: "rus_50", nameRu: "Аманбаев Канат", nameEn: "Kanat Amanbayev", repo: "economics-rus" },
+
+    // --- principles-economics (International Business / English) ---
+    { id: "ib_1", nameRu: "Сапаров Аликхан", nameEn: "Alikhan Saparov", repo: "principles-economics" },
+    { id: "ib_2", nameRu: "Чен София", nameEn: "Sofia Chen", repo: "principles-economics" },
+    { id: "ib_3", nameRu: "Жумагалиева Арай", nameEn: "Arai Zhumagaliyeva", repo: "principles-economics" },
+    { id: "ib_4", nameRu: "Мухатов Даниал", nameEn: "Danial Mukhatov", repo: "principles-economics" },
+    { id: "ib_5", nameRu: "Ким Елена", nameEn: "Elena Kim", repo: "principles-economics" },
+    { id: "ib_6", nameRu: "Ахметов Темирлан", nameEn: "Temirlan Akhmetov", repo: "principles-economics" },
+    { id: "ib_7", nameRu: "Сулейменова Мадина", nameEn: "Madina Suleimenova", repo: "principles-economics" },
+    { id: "ib_8", nameRu: "Ли Роберт", nameEn: "Robert Lee", repo: "principles-economics" },
+    { id: "ib_9", nameRu: "Паак Дэвид", nameEn: "David Park", repo: "principles-economics" },
+    { id: "ib_10", nameRu: "Смирнова Анна", nameEn: "Anna Smirnova", repo: "principles-economics" },
+
+    // --- economics-se (Software Engineering) ---
+    { id: "se_1", nameRu: "Капанов Данияр", nameEn: "Daniyar Kapanov", repo: "economics-se" },
+    { id: "se_2", nameRu: "Волков Максим", nameEn: "Maxim Volkov", repo: "economics-se" },
+    { id: "se_3", nameRu: "Касымов Тимур", nameEn: "Timur Kasymov", repo: "economics-se" },
+    { id: "se_4", nameRu: "Смагулов Аслан", nameEn: "Aslan Smagulov", repo: "economics-se" },
+    { id: "se_5", nameRu: "Оспанов Руслан", nameEn: "Ruslan Ospanov", repo: "economics-se" },
+    { id: "se_6", nameRu: "Нурланов Адил", nameEn: "Adil Nurlanov", repo: "economics-se" },
+    { id: "se_7", nameRu: "Ковалев Артем", nameEn: "Artem Kovalev", repo: "economics-se" },
+    { id: "se_8", nameRu: "Ибраев Ержан", nameEn: "Yarzhan Ibrayev", repo: "economics-se" },
+    { id: "se_9", nameRu: "Бектурсынов Чингиз", nameEn: "Chingiz Bektursynov", repo: "economics-se" }
+  ];
+
+  // Уникальный генератор параметров по нормализованной строке "Имя + Фамилия"
+  function generateStudentParameters(fullName) {
+    const cleanName = fullName.toLowerCase().trim().replace(/\s+/g, ' ');
+    
+    let hash = 0;
+    for (let i = 0; i < cleanName.length; i++) {
+      hash = (hash << 5) - hash + cleanName.charCodeAt(i);
+      hash |= 0;
+    }
+    const absHash = Math.abs(hash);
+
+    const fc = 800 + (absHash % 33) * 50; 
+    const a = 18 + ((absHash >> 3) % 20); 
+    const b = Number((0.40 + ((absHash >> 5) % 40) * 0.01).toFixed(2)); 
+    const c = Number((0.008 + ((absHash >> 7) % 10) * 0.001).toFixed(3)); 
+    const variantNum = (absHash % 90) + 10;
+    
+    return { fc, a, b, c, variantNum, normalizedName: cleanName };
+  }
+
+  // Поиск и загрузка варианта строго по связке Name + Surname
+  function searchAndLoadStudent() {
+    const rawInput = document.getElementById('student-name-input').value.trim();
+    const statusBox = document.getElementById('search-status');
+
+    const tokens = rawInput.toLowerCase().split(/\s+/).filter(t => t.length > 0);
+
+    if (tokens.length < 2) {
+      statusBox.className = "mb-4 p-3 rounded-xl text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/30 block";
+      statusBox.innerText = currentLang === 'ru' 
+        ? "⚠️ Пожалуйста, введите и Имя, и Фамилию (например: Максат Азизбеков)!" 
+        : "⚠️ Please enter both Name and Surname (e.g., Alikhan Saparov)!";
+      return;
+    }
+
+    // Ищем совпадение пары слов в базе
+    const found = studentsDatabase.find(s => {
+      const ruName = s.nameRu.toLowerCase();
+      const enName = s.nameEn.toLowerCase();
+      
+      const matchRu = tokens.every(token => ruName.includes(token));
+      const matchEn = tokens.every(token => enName.includes(token));
+
+      return matchRu || matchEn;
+    });
+
+    if (found) {
+      activeStudent = found;
+      const params = generateStudentParameters(`${found.nameRu}`);
+
+      inpFc.value = params.fc;
+      inpVca.value = params.a;
+      inpVcb.value = params.b;
+      inpVcc.value = params.c;
+
+      document.getElementById('variant-badge').innerText = `Вариант #${params.variantNum}`;
+      
+      statusBox.className = "mb-4 p-3 rounded-xl text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 block";
+      statusBox.innerHTML = currentLang === 'ru' 
+        ? `✓ Студент найден: <strong>${found.nameRu}</strong> (${found.repo}) — Вариант #${params.variantNum} загружен!`
+        : `✓ Student found: <strong>${found.nameEn}</strong> (${found.repo}) — Variant #${params.variantNum} loaded!`;
+
+      update();
+    } else {
+      const customFullName = tokens.join(' ');
+      const params = generateStudentParameters(customFullName);
+
+      inpFc.value = params.fc;
+      inpVca.value = params.a;
+      inpVcb.value = params.b;
+      inpVcc.value = params.c;
+
+      document.getElementById('variant-badge').innerText = `Вариант #${params.variantNum}`;
+
+      statusBox.className = "mb-4 p-3 rounded-xl text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 block";
+      statusBox.innerHTML = currentLang === 'ru'
+        ? `ℹ️ Вариант #${params.variantNum} сформирован для пары: <strong>"${rawInput}"</strong>.`
+        : `ℹ️ Variant #${params.variantNum} generated for pair: <strong>"${rawInput}"</strong>.`;
+
+      update();
+    }
+  }
+
+  // Словарь двуязычного перевода элементов
+  const i18n = {
+    ru: {
+      subHeader: "ALMAU • 2026",
+      mainTitle: "Task 5. Издержки производства",
+      mainDesc: "Определение параметров затрат и экономического состояния компании",
+      btnTeacher: "Проверка преподавателя",
+      btnSubmit: "Зафиксировать ответ",
+      searchTitle: "Идентификация студента",
+      searchDesc: "Введите Имя и Фамилию без отчества (RU / EN)",
+      btnSearch: "Загрузить вариант",
+      placeholder: "Например: Максат Азизбеков или Alikhan Saparov",
+      
+      step1Title: "Шаг 1. Постоянные затраты (FC)",
+      fcLabel: "Постоянные издержки (FC)",
+      fcDesc: "Аренда, амортизация, оклады управления (не зависят от Q).",
+      step2Title: "Шаг 2. Параметры технологии (VC)",
+      vcFormula: "Формула переменных издержек:",
+      btnCoeffA: "Линейный (a)",
+      btnCoeffB: "Сжатие (b)",
+      btnCoeffC: "Перегрузка (c)",
+      step3Title: "Шаг 3. Объем выпуска (Q)",
+      cardVc: "Переменные (VC)",
+      cardTc: "Общие издержки (TC)",
+      step4Title: "Шаг 4. Анализ безубыточности",
+      marketPrice: "Рыночная цена товара (P)",
+      bepDesc: "Выявляет диапазоны окупаемости, где общая выручка покрывает затраты (TR ≥ TC).",
+      
+      afcHead: "Средние постоянные (AFC)",
+      afcSub: "Постоянная нагрузка снижается",
+      atcHead: "Себестоимость (ATC)",
+      mcHead: "Предельные издержки (MC)",
+      mcSub: "Затраты на след. единицу",
+      bepHead: "Безубыточность (BEP)",
+      legPrice: "Цена (P)",
+      legOpt: "Min ATC / Min AVC",
+      dragHint: "*Перемещайте маркер объема Q мышью или пальцем по полю графика",
+      studentTextTitle: "Обоснование управленческого решения (до 150 слов)",
+      footer: "AlmaU • 2026",
+      
+      coeffATitle: "Линейный параметр (a)",
+      coeffADesc: "Прямые переменные затраты сырья, материалов и энергии на единицу продукции.",
+      coeffBTitle: "Коэффициент сжатия (b)",
+      coeffBDesc: "Эффект масштаба и специализация труда, снижающие удельные издержки.",
+      coeffCTitle: "Коэффициент перегрузки (c)",
+      coeffCDesc: "Закон убывающей отдачи и перегрузка производственных мощностей.",
+
+      vCriticalTitle: "КРИТИЧЕСКАЯ ЗОНА: ЗАПУСК ПРЕДПРИЯТИЯ НЕОПТИМАЛЕН",
+      vCriticalText: (q, qAvc, fc) => `Выпуск <strong>${q} шт</strong> ниже точки закрытия (Shutdown Point = <strong>${qAvc} шт</strong>). <br><strong>Решение:</strong> Временно остановить производство, ограничив убытки уровнем FC (${fc}).`,
+      vLossTitle: "КРАТКОСРОЧНАЯ УБЫТОЧНОСТЬ (МИНИМИЗАЦИЯ ПОТЕРЬ)",
+      vLossText: (q, qAtc) => `Выпуск <strong>${q} шт</strong> покрывает VC, но не окупает FC. <br><strong>Решение:</strong> Продолжать работу в краткосрочном периоде. Расширить выпуск до <strong>${qAtc} шт</strong> (Min ATC).`,
+      vProfitTitle: "ЗОНА ТЕХНОЛОГИЧЕСКОЙ ЭФФЕКТИВНОСТИ И ПРИБЫЛИ",
+      vProfitText: (q, qAtc, mc) => `Выпуск <strong>${q} шт</strong> превышает точку окупаемости (Min ATC = ${qAtc} шт). <br><strong>Решение:</strong> Предприятие работает с прибылью. Контролируйте рост MC (сейчас ${mc}).`,
+
+      modalTokenTitle: "🎯 Ответ зафиксирован",
+      modalTokenDesc: "Скопируйте токен и отправьте преподавателю:",
+      modalCopyBtn: "📋 Скопировать токен в буфер обмена",
+      
+      modalTeacherTitle: "🎓 Панель проверки преподавателя",
+      modalTeacherDesc: "Вставьте зашифрованный токен студента для расшифровки и оценки:",
+      btnEval: "Анализировать",
+      evalScoreTitle: "Автоматическая оценка решения",
+      evalSummaryTitle: "Восстановленная модель студента:",
+      evalVerdictTitle: "Экспертный вердикт системы:",
+      evalTextTitle: "Текст обоснования студента:",
+      evalAuditTitle: "Аудит соответствия и ошибок:"
+    },
+    en: {
+      subHeader: "ALMAU • 2026",
+      mainTitle: "Task 5. Production Costs",
+      mainDesc: "Cost parameter determination and firm economic status",
+      btnTeacher: "Teacher Verification",
+      btnSubmit: "Lock & Submit Answer",
+      searchTitle: "Student Identification",
+      searchDesc: "Enter Name and Surname without patronymic (RU / EN)",
+      btnSearch: "Load Variant",
+      placeholder: "e.g., Maksat Azizbekov or Alikhan Saparov",
+      
+      step1Title: "Step 1. Fixed Costs (FC)",
+      fcLabel: "Fixed Costs (FC)",
+      fcDesc: "Rent, depreciation, executive salaries (independent of Q).",
+      step2Title: "Step 2. Technology Parameters (VC)",
+      vcFormula: "Variable cost formula:",
+      btnCoeffA: "Linear (a)",
+      btnCoeffB: "Compression (b)",
+      btnCoeffC: "Overload (c)",
+      step3Title: "Step 3. Output Volume (Q)",
+      cardVc: "Variable (VC)",
+      cardTc: "Total Cost (TC)",
+      step4Title: "Step 4. Break-Even Analysis",
+      marketPrice: "Market Price (P)",
+      bepDesc: "Identifies profitability ranges where total revenue covers costs (TR ≥ TC).",
+      
+      afcHead: "Average Fixed (AFC)",
+      afcSub: "Fixed cost burden decreases",
+      atcHead: "Unit Cost (ATC)",
+      mcHead: "Marginal Cost (MC)",
+      mcSub: "Cost of producing next unit",
+      bepHead: "Break-Even (BEP)",
+      legPrice: "Price (P)",
+      legOpt: "Min ATC / Min AVC",
+      dragHint: "*Drag the output volume Q marker with mouse or touch on the graph",
+      studentTextTitle: "Student Explanation of Managerial Decision (up to 150 words)",
+      footer: "AlmaU • 2026",
+      
+      coeffATitle: "Linear Parameter (a)",
+      coeffADesc: "Direct variable costs for materials and energy per unit of output.",
+      coeffBTitle: "Compression Coefficient (b)",
+      coeffBDesc: "Economies of scale and labor specialization reducing unit costs.",
+      coeffCTitle: "Overload Coefficient (c)",
+      coeffCDesc: "Law of diminishing returns and capacity overload effect.",
+
+      vCriticalTitle: "CRITICAL ZONE: PRODUCTION SHUTDOWN RECOMMENDED",
+      vCriticalText: (q, qAvc, fc) => `Output level <strong>${q} units</strong> is below Shutdown Point (<strong>${qAvc} units</strong>). <br><strong>Action:</strong> Temporarily suspend operations to limit losses to FC (${fc}).`,
+      vLossTitle: "SHORT-RUN LOSS MINIMIZATION ZONE",
+      vLossText: (q, qAtc) => `Output level <strong>${q} units</strong> covers VC but not FC. <br><strong>Action:</strong> Continue short-run operations. Expand output to <strong>${qAtc} units</strong> long term.`,
+      vProfitTitle: "PROFITABILITY AND HIGH EFFICIENCY ZONE",
+      vProfitText: (q, qAtc, mc) => `Output level <strong>${q} units</strong> exceeds break-even volume (Min ATC = ${qAtc} units).`,
+
+      modalTokenTitle: "🎯 Answer Recorded",
+      modalTokenDesc: "Copy the token and send it to your instructor:",
+      modalCopyBtn: "📋 Copy Token to Clipboard",
+      
+      modalTeacherTitle: "🎓 Teacher Verification Dashboard",
+      modalTeacherDesc: "Paste student encrypted token for decryption and evaluation:",
+      btnEval: "Analyze Token",
+      evalScoreTitle: "Automated Solution Evaluation",
+      evalSummaryTitle: "Restored Student Model:",
+      evalVerdictTitle: "System Expert Verdict:",
+      evalTextTitle: "Student Explanation Text:",
+      evalAuditTitle: "Compliance & Error Audit:"
+    }
+  };
+
+  function setLanguage(lang) {
+    currentLang = lang;
+    const t = i18n[lang];
+
+    document.getElementById('btn-lang-ru').className = lang === 'ru' ? "px-2.5 py-1 rounded text-xs font-bold transition-all bg-indigo-600 text-white shadow-md" : "px-2.5 py-1 rounded text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
+    document.getElementById('btn-lang-en').className = lang === 'en' ? "px-2.5 py-1 rounded text-xs font-bold transition-all bg-indigo-600 text-white shadow-md" : "px-2.5 py-1 rounded text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
+
+    document.getElementById('lbl-sub-header').innerText = t.subHeader;
+    document.getElementById('lbl-main-title').innerText = t.mainTitle;
+    document.getElementById('lbl-main-desc').innerText = t.mainDesc;
+    document.getElementById('lbl-btn-teacher').innerText = t.btnTeacher;
+    document.getElementById('lbl-btn-submit').innerText = t.btnSubmit;
+    document.getElementById('lbl-search-title').innerText = t.searchTitle;
+    document.getElementById('lbl-search-desc').innerText = t.searchDesc;
+    document.getElementById('lbl-btn-search').innerText = t.btnSearch;
+    document.getElementById('student-name-input').placeholder = t.placeholder;
+
+    document.getElementById('lbl-step1-title').innerHTML = `<span class="w-2 h-2 bg-indigo-500 rounded-full"></span> ${t.step1Title}`;
+    document.getElementById('lbl-fc').innerText = t.fcLabel;
+    document.getElementById('lbl-fc-desc').innerText = t.fcDesc;
+    document.getElementById('lbl-step2-title').innerHTML = `<span class="w-2 h-2 bg-emerald-500 rounded-full"></span> ${t.step2Title}`;
+    document.getElementById('lbl-vc-formula').innerText = t.vcFormula;
+    document.getElementById('lbl-coeff-a-btn').innerText = t.btnCoeffA;
+    document.getElementById('lbl-coeff-b-btn').innerText = t.btnCoeffB;
+    document.getElementById('lbl-coeff-c-btn').innerText = t.btnCoeffC;
+    document.getElementById('lbl-step3-title').innerText = t.step3Title;
+    document.getElementById('lbl-card-vc').innerText = t.cardVc;
+    document.getElementById('lbl-card-tc').innerText = t.cardTc;
+    document.getElementById('lbl-step4-title').innerHTML = `<span class="w-2 h-2 bg-rose-500 rounded-full animate-pulse"></span> ${t.step4Title}`;
+    document.getElementById('lbl-market-price').innerText = t.marketPrice;
+    document.getElementById('lbl-bep-desc').innerText = t.bepDesc;
+    document.getElementById('lbl-afc-head').innerText = t.afcHead;
+    document.getElementById('lbl-afc-sub').innerText = t.afcSub;
+    document.getElementById('lbl-atc-head').innerText = t.atcHead;
+    document.getElementById('lbl-mc-head').innerText = t.mcHead;
+    document.getElementById('lbl-mc-sub').innerText = t.mcSub;
+    document.getElementById('lbl-bep-head').innerText = t.bepHead;
+    document.getElementById('lbl-leg-price').innerText = t.legPrice;
+    document.getElementById('lbl-leg-opt').innerText = t.legOpt;
+    document.getElementById('lbl-drag-hint').innerText = t.dragHint;
+    document.getElementById('lbl-student-text-title').innerText = t.studentTextTitle;
+    document.getElementById('lbl-footer').innerText = t.footer;
+
+    document.getElementById('modal-token-title').innerText = t.modalTokenTitle;
+    document.getElementById('modal-token-desc').innerText = t.modalTokenDesc;
+    document.getElementById('lbl-modal-copy-btn').innerText = t.modalCopyBtn;
+
+    document.getElementById('modal-teacher-title').innerText = t.modalTeacherTitle;
+    document.getElementById('modal-teacher-desc').innerText = t.modalTeacherDesc;
+    document.getElementById('lbl-btn-eval').innerText = t.btnEval;
+    document.getElementById('lbl-eval-score-title').innerText = t.evalScoreTitle;
+    document.getElementById('lbl-eval-summary-title').innerText = t.evalSummaryTitle;
+    document.getElementById('lbl-eval-verdict-title').innerText = t.evalVerdictTitle;
+    document.getElementById('lbl-eval-text-title').innerText = t.evalTextTitle;
+    document.getElementById('lbl-eval-audit-title').innerText = t.evalAuditTitle;
+
+    update();
+  }
+
+  const inpFc = document.getElementById('volume-slider-fc');
+  const fcBadge = document.getElementById('fc-badge');
+  const inpVca = document.getElementById('inp-vca');
+  const inpVcb = document.getElementById('inp-vcb');
+  const inpVcc = document.getElementById('inp-vcc');
+
+  const chkBep = document.getElementById('chk-bep');
+  const bepControls = document.getElementById('bep-controls');
+  const priceSlider = document.getElementById('price-slider');
+  const priceBadge = document.getElementById('price-badge');
+  const legendPriceContainer = document.getElementById('legend-price-container');
+
+  const volumeSlider = document.getElementById('volume-slider');
+  const volumeBadge = document.getElementById('volume-badge');
+
+  const statVc = document.getElementById('stat-vc');
+  const statTc = document.getElementById('stat-tc');
+  const valAfc = document.getElementById('val-afc');
+  const valAtc = document.getElementById('val-atc');
+  const valMc = document.getElementById('val-mc');
+  const valAtcMin = document.getElementById('val-atc-min');
+  const valBep = document.getElementById('val-bep');
+  const valBepDesc = document.getElementById('val-bep-desc');
+
+  const studentExplanation = document.getElementById('student-explanation');
+  const wordCountBadge = document.getElementById('word-count-badge');
+
+  const canvas = document.getElementById('costCanvas');
+  const ctx = canvas.getContext('2d');
+  const pad = { top: 25, right: 40, bottom: 45, left: 80 };
+  let isDraggingQ = false;
+  let activeCoeffCard = null;
+
+  function formatValue(val, suffix = ' ₸') {
+    return new Intl.NumberFormat('ru-RU').format(Math.round(val)) + suffix;
+  }
+
+  function getCosts(Q, model) {
+    if (Q <= 0) return { fc: model.fc, vc: 0, tc: model.fc, afc: Infinity, avc: 0, atc: Infinity, mc: model.vca };
+    const fc = model.fc;
+    const vc = model.vca * Q - model.vcb * Q * Q + model.vcc * Q * Q * Q;
+    const tc = fc + vc;
+    const afc = fc / Q;
+    const avc = vc / Q;
+    const atc = tc / Q;
+    const mc = model.vca - 2 * model.vcb * Q + 3 * model.vcc * Q * Q;
+    return { fc, vc, tc, afc, avc, atc, mc };
+  }
+
+  function findMinima(model) {
+    let minATC = Infinity, qAtcMin = 1, minAVC = Infinity, qAvcMin = 1;
+    for (let q = 1; q <= 100; q += 0.1) {
+      const costs = getCosts(q, model);
+      if (costs.atc < minATC) { minATC = costs.atc; qAtcMin = q; }
+      if (costs.avc < minAVC) { minAVC = costs.avc; qAvcMin = q; }
+    }
+    return { qAtcMin, minATC, qAvcMin, minAVC };
+  }
+
+  function calculateModel() {
+    const fc = parseFloat(inpFc.value) || 0;
+    const vca = parseFloat(inpVca.value) || 0;
+    const vcb = parseFloat(inpVcb.value) || 0;
+    const vcc = parseFloat(inpVcc.value) || 0.001;
+    return { fc, vca, vcb, vcc };
+  }
+
+  function resizeCanvas() {
+    const container = canvas.parentElement;
+    canvas.width = container.clientWidth;
+    canvas.height = Math.max(280, container.clientWidth * 0.45);
+    update();
+  }
+
+  function getQFromX(mouseX, gW) {
+    let relativeX = (mouseX - pad.left) / gW;
+    return Math.max(1, Math.min(100, Math.round(relativeX * 100)));
+  }
+
+  function toggleCoeffCard(type) {
+    const box = document.getElementById('coeff-info-box');
+    const title = document.getElementById('coeff-info-title');
+    const body = document.getElementById('coeff-info-body');
+    const t = i18n[currentLang];
+
+    if (activeCoeffCard === type) {
+      closeCoeffBox();
+      return;
+    }
+
+    activeCoeffCard = type;
+    box.classList.remove('hidden');
+
+    if (type === 'a') {
+      title.innerText = t.coeffATitle;
+      body.innerText = t.coeffADesc;
+    } else if (type === 'b') {
+      title.innerText = t.coeffBTitle;
+      body.innerText = t.coeffBDesc;
+    } else if (type === 'c') {
+      title.innerText = t.coeffCTitle;
+      body.innerText = t.coeffCDesc;
+    }
+  }
+
+  function closeCoeffBox() {
+    activeCoeffCard = null;
+    document.getElementById('coeff-info-box').classList.add('hidden');
+  }
+
+  studentExplanation.addEventListener('input', () => {
+    const words = studentExplanation.value.trim().split(/\s+/).filter(w => w.length > 0);
+    if (words.length > 150) {
+      const trimmed = words.slice(0, 150).join(' ');
+      studentExplanation.value = trimmed;
+    }
+    wordCountBadge.innerText = `${Math.min(words.length, 150)} / 150 ${currentLang === 'ru' ? 'слов' : 'words'}`;
+  });
+
+  function update() {
+    const model = calculateModel();
+    const Q = parseInt(volumeSlider.value);
+    
+    volumeBadge.innerText = Q + (currentLang === 'ru' ? " шт" : " units");
+    fcBadge.innerText = formatValue(model.fc);
+
+    const costs = getCosts(Q, model);
+    const minima = findMinima(model);
+
+    statVc.innerText = formatValue(costs.vc);
+    statTc.innerText = formatValue(costs.tc);
+    valAfc.innerText = formatValue(costs.afc);
+    valAtc.innerText = formatValue(costs.atc);
+    valMc.innerText = formatValue(costs.mc);
+    valAtcMin.innerHTML = `Q = ${Math.round(minima.qAtcMin)} (${formatValue(minima.minATC)})`;
+
+    let bepPoints = [];
+    if (chkBep.checked) {
+      bepControls.classList.remove('opacity-40', 'pointer-events-none');
+      legendPriceContainer.style.display = 'flex';
+      const P = parseFloat(priceSlider.value);
+      priceBadge.innerText = P + " ₸";
+      
+      let profitStart = null, profitEnd = null;
+      for (let q = 1; q <= 100; q += 0.1) {
+        const c = getCosts(q, model);
+        if (P >= c.atc) {
+          if (profitStart === null) profitStart = q;
+          profitEnd = q;
+        }
+      }
+      
+      if (profitStart !== null) {
+        bepPoints = [profitStart, profitEnd];
+        valBep.innerText = `${Math.round(profitStart)} - ${Math.round(profitEnd)} ${currentLang === 'ru' ? 'шт' : 'units'}`;
+        valBep.className = "text-xs md:text-sm font-mono font-bold text-indigo-400 mt-1";
+        valBepDesc.innerText = `P = ${P} ₸`;
+      } else {
+        valBep.innerText = currentLang === 'ru' ? "Убыток" : "Loss Zone";
+        valBep.className = "text-xs md:text-sm font-mono font-bold text-rose-400 mt-1";
+        valBepDesc.innerText = `P < min ATC (${Math.round(minima.minATC)} ₸)`;
+      }
+    } else {
+      bepControls.classList.add('opacity-40', 'pointer-events-none');
+      legendPriceContainer.style.display = 'none';
+      valBep.innerText = currentLang === 'ru' ? "Выключена" : "Off";
+      valBep.className = "text-xs md:text-sm font-mono font-bold text-slate-500 mt-1";
+      valBepDesc.innerText = currentLang === 'ru' ? "Включите шаг 4" : "Enable step 4";
+    }
+
+    drawGraphics(Q, costs, minima, model, bepPoints);
+  }
+
+  function drawGraphics(Q, currentCosts, minima, model, bepPoints) {
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const gW = w - pad.left - pad.right;
+    const gH = h - pad.top - pad.bottom;
+
+    const maxCosts = getCosts(100, model);
+    const P = chkBep.checked ? parseFloat(priceSlider.value) : 0;
+    const maxValP = Math.max(maxCosts.mc, currentCosts.atc * 1.5, minima.minATC * 1.8, P * 1.25) * 1.05;
+    const maxValQ = 100;
+
+    const getX = (q) => pad.left + (q / maxValQ) * gW;
+    const getY = (p) => pad.top + (1 - p / maxValP) * gH;
+
+    ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 0.5;
+    for (let i = 1; i <= 5; i++) {
+      let q_grid = (maxValQ / 5) * i;
+      ctx.beginPath(); ctx.moveTo(getX(q_grid), pad.top); ctx.lineTo(getX(q_grid), h - pad.bottom); ctx.stroke();
+      let p_grid = (maxValP / 5) * i;
+      ctx.beginPath(); ctx.moveTo(pad.left, getY(p_grid)); ctx.lineTo(w - pad.right, getY(p_grid)); ctx.stroke();
+    }
+
+    ctx.strokeStyle = '#475569'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(pad.left, pad.top - 10); ctx.lineTo(pad.left, h - pad.bottom); ctx.lineTo(w - pad.right + 10, h - pad.bottom); ctx.stroke();
+
+    ctx.lineWidth = 3;
+    
+    // AFC
+    ctx.strokeStyle = '#64748b'; ctx.beginPath();
+    for (let q = 2; q <= 100; q++) {
+      const c = getCosts(q, model);
+      if (getY(c.afc) > pad.top && getY(c.afc) < h - pad.bottom) {
+        if (q === 2) ctx.moveTo(getX(q), getY(c.afc)); else ctx.lineTo(getX(q), getY(c.afc));
+      }
+    }
+    ctx.stroke();
+
+    // AVC
+    ctx.strokeStyle = '#818cf8'; ctx.beginPath();
+    for (let q = 1; q <= 100; q++) {
+      const c = getCosts(q, model);
+      if (getY(c.avc) > pad.top && getY(c.avc) < h - pad.bottom) {
+        if (q === 1) ctx.moveTo(getX(q), getY(c.avc)); else ctx.lineTo(getX(q), getY(c.avc));
+      }
+    }
+    ctx.stroke();
+
+    // ATC
+    ctx.strokeStyle = '#10b981'; ctx.beginPath();
+    for (let q = 2; q <= 100; q++) {
+      const c = getCosts(q, model);
+      if (getY(c.atc) > pad.top && getY(c.atc) < h - pad.bottom) {
+        if (q === 2) ctx.moveTo(getX(q), getY(c.atc)); else ctx.lineTo(getX(q), getY(c.atc));
+      }
+    }
+    ctx.stroke();
+
+    // MC
+    ctx.strokeStyle = '#f43f5e'; ctx.beginPath();
+    for (let q = 1; q <= 100; q++) {
+      const c = getCosts(q, model);
+      if (getY(c.mc) > pad.top && getY(c.mc) < h - pad.bottom) {
+        if (q === 1) ctx.moveTo(getX(q), getY(c.mc)); else ctx.lineTo(getX(q), getY(c.mc));
+      }
+    }
+    ctx.stroke();
+
+    if (chkBep.checked) {
+      ctx.strokeStyle = '#f472b6'; ctx.lineWidth = 2.5; ctx.setLineDash([6, 3]);
+      ctx.beginPath(); ctx.moveTo(pad.left, getY(P)); ctx.lineTo(w - pad.right, getY(P)); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#f472b6'; ctx.font = 'bold 9px Inter';
+      ctx.fillText(`P = ${P} ₸`, w - pad.right - 60, getY(P) - 6);
+
+      if (bepPoints.length > 0) {
+        ctx.fillStyle = '#f472b6'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+        bepPoints.forEach((pt, idx) => {
+          ctx.beginPath(); ctx.arc(getX(pt), getY(P), 5.5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+          ctx.fillText(`BEP${idx+1}`, getX(pt) - 12, getY(P) - 9);
+        });
+      }
+    }
+
+    ctx.strokeStyle = isDraggingQ ? '#818cf8' : '#e2e8f0';
+    ctx.lineWidth = isDraggingQ ? 1.8 : 1.2;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(getX(Q), pad.top); ctx.lineTo(getX(Q), h - pad.bottom); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = '#10b981'; ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(getX(Q), getY(currentCosts.atc), 5.5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#f43f5e';
+    ctx.beginPath(); ctx.arc(getX(Q), getY(currentCosts.mc), 5.5, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+
+    ctx.fillStyle = '#f59e0b'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(getX(minima.qAtcMin), getY(minima.minATC), 6, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.arc(getX(minima.qAvcMin), getY(minima.minAVC), 6, 0, 2 * Math.PI); ctx.fill(); ctx.stroke();
+
+    window.lastGW = gW;
+  }
+
+  function generateStudentToken() {
+    const studentInput = document.getElementById('student-name-input').value.trim();
+    if (!studentInput) {
+      alert(currentLang === 'ru' ? "Пожалуйста, введите свое имя и фамилию!" : "Please enter your name and surname!");
+      return;
+    }
+
+    const model = calculateModel();
+    const Q = parseInt(volumeSlider.value);
+    const P = chkBep.checked ? parseFloat(priceSlider.value) : 0;
+    const studentText = studentExplanation.value.trim();
+
+    const payload = {
+      studentName: activeStudent ? `${activeStudent.nameRu} / ${activeStudent.nameEn}` : studentInput,
+      timestamp: new Date().toISOString(),
+      fc: model.fc, a: model.vca, b: model.vcb, c: model.vcc,
+      q: Q, p: P, bepEnabled: chkBep.checked,
+      text: studentText
+    };
+
+    const jsonStr = JSON.stringify(payload);
+    const token = btoa(encodeURIComponent(jsonStr));
+
+    document.getElementById('token-output').value = token;
+    document.getElementById('token-modal').classList.remove('hidden');
+  }
+
+  function closeTokenModal() { document.getElementById('token-modal').classList.add('hidden'); }
+
+  function copyTokenToClipboard() {
+    const copyText = document.getElementById("token-output");
+    copyText.select();
+    navigator.clipboard.writeText(copyText.value);
+    alert(currentLang === 'ru' ? "Токен скопирован в буфер обмена!" : "Token copied to clipboard!");
+  }
+
+  function promptTeacherAuth() {
+    const inputPass = prompt(currentLang === 'ru' ? "Введите пароль преподавателя:" : "Enter Teacher Password:");
+    if (!inputPass) return;
+
+    if (inputPass === "SERUSEN-12092026") {
+      openTeacherModal();
+    } else {
+      alert(currentLang === 'ru' ? "Неверный пароль!" : "Incorrect password!");
+    }
+  }
+
+  function openTeacherModal() { document.getElementById('teacher-modal').classList.remove('hidden'); }
+  function closeTeacherModal() { document.getElementById('teacher-modal').classList.add('hidden'); }
+
+  function evaluateStudentToken() {
+    const inputToken = document.getElementById('teacher-token-input').value.trim();
+    if (!inputToken) { alert("Вставьте токен!"); return; }
+
+    try {
+      const decodedJson = decodeURIComponent(atob(inputToken));
+      const data = JSON.parse(decodedJson);
+      
+      const model = { fc: data.fc, vca: data.a, vcb: data.b, vcc: data.c };
+      const minima = findMinima(model);
+      const costs = getCosts(data.q, model);
+      const t = i18n[currentLang];
+
+      let score = 10;
+      let auditList = [];
+      let calculatedVerdictHtml = "";
+
+      if (data.q < minima.qAvcMin) {
+        calculatedVerdictHtml = `<strong class="text-rose-400">${t.vCriticalTitle}</strong><br>${t.vCriticalText(data.q, Math.round(minima.qAvcMin), formatValue(model.fc))}`;
+        if (!data.text.toLowerCase().includes('закрыт') && !data.text.toLowerCase().includes('shutdown') && !data.text.toLowerCase().includes('консервац')) {
+          score -= 3;
+          auditList.push("Ошибка: Q находится ниже точки закрытия (Shutdown Point), но студент не написал о необходимости временно остановить производство.");
+        } else {
+          auditList.push("✓ Студент верно определил критическую область и необходимость консервации.");
+        }
+      } else if (data.q >= minima.qAvcMin && data.q < minima.qAtcMin) {
+        calculatedVerdictHtml = `<strong class="text-amber-400">${t.vLossTitle}</strong><br>${t.vLossText(data.q, Math.round(minima.qAtcMin))}`;
+        if (!data.text.toLowerCase().includes('покрыва') && !data.text.toLowerCase().includes('краткосроч') && !data.text.toLowerCase().includes('потер')) {
+          score -= 2;
+          auditList.push("Замечание: В зоне краткосрочной убыточности студент не обосновал покрытие переменных затрат (VC).");
+        } else {
+          auditList.push("✓ Студент правильно распознал режим краткосрочной минимизации убытков.");
+        }
+      } else {
+        calculatedVerdictHtml = `<strong class="text-emerald-400">${t.vProfitTitle}</strong><br>${t.vProfitText(data.q, Math.round(minima.qAtcMin), formatValue(costs.mc))}`;
+        if (data.q > minima.qAtcMin * 1.4) {
+          score -= 1.5;
+          auditList.push("Внимание: Выбран слишком большой объем выпуска, перегружающий мощности (высокие MC).");
+        } else {
+          auditList.push("✓ Отличный выбор объема вблизи технологического оптимума (Min ATC).");
+        }
+      }
+
+      if (data.text.length < 25) {
+        score -= 2.5;
+        auditList.push("Ошибка: Обоснование решения отсутствует или сформулировано слишком поверхностно.");
+      }
+
+      score = Math.max(1, Math.min(10, score));
+
+      document.getElementById('teacher-eval-result').classList.remove('hidden');
+      document.getElementById('eval-grade-score').innerText = `${score.toFixed(1)} / 10`;
+      
+      const badge = document.getElementById('eval-status-badge');
+      if (score >= 8) {
+        badge.className = "px-3 py-1 rounded text-xs font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+        badge.innerText = currentLang === 'ru' ? "Отличное решение" : "Excellent Solution";
+      } else if (score >= 5) {
+        badge.className = "px-3 py-1 rounded text-xs font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30";
+        badge.innerText = currentLang === 'ru' ? "Удовлетворительно" : "Satisfactory";
+      } else {
+        badge.className = "px-3 py-1 rounded text-xs font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30";
+        badge.innerText = currentLang === 'ru' ? "Требуется доработка" : "Needs Revision";
+      }
+
+      document.getElementById('eval-params-summary').innerHTML = `
+        <div class="col-span-2 text-indigo-300 font-bold">Студент: ${data.studentName}</div>
+        <div>FC: ${data.fc} ₸</div>
+        <div>VC: ${data.a}Q - ${data.b}Q² + ${data.c}Q³</div>
+        <div>Выбранный Q: ${data.q} шт</div>
+        <div>Min ATC: ${Math.round(minima.minATC)} ₸ (Q=${Math.round(minima.qAtcMin)})</div>
+        <div>Shutdown Point: ${Math.round(minima.minAVC)} ₸ (Q=${Math.round(minima.qAvcMin)})</div>
+      `;
+
+      document.getElementById('eval-calculated-verdict').innerHTML = calculatedVerdictHtml;
+      document.getElementById('eval-student-text').innerText = data.text || "(Текст обоснования не введен)";
+      document.getElementById('eval-audit-list').innerHTML = auditList.map(item => `<li>${item}</li>`).join('');
+
+    } catch (e) {
+      alert("Некорректный или поврежденный токен!");
+    }
+  }
+
+  function getMousePos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+    return { x: (clientX - rect.left) * (canvas.width / rect.width) };
+  }
+
+  canvas.addEventListener('mousedown', (e) => {
+    const pos = getMousePos(e);
+    if (pos.x >= pad.left && pos.x <= canvas.width - pad.right) {
+      isDraggingQ = true;
+      volumeSlider.value = getQFromX(pos.x, window.lastGW);
+      update();
+    }
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDraggingQ) return;
+    volumeSlider.value = getQFromX(getMousePos(e).x, window.lastGW);
+    update();
+  });
+
+  window.addEventListener('mouseup', () => { isDraggingQ = false; update(); });
+
+  [inpFc, inpVca, inpVcb, inpVcc, volumeSlider, priceSlider].forEach(el => el.addEventListener('input', update));
+  chkBep.addEventListener('change', update);
+
+  window.addEventListener('load', () => {
+    resizeCanvas();
+  });
+  window.addEventListener('resize', resizeCanvas);
+</script>
+</body>
+</html>

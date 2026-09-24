@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Изокосты и Изокванты в банановой индустрии / Isoquants & Isocosts</title>
+    <!-- Google Fonts & Tailwind CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at center, #1c1d22 0%, #0e0f11 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        h1, h2, h3 {
+            font-family: 'Playfair Display', serif;
+        }
+        /* Тонкий неоновый бордюр */
+        .maya-neon-border {
+            border: 1.5px solid #c5a059;
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.15);
+            background: #141519;
+        }
+        /* Стиль неонового серого блока */
+        .neon-box {
+            background: #16181d;
+            border: 1px solid rgba(197, 160, 89, 0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+        }
+        .neon-box:hover {
+            border-color: rgba(197, 160, 89, 0.3);
+        }
+        /* Ползунки */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: #252830;
+            height: 4px;
+            border-radius: 2px;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #c5a059;
+            cursor: pointer;
+            box-shadow: 0 0 6px rgba(197, 160, 89, 0.6);
+            transition: transform 0.1s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.3);
+        }
+        /* Пульсация точки */
+        @keyframes green-pulse {
+            0% { r: 5.5px; stroke-width: 1px; stroke: #10b981; filter: drop-shadow(0 0 2px #10b981); }
+            50% { r: 9px; stroke-width: 3px; stroke: #6ee7b7; filter: drop-shadow(0 0 10px #34d399); }
+            100% { r: 5.5px; stroke-width: 1px; stroke: #10b981; filter: drop-shadow(0 0 2px #10b981); }
+        }
+        .pulse-green {
+            animation: green-pulse 1.4s infinite ease-in-out;
+            fill: #10b981 !important;
+            transform-box: fill-box;
+            transform-origin: center;
+        }
+        /* Сетка */
+        .graph-grid {
+            stroke: #f1f5f9;
+            stroke-width: 0.75;
+            stroke-dasharray: 4,4;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 flex flex-col justify-between min-h-screen">
+
+    <!-- Header Section -->
+    <header class="maya-neon-border max-w-6xl mx-auto w-full p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 mb-4">
+        <div class="text-center sm:text-left">
+            <h1 id="txt-main-title" class="text-xl md:text-2xl font-extrabold text-[#c5a059] tracking-wide uppercase mb-0.5">
+                Изокосты и Изокванты в банановой индустрии
+            </h1>
+            <p id="txt-sub-title" class="text-[10px] md:text-xs text-slate-400 font-semibold tracking-widest uppercase">
+                Экономика • AlmaU 2026
+            </p>
+        </div>
+
+        <!-- КНОПКА ПЕРЕКЛЮЧЕНИЯ ЯЗЫКА (RU / EN) -->
+        <div class="flex items-center bg-[#1c1d22] border border-[#c5a059]/40 rounded-lg p-1 shadow-inner shrink-0">
+            <button id="btn-lang-ru" onclick="setLanguage('ru')" class="px-3 py-1 rounded text-xs font-bold transition-all bg-[#c5a059] text-slate-950 shadow-md">
+                RU
+            </button>
+            <button id="btn-lang-en" onclick="setLanguage('en')" class="px-3 py-1 rounded text-xs font-bold transition-all text-slate-400 hover:text-slate-200">
+                EN
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch w-full flex-grow">
+        
+        <!-- Sidebar Controls -->
+        <section class="lg:col-span-4 neon-box p-4 rounded-xl flex flex-col justify-between space-y-4">
+            <div>
+                <div class="flex items-center gap-2 border-b border-slate-700/60 pb-2 mb-4">
+                    <span class="text-base">🏺</span>
+                    <h2 id="lbl-model-params" class="text-xs font-bold text-[#c5a059] uppercase tracking-wider">Параметры модели</h2>
+                </div>
+                
+                <!-- Variable A: CapEx -->
+                <div class="mb-4">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span id="lbl-capex" class="font-medium text-slate-300">а) Цена капитала (CapEx)</span>
+                        <span class="text-[#c5a059] font-bold" id="capex-val">4.0 млн $</span>
+                    </div>
+                    <input type="range" id="capex" min="1.0" max="10.0" step="0.5" value="4.0">
+                    <p id="desc-capex" class="text-[9px] text-slate-400 mt-0.5">Стоимость оборудования, теплиц и автоматики.</p>
+                </div>
+
+                <!-- Variable B: OpEx -->
+                <div class="mb-4">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span id="lbl-opex" class="font-medium text-slate-300">б) Цена труда (OpEx)</span>
+                        <span class="text-[#c5a059] font-bold" id="opex-val">40 тыс. $</span>
+                    </div>
+                    <input type="range" id="opex" min="10" max="100" step="5" value="40">
+                    <p id="desc-opex" class="text-[9px] text-slate-400 mt-0.5">Месячный фонд оплаты труда и энергии на 1 ед.</p>
+                </div>
+
+                <!-- Variable C: Budget Limit -->
+                <div class="mb-4">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span id="lbl-budget" class="font-medium text-slate-300">с) Бюджетное ограничение</span>
+                        <span class="text-[#c5a059] font-bold" id="budget-val">8.0 млн $</span>
+                    </div>
+                    <input type="range" id="budget" min="2.0" max="15.0" step="0.1" value="8.0">
+                    <p id="desc-budget" class="text-[9px] text-slate-400 mt-0.5">Финансовый лимит производства бананов.</p>
+                </div>
+
+                <!-- Parallel Shift (Q Level) Slider -->
+                <div class="mb-4 bg-[#1b1d24] p-3 rounded-lg border border-slate-700/50">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span id="lbl-output-q" class="font-semibold text-indigo-400">📈 Выпуск продукции (Q)</span>
+                        <span class="text-indigo-300 font-bold" id="q-val">100 ед.</span>
+                    </div>
+                    <input type="range" id="q-slider" min="50" max="200" step="5" value="100">
+                    <p id="desc-output-q" class="text-[9px] text-slate-400 mt-1">Параллельный сдвиг изокванты (масштаб технологий).</p>
+                    
+                    <div class="flex gap-2 mt-2">
+                        <button id="btn-q-up" class="flex-1 bg-indigo-600/80 hover:bg-indigo-600 text-white font-bold py-1 px-1.5 rounded text-[10px] border border-indigo-500/30 transition-colors">
+                            ▲ Сдвиг вверх (Q+)
+                        </button>
+                        <button id="btn-q-down" class="flex-1 bg-indigo-600/80 hover:bg-indigo-600 text-white font-bold py-1 px-1.5 rounded text-[10px] border border-indigo-500/30 transition-colors">
+                            ▼ Сдвиг вниз (Q-)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Factor L Choice Slider -->
+                <div class="bg-[#121317] p-3 rounded-lg border border-slate-800">
+                    <div class="flex justify-between text-xs mb-1">
+                        <span id="lbl-point-e" class="font-medium text-slate-300">⚙️ Положение точки Е (Труд L)</span>
+                        <span class="text-[#c5a059] font-bold" id="tech-val">100</span>
+                    </div>
+                    <input type="range" id="tech-ratio" min="20" max="220" step="2" value="100">
+                    <p id="desc-point-e" class="text-[9px] text-slate-400 mt-0.5">Регулирует соотношение труда и капитала на изокванте.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Graphs Plot Area -->
+        <section class="lg:col-span-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Graph 1: Isoquant -->
+            <div class="bg-white p-3 rounded-xl shadow-lg flex flex-col justify-between border border-slate-200 relative text-slate-800">
+                <h3 id="lbl-graph1-title" class="text-sm font-bold text-slate-700 mb-1 border-b border-slate-100 pb-1">
+                    Изокванта
+                </h3>
+
+                <!-- Live formula box -->
+                <div class="absolute top-12 right-3 bg-slate-900/95 text-white p-2 rounded text-[9px] shadow-lg max-w-[190px] border border-slate-700/50 z-10">
+                    <div id="lbl-analysis-header" class="font-bold text-[#c5a059] mb-1">Мгновенный анализ:</div>
+                    <div><span id="lbl-mrts-text">Наклон кривой (MRTS):</span> <span id="formula-mrts" class="font-mono text-amber-400 font-bold">0.0100</span></div>
+                    <div><span id="lbl-ratio-text">Наклон цен (P<sub>L</sub>/P<sub>K</sub>):</span> <span id="formula-ratio" class="font-mono text-cyan-400 font-bold">0.0100</span></div>
+                    <div class="border-t border-slate-700 my-1 pt-1 font-bold text-center" id="formula-inequality">
+                        MRTS = P<sub>L</sub>/P<sub>K</sub>
+                    </div>
+                    <p class="text-[8px] text-slate-300 leading-tight" id="formula-explanation">Оптимальный баланс ресурсов найден.</p>
+                </div>
+
+                <div class="relative w-full aspect-square bg-slate-50/50 rounded border border-slate-200 overflow-hidden">
+                    <svg viewBox="0 0 260 260" class="w-full h-full" id="svg-isoquant">
+                        <!-- Grid -->
+                        <g class="graph-grid">
+                            <line x1="40" y1="40" x2="240" y2="40" />
+                            <line x1="40" y1="80" x2="240" y2="80" />
+                            <line x1="40" y1="120" x2="240" y2="120" />
+                            <line x1="40" y1="160" x2="240" y2="160" />
+                            <line x1="40" y1="200" x2="240" y2="200" />
+                            
+                            <line x1="40" y1="40" x2="40" y2="220" />
+                            <line x1="80" y1="40" x2="80" y2="220" />
+                            <line x1="120" y1="40" x2="120" y2="220" />
+                            <line x1="160" y1="40" x2="160" y2="220" />
+                            <line x1="200" y1="40" x2="200" y2="220" />
+                        </g>
+
+                        <!-- Axes -->
+                        <line x1="40" y1="220" x2="240" y2="220" stroke="#475569" stroke-width="1.5" />
+                        <line x1="40" y1="20" x2="40" y2="220" stroke="#475569" stroke-width="1.5" />
+
+                        <path id="warning-curve" d="" fill="none" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,3" style="display:none;" />
+                        <path id="isoquant-curve" d="" fill="none" stroke="#4f46e5" stroke-width="2.5" />
+                        <line id="tangent-line" x1="0" y1="0" x2="0" y2="0" stroke="#b45309" stroke-width="2" />
+
+                        <line id="proj-y" x1="40" y1="130" x2="130" y2="130" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
+                        <line id="proj-x" x1="130" y1="130" x2="130" y2="220" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
+
+                        <circle id="point-e" cx="130" cy="130" r="5.5" fill="#e11d48" stroke="#fff" stroke-width="1" class="transition-all duration-75 cursor-pointer" />
+
+                        <!-- Axis Labels -->
+                        <text id="lbl-axis-k" x="12" y="16" fill="#475569" font-size="7" font-weight="bold">Капитал K</text>
+                        <text id="lbl-axis-l" x="195" y="232" fill="#475569" font-size="7" font-weight="bold">Труд L (Раб.)</text>
+                    </svg>
+
+                    <!-- Realtime display window -->
+                    <div class="absolute bottom-1.5 left-11 bg-white/95 border border-slate-200 p-1.5 rounded text-[8px] shadow-md text-slate-700">
+                        <span id="lbl-factors-e" class="font-bold text-slate-800">Факторы в точке Е:</span><br>
+                        <span id="lbl-cap-k">Капитал K:</span> <span class="font-bold text-indigo-600" id="k-val">1.0</span> <span id="unit-k">ед.</span><br>
+                        <span id="lbl-lab-l">Труд L:</span> <span class="font-bold text-indigo-600" id="l-val">100</span> <span id="unit-l">чел.</span>
+                    </div>
+
+                    <div id="warning-label" class="absolute bottom-16 right-3 bg-red-50 border border-red-200 text-red-600 text-[8px] font-bold p-1 rounded shadow-md max-w-[130px] leading-tight text-center" style="display:none;">
+                        ⚠️ Требуется более технологическое оборудование или дополнительный бюджет
+                    </div>
+                </div>
+                <p id="desc-tangent-line" class="text-[9px] text-center italic mt-1 text-slate-500">Золотая касательная линия отображает угол наклона.</p>
+            </div>
+
+            <!-- Graph 2: Isocost -->
+            <div class="bg-white p-3 rounded-xl shadow-lg flex flex-col justify-between border border-slate-200 relative text-slate-800">
+                <h3 id="lbl-graph2-title" class="text-sm font-bold text-slate-700 mb-1 border-b border-slate-100 pb-1">
+                    Изокоста
+                </h3>
+                <div class="relative w-full aspect-square bg-slate-50/50 rounded border border-slate-200 overflow-hidden">
+                    <svg viewBox="0 0 260 260" class="w-full h-full" id="svg-isocost">
+                        <!-- Grid -->
+                        <g class="graph-grid">
+                            <line x1="40" y1="40" x2="240" y2="40" />
+                            <line x1="40" y1="80" x2="240" y2="80" />
+                            <line x1="40" y1="120" x2="240" y2="120" />
+                            <line x1="40" y1="160" x2="240" y2="160" />
+                            <line x1="40" y1="200" x2="240" y2="200" />
+                            
+                            <line x1="40" y1="40" x2="40" y2="220" />
+                            <line x1="80" y1="40" x2="80" y2="220" />
+                            <line x1="120" y1="40" x2="120" y2="220" />
+                            <line x1="160" y1="40" x2="160" y2="220" />
+                            <line x1="200" y1="40" x2="200" y2="220" />
+                        </g>
+
+                        <!-- Axes -->
+                        <line x1="40" y1="220" x2="240" y2="220" stroke="#475569" stroke-width="1.5" />
+                        <line x1="40" y1="20" x2="40" y2="220" stroke="#475569" stroke-width="1.5" />
+
+                        <line id="isocost-line" x1="40" y1="220" x2="220" y2="220" stroke="#d97706" stroke-width="2.5" />
+                        <path id="isoquant-ref" d="" fill="none" stroke="#4f46e5" stroke-width="1" stroke-dasharray="2,2" opacity="0.6" />
+                        <circle id="point-tangent" cx="0" cy="0" r="6" fill="#c5a059" stroke="#fff" stroke-width="1.5" style="display:none;" />
+
+                        <!-- Axis Labels -->
+                        <text id="lbl-axis-k2" x="12" y="16" fill="#475569" font-size="7" font-weight="bold">Капитал K</text>
+                        <text id="lbl-axis-l2" x="195" y="232" fill="#475569" font-size="7" font-weight="bold">Труд L (Раб.)</text>
+                    </svg>
+
+                    <!-- Tangency Status Box -->
+                    <div class="absolute top-1.5 left-11 bg-white/95 border border-slate-200 p-1.5 rounded text-[8px] shadow-md text-slate-700 w-44">
+                        <span id="lbl-budget-state-header" class="font-bold">Состояние бюджета:</span><br>
+                        <span id="budget-status" class="font-bold text-rose-600">Недостаточно средств</span>
+                    </div>
+                </div>
+                <p id="desc-isocost-line" class="text-[9px] text-center italic mt-1 text-slate-500">Золотая линия показывает бюджетное ограничение.</p>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Success Banner -->
+    <div id="success-banner" class="max-w-6xl mx-auto bg-gradient-to-r from-emerald-950/90 to-emerald-900/85 border border-emerald-500/40 p-2.5 rounded-lg text-center shadow-lg hidden mt-4">
+        <h4 id="lbl-success-title" class="text-xs font-bold text-emerald-400 uppercase tracking-widest animate-pulse">
+            ☀️ Оптимальное Состояние Достигнуто! (MRTS = P<sub>L</sub> / P<sub>K</sub>)
+        </h4>
+        <p id="lbl-success-desc" class="text-[9px] text-slate-300 max-w-2xl mx-auto mt-0.5">
+            Управленческое решение найдено! Предельная норма технологического замещения совпала с соотношением цен факторов производства. Эффективность плантации максимальна.
+        </p>
+    </div>
+
+    <!-- Technical Footer -->
+    <footer id="txt-footer" class="text-center text-[8px] text-slate-500 mt-4 border-t border-slate-800/60 pt-2">
+        Экономика • AlmaU 2026. Разработано для студентов Алматы Менеджмент Университета.
+    </footer>
+
+    <!-- Simulation Engine Script -->
+    <script>
+        let currentLang = 'ru';
+
+        const i18n = {
+            ru: {
+                mainTitle: "Изокосты и Изокванты в банановой индустрии",
+                subTitle: "Экономика • AlmaU 2026",
+                modelParams: "Параметры модели",
+                capex: "а) Цена капитала (CapEx)",
+                capexDesc: "Стоимость оборудования, теплиц и автоматики.",
+                opex: "б) Цена труда (OpEx)",
+                opexDesc: "Месячный фонд оплаты труда и энергии на 1 ед.",
+                budget: "с) Бюджетное ограничение",
+                budgetDesc: "Финансовый лимит производства бананов.",
+                outputQ: "📈 Выпуск продукции (Q)",
+                outputQDesc: "Параллельный сдвиг изокванты (масштаб технологий).",
+                btnQUp: "▲ Сдвиг вверх (Q+)",
+                btnQDown: "▼ Сдвиг вниз (Q-)",
+                pointE: "⚙️ Положение точки Е (Труд L)",
+                pointEDesc: "Регулирует соотношение труда и капитала на изокванте.",
+                graph1Title: "Изокванта",
+                graph2Title: "Изокоста",
+                analysisHeader: "Мгновенный анализ:",
+                mrtsText: "Наклон кривой (MRTS):",
+                ratioText: "Наклон цен (PL/PK):",
+                axisK: "Капитал K",
+                axisL: "Труд L (Раб.)",
+                factorsE: "Факторы в точке Е:",
+                capK: "Капитал K:",
+                labL: "Труд L:",
+                unitK: "ед.",
+                unitL: "чел.",
+                unitQ: "ед.",
+                warningLabel: "⚠️ Требуется более технологическое оборудование или дополнительный бюджет",
+                tangentDesc: "Золотая касательная линия отображает угол наклона.",
+                isocostDesc: "Золотая линия показывает бюджетное ограничение.",
+                budgetStateHeader: "Состояние бюджета:",
+                successTitle: "☀️ Оптимальное Состояние Достигнуто! (MRTS = PL / PK)",
+                successDesc: "Управленческое решение найдено! Предельная норма технологического замещения совпала с соотношением цен факторов производства. Эффективность плантации максимальна.",
+                footer: "Экономика • AlmaU 2026. Разработано для студентов Алматы Менеджмент Университета.",
+                
+                // Динамические тексты
+                eqEqual: "MRTS ≈ P<sub>L</sub>/P<sub>K</sub>",
+                eqGreat: "MRTS > P<sub>L</sub>/P<sub>K</sub>",
+                eqLess: "MRTS < P<sub>L</sub>/P<sub>K</sub>",
+                expEqual: "Равновесие! Производство оптимально сбалансировано по затратам.",
+                expGreat: "Труд дешевле капитала в замещении. Нанимайте больше рабочих (L)!",
+                expLess: "Капитал дешевле труда. Покупайте оборудование (K) и автоматизируйте.",
+                
+                budDeficit: (minB) => `<span class="text-rose-600 font-bold">🚨 Бюджет дефицитен (Минимум $${minB}M)</span><br>Финансов не хватит для достижения выбранного выпуска.`,
+                budOpt: (optB) => `<span class="text-amber-600 font-bold">🎯 Оптимальный бюджет ($${optB}M)</span><br>Бюджет идеален. Совместите точку Е с золотым оптимумом!`,
+                budMatch: `<span class="text-emerald-600 font-bold">✨ ОПТИМУМ НАЙДЕН!</span><br>Точка касания достигнута. Затраты минимизированы.`,
+                budExcess: (optB) => `<span class="text-indigo-600 font-bold">⚖️ Избыточный бюджет</span><br>Снизьте бюджет до $${optB}M или сместите изокванту вверх (Q+).`
+            },
+            en: {
+                mainTitle: "Isoquants & Isocosts in the Banana Industry",
+                subTitle: "Economics • AlmaU 2026",
+                modelParams: "Model Parameters",
+                capex: "a) Price of Capital (CapEx)",
+                capexDesc: "Cost of equipment, greenhouses, and automation.",
+                opex: "b) Price of Labor (OpEx)",
+                opexDesc: "Monthly wage bill and energy cost per unit.",
+                budget: "c) Budget Constraint",
+                budgetDesc: "Financial limit for banana production.",
+                outputQ: "📈 Output Level (Q)",
+                outputQDesc: "Parallel isoquant shift (technology scale).",
+                btnQUp: "▲ Shift Up (Q+)",
+                btnQDown: "▼ Shift Down (Q-)",
+                pointE: "⚙️ Point E Position (Labor L)",
+                pointEDesc: "Adjusts the labor-to-capital ratio on the isoquant.",
+                graph1Title: "Isoquant",
+                graph2Title: "Isocost",
+                analysisHeader: "Instant Analysis:",
+                mrtsText: "Curve Slope (MRTS):",
+                ratioText: "Price Ratio (PL/PK):",
+                axisK: "Capital K",
+                axisL: "Labor L (Workers)",
+                factorsE: "Factors at Point E:",
+                capK: "Capital K:",
+                labL: "Labor L:",
+                unitK: "units",
+                unitL: "workers",
+                unitQ: "units",
+                warningLabel: "⚠️ Requires more advanced equipment or additional budget",
+                tangentDesc: "Golden tangent line depicts the slope angle.",
+                isocostDesc: "Golden line shows the budget constraint line.",
+                budgetStateHeader: "Budget Status:",
+                successTitle: "☀️ Optimal State Achieved! (MRTS = PL / PK)",
+                successDesc: "Optimal decision found! Marginal rate of technical substitution matches the factor price ratio. Plantation efficiency is maximized.",
+                footer: "Economics • AlmaU 2026. Developed for Almaty Management University students.",
+                
+                eqEqual: "MRTS ≈ P<sub>L</sub>/P<sub>K</sub>",
+                eqGreat: "MRTS > P<sub>L</sub>/P<sub>K</sub>",
+                eqLess: "MRTS < P<sub>L</sub>/P<sub>K</sub>",
+                expEqual: "Equilibrium! Factor allocation is cost-optimal.",
+                expGreat: "Labor is cheaper than capital in substitution. Hire more workers (L)!",
+                expLess: "Capital is cheaper than labor. Buy equipment (K) and automate.",
+                
+                budDeficit: (minB) => `<span class="text-rose-600 font-bold">🚨 Budget Deficit (Min $${minB}M)</span><br>Funds are insufficient to reach selected output.`,
+                budOpt: (optB) => `<span class="text-amber-600 font-bold">🎯 Optimal Budget ($${optB}M)</span><br>Budget is ideal. Align point E with the golden optimum!`,
+                budMatch: `<span class="text-emerald-600 font-bold">✨ OPTIMUM FOUND!</span><br>Tangency point reached. Costs are minimized.`,
+                budExcess: (optB) => `<span class="text-indigo-600 font-bold">⚖️ Excess Budget</span><br>Reduce budget to $${optB}M or shift isoquant up (Q+).`
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = i18n[lang];
+
+            const btnRu = document.getElementById('btn-lang-ru');
+            const btnEn = document.getElementById('btn-lang-en');
+            if (lang === 'ru') {
+                btnRu.className = "px-3 py-1 rounded text-xs font-bold transition-all bg-[#c5a059] text-slate-950 shadow-md";
+                btnEn.className = "px-3 py-1 rounded text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
+            } else {
+                btnEn.className = "px-3 py-1 rounded text-xs font-bold transition-all bg-[#c5a059] text-slate-950 shadow-md";
+                btnRu.className = "px-3 py-1 rounded text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
+            }
+
+            document.getElementById('txt-main-title').innerText = t.mainTitle;
+            document.getElementById('txt-sub-title').innerText = t.subTitle;
+            document.getElementById('lbl-model-params').innerText = t.modelParams;
+            document.getElementById('lbl-capex').innerText = t.capex;
+            document.getElementById('desc-capex').innerText = t.capexDesc;
+            document.getElementById('lbl-opex').innerText = t.opex;
+            document.getElementById('desc-opex').innerText = t.opexDesc;
+            document.getElementById('lbl-budget').innerText = t.budget;
+            document.getElementById('desc-budget').innerText = t.budgetDesc;
+            document.getElementById('lbl-output-q').innerText = t.outputQ;
+            document.getElementById('desc-output-q').innerText = t.outputQDesc;
+            document.getElementById('btn-q-up').innerText = t.btnQUp;
+            document.getElementById('btn-q-down').innerText = t.btnQDown;
+            document.getElementById('lbl-point-e').innerText = t.pointE;
+            document.getElementById('desc-point-e').innerText = t.pointEDesc;
+
+            document.getElementById('lbl-graph1-title').innerText = t.graph1Title;
+            document.getElementById('lbl-graph2-title').innerText = t.graph2Title;
+            document.getElementById('lbl-analysis-header').innerText = t.analysisHeader;
+            document.getElementById('lbl-mrts-text').innerText = t.mrtsText;
+            document.getElementById('lbl-ratio-text').innerText = t.ratioText;
+
+            document.getElementById('lbl-axis-k').textContent = t.axisK;
+            document.getElementById('lbl-axis-l').textContent = t.axisL;
+            document.getElementById('lbl-axis-k2').textContent = t.axisK;
+            document.getElementById('lbl-axis-l2').textContent = t.axisL;
+
+            document.getElementById('lbl-factors-e').innerText = t.factorsE;
+            document.getElementById('lbl-cap-k').innerText = t.capK;
+            document.getElementById('lbl-lab-l').innerText = t.labL;
+            document.getElementById('unit-k').innerText = t.unitK;
+            document.getElementById('unit-l').innerText = t.unitL;
+
+            document.getElementById('warning-label').innerText = t.warningLabel;
+            document.getElementById('desc-tangent-line').innerText = t.tangentDesc;
+            document.getElementById('desc-isocost-line').innerText = t.isocostDesc;
+            document.getElementById('lbl-budget-state-header').innerText = t.budgetStateHeader;
+
+            document.getElementById('lbl-success-title').innerText = t.successTitle;
+            document.getElementById('lbl-success-desc').innerText = t.successDesc;
+            document.getElementById('txt-footer').innerText = t.footer;
+
+            update();
+        }
+
+        // Координаты и масштабирование
+        const xMinVal = 0, xMaxVal = 250;
+        const yMinVal = 0, yMaxVal = 5;
+        const xMinPx = 40, xMaxPx = 240;
+        const yMinPx = 220, yMaxPx = 40;
+
+        function mapX(val) {
+            return xMinPx + ((val - xMinVal) / (xMaxVal - xMinVal)) * (xMaxPx - xMinPx);
+        }
+        function unmapX(px) {
+            return xMinVal + ((px - xMinPx) / (xMaxPx - xMinPx)) * (xMaxVal - xMinVal);
+        }
+        function mapY(val) {
+            return yMinPx - ((val - yMinVal) / (yMaxVal - yMinVal)) * (yMinPx - yMaxPx);
+        }
+        function unmapY(px) {
+            return yMinVal + ((yMinPx - px) / (yMinPx - yMaxPx)) * (yMaxVal - yMinVal);
+        }
+
+        // Элементы управления
+        const capexSlider = document.getElementById('capex');
+        const opexSlider = document.getElementById('opex');
+        const budgetSlider = document.getElementById('budget');
+        const techRatioSlider = document.getElementById('tech-ratio');
+        const qSlider = document.getElementById('q-slider');
+
+        const capexValDisp = document.getElementById('capex-val');
+        const opexValDisp = document.getElementById('opex-val');
+        const budgetValDisp = document.getElementById('budget-val');
+        const techValDisp = document.getElementById('tech-val');
+        const qValDisp = document.getElementById('q-val');
+
+        const kValDisp = document.getElementById('k-val');
+        const lValDisp = document.getElementById('l-val');
+        const budgetStatus = document.getElementById('budget-status');
+        const successBanner = document.getElementById('success-banner');
+
+        const curveIso = document.getElementById('isoquant-curve');
+        const curveRef = document.getElementById('isoquant-ref');
+        const warningCurve = document.getElementById('warning-curve');
+        const warningLabel = document.getElementById('warning-label');
+        const pointE = document.getElementById('point-e');
+        const pointTangent = document.getElementById('point-tangent');
+        const projX = document.getElementById('proj-x');
+        const projY = document.getElementById('proj-y');
+        const isocostLine = document.getElementById('isocost-line');
+        const tangentLine = document.getElementById('tangent-line');
+
+        const fMrts = document.getElementById('formula-mrts');
+        const fRatio = document.getElementById('formula-ratio');
+        const fInequality = document.getElementById('formula-inequality');
+        const fExplanation = document.getElementById('formula-explanation');
+
+        const btnQUp = document.getElementById('btn-q-up');
+        const btnQDown = document.getElementById('btn-q-down');
+
+        function getIsoquantPath(Q) {
+            let path = "";
+            let start = true;
+            for (let L = 15; L <= 240; L += 5) {
+                let K = Q / L;
+                if (K > 5) K = 5;
+                let px = mapX(L);
+                let py = mapY(K);
+                if (start) {
+                    path += `M ${px} ${py}`;
+                    start = false;
+                } else {
+                    path += ` L ${px} ${py}`;
+                }
+            }
+            return path;
+        }
+
+        function update() {
+            const t = i18n[currentLang];
+            const Q = parseFloat(qSlider.value);
+            const PK = parseFloat(capexSlider.value);
+            const PL = parseFloat(opexSlider.value) / 1000;
+            const Budget = parseFloat(budgetSlider.value);
+            const L_user = parseFloat(techRatioSlider.value);
+
+            capexValDisp.innerText = PK.toFixed(1) + (currentLang === 'ru' ? " млн $" : " M $");
+            opexValDisp.innerText = opexSlider.value + (currentLang === 'ru' ? " тыс. $" : " k $");
+            budgetValDisp.innerText = Budget.toFixed(1) + (currentLang === 'ru' ? " млн $" : " M $");
+            techValDisp.innerText = L_user.toFixed(0);
+            qValDisp.innerText = Q.toFixed(0) + " " + t.unitQ;
+
+            const basePath = getIsoquantPath(Q);
+            curveIso.setAttribute('d', basePath);
+            curveRef.setAttribute('d', basePath);
+
+            if (Q > 100) {
+                warningCurve.setAttribute('d', getIsoquantPath(Q));
+                warningCurve.style.display = 'block';
+                warningLabel.style.display = 'block';
+            } else {
+                warningCurve.style.display = 'none';
+                warningLabel.style.display = 'none';
+            }
+
+            const K_user = Q / L_user;
+            kValDisp.innerText = K_user.toFixed(2);
+            lValDisp.innerText = L_user.toFixed(0);
+
+            const pxE = mapX(L_user);
+            const pyE = mapY(K_user > 5 ? 5 : K_user);
+            pointE.setAttribute('cx', pxE);
+            pointE.setAttribute('cy', pyE);
+
+            projX.setAttribute('x1', pxE);
+            projX.setAttribute('y1', pyE);
+            projX.setAttribute('x2', pxE);
+            projX.setAttribute('y2', yMinPx);
+
+            projY.setAttribute('x1', xMinPx);
+            projY.setAttribute('y1', pyE);
+            projY.setAttribute('x2', pxE);
+            projY.setAttribute('y2', pyE);
+
+            const currentMRTS = K_user / L_user;
+            const priceRatio = PL / PK;
+
+            fMrts.innerText = currentMRTS.toFixed(4);
+            fRatio.innerText = priceRatio.toFixed(4);
+
+            const deltaL = 55;
+            const L1 = Math.max(10, L_user - deltaL);
+            const L2 = Math.min(240, L_user + deltaL);
+            const K1 = K_user + (L_user - L1) * currentMRTS;
+            const K2 = K_user - (L2 - L_user) * currentMRTS;
+
+            tangentLine.setAttribute('x1', mapX(L1));
+            tangentLine.setAttribute('y1', mapY(K1 > 5 ? 5 : K1));
+            tangentLine.setAttribute('x2', mapX(L2));
+            tangentLine.setAttribute('y2', mapY(K2 < 0 ? 0 : K2));
+
+            const K_max = Budget / PK;
+            const L_max = Budget / PL;
+
+            const pxIsocostStart = mapX(0);
+            const pyIsocostStart = mapY(K_max);
+            const pxIsocostEnd = mapX(L_max);
+            const pyIsocostEnd = mapY(0);
+
+            isocostLine.setAttribute('x1', pxIsocostStart);
+            isocostLine.setAttribute('y1', pyIsocostStart < yMaxPx ? yMaxPx : pyIsocostStart);
+            isocostLine.setAttribute('x2', pxIsocostEnd > xMaxPx ? xMaxPx : pxIsocostEnd);
+            isocostLine.setAttribute('y2', pyIsocostEnd < yMinPx ? yMinPx : pyIsocostEnd);
+
+            const L_opt = Math.sqrt((Q * PK) / PL);
+            const K_opt = Q / L_opt;
+            const Budget_tangent = (K_opt * PK) + (L_opt * PL);
+
+            const budgetDiff = Math.abs(Budget - Budget_tangent);
+            const isBudgetOptimal = budgetDiff < 0.25; 
+            const isUserAtOptimum = Math.abs(L_user - L_opt) < 8;
+
+            const tolerance = 0.0015;
+            if (Math.abs(currentMRTS - priceRatio) < tolerance) {
+                fInequality.innerHTML = `<span class="text-emerald-500">${t.eqEqual}</span>`;
+                fExplanation.innerText = t.expEqual;
+            } else if (currentMRTS > priceRatio) {
+                fInequality.innerHTML = `<span class="text-amber-500">${t.eqGreat}</span>`;
+                fExplanation.innerText = t.expGreat;
+            } else {
+                fInequality.innerHTML = `<span class="text-amber-500">${t.eqLess}</span>`;
+                fExplanation.innerText = t.expLess;
+            }
+
+            if (Budget < Budget_tangent - 0.1) {
+                budgetStatus.innerHTML = t.budDeficit(Budget_tangent.toFixed(1));
+                pointE.classList.remove('pulse-green');
+                pointTangent.style.display = 'none';
+                successBanner.classList.add('hidden');
+            } else if (isBudgetOptimal) {
+                budgetStatus.innerHTML = t.budOpt(Budget_tangent.toFixed(1));
+                
+                pointTangent.style.display = 'block';
+                pointTangent.setAttribute('cx', mapX(L_opt));
+                pointTangent.setAttribute('cy', mapY(K_opt));
+
+                if (isUserAtOptimum) {
+                    pointE.classList.add('pulse-green');
+                    budgetStatus.innerHTML = t.budMatch;
+                    successBanner.classList.remove('hidden');
+                } else {
+                    pointE.classList.remove('pulse-green');
+                    successBanner.classList.add('hidden');
+                }
+            } else {
+                budgetStatus.innerHTML = t.budExcess(Budget_tangent.toFixed(1));
+                pointE.classList.remove('pulse-green');
+                pointTangent.style.display = 'none';
+                successBanner.classList.add('hidden');
+            }
+        }
+
+        btnQUp.addEventListener('click', () => {
+            let curQ = parseInt(qSlider.value);
+            if (curQ < 200) {
+                qSlider.value = curQ + 10;
+                update();
+            }
+        });
+
+        btnQDown.addEventListener('click', () => {
+            let curQ = parseInt(qSlider.value);
+            if (curQ > 50) {
+                qSlider.value = curQ - 10;
+                update();
+            }
+        });
+
+        capexSlider.addEventListener('input', update);
+        opexSlider.addEventListener('input', update);
+        budgetSlider.addEventListener('input', update);
+        techRatioSlider.addEventListener('input', update);
+        qSlider.addEventListener('input', update);
+
+        let isDragging = false;
+        
+        function handleDrag(evt) {
+            if (!isDragging) return;
+            const rect = svgIsoquant.getBoundingClientRect();
+            let clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
+            if (!clientX) return;
+            const xPx = clientX - rect.left;
+            const mappedValL = unmapX((xPx / rect.width) * 260);
+            
+            if (mappedValL >= 20 && mappedValL <= 220) {
+                techRatioSlider.value = mappedValL;
+                update();
+            }
+        }
+
+        const svgIsoquant = document.getElementById('svg-isoquant');
+        pointE.addEventListener('mousedown', () => { isDragging = true; });
+        svgIsoquant.addEventListener('mousemove', handleDrag);
+        window.addEventListener('mouseup', () => { isDragging = false; });
+
+        pointE.addEventListener('touchstart', (e) => { isDragging = true; e.preventDefault(); });
+        svgIsoquant.addEventListener('touchmove', handleDrag);
+        window.addEventListener('touchend', () => { isDragging = false; });
+
+        // Первичный запуск
+        update();
+    </script>
+</body>
+</html>
