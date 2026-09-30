@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlmaU | Market Infrastructure & Simulators</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#050505',
+                        neonpink: '#ec4899',
+                        deeprose: '#f43f5e',
+                        softpurple: '#c084fc',
+                        neonamber: '#f59e0b',
+                        goldaccent: '#fbbf24',
+                        neoncyan: '#00f2fe'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #050505; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .glass-card { background: rgba(22, 13, 33, 0.85); backdrop-filter: blur(14px); border: 1px solid rgba(236, 72, 153, 0.15); border-radius: 0.85rem; }
+        .glass-card:hover { border-color: rgba(236, 72, 153, 0.3); }
+        
+        .tab-btn { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); }
+        .tab-btn.active { transform: translateY(-4px) scale(1.02); border: 1px solid currentColor; background: rgba(255,255,255,0.05); box-shadow: 0 10px 25px -5px currentColor; }
+        .tab-content { animation: fadeIn 0.4s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .num-font { font-family: 'Inter', sans-serif; font-feature-settings: "tnum"; }
+        .mono-font { font-family: 'Share Tech Mono', monospace; }
+
+        /* Vintage Sliders Perfect Competition & Logistics */
+        input[type="range"].vintage-slider { -webkit-appearance: none; width: 100%; background: #151b22; height: 10px; border-radius: 4px; outline: none; border: 1px solid #30363d; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8); }
+        input[type="range"].vintage-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 28px; background: linear-gradient(to right, #8a95a5, #cfd8dc, #ef4444, #cfd8dc, #8a95a5); border-radius: 3px; cursor: pointer; border: 1px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        
+        /* Stylist Sliders */
+        input[type=range].stylist-slider { -webkit-appearance: none; width: 100%; height: 12px; background: #1a1026; border: 1px solid #321c4a; border-radius: 6px; outline: none; position: relative; }
+        input[type=range].stylist-slider::-webkit-slider-runnable-track { height: 4px; background: #ef4444; border-radius: 2px; box-shadow: 0 0 6px rgba(239, 68, 68, 0.5); }
+        input[type=range].stylist-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 26px; width: 16px; border-radius: 4px; background: linear-gradient(to right, #9ca3af 0%, #9ca3af 40%, #ef4444 40%, #ef4444 60%, #9ca3af 60%, #9ca3af 100%); border: 1px solid #ffffff; box-shadow: 0 2px 10px rgba(0,0,0,0.7); cursor: pointer; margin-top: -11px; transition: all 0.15s ease; }
+        input[type=range].stylist-slider::-webkit-slider-thumb:hover { background: linear-gradient(to right, #ffffff 0%, #ffffff 40%, #ef4444 40%, #ef4444 60%, #ffffff 60%, #ffffff 100%); box-shadow: 0 0 12px #ec4899; }
+
+        /* 3D Flip Card Styles */
+        .flip-card { perspective: 1000px; height: 260px; }
+        .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+        .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+        .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 0.85rem; }
+        .flip-card-back { transform: rotateY(180deg); background: rgba(18, 10, 28, 0.96); border: 1px solid #ec4899; overflow-y: auto; }
+
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.2); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.5); border-radius: 4px; }
+
+        @keyframes dash { to { stroke-dashoffset: -40; } }
+        .route-flow { stroke-dasharray: 8, 6; animation: dash 1.5s linear infinite; }
+    </style>
+</head>
+<body class="p-3 md:p-8 custom-scroll min-h-screen">
+
+<div class="max-w-[1650px] mx-auto space-y-6">
+
+    <!-- Header -->
+    <header class="border-b border-slate-800 pb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+            <h1 id="lbl-header-title" class="text-3xl md:text-5xl font-black text-white tracking-tight">Рыночная инфраструктура</h1>
+            <p id="lbl-header-subtitle" class="text-indigo-400 text-xs md:text-sm font-bold tracking-widest uppercase mt-2">Экономика • Микроэкономика | Software Engineering</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <!-- Language Switcher -->
+            <div class="flex items-center bg-[#151b22] border border-slate-700/60 rounded-xl p-1 shadow-md">
+                <button id="btn-lang-ru" onclick="setLanguage('ru')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md">RU</button>
+                <button id="btn-lang-en" onclick="setLanguage('en')" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200">EN</button>
+            </div>
+            
+            <div class="bg-indigo-500/10 border border-indigo-500/20 px-4 py-2.5 rounded-xl flex items-center gap-3">
+                <i data-lucide="activity" class="text-indigo-400"></i>
+                <span id="lbl-terminal-badge" class="text-xs font-semibold text-indigo-300 uppercase tracking-wider">Интерактивный Терминал</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <button onclick="switchTab(this, 'perfect', '#3b82f6')" class="tab-btn active text-blue-400 font-bold p-5 rounded-2xl flex flex-col items-center gap-2 bg-slate-900/50">
+            <i data-lucide="shield-check" class="w-7 h-7"></i>
+            <span id="tab-label-perfect" class="text-center leading-tight">Совершенная<br>конкуренция</span>
+        </button>
+        <button onclick="switchTab(this, 'mono-stylist', '#ec4899')" class="tab-btn text-pink-400 font-bold p-5 rounded-2xl flex flex-col items-center gap-2 bg-slate-900/50">
+            <i data-lucide="sparkles" class="w-7 h-7"></i>
+            <span id="tab-label-mono" class="text-center leading-tight">Монополистическая<br>конкуренция (Оптимизация времени работы визажиста)</span>
+        </button>
+        <button onclick="switchTab(this, 'vrp-logistics', '#00f2fe')" class="tab-btn text-cyan-400 font-bold p-5 rounded-2xl flex flex-col items-center gap-2 bg-slate-900/50">
+            <i data-lucide="route" class="w-7 h-7"></i>
+            <span id="tab-label-vrp" class="text-center leading-tight">Оптимизационная<br>задача (VRP)</span>
+        </button>
+    </div>
+
+    <!-- Main Content Container -->
+    <div id="content" class="glass rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+        
+        <!-- ==================== ВКТАДКА 1: Совершенная конкуренция ==================== -->
+        <div id="perfect" class="tab-content block">
+            <div class="flex items-center gap-3 mb-6 pb-4 border-b border-slate-800">
+                <div class="p-2 bg-blue-500/20 rounded-lg"><i data-lucide="trending-up" class="text-blue-400"></i></div>
+                <div>
+                    <h2 id="lbl-perfect-title" class="text-2xl font-black text-white">Модель: Совершенная конкуренция</h2>
+                    <p id="lbl-perfect-sub" class="text-xs text-slate-400 uppercase tracking-widest">Анализ фирмы на совершенно конкурентном рынке (Price Taker)</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-8">
+                <!-- Левая колонка: Управление симулятором -->
+                <div class="xl:col-span-4 flex flex-col gap-6">
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700">
+                        <h3 id="lbl-p1-ctrl-title" class="text-sm font-bold text-blue-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+                            <i data-lucide="sliders" class="w-4 h-4"></i> Панель управления
+                        </h3>
+                        
+                        <!-- Рыночная цена P -->
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-2">
+                                <label id="lbl-p1-price-lbl" class="text-xs font-semibold text-slate-300">Рыночная цена (P = MR)</label>
+                                <span id="val-p" class="font-mono font-bold text-blue-300 bg-blue-500/10 px-2 py-0.5 rounded">16 000 ₸</span>
+                            </div>
+                            <input type="range" id="slider-p" min="4000" max="30000" value="16000" step="1000" class="vintage-slider">
+                            <p id="lbl-p1-price-desc" class="text-[10px] text-slate-500 mt-1">Рынок диктует цену. Фирма не может ее изменить.</p>
+                        </div>
+
+                        <!-- Объем выпуска Q -->
+                        <div class="mb-4">
+                            <div class="flex justify-between items-center mb-2">
+                                <label id="lbl-p1-vol-lbl" class="text-xs font-semibold text-slate-300">Ваш выпуск (Q)</label>
+                                <span id="val-q" class="font-mono font-bold text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded">6 ед.</span>
+                            </div>
+                            <input type="range" id="slider-q" min="1" max="12" value="6" step="1" class="vintage-slider">
+                            <p id="lbl-p1-vol-desc" class="text-[10px] text-slate-500 mt-1">Поиск оптимального объема производства.</p>
+                        </div>
+                    </div>
+
+                    <!-- Статистика -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                            <span id="lbl-p1-stat-tr" class="block text-[9px] text-slate-500 uppercase font-bold">Выручка (TR)</span>
+                            <span id="stat-tr" class="text-lg font-mono font-black text-white">-</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                            <span id="lbl-p1-stat-tc" class="block text-[9px] text-slate-500 uppercase font-bold">Общие издержки (TC)</span>
+                            <span id="stat-tc" class="text-lg font-mono font-black text-rose-400">-</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                            <span id="lbl-p1-stat-mc" class="block text-[9px] text-slate-500 uppercase font-bold">Предельные (MC)</span>
+                            <span id="stat-mc" class="text-lg font-mono font-black text-orange-400">-</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+                            <span id="lbl-p1-stat-atc" class="block text-[9px] text-slate-500 uppercase font-bold">Средние (ATC)</span>
+                            <span id="stat-atc" class="text-lg font-mono font-black text-emerald-400">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Вердикт -->
+                    <div id="verdict-box" class="p-4 rounded-xl border-l-4 bg-slate-900/80 transition-all duration-300">
+                        <h4 id="verdict-title" class="text-xs font-black uppercase tracking-wider mb-2">Вердикт</h4>
+                        <p id="verdict-desc" class="text-xs text-slate-300 leading-relaxed"></p>
+                        <div class="mt-3 pt-3 border-t border-slate-700/50 flex justify-between items-center">
+                            <span id="lbl-p1-econ-profit" class="text-[10px] font-bold text-slate-400">Экономическая прибыль:</span>
+                            <span id="stat-profit" class="text-xl font-black font-mono"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Правая колонка: График и Теория -->
+                <div class="xl:col-span-8 flex flex-col gap-6">
+                    <div class="bg-[#0b1120] border border-slate-800 rounded-2xl p-5 relative">
+                        <div class="flex flex-wrap gap-4 mb-4 text-[10px] font-bold uppercase tracking-widest text-slate-400 justify-center">
+                            <span id="leg-p1-p" class="text-blue-400 border-b border-blue-400 pb-0.5">--- Цена (P=MR)</span>
+                            <span id="leg-p1-atc" class="text-emerald-400">● ATC (Средние)</span>
+                            <span id="leg-p1-avc" class="text-purple-400">● AVC (Переменные)</span>
+                            <span id="leg-p1-mc" class="text-orange-400">● MC (Предельные)</span>
+                        </div>
+                        <canvas id="perfectCanvas" class="w-full h-[350px]"></canvas>
+                        <p id="lbl-p1-math-model" class="text-center text-[10px] text-slate-500 mt-2">Математическая модель: TC = 20 000 + 4000Q + 1000Q²</p>
+                    </div>
+
+                    <div class="bg-indigo-900/10 p-5 rounded-2xl border border-indigo-500/20">
+                        <h3 id="lbl-p1-biz-title" class="text-sm font-bold text-indigo-400 mb-3 flex items-center gap-2">
+                            <i data-lucide="store" class="w-4 h-4"></i> Бизнес-интерпретация модели
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div>
+                                <span id="lbl-p1-biz-q1" class="block text-[10px] text-slate-500 uppercase font-bold mb-1">Что за бизнес?</span>
+                                <p id="lbl-p1-biz-a1" class="text-xs text-slate-300 leading-relaxed">Типичная кондитерская с ежедневным циклом производства.</p>
+                            </div>
+                            <div>
+                                <span id="lbl-p1-biz-q2" class="block text-[10px] text-slate-500 uppercase font-bold mb-1">FC = 20 000 ₸</span>
+                                <p id="lbl-p1-biz-a2" class="text-xs text-slate-300 leading-relaxed">Ежедневная аренда кухни, фиксированный налог и базовые коммунальные платежи.</p>
+                            </div>
+                            <div>
+                                <span id="lbl-p1-biz-q3" class="block text-[10px] text-slate-500 uppercase font-bold mb-1">Сырье + Перегрузка</span>
+                                <p id="lbl-p1-biz-a3" class="text-xs text-slate-300 leading-relaxed">Базовые ингредиенты (4к ₸). Квадрат <strong>Q²</strong> отражает рост брака, тесноту и сверхурочные при спешке.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-blue-900/10 p-5 rounded-2xl border border-blue-500/20">
+                            <h3 id="lbl-p1-prin-title" class="text-sm font-bold text-blue-400 mb-3 flex items-center gap-2"><i data-lucide="book-open" class="w-4 h-4"></i> Ключевые принципы</h3>
+                            <ul id="lbl-p1-prin-list" class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                                <li><strong class="text-white">Price Taker:</strong> Фирма не может влиять на рыночную цену. Спрос абсолютно эластичен (горизонтален).</li>
+                                <li><strong class="text-white">Однородность:</strong> Товары неотличимы.</li>
+                                <li><strong class="text-white">Свободный вход:</strong> Отсутствие барьеров нормализует прибыль в долгосрочном периоде до нуля.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-emerald-900/10 p-5 rounded-2xl border border-emerald-500/20">
+                            <h3 id="lbl-p1-mgt-title" class="text-sm font-bold text-emerald-400 mb-3 flex items-center gap-2"><i data-lucide="check-circle" class="w-4 h-4"></i> Управленческие выводы</h3>
+                            <ul id="lbl-p1-mgt-list" class="text-xs text-slate-300 space-y-2 leading-relaxed">
+                                <li><strong class="text-white">P = MC:</strong> Золотое правило максимизации прибыли. Всегда производите до точки, где предельные издержки равны цене.</li>
+                                <li><strong class="text-white">Shutdown Point:</strong> Если цена падает ниже минимума AVC, немедленно приостанавливайте производство.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ВКТАДКА 2: Монополистическая конкуренция (Стилист) ==================== -->
+        <div id="mono-stylist" class="tab-content hidden space-y-5">
+            
+            <!-- Header -->
+            <header class="glass-card p-4 sm:p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-l-4 border-l-neonpink">
+                <div class="flex items-center gap-4">
+                    <div class="p-3 bg-pink-950/60 rounded-xl text-neonpink border border-pink-500/30 shadow-[0_0_15px_rgba(236,72,153,0.2)]">
+                        <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                            <path d="M3 9 1 6"/><path d="M6 5 5 2"/><path d="M10 3v-2"/><path d="M14 3v-2"/><path d="M18 5l1-3"/><path d="M21 9l2-3"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 id="lbl-p2-header-title" class="text-xl sm:text-2xl font-extrabold tracking-tight text-white">Оптимизация смены визажиста</h1>
+                            <span class="text-[10px] px-2.5 py-0.5 rounded bg-pink-950 text-pink-300 font-bold border border-pink-800 uppercase tracking-wider num-font">Beauty Management</span>
+                        </div>
+                        <p id="lbl-p2-header-sub" class="text-xs text-gray-400 mt-0.5">Анализ утилизации времени смены (480 мин), транзакционных издержек сетапа и маржинальности услуг</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-pink-950/40 border border-pink-500/30 text-gray-300 opacity-80 hover:opacity-100 transition-opacity">
+                    <span class="text-base">😊</span>
+                    <span class="text-xs font-semibold tracking-wide text-pink-300"></span>
+                </div>
+            </header>
+
+            <!-- Top KPI Bar -->
+            <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+                <div class="glass-card p-3.5 border-b-2 border-b-neonpink">
+                    <p id="lbl-p2-kpi1-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Дневная Выручка</p>
+                    <h3 class="text-lg sm:text-xl font-black text-pink-300 mt-1 num-font" id="kpiRevenue">0 ₸</h3>
+                    <p id="lbl-p2-kpi1-sub" class="text-[9px] text-gray-500 mt-0.5">Сумма чеков за смену</p>
+                </div>
+                <div class="glass-card p-3.5 border-b-2 border-b-emerald-400">
+                    <p id="lbl-p2-kpi2-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Чистая Маржа Смены</p>
+                    <h3 class="text-lg sm:text-xl font-black text-emerald-400 mt-1 num-font" id="kpiProfit">0 ₸</h3>
+                    <p id="lbl-p2-kpi2-sub" class="text-[9px] text-gray-500 mt-0.5">Выручка - Косметика - Аренда</p>
+                </div>
+                <div class="glass-card p-3.5 border-b-2 border-b-purple-400">
+                    <p id="lbl-p2-kpi3-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Полезная Работа</p>
+                    <h3 class="text-lg sm:text-xl font-black text-purple-300 mt-1 num-font" id="kpiWorkTime">0 мин</h3>
+                    <p id="lbl-p2-kpi3-sub" class="text-[9px] text-gray-500 mt-0.5">Из 480 минут смены</p>
+                </div>
+                <div class="glass-card p-3.5 border-b-2 border-b-neonamber">
+                    <p id="lbl-p2-kpi4-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Оверхед Сетапа (t0)</p>
+                    <h3 class="text-lg sm:text-xl font-black text-amber-300 mt-1 num-font" id="kpiSetupTime">0 мин</h3>
+                    <p id="lbl-p2-kpi4-sub" class="text-[9px] text-gray-500 mt-0.5">Подготовка + Дезинфекция</p>
+                </div>
+                <div class="glass-card p-3.5 border-b-2 border-b-deeprose col-span-2 sm:col-span-1">
+                    <p id="lbl-p2-kpi5-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Эффективность Часа</p>
+                    <h3 class="text-lg sm:text-xl font-black text-rose-400 mt-1 num-font" id="kpiHourlyRate">0 ₸/ч</h3>
+                    <p id="lbl-p2-kpi5-sub" class="text-[9px] text-gray-500 mt-0.5">Маржа на 1 час смены</p>
+                </div>
+            </section>
+
+            <!-- Context Intro Box -->
+            <div class="glass-card p-4 border-l-4 border-l-goldaccent text-xs leading-relaxed text-gray-300 space-y-1">
+                <span id="lbl-p2-ctx-title" class="font-bold text-goldaccent uppercase tracking-wider block text-sm">Суть экономии рабочего времени стилиста (Входной контекст):</span>
+                <p id="lbl-p2-ctx-body">Рабочий день студии ограничен 8 часами (480 минут). На каждого нового клиента расходуется не только время услуги, но и обязательное фиксированное время сетапа/дезинфекции/консультации (<strong>t0</strong>). Чем короче слоты клиентов, тем больше времени смены съедают суммарные оверхеды <strong>t0</strong>. Задача — подбирать комбинацию быстрых, средних и VIP-комплексов для максимизации чистой маржи смены.</p>
+            </div>
+
+            <!-- Main Working Screen -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <!-- Controls Sidebar -->
+                <div class="lg:col-span-4 space-y-4">
+                    <div class="glass-card p-4 space-y-3.5 border-t-2 border-t-neonpink">
+                        <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+                            <h2 id="lbl-p2-param-title" class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="sliders" class="w-4 h-4 text-neonpink"></i> Параметры смены
+                            </h2>
+                            <span class="text-[9px] bg-pink-950 text-pink-300 px-2 py-0.5 rounded border border-pink-800 num-font">8 HOURS SHIFT</span>
+                        </div>
+
+                        <div class="space-y-1.5">
+                            <span id="lbl-p2-combo-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Быстрый выбор структуры дня:</span>
+                            <div class="grid grid-cols-2 gap-2 text-xs">
+                                <button id="btn-combo-1" onclick="applyCombo(8,0,0)" class="px-2 py-1.5 rounded bg-slate-900 hover:bg-slate-800 text-gray-300 border border-gray-800 transition-all text-[11px] font-medium">8 × 1ч (Экспресс)</button>
+                                <button id="btn-combo-2" onclick="applyCombo(0,4,0)" class="px-2 py-1.5 rounded bg-slate-900 hover:bg-slate-800 text-gray-300 border border-gray-800 transition-all text-[11px] font-medium">4 × 2ч (Вечерний)</button>
+                                <button id="btn-combo-3" onclick="applyCombo(0,0,2)" class="px-2 py-1.5 rounded bg-slate-900 hover:bg-slate-800 text-gray-300 border border-gray-800 transition-all text-[11px] font-medium">2 × 4ч (VIP Съемка)</button>
+                                <button id="btn-combo-4" onclick="applyCombo(2,2,0)" class="px-2 py-1.5 rounded bg-pink-950 text-pink-300 border border-pink-700 hover:bg-pink-900 transition-all text-[11px] font-bold">2×3ч + 1×2ч (Гибрид)</button>
+                            </div>
+                        </div>
+
+                        <div class="space-y-1.5 bg-slate-950/60 p-3 rounded border border-gray-800">
+                            <div class="flex justify-between items-center text-xs">
+                                <label id="lbl-p2-t0-lbl" for="sliderT0" class="text-gray-300 font-medium text-[11px]">Сетап / Подготовка (t0):</label>
+                                <span class="font-bold text-neonamber num-font text-[12px]" id="valT0">20 мин</span>
+                            </div>
+                            <input type="range" id="sliderT0" min="0" max="40" step="5" value="20" class="stylist-slider">
+                        </div>
+
+                        <div class="space-y-1.5 bg-slate-950/60 p-3 rounded border border-gray-800">
+                            <div class="flex justify-between items-center text-xs">
+                                <label id="lbl-p2-rent-lbl" for="sliderRent" class="text-gray-300 font-medium text-[11px]">Аренда места за день:</label>
+                                <span class="font-bold text-deeprose num-font text-[12px]" id="valRent">15,000 ₸</span>
+                            </div>
+                            <input type="range" id="sliderRent" min="5000" max="40000" step="1000" value="15000" class="stylist-slider">
+                        </div>
+
+                        <div class="space-y-1.5 bg-slate-950/60 p-3 rounded border border-gray-800">
+                            <div class="flex justify-between items-center text-xs">
+                                <label id="lbl-p2-s-lbl" for="sliderCountS" class="text-gray-300 font-medium text-[11px]">Слоты S (Экспресс 60м / 10к ₸):</label>
+                                <span class="font-bold text-pink-400 num-font text-[12px]" id="valCountS">2 клиента</span>
+                            </div>
+                            <input type="range" id="sliderCountS" min="0" max="8" step="1" value="2" class="stylist-slider">
+                        </div>
+
+                        <div class="space-y-1.5 bg-slate-950/60 p-3 rounded border border-gray-800">
+                            <div class="flex justify-between items-center text-xs">
+                                <label id="lbl-p2-m-lbl" for="sliderCountM" class="text-gray-300 font-medium text-[11px]">Слоты M (Вечерний 120м / 25к ₸):</label>
+                                <span class="font-bold text-purple-300 num-font text-[12px]" id="valCountM">2 клиента</span>
+                            </div>
+                            <input type="range" id="sliderCountM" min="0" max="4" step="1" value="2" class="stylist-slider">
+                        </div>
+
+                        <div class="space-y-1.5 bg-slate-950/60 p-3 rounded border border-gray-800">
+                            <div class="flex justify-between items-center text-xs">
+                                <label id="lbl-p2-l-lbl" for="sliderCountL" class="text-gray-300 font-medium text-[11px]">Слоты L (VIP невеста 240м / 50к ₸):</label>
+                                <span class="font-bold text-emerald-400 num-font text-[12px]" id="valCountL">0 клиентов</span>
+                            </div>
+                            <input type="range" id="sliderCountL" min="0" max="2" step="1" value="0" class="stylist-slider">
+                        </div>
+
+                        <div class="p-3 rounded bg-slate-950/90 border border-gray-800 text-xs space-y-1.5 num-font">
+                            <div class="flex justify-between"><span id="lbl-p2-time-used-lbl" class="text-gray-400">Занято времени:</span><span class="text-pink-400 font-bold" id="totalTimeUsed">0 / 480 мин</span></div>
+                            <div class="flex justify-between"><span id="lbl-p2-free-time-lbl" class="text-gray-400">Окно простоя:</span><span class="text-amber-300 font-bold" id="freeTimeLeft">0 мин</span></div>
+                            <div class="flex justify-between pt-1 border-t border-gray-800"><span id="lbl-p2-shift-stat-lbl" class="text-gray-400">Статус смены:</span><span id="shiftStatusTag" class="font-bold text-emerald-400">В норме</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Full-Width Timeline Block + Explanation -->
+                <div class="lg:col-span-8 space-y-4">
+                    <div class="glass-card p-5 border-t-2 border-t-neonpink space-y-4">
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                            <h3 id="lbl-p2-timeline-title" class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="clock" class="w-4 h-4 text-neonpink"></i> Визуальная лента смены (09:00 - 17:00 / 480 минут)
+                            </h3>
+                            <span class="text-[10px] bg-slate-800 text-pink-300 border border-gray-700 px-2 py-0.5 rounded num-font">TIMELINE</span>
+                        </div>
+
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-[11px] text-gray-400 num-font font-semibold px-1">
+                                <span>09:00</span><span>11:00</span><span>13:00</span><span>15:00</span><span>17:00</span>
+                            </div>
+
+                            <div id="dayTimelineBar" class="w-full h-20 bg-slate-950 rounded-lg border border-gray-800 flex overflow-hidden p-1.5 gap-1 shadow-inner"></div>
+
+                            <div class="grid grid-cols-3 gap-2 text-[11px] pt-2 border-t border-gray-800/80 text-gray-400 font-medium">
+                                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-pink-500 inline-block"></span><span id="leg-p2-work">Работа (Слоты)</span></div>
+                                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-amber-400 inline-block"></span><span id="leg-p2-t0">Сетап / Дезинфекция (t0)</span></div>
+                                <div class="flex items-center gap-2"><span class="w-3 h-3 rounded bg-slate-700 inline-block"></span><span id="leg-p2-idle">Простой / Окно</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-5 border-t-2 border-t-goldaccent space-y-3">
+                        <h3 id="lbl-p2-exp-title" class="text-xs font-bold text-goldaccent uppercase tracking-wider flex items-center gap-2 border-b border-gray-800 pb-2">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i> Пояснение к структуре записи
+                        </h3>
+                        <div id="shiftExplanationText" class="text-xs text-gray-300 leading-relaxed space-y-2"></div>
+                        <div class="p-3 rounded bg-slate-950/80 border border-gray-800/80 text-[11px] text-gray-400">
+                            <span id="lbl-p2-margin-bal-title" class="text-emerald-400 font-bold block mb-0.5">Маржинальный баланс:</span>
+                            <span id="lbl-p2-margin-bal-desc">Модель автоматически учитывает затраты на расходные материалы (косметику) и фиксированную суточную аренду студии.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 Flip Cards -->
+            <section class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <h2 id="lbl-p2-cards-header" class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-neonpink"></i> Аналитика структуры смены (Кликните на карточку для переворота)
+                    </h2>
+                    <span class="text-[10px] text-gray-500">3D FLIP CARDS</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="flip-card cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front glass-card p-4 space-y-2 border-b-2 border-b-neonpink flex flex-col justify-between">
+                                <div class="flex justify-between items-center border-b border-gray-800 pb-1.5">
+                                    <h4 id="lbl-p2-c1-title" class="text-[11px] font-bold text-gray-200">1. Баланс времени смены</h4>
+                                    <span id="lbl-p2-c1-btn" class="text-[9px] text-pink-400 bg-pink-950 px-1.5 py-0.5 rounded border border-pink-800">Инфо 🔄</span>
+                                </div>
+                                <div class="h-44 relative"><canvas id="chartTimeBreakdown"></canvas></div>
+                            </div>
+                            <div class="flip-card-back p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-pink-500/40 pb-1">
+                                    <h4 id="lbl-p2-c1-back-title" class="text-xs font-bold text-pink-300">Экономический смысл графика 1</h4>
+                                    <span id="lbl-p2-c1-back-btn" class="text-[9px] text-gray-400">Назад 🔄</span>
+                                </div>
+                                <p id="lbl-p2-c1-back-desc" class="text-[11px] text-gray-300 leading-relaxed">
+                                    Делит 480 минут смены на 3 категории: Чистый визаж (Розовый), Подготовка t0 (Янтарный) и Простой (Серый).<br/><br/>
+                                    <em>Управленческий вывод:</em> Большой янтарный сектор указывает на скрытую потерю дохода из-за частой смены клиентов.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front glass-card p-4 space-y-2 border-b-2 border-b-purple-400 flex flex-col justify-between">
+                                <div class="flex justify-between items-center border-b border-gray-800 pb-1.5">
+                                    <h4 id="lbl-p2-c2-title" class="text-[11px] font-bold text-gray-200">2. Доход в минуту по слотам</h4>
+                                    <span id="lbl-p2-c2-btn" class="text-[9px] text-purple-400 bg-purple-950 px-1.5 py-0.5 rounded border border-purple-800">Инфо 🔄</span>
+                                </div>
+                                <div class="h-44 relative"><canvas id="chartSlotMargin"></canvas></div>
+                            </div>
+                            <div class="flip-card-back p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-purple-500/40 pb-1">
+                                    <h4 id="lbl-p2-c2-back-title" class="text-xs font-bold text-purple-300">Экономический смысл графика 2</h4>
+                                    <span id="lbl-p2-c2-back-btn" class="text-[9px] text-gray-400">Назад 🔄</span>
+                                </div>
+                                <p id="lbl-p2-c2-back-desc" class="text-[11px] text-gray-300 leading-relaxed">
+                                    Сравнивает реальную маржу на 1 минуту полного времени (услуга + t0) для слотов Экспресс, Вечерний и VIP.<br/><br/>
+                                    <em>Управленческий вывод:</em> Показывает, какой формат записи приносит максимальный доход в единицу времени.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front glass-card p-4 space-y-2 border-b-2 border-b-emerald-400 flex flex-col justify-between">
+                                <div class="flex justify-between items-center border-b border-gray-800 pb-1.5">
+                                    <h4 id="lbl-p2-c3-title" class="text-[11px] font-bold text-gray-200">3. Сравнение сценариев</h4>
+                                    <span id="lbl-p2-c3-btn" class="text-[9px] text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800">Инфо 🔄</span>
+                                </div>
+                                <div class="h-44 relative"><canvas id="chartScenarios"></canvas></div>
+                            </div>
+                            <div class="flip-card-back p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-emerald-500/40 pb-1">
+                                    <h4 id="lbl-p2-c3-back-title" class="text-xs font-bold text-emerald-300">Экономический смысл графика 3</h4>
+                                    <span id="lbl-p2-c3-back-btn" class="text-[9px] text-gray-400">Назад 🔄</span>
+                                </div>
+                                <p id="lbl-p2-c3-back-desc" class="text-[11px] text-gray-300 leading-relaxed">
+                                    Сравнивает чистую маржу при 3 стратегиях: Только экспресс-клиенты, Ваш текущий баланс и Только VIP-комплексы.<br/><br/>
+                                    <em>Управленческий вывод:</em> Наглядно демонстрирует выгоду сокращения количества сетапов t0.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front glass-card p-4 space-y-2 border-b-2 border-b-goldaccent flex flex-col justify-between">
+                                <div class="flex justify-between items-center border-b border-gray-800 pb-1.5">
+                                    <h4 id="lbl-p2-c4-title" class="text-[11px] font-bold text-gray-200">4. Покрытие аренды студии</h4>
+                                    <span id="lbl-p2-c4-btn" class="text-[9px] text-amber-400 bg-amber-950 px-1.5 py-0.5 rounded border border-amber-800">Инфо 🔄</span>
+                                </div>
+                                <div class="h-44 relative"><canvas id="chartBreakEven"></canvas></div>
+                            </div>
+                            <div class="flip-card-back p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-amber-500/40 pb-1">
+                                    <h4 id="lbl-p2-c4-back-title" class="text-xs font-bold text-goldaccent">Экономический смысл графика 4</h4>
+                                    <span id="lbl-p2-c4-back-btn" class="text-[9px] text-gray-400">Назад 🔄</span>
+                                </div>
+                                <p id="lbl-p2-c4-back-desc" class="text-[11px] text-gray-300 leading-relaxed">
+                                    Waterfall затрат смены: Выручка за вычетом прямых расходов на косметику за вычетом суточной аренды.<br/><br/>
+                                    <em>Управленческий вывод:</em> Финальный столбец показывает чистый заработок мастера за смену.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Academic Case Section Stylist -->
+            <section class="glass-card p-5 border-l-4 border-l-indigo-500 space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="graduation-cap" onclick="toggleAnswersKey('.answer-key-stylist')" class="w-5 h-5 text-gray-700 hover:text-indigo-400 transition-colors cursor-pointer opacity-30"></i>
+                        <h3 id="lbl-p2-cases-title" class="text-sm font-bold text-white uppercase tracking-wider">Учебные кейсы и контрольные задания</h3>
+                    </div>
+                    <span class="text-xs text-indigo-300 bg-slate-800 px-2.5 py-1 rounded border border-gray-700 font-mono">PRACTICE MODULE</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-slate-950/80 p-4 rounded-lg border border-gray-800 space-y-2 flex flex-col justify-between">
+                        <div class="space-y-1.5">
+                            <span id="lbl-p2-case1-title" class="text-[10px] font-bold text-pink-400 uppercase tracking-widest">Кейс 1: Влияние оверхеда t0</span>
+                            <p id="lbl-p2-case1-q" class="text-gray-300 font-medium">Если время дезинфекции и консультации t0 вырастет с 15 до 30 минут, почему при 6 экспресс-клиентах мастер теряет 1.5 часа рабочего времени?</p>
+                        </div>
+                        <div id="lbl-p2-case1-a" class="answer-key-stylist hidden mt-2 p-2.5 bg-slate-900/90 rounded border border-pink-500/40 text-gray-300 leading-relaxed text-[11px]">
+                            <span class="text-pink-400 font-bold block mb-1">Разбор эксперта:</span>
+                            При 6 клиентах увеличение t0 на 15 минут даёт 6 × 15 = 90 минут потерь продуктивного времени. Из 8 часов рабочее время услуги сокращается с 6.5 до 5 часов, снижая дневную выработку на 23%.
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/80 p-4 rounded-lg border border-gray-800 space-y-2 flex flex-col justify-between">
+                        <div class="space-y-1.5">
+                            <span id="lbl-p2-case2-title" class="text-[10px] font-bold text-purple-400 uppercase tracking-widest">Кейс 2: Ценообразование VIP-слотов</span>
+                            <p id="lbl-p2-case2-q" class="text-gray-300 font-medium">Какую цену необходимо установить на 4-часовой VIP-образ невесты, чтобы он был выгоднее приема 3 экспресс-клиентов?</p>
+                        </div>
+                        <div id="lbl-p2-case2-a" class="answer-key-stylist hidden mt-2 p-2.5 bg-slate-900/90 rounded border border-purple-500/40 text-gray-300 leading-relaxed text-[11px]">
+                            <span class="text-purple-300 font-bold block mb-1">Разбор эксперта:</span>
+                            3 экспресс-клиента приносят 30,000 ₸ за вычетом 3 сетапов t0. VIP-слот экономит 2 сетапа (40 мин). Минимальная цена VIP-слота должна перекрывать суммарную маржу 3 коротких клиентов с учетом разницы в расходных материалах.
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/80 p-4 rounded-lg border border-gray-800 space-y-2 flex flex-col justify-between">
+                        <div class="space-y-1.5">
+                            <span id="lbl-p2-case3-title" class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Кейс 3: Диверсификация рисков записи</span>
+                            <p id="lbl-p2-case3-q" class="text-gray-300 font-medium">Почему ориентироваться исключительно на 4-часовые VIP-слоты рискованно при возможной отмене клиента?</p>
+                        </div>
+                        <div id="lbl-p2-case3-a" class="answer-key-stylist hidden mt-2 p-2.5 bg-slate-900/90 rounded border border-emerald-500/40 text-gray-300 leading-relaxed text-[11px]">
+                            <span class="text-emerald-400 font-bold block mb-1">Разбор эксперта:</span>
+                            При 2 крупных клиентах за день отмена одной записи лишает мастера 50% суточной выручки при 100% сохранении фиксированной аренды студии. Гибридный график (S + M + L) сглаживает этот риск.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== ВКТАДКА 3: Оптимизационная логистическая задача (VRP) ==================== -->
+        <div id="vrp-logistics" class="tab-content hidden space-y-5">
+            
+            <header class="glass-card p-4 sm:p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-l-4 border-l-cyan-500">
+                <div class="flex items-center gap-3.5">
+                    <div class="p-3 bg-cyan-500/10 rounded-xl text-cyan-400 border border-cyan-500/20">
+                        <i data-lucide="route" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h1 id="lbl-p3-header-title" class="text-xl sm:text-2xl font-extrabold tracking-tight text-white uppercase">Оптимизационная логистическая задача (VRP)</h1>
+                            <span id="lbl-p3-header-badge" class="text-[10px] px-2.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300 font-bold border border-cyan-500/30 uppercase tracking-wider">SE Module</span>
+                        </div>
+                        <p id="lbl-p3-header-sub" class="text-xs text-gray-400 mt-0.5">Симулятор оптимизации маршрутов развоза и анализа компромиссов затрат (Trade-Offs)</p>
+                    </div>
+                </div>
+
+                <button onclick="generateRandomClients()" class="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-gray-700 text-white font-semibold text-xs transition-all active:scale-95">
+                    <i data-lucide="shuffle" class="w-4 h-4 text-cyan-400"></i> <span id="lbl-p3-btn-regen">Перегенерировать карту клиентов</span>
+                </button>
+            </header>
+
+            <!-- KPI Bar Logistics -->
+            <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
+                <div class="glass-card p-3.5 border-b-2 border-b-cyan-400">
+                    <p id="lbl-p3-kpi1-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Общие затраты</p>
+                    <h3 class="text-lg sm:text-xl font-black text-cyan-300 mt-1 mono-font" id="kpiTotalCost">0 ₸</h3>
+                    <p id="lbl-p3-kpi1-sub" class="text-[9px] text-gray-500 mt-0.5">Фикс + Переменка + Штраф</p>
+                </div>
+                <div class="glass-card p-3.5 border-b-2 border-b-purple-400">
+                    <p id="lbl-p3-kpi2-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Активный флот</p>
+                    <h3 class="text-lg sm:text-xl font-black text-purple-300 mt-1 mono-font" id="kpiVehicles">0 шт</h3>
+                    <p id="lbl-p3-kpi2-sub" class="text-[9px] text-gray-500 mt-0.5">Оптимальных рейсов</p>
+                </div>
+                <div class="glass-card p-3.5 border-b-2 border-b-emerald-400">
+                    <p id="lbl-p3-kpi3-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Утилизация кузова</p>
+                    <h3 class="text-lg sm:text-xl font-black text-emerald-300 mt-1 mono-font" id="kpiUtilization">0%</h3>
+                    <p id="lbl-p3-kpi3-sub" class="text-[9px] text-gray-500 mt-0.5">Средняя загрузка кузова</p>
+                </div>
+                <div class="glass-card p-3.5 border-b-2 border-b-amber-400">
+                    <p id="lbl-p3-kpi4-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Ср. плечо доставки</p>
+                    <h3 class="text-lg sm:text-xl font-black text-amber-300 mt-1 mono-font" id="kpiAvgDist">0 км</h3>
+                    <p id="lbl-p3-kpi4-sub" class="text-[9px] text-gray-500 mt-0.5">Пробег на 1 точку</p>
+                </div>
+                <div class="glass-card p-3.5 border-b-2 border-b-rose-500 col-span-2 sm:col-span-1">
+                    <p id="lbl-p3-kpi5-title" class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Теневая цена емкости</p>
+                    <h3 class="text-lg sm:text-xl font-black text-rose-400 mt-1 mono-font" id="kpiShadowPrice">0 ₸/кг</h3>
+                    <p id="lbl-p3-kpi5-sub" class="text-[9px] text-gray-500 mt-0.5">Ценность +10% к кузову</p>
+                </div>
+            </section>
+
+            <!-- Context Intro Logistics -->
+            <div class="glass-card p-4 border-l-4 border-l-amber-500 text-xs leading-relaxed text-gray-300 space-y-1">
+                <span id="lbl-p3-ctx-title" class="bold text-amber-400 uppercase tracking-wider block font-bold">Суть оптимизационной задачи (Входной контекст):</span>
+                <p id="lbl-p3-ctx-body">У вас есть Центральный Депо и клиенты в разных точках города с разным спросом (кг). За каждый выезд машины вы платите фиксированную сумму <strong>F</strong> (зарплата, аренда), а за каждый пройденный километр — <strong>c</strong> (топливо). Задача алгоритма — найти идеальное число машин и построить замкнутые маршруты так, чтобы развезти весь груз с <strong>минимальными совокупными затратами</strong>.</p>
+            </div>
+
+            <!-- Main Working Screen Logistics -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <div class="lg:col-span-4 space-y-4">
+                    <div class="glass-card p-4 space-y-3 border-t-2 border-t-cyan-500">
+                        <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+                            <h2 id="lbl-p3-ctrl-title" class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="sliders" class="w-4 h-4 text-cyan-400"></i> Параметры задачи
+                            </h2>
+                            <span id="lbl-p3-ctrl-badge" class="text-[9px] bg-slate-800 text-gray-300 px-2 py-0.5 rounded border border-gray-700 mono-font">Управление</span>
+                        </div>
+
+                        <div class="space-y-1 bg-slate-950/60 p-2.5 rounded border border-gray-800">
+                            <div class="flex justify-between items-center text-xs">
+                                <label id="lbl-p3-f-lbl" for="sliderF" class="text-gray-300 font-medium text-[11px]">Фикс выезда машины (F):</label>
+                                <span class="font-bold text-cyan-300 mono-font text-[12px]" id="valF">18,000 ₸</span>
+                            </div>
+                            <input type="range" id="sliderF" min="5000" max="50000" step="1000" value="18000" class="vintage-slider">
+                        </div>
+
+                        <div class="space-y-1 bg-slate-950/60 p-2.5 rounded border border-gray-800">
+                            <div class="flex justify-between items-center text-xs">
+                                <label id="lbl-p3-c-lbl" for="sliderC" class="text-gray-300 font-medium text-[11px]">Затраты на 1 км (c):</label>
+                                <span class="font-bold text-emerald-300 mono-font text-[12px]" id="valC">450 ₸/км</span>
+                            </div>
+                            <input type="range" id="sliderC" min="200" max="2000" step="50" value="450" class="vintage-slider">
+                        </div>
+
+                        <div class="space-y-1 bg-slate-950/60 p-2.5 rounded border border-gray-800">
+                            <div class="flex justify-between items-center text-xs">
+                                <label id="lbl-p3-q-lbl" for="sliderQ" class="text-gray-300 font-medium text-[11px]">Емкость кузова (Q):</label>
+                                <span class="font-bold text-purple-300 mono-font text-[12px]" id="valQ">350 кг</span>
+                            </div>
+                            <input type="range" id="sliderQ" min="50" max="1000" step="25" value="350" class="vintage-slider">
+                        </div>
+
+                        <div class="space-y-1 bg-slate-950/60 p-2.5 rounded border border-gray-800">
+                            <div class="flex justify-between items-center text-xs">
+                                <label id="lbl-p3-n-lbl" for="sliderN" class="text-gray-300 font-medium text-[11px]">Число точек (N):</label>
+                                <span class="font-bold text-amber-300 mono-font text-[12px]" id="valN">14 точек</span>
+                            </div>
+                            <input type="range" id="sliderN" min="8" max="25" step="1" value="14" class="vintage-slider">
+                        </div>
+
+                        <div class="space-y-1 bg-slate-950/60 p-2.5 rounded border border-gray-800">
+                            <div class="flex justify-between items-center text-xs">
+                                <label id="lbl-p3-p-lbl" for="sliderP" class="text-gray-300 font-medium text-[11px]">Штраф за дефицит (P):</label>
+                                <span class="font-bold text-rose-400 mono-font text-[12px]" id="valP">1,200 ₸/кг</span>
+                            </div>
+                            <input type="range" id="sliderP" min="500" max="5000" step="100" value="1200" class="vintage-slider">
+                        </div>
+
+                        <div class="p-3 rounded bg-slate-950/90 border border-gray-800 text-xs space-y-1.5 mono-font">
+                            <div class="flex justify-between"><span id="lbl-p3-tot-dem-lbl" class="text-gray-400">Суммарный спрос:</span><span class="text-amber-300 font-bold" id="totalDemand">0 кг</span></div>
+                            <div class="flex justify-between"><span id="lbl-p3-tot-cap-lbl" class="text-gray-400">Емкость флота:</span><span class="text-cyan-300 font-bold" id="totalCapacity">0 кг</span></div>
+                            <div class="flex justify-between pt-1 border-t border-gray-800"><span id="lbl-p3-stat-lbl" class="text-gray-400">Статус:</span><span id="capacityBalanceTag" class="font-bold text-emerald-400">100% Покрыто</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-8 grid grid-cols-1 md:grid-cols-12 gap-4">
+                    <div class="md:col-span-8 glass-card p-4 flex flex-col justify-between border-t-2 border-t-cyan-400">
+                        <div class="flex justify-between items-center border-b border-gray-800 pb-2">
+                            <h3 id="lbl-p3-map-title" class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-cyan-400"></i> Карта маршрутов
+                            </h3>
+                            <span class="text-[10px] bg-slate-800 text-cyan-300 border border-gray-700 px-2 py-0.5 rounded font-mono" id="mapStatusBadge">ОПТИМАЛЬНО</span>
+                        </div>
+
+                        <div class="w-full h-[360px] bg-slate-950 rounded-lg border border-gray-800 relative overflow-hidden mt-2">
+                            <svg id="vrpMap" class="w-full h-full" viewBox="0 0 800 480" preserveAspectRatio="xMidYMid meet"></svg>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-4 glass-card p-4 border-t-2 border-t-amber-400 flex flex-col justify-between space-y-3">
+                        <div>
+                            <h3 id="lbl-p3-exp-header" class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-gray-800 pb-2">
+                                <i data-lucide="info" class="w-4 h-4"></i> Пояснение к элементу
+                            </h3>
+                            <div id="routeExplanationText" class="text-xs text-gray-300 leading-relaxed mt-2 space-y-2">
+                                <p id="lbl-p3-exp-default" class="text-gray-400 italic">Наведите курсор на любую точку клиента или линию маршрута на карте, чтобы узнать экономическую логику выбора этого пути.</p>
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 rounded bg-slate-950/80 border border-gray-800/80 text-[11px] text-gray-400">
+                            <span id="lbl-p3-algo-title" class="text-cyan-300 font-bold block mb-0.5">Алгоритм Кларка-Райта:</span>
+                            <span id="lbl-p3-algo-desc">Объединяет клиентов в один рейс только если экономия на возврате в Депо больше, чем дополнительный пробег между ними.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 Flip Cards Logistics -->
+            <section class="space-y-2">
+                <div class="flex justify-between items-center">
+                    <h2 id="lbl-p3-cards-header" class="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-cyan-400"></i> Аналитические панели (Кликните на карточку, чтобы перевернуть)
+                    </h2>
+                    <span class="text-[10px] text-gray-500">3D Flip Cards</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="flip-card cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front glass-card p-4 space-y-2 border-b-2 border-b-cyan-400 flex flex-col justify-between">
+                                <div class="flex justify-between items-center border-b border-gray-800 pb-1.5">
+                                    <h4 id="lbl-p3-c1-title" class="text-[11px] font-bold text-gray-200">1. Структура затрат</h4>
+                                    <span id="lbl-p3-c1-btn" class="text-[9px] text-cyan-400 bg-cyan-950 px-1.5 py-0.5 rounded border border-cyan-800">Инфо 🔄</span>
+                                </div>
+                                <div class="h-44 relative"><canvas id="chartCostBreakdown"></canvas></div>
+                            </div>
+                            <div class="flip-card-back p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-cyan-500/40 pb-1">
+                                    <h4 id="lbl-p3-c1-back-title" class="text-xs font-bold text-cyan-300">Экономический смысл графика 1</h4>
+                                    <span id="lbl-p3-c1-back-btn" class="text-[9px] text-gray-400">Назад 🔄</span>
+                                </div>
+                                <p id="lbl-p3-c1-back-desc" class="text-[11px] text-gray-300 leading-relaxed">
+                                    Иллюстрирует компромисс издержек (Trade-Off). Голубой столбец — постоянные расходы на выезд автопарка (F). Зеленый — переменные расходы на километраж (c). Розовый — штрафы за недостаток места в кузове (P).<br/><br/>
+                                    <em>Управленческий вывод:</em> Преобладание голубого столбца сигналом требует укрупнения кузова и сокращения рейсов.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front glass-card p-4 space-y-2 border-b-2 border-b-purple-400 flex flex-col justify-between">
+                                <div class="flex justify-between items-center border-b border-gray-800 pb-1.5">
+                                    <h4 id="lbl-p3-c2-title" class="text-[11px] font-bold text-gray-200">2. Загрузка кузовов</h4>
+                                    <span id="lbl-p3-c2-btn" class="text-[9px] text-purple-400 bg-purple-950 px-1.5 py-0.5 rounded border border-purple-800">Инфо 🔄</span>
+                                </div>
+                                <div class="h-44 relative"><canvas id="chartCapacityProfile"></canvas></div>
+                            </div>
+                            <div class="flip-card-back p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-purple-500/40 pb-1">
+                                    <h4 id="lbl-p3-c2-back-title" class="text-xs font-bold text-purple-300">Экономический смысл графика 2</h4>
+                                    <span id="lbl-p3-c2-back-btn" class="text-[9px] text-gray-400">Назад 🔄</span>
+                                </div>
+                                <p id="lbl-p3-c2-back-desc" class="text-[11px] text-gray-300 leading-relaxed">
+                                    Показывает уровень использования полезного объема (Q) по каждому рейсу.<br/><br/>
+                                    <em>Управленческий вывод:</em> Столбцы, достигнувшие 100%, указывают на наличие узкого места (Bottleneck). Дополнительная вместимость мгновенно сократит общие издержки.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front glass-card p-4 space-y-2 border-b-2 border-b-emerald-400 flex flex-col justify-between">
+                                <div class="flex justify-between items-center border-b border-gray-800 pb-1.5">
+                                    <h4 id="lbl-p3-c3-title" class="text-[11px] font-bold text-gray-200">3. Оптимизация флота</h4>
+                                    <span id="lbl-p3-c3-btn" class="text-[9px] text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded border border-emerald-800">Инфо 🔄</span>
+                                </div>
+                                <div class="h-44 relative"><canvas id="chartFleetSensitivity"></canvas></div>
+                            </div>
+                            <div class="flip-card-back p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-emerald-500/40 pb-1">
+                                    <h4 id="lbl-p3-c3-back-title" class="text-xs font-bold text-emerald-300">Экономический смысл графика 3</h4>
+                                    <span id="lbl-p3-c3-back-btn" class="text-[9px] text-gray-400">Назад 🔄</span>
+                                </div>
+                                <p id="lbl-p3-c3-back-desc" class="text-[11px] text-gray-300 leading-relaxed">
+                                    U-образная кривая совокупных затрат. Левая часть растет из-за гигантских пробегов малочисленного флота. Правая — из-за переплат за постоянный фикс (F).<br/><br/>
+                                    <em>Управленческий вывод:</em> Самая нижняя точка траектории определяет идеальное количество грузовиков.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flip-card cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front glass-card p-4 space-y-2 border-b-2 border-b-amber-400 flex flex-col justify-between">
+                                <div class="flex justify-between items-center border-b border-gray-800 pb-1.5">
+                                    <h4 id="lbl-p3-c4-title" class="text-[11px] font-bold text-gray-200">4. Удельный кост доставки</h4>
+                                    <span id="lbl-p3-c4-btn" class="text-[9px] text-amber-400 bg-amber-950 px-1.5 py-0.5 rounded border border-amber-800">Инфо 🔄</span>
+                                </div>
+                                <div class="h-44 relative"><canvas id="chartCostEfficiency"></canvas></div>
+                            </div>
+                            <div class="flip-card-back p-4 space-y-2">
+                                <div class="flex justify-between items-center border-b border-amber-500/40 pb-1">
+                                    <h4 id="lbl-p3-c4-back-title" class="text-xs font-bold text-amber-300">Экономический смысл графика 4</h4>
+                                    <span id="lbl-p3-c4-back-btn" class="text-[9px] text-gray-400">Назад 🔄</span>
+                                </div>
+                                <p id="lbl-p3-c4-back-desc" class="text-[11px] text-gray-300 leading-relaxed">
+                                    Карта распределения клиентов по удельной стоимости единицы груза (тенге/кг) в зависимости от удаленности от Депо.<br/><br/>
+                                    <em>Управленческий вывод:</em> Выявляет нерентабельные отдаленные точки с небольшим спросом для обоснования минимального размера заказа.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Academic Cases Logistics -->
+            <section class="glass-card p-5 border-l-4 border-l-indigo-500 space-y-4">
+                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="graduation-cap" onclick="toggleAnswersKey('.answer-key-vrp')" class="w-5 h-5 text-gray-700 hover:text-indigo-400 transition-colors cursor-pointer opacity-30"></i>
+                        <h3 id="lbl-p3-cases-title" class="text-sm font-bold text-white uppercase tracking-wider">Учебные кейсы и контрольные задания</h3>
+                    </div>
+                    <span class="text-xs text-indigo-300 bg-slate-800 px-2.5 py-1 rounded border border-gray-700 font-mono">PRACTICE MODULE</span>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div class="bg-slate-950/80 p-4 rounded-lg border border-gray-800 space-y-2 flex flex-col justify-between">
+                        <div class="space-y-1.5">
+                            <span id="lbl-p3-case1-title" class="text-[10px] font-bold text-cyan-400 uppercase tracking-widest">Кейс 1: Шок переменной составляющей</span>
+                            <p id="lbl-p3-case1-q" class="text-gray-300 font-medium">Если стоимость топлива и амортизации на километр (c) подскочит в 3 раза, как эластичность маршрутов заставит алгоритм перестроить конфигурацию флота?</p>
+                        </div>
+                        <div id="lbl-p3-case1-a" class="answer-key-vrp hidden mt-2 p-2.5 bg-slate-900/90 rounded border border-cyan-500/40 text-gray-300 leading-relaxed text-[11px]">
+                            <span class="text-cyan-400 font-bold block mb-1">Разбор эксперта:</span>
+                            Количество задействованных машин вырастет. При дорогом пробеге длинные кольцевые маршруты становятся экономически катастрофическими. Алгоритм дробно разбивает карту на мелкие локальные сектора, высылая дополнительные единицы автотранспорта для сокращения совокупного километража.
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/80 p-4 rounded-lg border border-gray-800 space-y-2 flex flex-col justify-between">
+                        <div class="space-y-1.5">
+                            <span id="lbl-p3-case2-title" class="text-[10px] font-bold text-purple-400 uppercase tracking-widest">Кейс 2: Оценка предельной ценности</span>
+                            <p id="lbl-p3-case2-q" class="text-gray-300 font-medium">Поставщик предлагает модификацию кузова, увеличивающую объем (Q) на 10%. Каков предельный размер дневного платежа за лизинг, при котором соглашение остается прибыльным?</p>
+                        </div>
+                        <div id="lbl-p3-case2-a" class="answer-key-vrp hidden mt-2 p-2.5 bg-slate-900/90 rounded border border-purple-500/40 text-gray-300 leading-relaxed text-[11px]">
+                            <span class="text-purple-400 font-bold block mb-1">Разбор эксперта:</span>
+                            Максимально допустимый платеж равен величине Теневой цены емкости, умноженной на прирост килограммов. Если суточная экономия общих издержек от расширения кузова превышает лизинговую ставку — проект создает положительную чистую приведенную ценность (NPV).
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950/80 p-4 rounded-lg border border-gray-800 space-y-2 flex flex-col justify-between">
+                        <div class="space-y-1.5">
+                            <span id="lbl-p3-case3-title" class="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Кейс 3: Ловушка постоянного фикса</span>
+                            <p id="lbl-p3-case3-q" class="text-gray-300 font-medium">Почему стремление руководства минимизировать количество выехавших машин часто приводит к скрытому удорожанию логистики?</p>
+                        </div>
+                        <div id="lbl-p3-case3-a" class="answer-key-vrp hidden mt-2 p-2.5 bg-slate-900/90 rounded border border-emerald-500/40 text-gray-300 leading-relaxed text-[11px]">
+                            <span class="text-emerald-400 font-bold block mb-1">Разбор эксперта:</span>
+                            При искусственном сокращении машин перепробег оставшихся единиц растет нелинейно. Если совокупный рост переменных затрат на километраж и штрафы за просрочку неперевезенного груза (P) превышают экономию на фиксированном выезде (F), компания несет прямой убыток.
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+    </div>
+    
+    <div class="text-center text-xs text-slate-600 pt-4 border-t border-slate-900">
+        AlmaU • Software Engineering • 2026
+    </div>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    let currentLang = 'ru';
+
+    const i18n = {
+        ru: {
+            headerTitle: "Рыночная инфраструктура",
+            headerSub: "Принципы экономики • Микроэкономика | Software Engineering",
+            terminalBadge: "Интерактивный Терминал",
+            tabPerfect: "Совершенная<br>конкуренция",
+            tabMono: "Монополистическая<br>конкуренция (Стилист)",
+            tabVrp: "Оптимизационная<br>задача (VRP)",
+            
+            // Tab 1
+            p1Title: "Модель: Совершенная конкуренция",
+            p1Sub: "Анализ фирмы на совершенно конкурентном рынке (Price Taker)",
+            p1CtrlTitle: "Панель управления",
+            p1PriceLbl: "Рыночная цена (P = MR)",
+            p1PriceDesc: "Рынок диктует цену. Фирма не может ее изменить.",
+            p1VolLbl: "Ваш выпуск (Q)",
+            p1VolDesc: "Поиск оптимального объема производства.",
+            p1StatTr: "Выручка (TR)",
+            p1StatTc: "Общие издержки (TC)",
+            p1StatMc: "Предельные (MC)",
+            p1StatAtc: "Средние (ATC)",
+            p1EconProfit: "Экономическая прибыль:",
+            p1MathModel: "Математическая модель: TC = 20 000 + 4000Q + 1000Q²",
+            p1BizTitle: "Бизнес-интерпретация модели",
+            p1BizQ1: "Что за бизнес?",
+            p1BizA1: "Типичная кондитерская с ежедневным циклом производства.",
+            p1BizQ2: "FC = 20 000 ₸",
+            p1BizA2: "Ежедневная аренда кухни, фиксированный налог и базовые коммунальные платежи.",
+            p1BizQ3: "Сырье + Перегрузка",
+            p1BizA3: "Базовые ингредиенты (4к ₸). Квадрат Q² отражает рост брака, тесноту и сверхурочные при спешке.",
+            p1PrinTitle: "Ключевые принципы",
+            p1PrinList: `<li><strong class="text-white">Price Taker:</strong> Фирма не может влиять на рыночную цену. Спрос абсолютно эластичен (горизонтален).</li>
+                         <li><strong class="text-white">Однородность:</strong> Товары неотличимы.</li>
+                         <li><strong class="text-white">Свободный вход:</strong> Отсутствие барьеров нормализует прибыль в долгосрочном периоде до нуля.</li>`,
+            p1MgtTitle: "Управленческие выводы",
+            p1MgtList: `<li><strong class="text-white">P = MC:</strong> Золотое правило максимизации прибыли. Всегда производите до точки, где предельные издержки равны цене.</li>
+                        <li><strong class="text-white">Shutdown Point:</strong> Если цена падает ниже минимума AVC, немедленно приостанавливайте производство.</li>`,
+            legP1P: "--- Цена (P=MR)",
+            legP1Atc: "● ATC (Средние)",
+            legP1Avc: "● AVC (Переменные)",
+            legP1Mc: "● MC (Предельные)",
+
+            // Tab 2
+            p2HeaderTitle: "Оптимизация смены стилиста",
+            p2HeaderSub: "Анализ утилизации времени смены (480 мин), транзакционных издержек сетапа и маржинальности услуг",
+            p2Kpi1Title: "Дневная Выручка",
+            p2Kpi1Sub: "Сумма чеков за смену",
+            p2Kpi2Title: "Чистая Маржа Смены",
+            p2Kpi2Sub: "Выручка - Косметика - Аренда",
+            p2Kpi3Title: "Полезная Работа",
+            p2Kpi3Sub: "Из 480 минут смены",
+            p2Kpi4Title: "Оверхед Сетапа (t0)",
+            p2Kpi4Sub: "Подготовка + Дезинфекция",
+            p2Kpi5Title: "Эффективность Часа",
+            p2Kpi5Sub: "Маржа на 1 час смены",
+            p2CtxTitle: "Суть экономии рабочего времени стилиста (Входной контекст):",
+            p2CtxBody: "Рабочий день студии ограничен 8 часами (480 минут). На каждого нового клиента расходуется не только время услуги, но и обязательное фиксированное время сетапа/дезинфекции/консультации (t0). Чем короче слоты клиентов, тем больше времени смены съедают суммарные оверхеды t0. Задача — подбирать комбинацию быстрых, средних и VIP-комплексов для максимизации чистой маржи смены.",
+            p2ParamTitle: "Параметры смены",
+            p2ComboTitle: "Быстрый выбор структуры дня:",
+            p2Combo1: "8 × 1ч (Экспресс)",
+            p2Combo2: "4 × 2ч (Вечерний)",
+            p2Combo3: "2 × 4ч (VIP Съемка)",
+            p2Combo4: "2×3ч + 1×2ч (Гибрид)",
+            p2T0Lbl: "Сетап / Подготовка (t0):",
+            p2RentLbl: "Аренда места за день:",
+            p2SLbl: "Слоты S (Экспресс 60м / 10к ₸):",
+            p2MLbl: "Слоты M (Вечерний 120м / 25к ₸):",
+            p2LLbl: "Слоты L (VIP невеста 240м / 50к ₸):",
+            p2TimeUsedLbl: "Занято времени:",
+            p2FreeTimeLbl: "Окно простоя:",
+            p2ShiftStatLbl: "Статус смены:",
+            p2TimelineTitle: "Визуальная лента смены (09:00 - 17:00 / 480 минут)",
+            legP2Work: "Работа (Слоты)",
+            legP2T0: "Сетап / Дезинфекция (t0)",
+            legP2Idle: "Простой / Окно",
+            p2ExpTitle: "Пояснение к структуре записи",
+            p2MarginBalTitle: "Маржинальный баланс:",
+            p2MarginBalDesc: "Модель автоматически учитывает затраты на расходные материалы (косметику) и фиксированную суточную аренду студии.",
+            p2CardsHeader: "Аналитика структуры смены (Кликните на карточку для переворота)",
+            p2C1Title: "1. Баланс времени смены",
+            p2C1Btn: "Инфо 🔄",
+            p2C1BackTitle: "Экономический смысл графика 1",
+            p2C1BackBtn: "Назад 🔄",
+            p2C1BackDesc: "Делит 480 минут смены на 3 категории: Чистый визаж (Розовый), Подготовка t0 (Янтарный) и Простой (Серый).<br/><br/><em>Управленческий вывод:</em> Большой янтарный сектор указывает на скрытую потерю дохода из-за частой смены клиентов.",
+            p2C2Title: "2. Доход в минуту по слотам",
+            p2C2Btn: "Инфо 🔄",
+            p2C2BackTitle: "Экономический смысл графика 2",
+            p2C2BackBtn: "Назад 🔄",
+            p2C2BackDesc: "Сравнивает реальную маржу на 1 минуту полного времени (услуга + t0) для слотов Экспресс, Вечерний и VIP.<br/><br/><em>Управленческий вывод:</em> Показывает, какой формат записи приносит максимальный доход в единицу времени.",
+            p2C3Title: "3. Сравнение сценариев",
+            p2C3Btn: "Инфо 🔄",
+            p2C3BackTitle: "Экономический смысл графика 3",
+            p2C3BackBtn: "Назад 🔄",
+            p2C3BackDesc: "Сравнивает чистую маржу при 3 стратегиях: Только экспресс-клиенты, Ваш текущий баланс и Только VIP-комплексы.<br/><br/><em>Управленческий вывод:</em> Наглядно демонстрирует выгоду сокращения количества сетапов t0.",
+            p2C4Title: "4. Покрытие аренды студии",
+            p2C4Btn: "Инфо 🔄",
+            p2C4BackTitle: "Экономический смысл графика 4",
+            p2C4BackBtn: "Назад 🔄",
+            p2C4BackDesc: "Waterfall затрат смены: Выручка за вычетом прямых расходов на косметику за вычетом суточной аренды.<br/><br/><em>Управленческий вывод:</em> Финальный столбец показывает чистый заработок мастера за смену.",
+            p2CasesTitle: "Учебные кейсы и контрольные задания",
+            p2Case1Title: "Кейс 1: Влияние оверхеда t0",
+            p2Case1Q: "Если время дезинфекции и консультации t0 вырастет с 15 до 30 минут, почему при 6 экспресс-клиентах мастер теряет 1.5 часа рабочего времени?",
+            p2Case1A: `<span class="text-pink-400 font-bold block mb-1">Разбор эксперта:</span>При 6 клиентах увеличение t0 на 15 минут даёт 6 × 15 = 90 минут потерь продуктивного времени. Из 8 часов рабочее время услуги сокращается с 6.5 до 5 часов, снижая дневную выработку на 23%.`,
+            p2Case2Title: "Кейс 2: Ценообразование VIP-слотов",
+            p2Case2Q: "Какую цену необходимо установить на 4-часовой VIP-образ невесты, чтобы он был выгоднее приема 3 экспресс-клиентов?",
+            p2Case2A: `<span class="text-purple-300 font-bold block mb-1">Разбор эксперта:</span>3 экспресс-клиента приносят 30,000 ₸ за вычетом 3 сетапов t0. VIP-слот экономит 2 сетапа (40 мин). Минимальная цена VIP-слота должна перекрывать суммарную маржу 3 коротких клиентов с учетом разницы в расходных материалах.`,
+            p2Case3Title: "Кейс 3: Диверсификация рисков записи",
+            p2Case3Q: "Почему ориентироваться исключительно на 4-часовые VIP-слоты рискованно при возможной отмене клиента?",
+            p2Case3A: `<span class="text-emerald-400 font-bold block mb-1">Разбор эксперта:</span>При 2 крупных клиентах за день отмена одной записи лишает мастера 50% суточной выручки при 100% сохранении фиксированной аренды студии. Гибридный график (S + M + L) сглаживает этот риск.`,
+
+            // Tab 3
+            p3HeaderTitle: "Оптимизационная логистическая задача (VRP)",
+            p3HeaderSub: "Симулятор оптимизации маршрутов развоза и анализа компромиссов затрат (Trade-Offs)",
+            p3BtnRegen: "Перегенерировать карту клиентов",
+            p3Kpi1Title: "Общие затраты",
+            p3Kpi1Sub: "Фикс + Переменка + Штраф",
+            p3Kpi2Title: "Активный флот",
+            p3Kpi2Sub: "Оптимальных рейсов",
+            p3Kpi3Title: "Утилизация кузова",
+            p3Kpi3Sub: "Средняя загрузка кузова",
+            p3Kpi4Title: "Ср. плечо доставки",
+            p3Kpi4Sub: "Пробег на 1 точку",
+            p3Kpi5Title: "Теневая цена емкости",
+            p3Kpi5Sub: "Ценность +10% к кузову",
+            p3CtxTitle: "Суть оптимизационной задачи (Входной контекст):",
+            p3CtxBody: "У вас есть Центральный Депо и клиенты в разных точках города с разным спросом (кг). За каждый выезд машины вы платите фиксированную сумму F (зарплата, аренда), а за каждый пройденный километр — c (топливо). Задача алгоритма — найти идеальное число машин и построить замкнутые маршруты так, чтобы развезти весь груз с минимальными совокупными затратами.",
+            p3CtrlTitle: "Параметры задачи",
+            p3CtrlBadge: "Управление",
+            p3FLbl: "Фикс выезда машины (F):",
+            p3CLbl: "Затраты на 1 км (c):",
+            p3QLbl: "Емкость кузова (Q):",
+            p3NLbl: "Число точек (N):",
+            p3PLbl: "Штраф за дефицит (P):",
+            p3TotDemLbl: "Суммарный спрос:",
+            p3TotCapLbl: "Емкость флота:",
+            p3StatLbl: "Статус:",
+            p3MapTitle: "Карта маршрутов",
+            p3ExpHeader: "Пояснение к элементу",
+            p3ExpDefault: "Наведите курсор на любую точку клиента или линию маршрута на карте, чтобы узнать экономическую логику выбора этого пути.",
+            p3AlgoTitle: "Алгоритм Кларка-Райта:",
+            p3AlgoDesc: "Объединяет клиентов в один рейс только если экономия на возврате в Депо больше, чем дополнительный пробег между ними.",
+            p3CardsHeader: "Аналитические панели (Кликните на карточку, чтобы перевернуть)",
+            p3C1Title: "1. Структура затрат",
+            p3C1Btn: "Инфо 🔄",
+            p3C1BackTitle: "Экономический смысл графика 1",
+            p3C1BackBtn: "Назад 🔄",
+            p3C1BackDesc: "Иллюстрирует компромисс издержек (Trade-Off). Голубой столбец — постоянные расходы на выезд автопарка (F). Зеленый — переменные расходы на километраж (c). Розовый — штрафы за недостаток места в кузове (P).<br/><br/><em>Управленческий вывод:</em> Преобладание голубого столбца сигналом требует укрупнения кузова и сокращения рейсов.",
+            p3C2Title: "2. Загрузка кузовов",
+            p3C2Btn: "Инфо 🔄",
+            p3C2BackTitle: "Экономический смысл графика 2",
+            p3C2BackBtn: "Назад 🔄",
+            p3C2BackDesc: "Показывает уровень использования полезного объема (Q) по каждому рейсу.<br/><br/><em>Управленческий вывод:</em> Столбцы, достигнувшие 100%, указывают на наличие узкого места (Bottleneck). Дополнительная вместимость мгновенно сократит общие издержки.",
+            p3C3Title: "3. Оптимизация флота",
+            p3C3Btn: "Инфо 🔄",
+            p3C3BackTitle: "Экономический смысл графика 3",
+            p3C3BackBtn: "Назад 🔄",
+            p3C3BackDesc: "U-образная кривая совокупных затрат. Левая часть растет из-за гигантских пробегов малочисленного флота. Правая — из-за переплат за постоянный фикс (F).<br/><br/><em>Управленческий вывод:</em> Самая нижняя точка траектории определяет идеальное количество грузовиков.",
+            p3C4Title: "4. Удельный кост доставки",
+            p3C4Btn: "Инфо 🔄",
+            p3C4BackTitle: "Экономический смысл графика 4",
+            p3C4BackBtn: "Назад 🔄",
+            p3C4BackDesc: "Карта распределения клиентов по удельной стоимости единицы груза (тенге/кг) в зависимости от удаленности от Депо.<br/><br/><em>Управленческий вывод:</em> Выявляет нерентабельные отдаленные точки с небольшим спросом для обоснования минимального размера заказа.",
+            p3CasesTitle: "Учебные кейсы и контрольные задания",
+            p3Case1Title: "Кейс 1: Шок переменной составляющей",
+            p3Case1Q: "Если стоимость топлива и амортизации на километр (c) подскочит в 3 раза, как эластичность маршрутов заставит алгоритм перестроить конфигурацию флота?",
+            p3Case1A: `<span class="text-cyan-400 font-bold block mb-1">Разбор эксперта:</span>Количество задействованных машин вырастет. При дорогом пробеге длинные кольцевые маршруты становятся экономически катастрофическими. Алгоритм дробно разбивает карту на мелкие локальные сектора, высылая дополнительные единицы автотранспорта для сокращения совокупного километража.`,
+            p3Case2Title: "Кейс 2: Оценка предельной ценности",
+            p3Case2Q: "Поставщик предлагает модификацию кузова, увеличивающую объем (Q) на 10%. Каков предельный размер дневного платежа за лизинг, при котором соглашение остается прибыльным?",
+            p3Case2A: `<span class="text-purple-400 font-bold block mb-1">Разбор эксперта:</span>Максимально допустимый платеж равен величине Теневой цены емкости, умноженной на прирост килограммов. Если суточная экономия общих издержек от расширения кузова превышает лизинговую ставку — проект создает положительную чистую приведенную ценность (NPV).`,
+            p3Case3Title: "Кейс 3: Ловушка постоянного фикса",
+            p3Case3Q: "Почему стремление руководства минимизировать количество выехавших машин часто приводит к скрытому удорожанию логистики?",
+            p3Case3A: `<span class="text-emerald-400 font-bold block mb-1">Разбор эксперта:</span>При искусственном сокращении машин перепробег оставшихся единиц растет нелинейно. Если совокупный рост переменных затрат на километраж и штрафы за просрочку неперевезенного груза (P) превышают экономию на фиксированном выезде (F), компания несет прямой убыток.`
+        },
+        en: {
+            headerTitle: "Market Infrastructure",
+            headerSub: "Principles of Economics • Microeconomics | Software Engineering",
+            terminalBadge: "Interactive Terminal",
+            tabPerfect: "Perfect<br>Competition",
+            tabMono: "Monopolistic<br>Competition (Stylist)",
+            tabVrp: "Optimization<br>Task (VRP)",
+
+            // Tab 1
+            p1Title: "Model: Perfect Competition",
+            p1Sub: "Firm analysis in a perfectly competitive market (Price Taker)",
+            p1CtrlTitle: "Control Panel",
+            p1PriceLbl: "Market Price (P = MR)",
+            p1PriceDesc: "The market dictates the price. The firm cannot alter it.",
+            p1VolLbl: "Your Output (Q)",
+            p1VolDesc: "Searching for optimal production volume.",
+            p1StatTr: "Revenue (TR)",
+            p1StatTc: "Total Cost (TC)",
+            p1StatMc: "Marginal Cost (MC)",
+            p1StatAtc: "Average Cost (ATC)",
+            p1EconProfit: "Economic Profit:",
+            p1MathModel: "Mathematical Model: TC = 20,000 + 4,000Q + 1,000Q²",
+            p1BizTitle: "Business Interpretation of the Model",
+            p1BizQ1: "What type of business?",
+            p1BizA1: "A typical bakery/pastry shop with a daily production cycle.",
+            p1BizQ2: "FC = 20,000 ₸",
+            p1BizA2: "Daily kitchen rent, fixed taxes, and basic utilities.",
+            p1BizQ3: "Materials + Overload",
+            p1BizA3: "Raw ingredients (4k ₸). The quadratic term Q² reflects waste, overcrowding, and overtime during rush.",
+            p1PrinTitle: "Key Principles",
+            p1PrinList: `<li><strong class="text-white">Price Taker:</strong> The firm cannot influence market price. Demand is perfectly elastic.</li>
+                         <li><strong class="text-white">Homogeneity:</strong> Products are identical across competitors.</li>
+                         <li><strong class="text-white">Free Entry/Exit:</strong> Zero long-run economic profit due to low barriers.</li>`,
+            p1MgtTitle: "Managerial Takeaways",
+            p1MgtList: `<li><strong class="text-white">P = MC:</strong> Golden rule of profit maximization. Produce where marginal cost equals price.</li>
+                        <li><strong class="text-white">Shutdown Point:</strong> If price falls below min AVC, halt operations immediately in short run.</li>`,
+            legP1P: "--- Price (P=MR)",
+            legP1Atc: "● ATC (Average)",
+            legP1Avc: "● AVC (Variable)",
+            legP1Mc: "● MC (Marginal)",
+
+            // Tab 2
+            p2HeaderTitle: "Stylist Shift Optimization",
+            p2HeaderSub: "Analysis of shift time utilization (480 min), setup overheads, and service profitability",
+            p2Kpi1Title: "Daily Revenue",
+            p2Kpi1Sub: "Total receipts per shift",
+            p2Kpi2Title: "Net Shift Margin",
+            p2Kpi2Sub: "Revenue - Cosmetics - Rent",
+            p2Kpi3Title: "Productive Work",
+            p2Kpi3Sub: "Out of 480 shift minutes",
+            p2Kpi4Title: "Setup Overhead (t0)",
+            p2Kpi4Sub: "Prep + Sanitization",
+            p2Kpi5Title: "Hourly Efficiency",
+            p2Kpi5Sub: "Margin per 1 shift hour",
+            p2CtxTitle: "Core Concept of Stylist Shift Optimization:",
+            p2CtxBody: "The working day is capped at 8 hours (480 minutes). Every client requires not only service time but also fixed setup/sanitization time (t0). Short client slots increase cumulative overhead t0, reducing overall output. The goal is to optimize slot composition (Express, Evening, VIP) to maximize shift margin.",
+            p2ParamTitle: "Shift Parameters",
+            p2ComboTitle: "Quick Schedule Presets:",
+            p2Combo1: "8 × 1h (Express)",
+            p2Combo2: "4 × 2h (Evening)",
+            p2Combo3: "2 × 4h (VIP Bridal)",
+            p2Combo4: "2×3h + 1×2h (Hybrid)",
+            p2T0Lbl: "Setup / Prep Time (t0):",
+            p2RentLbl: "Daily Rent Expense:",
+            p2SLbl: "S Slots (Express 60m / 10k ₸):",
+            p2MLbl: "M Slots (Evening 120m / 25k ₸):",
+            p2LLbl: "L Slots (VIP Bridal 240m / 50k ₸):",
+            p2TimeUsedLbl: "Time Allocated:",
+            p2FreeTimeLbl: "Idle Window:",
+            p2ShiftStatLbl: "Shift Status:",
+            p2TimelineTitle: "Visual Shift Timeline (09:00 - 17:00 / 480 minutes)",
+            legP2Work: "Work (Slots)",
+            legP2T0: "Setup / Prep (t0)",
+            legP2Idle: "Idle / Gap",
+            p2ExpTitle: "Schedule Breakdown Explanation",
+            p2MarginBalTitle: "Margin Balance:",
+            p2MarginBalDesc: "The model automatically accounts for variable cosmetic expenses and daily studio rental costs.",
+            p2CardsHeader: "Shift Structure Analytics (Click card to flip)",
+            p2C1Title: "1. Shift Time Balance",
+            p2C1Btn: "Info 🔄",
+            p2C1BackTitle: "Economic Sense of Chart 1",
+            p2C1BackBtn: "Back 🔄",
+            p2C1BackDesc: "Splits 480 minutes into 3 components: Active Work (Pink), Setup t0 (Amber), and Idle Time (Gray).<br/><br/><em>Managerial Takeaway:</em> A large amber sector signifies hidden revenue loss from frequent client turnover.",
+            p2C2Title: "2. Revenue per Minute by Slot",
+            p2C2Btn: "Info 🔄",
+            p2C2BackTitle: "Economic Sense of Chart 2",
+            p2C2BackBtn: "Back 🔄",
+            p2C2BackDesc: "Compares true margin per minute of total time (service + t0) across Express, Evening, and VIP slots.<br/><br/><em>Managerial Takeaway:</em> Highlights which slot format delivers maximum profit per unit time.",
+            p2C3Title: "3. Scenario Comparison",
+            p2C3Btn: "Info 🔄",
+            p2C3BackTitle: "Economic Sense of Chart 3",
+            p2C3BackBtn: "Back 🔄",
+            p2C3BackDesc: "Compares net shift margin across 3 strategies: Express Only, Current Mix, and VIP Only.<br/><br/><em>Managerial Takeaway:</em> Demonstrates the clear financial benefit of minimizing setup overhead t0.",
+            p2C4Title: "4. Studio Rent Coverage",
+            p2C4Btn: "Info 🔄",
+            p2C4BackTitle: "Economic Sense of Chart 4",
+            p2C4BackBtn: "Back 🔄",
+            p2C4BackDesc: "Shift Cost Waterfall: Revenue minus direct material costs minus daily fixed studio rent.<br/><br/><em>Managerial Takeaway:</em> The final bar displays the stylist's take-home net profit.",
+            p2CasesTitle: "Academic Case Studies & Exercises",
+            p2Case1Title: "Case 1: Setup Overhead t0 Impact",
+            p2Case1Q: "If sanitization & consultation time t0 rises from 15 to 30 mins, why does a stylist lose 1.5h of productive time over 6 clients?",
+            p2Case1A: `<span class="text-pink-400 font-bold block mb-1">Expert Breakdown:</span>With 6 clients, a 15-minute t0 increase equals 6 × 15 = 90 lost productive minutes. Out of 8 hours, service time drops from 6.5h to 5h, cutting daily output by 23%.`,
+            p2Case2Title: "Case 2: VIP Slot Pricing",
+            p2Case2Q: "What minimum price should be set for a 4-hour VIP bridal service to outperform 3 express clients?",
+            p2Case2A: `<span class="text-purple-300 font-bold block mb-1">Expert Breakdown:</span>3 express clients generate 30,000 ₸ gross margin minus 3 t0 setups. The VIP slot saves 2 setups (40m). VIP price must exceed 3 short clients' margin plus material differential.`,
+            p2Case3Title: "Case 3: Appointment Risk Diversification",
+            p2Case3Q: "Why is relying solely on two 4-hour VIP slots risky in case of client cancellation?",
+            p2Case3A: `<span class="text-emerald-400 font-bold block mb-1">Expert Breakdown:</span>With only 2 major clients per day, a single cancellation wipes out 50% of revenue while studio rent remains 100% fixed. A hybrid schedule (S + M + L) mitigates this volatility.`,
+
+            // Tab 3
+            p3HeaderTitle: "Vehicle Routing Problem (VRP)",
+            p3HeaderSub: "Route optimization simulator & logistics cost trade-offs analysis",
+            p3BtnRegen: "Regenerate Client Map",
+            p3Kpi1Title: "Total Cost",
+            p3Kpi1Sub: "Fixed + Variable + Penalty",
+            p3Kpi2Title: "Active Fleet",
+            p3Kpi2Sub: "Optimal routes count",
+            p3Kpi3Title: "Capacity Utilization",
+            p3Kpi3Sub: "Average truck load",
+            p3Kpi4Title: "Avg Delivery Arm",
+            p3Kpi4Sub: "Distance per stop",
+            p3Kpi5Title: "Shadow Price of Capacity",
+            p3Kpi5Sub: "Value of +10% truck volume",
+            p3CtxTitle: "Logistics Optimization Overview:",
+            p3CtxBody: "A Central Depot dispatches trucks to scattered clients with varying demands (kg). Dispatched vehicles incur fixed trip cost F (salary/lease), while distance incurs per-km variable cost c. The algorithm identifies optimal fleet size and closed routes to minimize total logistics expenditure.",
+            p3CtrlTitle: "Problem Parameters",
+            p3CtrlBadge: "Controls",
+            p3FLbl: "Fixed Trip Cost (F):",
+            p3CLbl: "Cost per km (c):",
+            p3QLbl: "Truck Capacity (Q):",
+            p3NLbl: "Number of Stops (N):",
+            p3PLbl: "Shortage Penalty (P):",
+            p3TotDemLbl: "Total Demand:",
+            p3TotCapLbl: "Fleet Capacity:",
+            p3StatLbl: "Status:",
+            p3MapTitle: "Route Map Canvas",
+            p3ExpHeader: "Element Explanation",
+            p3ExpDefault: "Hover over any client node or route line on the map to inspect economic routing logic.",
+            p3AlgoTitle: "Clarke-Wright Savings Algorithm:",
+            p3AlgoDesc: "Merges two stops into one route only if return-to-depot savings exceed inter-client transit mileage.",
+            p3CardsHeader: "Logistics Analytics Panels (Click card to flip)",
+            p3C1Title: "1. Cost Breakdown",
+            p3C1Btn: "Info 🔄",
+            p3C1BackTitle: "Economic Sense of Chart 1",
+            p3C1BackBtn: "Back 🔄",
+            p3C1BackDesc: "Illustrates the cost trade-off. Cyan bar represents fixed fleet dispatch cost (F). Green indicates mileage costs (c). Pink reflects shortage penalties (P).<br/><br/><em>Managerial Takeaway:</em> Dominant fixed costs call for larger truck capacity to consolidate trips.",
+            p3C2Title: "2. Truck Load Profile",
+            p3C2Btn: "Info 🔄",
+            p3C2BackTitle: "Economic Sense of Chart 2",
+            p3C2BackBtn: "Back 🔄",
+            p3C2BackDesc: "Displays volume utilization (Q) across active vehicle runs.<br/><br/><em>Managerial Takeaway:</em> Bars hitting 100% flag a bottleneck where additional truck capacity instantly reduces costs.",
+            p3C3Title: "3. Fleet Size Optimization",
+            p3C3Btn: "Info 🔄",
+            p3C3BackTitle: "Economic Sense of Chart 3",
+            p3C3BackBtn: "Back 🔄",
+            p3C3BackDesc: "U-shaped Total Cost curve. The left side escalates due to excessive transit distance of an under-sized fleet; the right side due to fixed trip cost inflation.<br/><br/><em>Managerial Takeaway:</em> The global minimum pinpoints ideal fleet count.",
+            p3C4Title: "4. Unit Delivery Cost",
+            p3C4Btn: "Info 🔄",
+            p3C4BackTitle: "Economic Sense of Chart 4",
+            p3C4BackBtn: "Back 🔄",
+            p3C4BackDesc: "Scatter distribution of delivery cost per kg relative to depot distance.<br/><br/><em>Managerial Takeaway:</em> Identifies unprofitable remote stops with low volume to justify minimum order size constraints.",
+            p3CasesTitle: "Academic Case Studies & Exercises",
+            p3Case1Title: "Case 1: Variable Cost Shock",
+            p3Case1Q: "If per-km fuel & maintenance costs (c) triple, how will route elasticity force the algorithm to adjust fleet deployment?",
+            p3Case1A: `<span class="text-cyan-400 font-bold block mb-1">Expert Breakdown:</span>The active fleet count will increase. With expensive mileage, long ring routes become unviable. The algorithm partitions the map into smaller local zones, deploying extra trucks to minimize cumulative mileage.`,
+            p3Case2Title: "Case 2: Marginal Capacity Value",
+            p3Case2Q: "A vendor offers truck modifications expanding payload (Q) by 10%. What is the maximum daily lease cost for a profitable agreement?",
+            p3Case2A: `<span class="text-purple-400 font-bold block mb-1">Expert Breakdown:</span>The maximum profitable daily rate equals the Shadow Price of Capacity multiplied by additional capacity gained. If daily cost savings exceed lease payments, NPV is positive.`,
+            p3Case3Title: "Case 3: Fixed Dispatch Trap",
+            p3Case3Q: "Why does management's push to minimize dispatched trucks often lead to hidden cost inflation?",
+            p3Case3A: `<span class="text-emerald-400 font-bold block mb-1">Expert Breakdown:</span>Artificially restricting vehicle count causes excessive transit detours. If incremental mileage and unfulfilled order penalties (P) exceed trip cost savings (F), total costs rise.`
+        }
+    };
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        const t = i18n[lang];
+
+        document.getElementById('btn-lang-ru').className = lang === 'ru' ? "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md" : "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
+        document.getElementById('btn-lang-en').className = lang === 'en' ? "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md" : "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
+
+        document.getElementById('lbl-header-title').innerText = t.headerTitle;
+        document.getElementById('lbl-header-subtitle').innerText = t.headerSub;
+        document.getElementById('lbl-terminal-badge').innerText = t.terminalBadge;
+        document.getElementById('tab-label-perfect').innerHTML = t.tabPerfect;
+        document.getElementById('tab-label-mono').innerHTML = t.tabMono;
+        document.getElementById('tab-label-vrp').innerHTML = t.tabVrp;
+
+        // Tab 1
+        document.getElementById('lbl-perfect-title').innerText = t.p1Title;
+        document.getElementById('lbl-perfect-sub').innerText = t.p1Sub;
+        document.getElementById('lbl-p1-ctrl-title').innerHTML = `<i data-lucide="sliders" class="w-4 h-4"></i> ${t.p1CtrlTitle}`;
+        document.getElementById('lbl-p1-price-lbl').innerText = t.p1PriceLbl;
+        document.getElementById('lbl-p1-price-desc').innerText = t.p1PriceDesc;
+        document.getElementById('lbl-p1-vol-lbl').innerText = t.p1VolLbl;
+        document.getElementById('lbl-p1-vol-desc').innerText = t.p1VolDesc;
+        document.getElementById('lbl-p1-stat-tr').innerText = t.p1StatTr;
+        document.getElementById('lbl-p1-stat-tc').innerText = t.p1StatTc;
+        document.getElementById('lbl-p1-stat-mc').innerText = t.p1StatMc;
+        document.getElementById('lbl-p1-stat-atc').innerText = t.p1StatAtc;
+        document.getElementById('lbl-p1-econ-profit').innerText = t.p1EconProfit;
+        document.getElementById('lbl-p1-math-model').innerText = t.p1MathModel;
+        document.getElementById('lbl-p1-biz-title').innerHTML = `<i data-lucide="store" class="w-4 h-4"></i> ${t.p1BizTitle}`;
+        document.getElementById('lbl-p1-biz-q1').innerText = t.p1BizQ1;
+        document.getElementById('lbl-p1-biz-a1').innerText = t.p1BizA1;
+        document.getElementById('lbl-p1-biz-q2').innerText = t.p1BizQ2;
+        document.getElementById('lbl-p1-biz-a2').innerText = t.p1BizA2;
+        document.getElementById('lbl-p1-biz-q3').innerText = t.p1BizQ3;
+        document.getElementById('lbl-p1-biz-a3').innerHTML = t.p1BizA3;
+        document.getElementById('lbl-p1-prin-title').innerHTML = `<i data-lucide="book-open" class="w-4 h-4"></i> ${t.p1PrinTitle}`;
+        document.getElementById('lbl-p1-prin-list').innerHTML = t.p1PrinList;
+        document.getElementById('lbl-p1-mgt-title').innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i> ${t.p1MgtTitle}`;
+        document.getElementById('lbl-p1-mgt-list').innerHTML = t.p1MgtList;
+        document.getElementById('leg-p1-p').innerText = t.legP1P;
+        document.getElementById('leg-p1-atc').innerText = t.legP1Atc;
+        document.getElementById('leg-p1-avc').innerText = t.legP1Avc;
+        document.getElementById('leg-p1-mc').innerText = t.legP1Mc;
+
+        // Tab 2
+        document.getElementById('lbl-p2-header-title').innerText = t.p2HeaderTitle;
+        document.getElementById('lbl-p2-header-sub').innerText = t.p2HeaderSub;
+        document.getElementById('lbl-p2-kpi1-title').innerText = t.p2Kpi1Title;
+        document.getElementById('lbl-p2-kpi1-sub').innerText = t.p2Kpi1Sub;
+        document.getElementById('lbl-p2-kpi2-title').innerText = t.p2Kpi2Title;
+        document.getElementById('lbl-p2-kpi2-sub').innerText = t.p2Kpi2Sub;
+        document.getElementById('lbl-p2-kpi3-title').innerText = t.p2Kpi3Title;
+        document.getElementById('lbl-p2-kpi3-sub').innerText = t.p2Kpi3Sub;
+        document.getElementById('lbl-p2-kpi4-title').innerText = t.p2Kpi4Title;
+        document.getElementById('lbl-p2-kpi4-sub').innerText = t.p2Kpi4Sub;
+        document.getElementById('lbl-p2-kpi5-title').innerText = t.p2Kpi5Title;
+        document.getElementById('lbl-p2-kpi5-sub').innerText = t.p2Kpi5Sub;
+        document.getElementById('lbl-p2-ctx-title').innerText = t.p2CtxTitle;
+        document.getElementById('lbl-p2-ctx-body').innerHTML = t.p2CtxBody;
+        document.getElementById('lbl-p2-param-title').innerHTML = `<i data-lucide="sliders" class="w-4 h-4 text-neonpink"></i> ${t.p2ParamTitle}`;
+        document.getElementById('lbl-p2-combo-title').innerText = t.p2ComboTitle;
+        document.getElementById('btn-combo-1').innerText = t.p2Combo1;
+        document.getElementById('btn-combo-2').innerText = t.p2Combo2;
+        document.getElementById('btn-combo-3').innerText = t.p2Combo3;
+        document.getElementById('btn-combo-4').innerText = t.p2Combo4;
+        document.getElementById('lbl-p2-t0-lbl').innerText = t.p2T0Lbl;
+        document.getElementById('lbl-p2-rent-lbl').innerText = t.p2RentLbl;
+        document.getElementById('lbl-p2-s-lbl').innerText = t.p2SLbl;
+        document.getElementById('lbl-p2-m-lbl').innerText = t.p2MLbl;
+        document.getElementById('lbl-p2-l-lbl').innerText = t.p2LLbl;
+        document.getElementById('lbl-p2-time-used-lbl').innerText = t.p2TimeUsedLbl;
+        document.getElementById('lbl-p2-free-time-lbl').innerText = t.p2FreeTimeLbl;
+        document.getElementById('lbl-p2-shift-stat-lbl').innerText = t.p2ShiftStatLbl;
+        document.getElementById('lbl-p2-timeline-title').innerHTML = `<i data-lucide="clock" class="w-4 h-4 text-neonpink"></i> ${t.p2TimelineTitle}`;
+        document.getElementById('leg-p2-work').innerText = t.legP2Work;
+        document.getElementById('leg-p2-t0').innerText = t.legP2T0;
+        document.getElementById('leg-p2-idle').innerText = t.legP2Idle;
+        document.getElementById('lbl-p2-exp-title').innerHTML = `<i data-lucide="sparkles" class="w-4 h-4"></i> ${t.p2ExpTitle}`;
+        document.getElementById('lbl-p2-margin-bal-title').innerText = t.p2MarginBalTitle;
+        document.getElementById('lbl-p2-margin-bal-desc').innerText = t.p2MarginBalDesc;
+        document.getElementById('lbl-p2-cards-header').innerHTML = `<i data-lucide="bar-chart-2" class="w-4 h-4 text-neonpink"></i> ${t.p2CardsHeader}`;
+        document.getElementById('lbl-p2-c1-title').innerText = t.p2C1Title;
+        document.getElementById('lbl-p2-c1-btn').innerText = t.p2C1Btn;
+        document.getElementById('lbl-p2-c1-back-title').innerText = t.p2C1BackTitle;
+        document.getElementById('lbl-p2-c1-back-btn').innerText = t.p2C1BackBtn;
+        document.getElementById('lbl-p2-c1-back-desc').innerHTML = t.p2C1BackDesc;
+        document.getElementById('lbl-p2-c2-title').innerText = t.p2C2Title;
+        document.getElementById('lbl-p2-c2-btn').innerText = t.p2C2Btn;
+        document.getElementById('lbl-p2-c2-back-title').innerText = t.p2C2BackTitle;
+        document.getElementById('lbl-p2-c2-back-btn').innerText = t.p2C2BackBtn;
+        document.getElementById('lbl-p2-c2-back-desc').innerHTML = t.p2C2BackDesc;
+        document.getElementById('lbl-p2-c3-title').innerText = t.p2C3Title;
+        document.getElementById('lbl-p2-c3-btn').innerText = t.p2C3Btn;
+        document.getElementById('lbl-p2-c3-back-title').innerText = t.p2C3BackTitle;
+        document.getElementById('lbl-p2-c3-back-btn').innerText = t.p2C3BackBtn;
+        document.getElementById('lbl-p2-c3-back-desc').innerHTML = t.p2C3BackDesc;
+        document.getElementById('lbl-p2-c4-title').innerText = t.p2C4Title;
+        document.getElementById('lbl-p2-c4-btn').innerText = t.p2C4Btn;
+        document.getElementById('lbl-p2-c4-back-title').innerText = t.p2C4BackTitle;
+        document.getElementById('lbl-p2-c4-back-btn').innerText = t.p2C4BackBtn;
+        document.getElementById('lbl-p2-c4-back-desc').innerHTML = t.p2C4BackDesc;
+        document.getElementById('lbl-p2-cases-title').innerText = t.p2CasesTitle;
+        document.getElementById('lbl-p2-case1-title').innerText = t.p2Case1Title;
+        document.getElementById('lbl-p2-case1-q').innerText = t.p2Case1Q;
+        document.getElementById('lbl-p2-case1-a').innerHTML = t.p2Case1A;
+        document.getElementById('lbl-p2-case2-title').innerText = t.p2Case2Title;
+        document.getElementById('lbl-p2-case2-q').innerText = t.p2Case2Q;
+        document.getElementById('lbl-p2-case2-a').innerHTML = t.p2Case2A;
+        document.getElementById('lbl-p2-case3-title').innerText = t.p2Case3Title;
+        document.getElementById('lbl-p2-case3-q').innerText = t.p2Case3Q;
+        document.getElementById('lbl-p2-case3-a').innerHTML = t.p2Case3A;
+
+        // Tab 3
+        document.getElementById('lbl-p3-header-title').innerText = t.p3HeaderTitle;
+        document.getElementById('lbl-p3-header-sub').innerText = t.p3HeaderSub;
+        document.getElementById('lbl-p3-btn-regen').innerText = t.p3BtnRegen;
+        document.getElementById('lbl-p3-kpi1-title').innerText = t.p3Kpi1Title;
+        document.getElementById('lbl-p3-kpi1-sub').innerText = t.p3Kpi1Sub;
+        document.getElementById('lbl-p3-kpi2-title').innerText = t.p3Kpi2Title;
+        document.getElementById('lbl-p3-kpi2-sub').innerText = t.p3Kpi2Sub;
+        document.getElementById('lbl-p3-kpi3-title').innerText = t.p3Kpi3Title;
+        document.getElementById('lbl-p3-kpi3-sub').innerText = t.p3Kpi3Sub;
+        document.getElementById('lbl-p3-kpi4-title').innerText = t.p3Kpi4Title;
+        document.getElementById('lbl-p3-kpi4-sub').innerText = t.p3Kpi4Sub;
+        document.getElementById('lbl-p3-kpi5-title').innerText = t.p3Kpi5Title;
+        document.getElementById('lbl-p3-kpi5-sub').innerText = t.p3Kpi5Sub;
+        document.getElementById('lbl-p3-ctx-title').innerText = t.p3CtxTitle;
+        document.getElementById('lbl-p3-ctx-body').innerHTML = t.p3CtxBody;
+        document.getElementById('lbl-p3-ctrl-title').innerHTML = `<i data-lucide="sliders" class="w-4 h-4 text-cyan-400"></i> ${t.p3CtrlTitle}`;
+        document.getElementById('lbl-p3-ctrl-badge').innerText = t.p3CtrlBadge;
+        document.getElementById('lbl-p3-f-lbl').innerText = t.p3FLbl;
+        document.getElementById('lbl-p3-c-lbl').innerText = t.p3CLbl;
+        document.getElementById('lbl-p3-q-lbl').innerText = t.p3QLbl;
+        document.getElementById('lbl-p3-n-lbl').innerText = t.p3NLbl;
+        document.getElementById('lbl-p3-p-lbl').innerText = t.p3PLbl;
+        document.getElementById('lbl-p3-tot-dem-lbl').innerText = t.p3TotDemLbl;
+        document.getElementById('lbl-p3-tot-cap-lbl').innerText = t.p3TotCapLbl;
+        document.getElementById('lbl-p3-stat-lbl').innerText = t.p3StatLbl;
+        document.getElementById('lbl-p3-map-title').innerHTML = `<i data-lucide="map-pin" class="w-4 h-4 text-cyan-400"></i> ${t.p3MapTitle}`;
+        document.getElementById('lbl-p3-exp-header').innerHTML = `<i data-lucide="info" class="w-4 h-4"></i> ${t.p3ExpHeader}`;
+        document.getElementById('lbl-p3-exp-default').innerText = t.p3ExpDefault;
+        document.getElementById('lbl-p3-algo-title').innerText = t.p3AlgoTitle;
+        document.getElementById('lbl-p3-algo-desc').innerText = t.p3AlgoDesc;
+        document.getElementById('lbl-p3-cards-header').innerHTML = `<i data-lucide="bar-chart-2" class="w-4 h-4 text-cyan-400"></i> ${t.p3CardsHeader}`;
+        document.getElementById('lbl-p3-c1-title').innerText = t.p3C1Title;
+        document.getElementById('lbl-p3-c1-btn').innerText = t.p3C1Btn;
+        document.getElementById('lbl-p3-c1-back-title').innerText = t.p3C1BackTitle;
+        document.getElementById('lbl-p3-c1-back-btn').innerText = t.p3C1BackBtn;
+        document.getElementById('lbl-p3-c1-back-desc').innerHTML = t.p3C1BackDesc;
+        document.getElementById('lbl-p3-c2-title').innerText = t.p3C2Title;
+        document.getElementById('lbl-p3-c2-btn').innerText = t.p3C2Btn;
+        document.getElementById('lbl-p3-c2-back-title').innerText = t.p3C2BackTitle;
+        document.getElementById('lbl-p3-c2-back-btn').innerText = t.p3C2BackBtn;
+        document.getElementById('lbl-p3-c2-back-desc').innerHTML = t.p3C2BackDesc;
+        document.getElementById('lbl-p3-c3-title').innerText = t.p3C3Title;
+        document.getElementById('lbl-p3-c3-btn').innerText = t.p3C3Btn;
+        document.getElementById('lbl-p3-c3-back-title').innerText = t.p3C3BackTitle;
+        document.getElementById('lbl-p3-c3-back-btn').innerText = t.p3C3BackBtn;
+        document.getElementById('lbl-p3-c3-back-desc').innerHTML = t.p3C3BackDesc;
+        document.getElementById('lbl-p3-c4-title').innerText = t.p3C4Title;
+        document.getElementById('lbl-p3-c4-btn').innerText = t.p3C4Btn;
+        document.getElementById('lbl-p3-c4-back-title').innerText = t.p3C4BackTitle;
+        document.getElementById('lbl-p3-c4-back-btn').innerText = t.p3C4BackBtn;
+        document.getElementById('lbl-p3-c4-back-desc').innerHTML = t.p3C4BackDesc;
+        document.getElementById('lbl-p3-cases-title').innerText = t.p3CasesTitle;
+        document.getElementById('lbl-p3-case1-title').innerText = t.p3Case1Title;
+        document.getElementById('lbl-p3-case1-q').innerText = t.p3Case1Q;
+        document.getElementById('lbl-p3-case1-a').innerHTML = t.p3Case1A;
+        document.getElementById('lbl-p3-case2-title').innerText = t.p3Case2Title;
+        document.getElementById('lbl-p3-case2-q').innerText = t.p3Case2Q;
+        document.getElementById('lbl-p3-case2-a').innerHTML = t.p3Case2A;
+        document.getElementById('lbl-p3-case3-title').innerText = t.p3Case3Title;
+        document.getElementById('lbl-p3-case3-q').innerText = t.p3Case3Q;
+        document.getElementById('lbl-p3-case3-a').innerHTML = t.p3Case3A;
+
+        lucide.createIcons();
+        updateSim();
+        recalculateShift();
+        recalculateVRP();
+    }
+
+    function switchTab(btn, id, color) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('active');
+            b.style.borderColor = 'rgba(255,255,255,0.05)';
+            b.style.boxShadow = 'none';
+        });
+        btn.classList.add('active');
+        btn.style.borderColor = color;
+        btn.style.boxShadow = `0 10px 25px -5px ${color}40`;
+
+        if (id === 'mono-stylist') recalculateShift();
+        if (id === 'vrp-logistics' && clients.length === 0) generateRandomClients();
+        if (id === 'perfect') updateSim();
+    }
+
+    function toggleFlip(cardElement) { cardElement.classList.toggle('flipped'); }
+
+    function toggleAnswersKey(selector) {
+        document.querySelectorAll(selector).forEach(ans => ans.classList.toggle('hidden'));
+    }
+
+    // ==================== СКРИПТЫ ТАБА 1: Совершенная конкуренция ====================
+    const sliderP = document.getElementById('slider-p');
+    const sliderQ = document.getElementById('slider-q');
+    const canvas = document.getElementById('perfectCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function formatMoney(val) { return new Intl.NumberFormat('ru-RU').format(Math.round(val)); }
+
+    function getCosts(Q) {
+        if(Q <= 0) return { tc: 20000, mc: 4000, atc: Infinity, avc: 4000 };
+        return { tc: 20000 + 4000*Q + 1000*Q*Q, mc: 4000 + 2000*Q, atc: 20000/Q + 4000 + 1000*Q, avc: 4000 + 1000*Q };
+    }
+
+    function updateSim() {
+        const P = parseFloat(sliderP.value);
+        const Q = parseFloat(sliderQ.value);
+        document.getElementById('val-p').innerText = formatMoney(P) + " ₸";
+        document.getElementById('val-q').innerText = Q + (currentLang === 'ru' ? " ед." : " units");
+
+        const c = getCosts(Q);
+        const TR = P * Q;
+        const profit = TR - c.tc;
+        const optQ = (P - 4000) / 2000;
+
+        document.getElementById('stat-tr').innerText = formatMoney(TR);
+        document.getElementById('stat-tc').innerText = formatMoney(c.tc);
+        document.getElementById('stat-mc').innerText = formatMoney(c.mc);
+        document.getElementById('stat-atc').innerText = formatMoney(c.atc);
+
+        const profitEl = document.getElementById('stat-profit');
+        profitEl.innerText = (profit > 0 ? "+" : "") + formatMoney(profit) + " ₸";
+
+        const vBox = document.getElementById('verdict-box');
+        const vTitle = document.getElementById('verdict-title');
+        const vDesc = document.getElementById('verdict-desc');
+
+        if (currentLang === 'ru') {
+            if (P < 4000) {
+                vBox.style.borderColor = '#ef4444'; vTitle.innerText = "Shutdown Point (Остановка)"; vTitle.style.color = '#ef4444'; profitEl.style.color = '#ef4444';
+                vDesc.innerHTML = `Цена упала ниже ${formatMoney(P)} ₸. Вы не покрываете даже переменные издержки (сырье). <strong>Совет: Немедленно остановить выпуск</strong> (минимизация убытка до FC = 20 000 ₸).`;
+            } else if (P < c.atc && profit < 0) {
+                vBox.style.borderColor = '#f59e0b'; vTitle.innerText = "Убыток, но работаем"; vTitle.style.color = '#f59e0b'; profitEl.style.color = '#f59e0b';
+                vDesc.innerHTML = `Выручка покрывает переменные затраты, но не окупает постоянные (FC). Остановка даст больший убыток. Оптимальный Q для минимизации потерь: <strong>${Math.max(0, Math.round(optQ))} ед.</strong>`;
+            } else {
+                vBox.style.borderColor = '#10b981'; vTitle.innerText = "Сверхприбыль (Short-run)"; vTitle.style.color = '#10b981'; profitEl.style.color = '#10b981';
+                let advice = "";
+                if (Math.abs(Q - optQ) < 0.6) advice = `Вы максимизируете прибыль! P = MC выполнено идеально.`;
+                else if (Q < optQ) advice = `Вы недопроизводите. Увеличьте Q до <strong>${Math.round(optQ)}</strong>, так как MR > MC.`;
+                else advice = `Вы перепроизводите. Снизьте Q до <strong>${Math.round(optQ)}</strong>, так как каждая лишняя единица приносит убыток (MC > MR).`;
+                vDesc.innerHTML = `Фирма получает экономическую прибыль. В долгосрочном периоде это привлечет конкурентов, и цена упадет. <br><span class="text-emerald-400 mt-1 block"><strong>Совет:</strong> ${advice}</span>`;
+            }
+        } else {
+            if (P < 4000) {
+                vBox.style.borderColor = '#ef4444'; vTitle.innerText = "Shutdown Point (Halt)"; vTitle.style.color = '#ef4444'; profitEl.style.color = '#ef4444';
+                vDesc.innerHTML = `Price dropped below ${formatMoney(P)} ₸. Variable costs are not covered. <strong>Advice: Halt output immediately</strong> (limit loss to FC = 20,000 ₸).`;
+            } else if (P < c.atc && profit < 0) {
+                vBox.style.borderColor = '#f59e0b'; vTitle.innerText = "Short-Run Loss Minimization"; vTitle.style.color = '#f59e0b'; profitEl.style.color = '#f59e0b';
+                vDesc.innerHTML = `Revenue covers variable costs but fails fixed costs (FC). Halting yields larger losses. Optimal Q to minimize loss: <strong>${Math.max(0, Math.round(optQ))} units.</strong>`;
+            } else {
+                vBox.style.borderColor = '#10b981'; vTitle.innerText = "Economic Profit (Short-run)"; vTitle.style.color = '#10b981'; profitEl.style.color = '#10b981';
+                let advice = "";
+                if (Math.abs(Q - optQ) < 0.6) advice = `Profit maximized! P = MC condition satisfied.`;
+                else if (Q < optQ) advice = `Underproducing. Increase Q to <strong>${Math.round(optQ)}</strong> as MR > MC.`;
+                else advice = `Overproducing. Reduce Q to <strong>${Math.round(optQ)}</strong> as MC > MR.`;
+                vDesc.innerHTML = `Firm earns economic profit. Long-run entry will reduce market price to min ATC. <br><span class="text-emerald-400 mt-1 block"><strong>Advice:</strong> ${advice}</span>`;
+            }
+        }
+        drawChart(P, Q, optQ);
+    }
+
+    function drawChart(P, userQ, optQ) {
+        const rect = canvas.parentElement.getBoundingClientRect();
+        const w = canvas.width = rect.width - 40;
+        const h = canvas.height = 350;
+        ctx.clearRect(0, 0, w, h);
+
+        const pad = { top: 20, right: 20, bottom: 30, left: 50 };
+        const graphW = w - pad.left - pad.right, graphH = h - pad.top - pad.bottom;
+        const maxQ = 14, maxCost = 35000;
+
+        const getX = (q) => pad.left + (q / maxQ) * graphW;
+        const getY = (val) => pad.top + graphH - (val / maxCost) * graphH;
+
+        ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+        for(let i=0; i<=maxCost; i+=5000) {
+            ctx.beginPath(); ctx.moveTo(pad.left, getY(i)); ctx.lineTo(w-pad.right, getY(i)); ctx.stroke();
+            ctx.fillStyle = '#64748b'; ctx.font = '10px Inter'; ctx.fillText((i/1000) + 'k', 15, getY(i)+3);
+        }
+        for(let i=0; i<=maxQ; i+=2) {
+            ctx.beginPath(); ctx.moveTo(getX(i), pad.top); ctx.lineTo(getX(i), h-pad.bottom); ctx.stroke();
+            ctx.fillText(i, getX(i)-3, h-10);
+        }
+
+        if (userQ > 0) {
+            const currentATC = getCosts(userQ).atc;
+            const isProfit = P >= currentATC;
+            ctx.fillStyle = isProfit ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+            const topY = Math.min(getY(P), getY(currentATC));
+            const rectHeight = Math.abs(getY(P) - getY(currentATC));
+            ctx.fillRect(pad.left, topY, getX(userQ) - pad.left, rectHeight);
+            ctx.strokeStyle = isProfit ? 'rgba(16, 185, 129, 0.5)' : 'rgba(239, 68, 68, 0.5)';
+            ctx.lineWidth = 1; ctx.strokeRect(pad.left, topY, getX(userQ) - pad.left, rectHeight);
+        }
+
+        const drawCurve = (type, color) => {
+            ctx.strokeStyle = color; ctx.lineWidth = 2; ctx.beginPath();
+            let started = false;
+            for(let q=0.5; q<=maxQ; q+=0.2) {
+                const val = getCosts(q)[type];
+                if(val <= maxCost) {
+                    if(!started) { ctx.moveTo(getX(q), getY(val)); started = true; } 
+                    else { ctx.lineTo(getX(q), getY(val)); }
+                }
+            }
+            ctx.stroke();
+        };
+
+        drawCurve('atc', '#10b981'); drawCurve('avc', '#a855f7'); drawCurve('mc', '#f97316');
+
+        ctx.strokeStyle = '#3b82f6'; ctx.lineWidth = 2; ctx.setLineDash([5, 5]);
+        ctx.beginPath(); ctx.moveTo(pad.left, getY(P)); ctx.lineTo(w-pad.right, getY(P)); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 12px Inter'; ctx.fillText('P = MR', w-pad.right-50, getY(P)-5);
+
+        ctx.strokeStyle = '#cbd5e1'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(getX(userQ), pad.top); ctx.lineTo(getX(userQ), h-pad.bottom); ctx.stroke();
+        ctx.fillStyle = '#cbd5e1'; ctx.beginPath(); ctx.arc(getX(userQ), getY(P), 4, 0, 2*Math.PI); ctx.fill();
+
+        if (optQ > 0 && optQ <= maxQ && P >= 4000) {
+            ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(getX(optQ), getY(P), 5, 0, 2*Math.PI); ctx.fill();
+            ctx.strokeStyle = '#fff'; ctx.lineWidth=1; ctx.stroke();
+        }
+    }
+
+    sliderP.addEventListener('input', updateSim);
+    sliderQ.addEventListener('input', updateSim);
+
+    // ==================== СКРИПТЫ ТАБА 2: Стилист ====================
+    const STYLIST_SLOTS = {
+        S: { name: 'Express (S)', time: 60, price: 10000, cost: 1000 },
+        M: { name: 'Evening (M)', time: 120, price: 25000, cost: 3000 },
+        L: { name: 'VIP Bridal (L)', time: 240, price: 50000, cost: 7000 }
+    };
+    let stChart1=null, stChart2=null, stChart3=null, stChart4=null;
+
+    function applyCombo(s, m, l) {
+        document.getElementById('sliderCountS').value = s;
+        document.getElementById('sliderCountM').value = m;
+        document.getElementById('sliderCountL').value = l;
+        recalculateShift();
+    }
+
+    function recalculateShift() {
+        const t0 = parseInt(document.getElementById('sliderT0').value);
+        const rent = parseInt(document.getElementById('sliderRent').value);
+        const countS = parseInt(document.getElementById('sliderCountS').value);
+        const countM = parseInt(document.getElementById('sliderCountM').value);
+        const countL = parseInt(document.getElementById('sliderCountL').value);
+
+        document.getElementById('valT0').innerText = t0 + (currentLang === 'ru' ? ' мин' : ' min');
+        document.getElementById('valRent').innerText = rent.toLocaleString('ru-RU') + ' ₸';
+        document.getElementById('valCountS').innerText = countS + (currentLang === 'ru' ? ' кл' : ' clients');
+        document.getElementById('valCountM').innerText = countM + (currentLang === 'ru' ? ' кл' : ' clients');
+        document.getElementById('valCountL').innerText = countL + (currentLang === 'ru' ? ' кл' : ' clients');
+
+        const totalClients = countS + countM + countL;
+        const totalSetupTime = totalClients * t0;
+        const totalWorkTime = (countS * STYLIST_SLOTS.S.time) + (countM * STYLIST_SLOTS.M.time) + (countL * STYLIST_SLOTS.L.time);
+        const totalTimeUsed = totalWorkTime + totalSetupTime;
+        const freeTimeLeft = Math.max(0, 480 - totalTimeUsed);
+
+        const totalRevenue = (countS * STYLIST_SLOTS.S.price) + (countM * STYLIST_SLOTS.M.price) + (countL * STYLIST_SLOTS.L.price);
+        const totalVarCosts = (countS * STYLIST_SLOTS.S.cost) + (countM * STYLIST_SLOTS.M.cost) + (countL * STYLIST_SLOTS.L.cost);
+        const netProfit = totalRevenue - totalVarCosts - rent;
+        const hourlyRate = netProfit > 0 ? Math.round((netProfit / 480) * 60) : 0;
+
+        document.getElementById('kpiRevenue').innerText = totalRevenue.toLocaleString('ru-RU') + ' ₸';
+        document.getElementById('kpiProfit').innerText = netProfit.toLocaleString('ru-RU') + ' ₸';
+        document.getElementById('kpiWorkTime').innerText = totalWorkTime + (currentLang === 'ru' ? ' мин' : ' min');
+        document.getElementById('kpiSetupTime').innerText = totalSetupTime + (currentLang === 'ru' ? ' мин' : ' min');
+        document.getElementById('kpiHourlyRate').innerText = hourlyRate.toLocaleString('ru-RU') + (currentLang === 'ru' ? ' ₸/ч' : ' ₸/h');
+
+        document.getElementById('totalTimeUsed').innerText = totalTimeUsed + (currentLang === 'ru' ? ' / 480 мин' : ' / 480 min');
+        document.getElementById('freeTimeLeft').innerText = freeTimeLeft + (currentLang === 'ru' ? ' мин' : ' min');
+
+        const tag = document.getElementById('shiftStatusTag');
+        if (totalTimeUsed > 480) {
+            tag.innerText = currentLang === 'ru' ? `Перегруз +${totalTimeUsed - 480}м!` : `Overload +${totalTimeUsed - 480}m!`;
+            tag.className = 'font-bold text-rose-400';
+        } else {
+            tag.innerText = currentLang === 'ru' ? 'В норме (<= 8ч)' : 'Optimal (<= 8h)';
+            tag.className = 'font-bold text-emerald-400';
+        }
+
+        renderStylistTimeline(countS, countM, countL, t0, freeTimeLeft);
+        renderStylistExplanation(totalWorkTime, totalSetupTime, netProfit, totalClients, t0);
+        renderStylistCharts(totalWorkTime, totalSetupTime, freeTimeLeft, t0, netProfit, totalRevenue, totalVarCosts, rent);
+    }
+
+    function renderStylistTimeline(countS, countM, countL, t0, freeTime) {
+        const bar = document.getElementById('dayTimelineBar'); bar.innerHTML = '';
+        function addBlock(w, cls, txt) {
+            if (w <= 0) return;
+            const div = document.createElement('div');
+            div.className = `h-full ${cls} rounded-md flex items-center justify-center text-xs font-bold text-slate-950 transition-all shadow-sm`;
+            div.style.width = w + '%'; if (w > 3) div.innerText = txt;
+            bar.appendChild(div);
+        }
+        for (let i=0; i<countS; i++) { addBlock((60/480)*100, 'bg-pink-500 text-white', 'S'); if (t0>0) addBlock((t0/480)*100, 'bg-amber-400', 't0'); }
+        for (let i=0; i<countM; i++) { addBlock((120/480)*100, 'bg-purple-400 text-slate-950', 'M'); if (t0>0) addBlock((t0/480)*100, 'bg-amber-400', 't0'); }
+        for (let i=0; i<countL; i++) { addBlock((240/480)*100, 'bg-emerald-400 text-slate-950', 'L'); if (t0>0) addBlock((t0/480)*100, 'bg-amber-400', 't0'); }
+        if (freeTime > 0) addBlock((freeTime/480)*100, 'bg-slate-800 text-gray-400', currentLang === 'ru' ? 'Окно' : 'Gap');
+    }
+
+    function renderStylistExplanation(workTime, setupTime, profit, clientsCount, t0) {
+        const expBox = document.getElementById('shiftExplanationText');
+        const setupRatio = Math.round((setupTime / 480) * 100);
+        if (currentLang === 'ru') {
+            expBox.innerHTML = `
+                <div class="p-2.5 rounded bg-pink-950/40 border border-pink-500/30 space-y-1">
+                    <strong class="text-pink-300 block">Принято клиентов за смену: ${clientsCount} чел.</strong>
+                    <span>Потери на подготовку/сетапы (t0): <strong class="text-amber-300">${setupTime} мин (${setupRatio}% времени смены)</strong></span>
+                </div>
+                <p class="text-[11px] text-gray-300 leading-relaxed">
+                    ${setupRatio > 20 
+                        ? 'Высокая доля оверхедов! Более 20% времени смены расходуется на подготовку и дезинфекцию. Рекомендуется сместить баланс записи в сторону более длинных вечерних и VIP-комплексов.' 
+                        : 'Сбалансированная структура смены! Время сетапа минимизировано, основную часть рабочего дня занимает полезная выработка.'}
+                </p>
+            `;
+        } else {
+            expBox.innerHTML = `
+                <div class="p-2.5 rounded bg-pink-950/40 border border-pink-500/30 space-y-1">
+                    <strong class="text-pink-300 block">Total clients served: ${clientsCount}</strong>
+                    <span>Setup & prep loss (t0): <strong class="text-amber-300">${setupTime} min (${setupRatio}% of shift)</strong></span>
+                </div>
+                <p class="text-[11px] text-gray-300 leading-relaxed">
+                    ${setupRatio > 20 
+                        ? 'High overhead ratio! Over 20% of shift time is spent on prep/sanitization. Consider shifting client mix towards longer Evening and VIP packages.' 
+                        : 'Balanced shift structure! Setup overhead is minimized, maximizing billable hours.'}
+                </p>
+            `;
+        }
+    }
+
+    function renderStylistCharts(workTime, setupTime, freeTime, t0, netProfit, revenue, varCosts, rent) {
+        const labels1 = currentLang === 'ru' ? ['Работа', 'Подготовка t0', 'Простой'] : ['Work', 'Setup t0', 'Idle'];
+        const c1 = document.getElementById('chartTimeBreakdown').getContext('2d');
+        if (stChart1) stChart1.destroy();
+        stChart1 = new Chart(c1, { type: 'doughnut', data: { labels: labels1, datasets: [{ data: [workTime, setupTime, freeTime], backgroundColor: ['#ec4899', '#f59e0b', '#334155'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+
+        const labels2 = currentLang === 'ru' ? ['Экспресс S', 'Вечерний M', 'VIP Невеста L'] : ['Express S', 'Evening M', 'VIP Bridal L'];
+        const c2 = document.getElementById('chartSlotMargin').getContext('2d');
+        if (stChart2) stChart2.destroy();
+        const marginS = Math.round((STYLIST_SLOTS.S.price - STYLIST_SLOTS.S.cost) / (STYLIST_SLOTS.S.time + t0));
+        const marginM = Math.round((STYLIST_SLOTS.M.price - STYLIST_SLOTS.M.cost) / (STYLIST_SLOTS.M.time + t0));
+        const marginL = Math.round((STYLIST_SLOTS.L.price - STYLIST_SLOTS.L.cost) / (STYLIST_SLOTS.L.time + t0));
+        stChart2 = new Chart(c2, { type: 'bar', data: { labels: labels2, datasets: [{ label: currentLang === 'ru' ? 'Маржа (₸/мин)' : 'Margin (₸/min)', data: [marginS, marginM, marginL], backgroundColor: ['#ec4899', '#c084fc', '#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+
+        const labels3 = currentLang === 'ru' ? ['8 × 1ч (S)', 'Текущий', '2 × 4ч (VIP L)'] : ['8 × 1h (S)', 'Current', '2 × 4h (VIP L)'];
+        const c3 = document.getElementById('chartScenarios').getContext('2d');
+        if (stChart3) stChart3.destroy();
+        const scA = (6 * (STYLIST_SLOTS.S.price - STYLIST_SLOTS.S.cost)) - rent;
+        const scB = netProfit;
+        const scC = (2 * (STYLIST_SLOTS.L.price - STYLIST_SLOTS.L.cost)) - rent;
+        stChart3 = new Chart(c3, { type: 'bar', data: { labels: labels3, datasets: [{ label: currentLang === 'ru' ? 'Чистая маржа (₸)' : 'Net Margin (₸)', data: [scA, scB, scC], backgroundColor: ['#334155', '#ec4899', '#c084fc'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+
+        const labels4 = currentLang === 'ru' ? ['Выручка', 'Косметика', 'Аренда', 'Маржа'] : ['Revenue', 'Materials', 'Rent', 'Net Margin'];
+        const c4 = document.getElementById('chartBreakEven').getContext('2d');
+        if (stChart4) stChart4.destroy();
+        stChart4 = new Chart(c4, { type: 'bar', data: { labels: labels4, datasets: [{ label: currentLang === 'ru' ? 'Сумма (₸)' : 'Amount (₸)', data: [revenue, varCosts, rent, Math.max(0, netProfit)], backgroundColor: ['#ec4899', '#f59e0b', '#f43f5e', '#10b981'] }] }, options: { responsive: true, maintainAspectRatio: false } });
+    }
+
+    ['sliderT0', 'sliderRent', 'sliderCountS', 'sliderCountM', 'sliderCountL'].forEach(id => {
+        document.getElementById(id).addEventListener('input', recalculateShift);
+    });
+
+    // ==================== СКРИПТЫ ТАБА 3: VRP Логистика ====================
+    const VEHICLE_COLORS = ['#00f2fe', '#a855f7', '#10b981', '#f59e0b', '#f43f5e', '#6366f1', '#ec4899'];
+    const depot = { x: 400, y: 240, name: 'Depot' };
+    let clients = [];
+    let currentSolution = null;
+    let vrpChart1 = null, vrpChart2 = null, vrpChart3 = null, vrpChart4 = null;
+
+    function generateRandomClients() {
+        const count = parseInt(document.getElementById('sliderN').value);
+        clients = [];
+        for (let i = 1; i <= count; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 60 + Math.random() * 190;
+            const x = Math.min(760, Math.max(40, Math.round(depot.x + Math.cos(angle) * distance)));
+            const y = Math.min(440, Math.max(40, Math.round(depot.y + Math.sin(angle) * distance)));
+            clients.push({ id: i, x, y, demand: Math.round(25 + Math.random() * 115) });
+        }
+        recalculateVRP();
+    }
+
+    function getDistance(p1, p2) {
+        const dx = p1.x - p2.x;
+        const dy = p1.y - p2.y;
+        return Math.round(Math.sqrt(dx * dx + dy * dy) * 0.12 * 10) / 10;
+    }
+
+    function solveVRP(F, c, Q, P) {
+        if (clients.length === 0) return null;
+
+        let routes = clients.map(client => ({
+            clients: [client],
+            load: client.demand,
+            dist: getDistance(depot, client) * 2
+        }));
+
+        const savings = [];
+        for (let i = 0; i < clients.length; i++) {
+            for (let j = i + 1; j < clients.length; j++) {
+                const c1 = clients[i], c2 = clients[j];
+                const s = getDistance(depot, c1) + getDistance(depot, c2) - getDistance(c1, c2);
+                savings.push({ c1, c2, s });
+            }
+        }
+        savings.sort((a, b) => b.s - a.s);
+
+        for (let pair of savings) {
+            let r1 = routes.find(r => r.clients[0].id === pair.c1.id || r.clients[r.clients.length - 1].id === pair.c1.id);
+            let r2 = routes.find(r => r.clients[0].id === pair.c2.id || r.clients[r.clients.length - 1].id === pair.c2.id);
+
+            if (r1 && r2 && r1 !== r2) {
+                if (r1.load + r2.load <= Q) {
+                    const r1IsEnd = r1.clients[r1.clients.length - 1].id === pair.c1.id;
+                    const r2IsStart = r2.clients[0].id === pair.c2.id;
+                    const r1IsStart = r1.clients[0].id === pair.c1.id;
+                    const r2IsEnd = r2.clients[r2.clients.length - 1].id === pair.c2.id;
+
+                    let merged = null;
+                    if (r1IsEnd && r2IsStart) merged = [...r1.clients, ...r2.clients];
+                    else if (r1IsEnd && r2IsEnd) merged = [...r1.clients, ...[...r2.clients].reverse()];
+                    else if (r1IsStart && r2IsStart) merged = [[...r1.clients].reverse(), ...r2.clients].flat();
+                    else if (r1IsStart && r2IsEnd) merged = [...r2.clients, ...r1.clients];
+
+                    if (merged) {
+                        let d = getDistance(depot, merged[0]);
+                        for (let k = 0; k < merged.length - 1; k++) d += getDistance(merged[k], merged[k + 1]);
+                        d += getDistance(merged[merged.length - 1], depot);
+
+                        r1.clients = merged;
+                        r1.load += r2.load;
+                        r1.dist = Math.round(d * 10) / 10;
+                        routes = routes.filter(r => r !== r2);
+                    }
+                }
+            }
+        }
+
+        let unhandledDemand = 0;
+        routes.forEach(r => {
+            if (r.load > Q) {
+                unhandledDemand += (r.load - Q);
+                r.load = Q;
+            }
+        });
+
+        let totalDist = 0;
+        routes.forEach(r => totalDist += r.dist);
+        totalDist = Math.round(totalDist * 10) / 10;
+
+        const fixedCosts = routes.length * F;
+        const variableCosts = totalDist * c;
+        const penaltyCosts = unhandledDemand * P;
+        const totalCost = fixedCosts + variableCosts + penaltyCosts;
+
+        return { routes, totalDist, fixedCosts, variableCosts, penaltyCosts, totalCost, vehicleCount: routes.length, unhandledDemand };
+    }
+
+    function recalculateVRP() {
+        const F = parseInt(document.getElementById('sliderF').value);
+        const c = parseInt(document.getElementById('sliderC').value);
+        const Q = parseInt(document.getElementById('sliderQ').value);
+        const N = parseInt(document.getElementById('sliderN').value);
+        const P = parseInt(document.getElementById('sliderP').value);
+
+        if (clients.length !== N) {
+            if (clients.length < N) {
+                for (let i = clients.length + 1; i <= N; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = 60 + Math.random() * 190;
+                    const x = Math.min(760, Math.max(40, Math.round(depot.x + Math.cos(angle) * distance)));
+                    const y = Math.min(440, Math.max(40, Math.round(depot.y + Math.sin(angle) * distance)));
+                    clients.push({ id: i, x, y, demand: Math.round(25 + Math.random() * 115) });
+                }
+            } else {
+                clients = clients.slice(0, N);
+            }
+        }
+
+        document.getElementById('valF').innerText = F.toLocaleString('ru-RU') + ' ₸';
+        document.getElementById('valC').innerText = c.toLocaleString('ru-RU') + (currentLang === 'ru' ? ' ₸/км' : ' ₸/km');
+        document.getElementById('valQ').innerText = Q + (currentLang === 'ru' ? ' кг' : ' kg');
+        document.getElementById('valN').innerText = N + (currentLang === 'ru' ? ' точек' : ' stops');
+        document.getElementById('valP').innerText = P.toLocaleString('ru-RU') + (currentLang === 'ru' ? ' ₸/кг' : ' ₸/kg');
+
+        currentSolution = solveVRP(F, c, Q, P);
+
+        const shadowSolution = solveVRP(F, c, Math.round(Q * 1.1), P);
+        const costSavings = currentSolution.totalCost - shadowSolution.totalCost;
+        const addedCapacity = (Math.round(Q * 1.1) - Q) * currentSolution.vehicleCount;
+        const shadowPriceVal = addedCapacity > 0 ? Math.max(0, Math.round(costSavings / addedCapacity)) : 0;
+
+        updateVRPKPIs(currentSolution, Q, shadowPriceVal);
+        renderVRPSVGMap(currentSolution);
+        renderVRPCharts(currentSolution, F, c, Q, P);
+    }
+
+    function updateVRPKPIs(sol, Q, shadowPrice) {
+        document.getElementById('kpiTotalCost').innerText = Math.round(sol.totalCost).toLocaleString('ru-RU') + ' ₸';
+        document.getElementById('kpiVehicles').innerText = sol.vehicleCount + (currentLang === 'ru' ? ' шт' : ' units');
+
+        const totalDemand = clients.reduce((s, cl) => s + cl.demand, 0);
+        const totalCap = sol.vehicleCount * Q;
+        const util = totalCap > 0 ? Math.min(100, Math.round((totalDemand / totalCap) * 100)) : 0;
+
+        document.getElementById('kpiUtilization').innerText = util + '%';
+        document.getElementById('kpiAvgDist').innerText = (clients.length > 0 ? Math.round((sol.totalDist / clients.length) * 10) / 10 : 0) + (currentLang === 'ru' ? ' км' : ' km');
+        document.getElementById('kpiShadowPrice').innerText = shadowPrice.toLocaleString('ru-RU') + (currentLang === 'ru' ? ' ₸/кг' : ' ₸/kg');
+
+        document.getElementById('totalDemand').innerText = totalDemand + (currentLang === 'ru' ? ' кг' : ' kg');
+        document.getElementById('totalCapacity').innerText = totalCap + (currentLang === 'ru' ? ' кг' : ' kg');
+
+        const balanceTag = document.getElementById('capacityBalanceTag');
+        if (sol.unhandledDemand > 0) {
+            balanceTag.innerText = currentLang === 'ru' ? `Дефицит ${sol.unhandledDemand} кг` : `Shortage ${sol.unhandledDemand} kg`;
+            balanceTag.className = 'font-bold text-rose-400';
+            document.getElementById('mapStatusBadge').innerText = currentLang === 'ru' ? 'ДЕФИЦИТ ЕМКОСТИ' : 'CAPACITY SHORTAGE';
+            document.getElementById('mapStatusBadge').className = 'text-[10px] bg-rose-950 text-rose-300 border border-rose-800 px-2 py-0.5 rounded font-mono';
+        } else {
+            balanceTag.innerText = currentLang === 'ru' ? '100% Покрыто' : '100% Covered';
+            balanceTag.className = 'font-bold text-emerald-400';
+            document.getElementById('mapStatusBadge').innerText = currentLang === 'ru' ? 'ОПТИМАЛЬНО' : 'OPTIMAL';
+            document.getElementById('mapStatusBadge').className = 'text-[10px] bg-slate-800 text-cyan-300 border border-gray-700 px-2 py-0.5 rounded font-mono';
+        }
+    }
+
+    function renderVRPSVGMap(sol) {
+        const svg = document.getElementById('vrpMap');
+        const expBox = document.getElementById('routeExplanationText');
+        const depotLabel = currentLang === 'ru' ? 'ДЕПО' : 'DEPOT';
+
+        let html = `<defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+            </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#grid)" />`;
+
+        sol.routes.forEach((route, idx) => {
+            const color = VEHICLE_COLORS[idx % VEHICLE_COLORS.length];
+            const pts = [depot, ...route.clients, depot];
+            let dStr = `M ${pts[0].x} ${pts[0].y}`;
+            for (let i = 1; i < pts.length; i++) dStr += ` L ${pts[i].x} ${pts[i].y}`;
+
+            html += `<path d="${dStr}" fill="none" stroke="${color}" stroke-width="6" stroke-opacity="0.2" class="cursor-pointer route-line" data-route="${idx+1}" data-load="${route.load}" data-dist="${route.dist}" />`;
+            html += `<path d="${dStr}" fill="none" stroke="${color}" stroke-width="2.5" class="route-flow pointer-events-none" />`;
+        });
+
+        clients.forEach(c => {
+            html += `
+            <g class="cursor-pointer client-node" data-id="${c.id}" data-demand="${c.demand}">
+                <circle cx="${c.x}" cy="${c.y}" r="11" fill="#0b0e17" stroke="#f59e0b" stroke-width="2"/>
+                <circle cx="${c.x}" cy="${c.y}" r="3.5" fill="#f59e0b"/>
+                <text x="${c.x}" y="${c.y - 15}" text-anchor="middle" fill="#cbd5e1" font-size="9" font-weight="600">${c.demand}${currentLang === 'ru' ? 'кг' : 'kg'}</text>
+            </g>`;
+        });
+
+        html += `
+        <g>
+            <rect x="${depot.x - 16}" y="${depot.y - 16}" width="32" height="32" rx="6" fill="#090d16" stroke="#00f2fe" stroke-width="2.5"/>
+            <circle cx="${depot.x}" cy="${depot.y}" r="4" fill="#00f2fe"/>
+            <text x="${depot.x}" y="${depot.y + 26}" text-anchor="middle" fill="#00f2fe" font-size="10" font-weight="bold">${depotLabel}</text>
+        </g>`;
+
+        svg.innerHTML = html;
+
+        svg.querySelectorAll('.client-node').forEach(n => {
+            n.addEventListener('mouseenter', () => {
+                const id = n.getAttribute('data-id');
+                const demand = n.getAttribute('data-demand');
+                const cl = clients.find(c => c.id == id);
+                const dDepot = getDistance(depot, cl);
+                if (currentLang === 'ru') {
+                    expBox.innerHTML = `
+                        <div class="p-2 rounded bg-amber-950/40 border border-amber-500/30">
+                            <strong class="text-amber-400 block">Клиент #${id}</strong>
+                            <span>Заказ: <strong>${demand} кг</strong></span><br/>
+                            <span>Удаление от Депо: <strong>${dDepot} км</strong></span>
+                        </div>
+                        <p class="text-[11px] text-gray-300">Чем дальше клиент от центра и чем меньше его вес, тем выше у него <em>удельный кост доставки на 1 кг</em>.</p>
+                    `;
+                } else {
+                    expBox.innerHTML = `
+                        <div class="p-2 rounded bg-amber-950/40 border border-amber-500/30">
+                            <strong class="text-amber-400 block">Client #${id}</strong>
+                            <span>Demand: <strong>${demand} kg</strong></span><br/>
+                            <span>Depot Distance: <strong>${dDepot} km</strong></span>
+                        </div>
+                        <p class="text-[11px] text-gray-300">Remote customers with smaller demand profiles generate higher <em>unit delivery costs per kg</em>.</p>
+                    `;
+                }
+            });
+        });
+
+        svg.querySelectorAll('.route-line').forEach(r => {
+            r.addEventListener('mouseenter', () => {
+                const rNum = r.getAttribute('data-route');
+                const load = r.getAttribute('data-load');
+                const dist = r.getAttribute('data-dist');
+                if (currentLang === 'ru') {
+                    expBox.innerHTML = `
+                        <div class="p-2 rounded bg-cyan-950/40 border border-cyan-500/30">
+                            <strong class="text-cyan-400 block">Рейс Машины #${rNum}</strong>
+                            <span>Загрузка кузова: <strong>${load} кг</strong></span><br/>
+                            <span>Длина кольца: <strong>${dist} км</strong></span>
+                        </div>
+                        <p class="text-[11px] text-gray-300">Алгоритм объединил этих клиентов в один замкнутый контур, чтобы машина выехала 1 раз и не возвращалась в Депо за каждым заказом отдельно.</p>
+                    `;
+                } else {
+                    expBox.innerHTML = `
+                        <div class="p-2 rounded bg-cyan-950/40 border border-cyan-500/30">
+                            <strong class="text-cyan-400 block">Truck Run #${rNum}</strong>
+                            <span>Truck Load: <strong>${load} kg</strong></span><br/>
+                            <span>Route Distance: <strong>${dist} km</strong></span>
+                        </div>
+                        <p class="text-[11px] text-gray-300">The algorithm consolidated these stops into a closed loop to save fixed dispatch cost (F) over individual depot roundtrips.</p>
+                    `;
+                }
+            });
+        });
+    }
+
+    function renderVRPCharts(sol, F, c, Q, P) {
+        const ctx1 = document.getElementById('chartCostBreakdown').getContext('2d');
+        if (vrpChart1) vrpChart1.destroy();
+        const l1Fixed = currentLang === 'ru' ? 'Фикс F' : 'Fixed F';
+        const l1Var = currentLang === 'ru' ? 'Переменка c' : 'Variable c';
+        const l1Pen = currentLang === 'ru' ? 'Штрафы P' : 'Penalties P';
+        vrpChart1 = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: [currentLang === 'ru' ? 'Затраты' : 'Costs'],
+                datasets: [
+                    { label: l1Fixed, data: [sol.fixedCosts], backgroundColor: '#00f2fe' },
+                    { label: l1Var, data: [sol.variableCosts], backgroundColor: '#10b981' },
+                    { label: l1Pen, data: [sol.penaltyCosts], backgroundColor: '#ff2a5f' }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true }, y: { stacked: true } } }
+        });
+
+        const ctx2 = document.getElementById('chartCapacityProfile').getContext('2d');
+        if (vrpChart2) vrpChart2.destroy();
+        vrpChart2 = new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: sol.routes.map((_, i) => (currentLang === 'ru' ? `ТС ${i+1}` : `Truck ${i+1}`)),
+                datasets: [{ label: currentLang === 'ru' ? 'Загрузка (кг)' : 'Payload (kg)', data: sol.routes.map(r => r.load), backgroundColor: '#a855f7' }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { y: { max: Math.max(Q * 1.1, 100) } } }
+        });
+
+        const ctx3 = document.getElementById('chartFleetSensitivity').getContext('2d');
+        if (vrpChart3) vrpChart3.destroy();
+        const sensK = [1, 2, 3, 4, 5, 6];
+        const sensData = sensK.map(k => k * F + (sol.totalDist * Math.pow(sol.vehicleCount / k, 0.35)) * c);
+        vrpChart3 = new Chart(ctx3, {
+            type: 'line',
+            data: {
+                labels: sensK.map(k => `${k} ${currentLang === 'ru' ? 'ТС' : 'Trucks'}`),
+                datasets: [{ label: 'Total Cost', data: sensData, borderColor: '#10b981', tension: 0.3, fill: true, backgroundColor: 'rgba(16,185,129,0.1)' }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+
+        const ctx4 = document.getElementById('chartCostEfficiency').getContext('2d');
+        if (vrpChart4) vrpChart4.destroy();
+        const bubbleData = clients.map(cl => ({
+            x: getDistance(depot, cl),
+            y: Math.round(((getDistance(depot, cl) * c * 1.8) + (F / sol.vehicleCount)) / cl.demand),
+            r: Math.max(3, Math.round(cl.demand / 15))
+        }));
+        vrpChart4 = new Chart(ctx4, {
+            type: 'bubble',
+            data: { datasets: [{ label: currentLang === 'ru' ? 'Клиенты' : 'Clients', data: bubbleData, backgroundColor: 'rgba(245, 158, 11, 0.7)' }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    ['sliderF', 'sliderC', 'sliderQ', 'sliderN', 'sliderP'].forEach(id => {
+        document.getElementById(id).addEventListener('input', recalculateVRP);
+    });
+
+    window.onload = () => {
+        setLanguage('ru');
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,2179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Принципы экономики | Рыночная инфраструктура</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+        body { background-color: #050505; color: #e2e8f0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.05); }
+        .tab-btn { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid rgba(255,255,255,0.05); }
+        .tab-btn.active { transform: translateY(-4px) scale(1.02); border: 1px solid currentColor; background: rgba(255,255,255,0.05); box-shadow: 0 10px 25px -5px currentColor; }
+        .subtab-btn { transition: all 0.3s; border: 1px solid rgba(255,255,255,0.05); background: rgba(30, 41, 59, 0.4); }
+        .subtab-btn.active { border-color: #f59e0b; background: rgba(245, 158, 11, 0.15); color: #fff; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+        .tab-content { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        input[type="range"].vintage-slider { -webkit-appearance: none; width: 100%; background: #151b22; height: 10px; border-radius: 4px; outline: none; border: 1px solid #30363d; box-shadow: inset 0 2px 4px rgba(0,0,0,0.8); }
+        input[type="range"].vintage-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 28px; background: linear-gradient(to right, #8a95a5, #cfd8dc, #ef4444, #cfd8dc, #8a95a5); border-radius: 3px; cursor: pointer; border: 1px solid #000; box-shadow: 0 4px 8px rgba(0,0,0,0.5); }
+        
+        input.mono-slider-q::-webkit-slider-thumb, input.pc-slider-q::-webkit-slider-thumb, input.mc-slider-q::-webkit-slider-thumb { background: #8b5cf6; box-shadow: 0 0 10px rgba(139, 92, 246, 0.5); border:none; border-radius: 4px;}
+        input.mono-slider-p::-webkit-slider-thumb { background: #3b82f6; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); border:none; border-radius: 4px;}
+
+        /* Винтажные слайдеры для Олигополии */
+        input[type=range].gold-slider::-webkit-slider-runnable-track { width: 100%; height: 8px; background: #111; border-radius: 4px; border: 1px solid #2a2a2a; box-shadow: inset 0 2px 4px rgba(0,0,0,0.9); }
+        input[type=range].gold-slider::-webkit-slider-thumb { -webkit-appearance: none; height: 22px; width: 22px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #fde08b 0%, #d4af37 40%, #8a6d1c 100%); border: 1px solid #4a3800; cursor: pointer; margin-top: -7px; box-shadow: 0 4px 6px rgba(0,0,0,0.6); }
+
+        .scenario-btn { transition: all 0.2s; }
+        .scenario-btn.active { box-shadow: 0 0 0 2px #fff; transform: scale(1.02); }
+
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.2); }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.5); border-radius: 4px; }
+
+        .period-toggle input:checked + div { background-color: #10b981; color: white; border-color: #10b981; }
+        .chart-container-lg { height: 360px !important; width: 100%; }
+    </style>
+</head>
+<body class="p-4 md:p-8 custom-scroll">
+
+<div class="max-w-7xl mx-auto">
+    <!-- Header -->
+    <header class="mb-8 border-b border-slate-800 pb-6 flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+        <div>
+            <h1 id="hdr-title" class="text-3xl md:text-5xl font-black text-white tracking-tight">Рыночная инфраструктура</h1>
+            <p id="hdr-subtitle" class="text-indigo-400 text-xs md:text-sm font-bold tracking-widest uppercase mt-2">Принципы экономики • Экономика</p>
+        </div>
+        <div class="flex flex-wrap items-center gap-3">
+            <!-- Переключатель языка -->
+            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl p-1 shadow-md">
+                <button id="btn-lang-ru" onclick="setLanguage('ru')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white">RU</button>
+                <button id="btn-lang-en" onclick="setLanguage('en')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200">EN</button>
+            </div>
+            
+            <div class="bg-indigo-500/10 border border-indigo-500/20 px-4 py-2 rounded-xl flex items-center gap-3">
+                <i data-lucide="activity" class="text-indigo-400"></i>
+                <span id="hdr-badge" class="text-xs font-semibold text-indigo-300 uppercase tracking-wider">Интерактивный Терминал</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <button onclick="switchTab(this, 'perfect', '#3b82f6')" class="tab-btn active text-blue-400 font-bold p-5 rounded-2xl flex flex-col items-center gap-3 bg-slate-900/50">
+            <i data-lucide="shield-check" class="w-8 h-8"></i> <span id="tab-pc" class="text-center leading-tight">Совершенная<br>конкуренция</span>
+        </button>
+        <button onclick="switchTab(this, 'mono-comp', '#10b981')" class="tab-btn text-emerald-400 font-bold p-5 rounded-2xl flex flex-col items-center gap-3 bg-slate-900/50">
+            <i data-lucide="sparkles" class="w-8 h-8"></i> <span id="tab-mc" class="text-center leading-tight">Монополистическая<br>конкуренция</span>
+        </button>
+        <button onclick="switchTab(this, 'oligopoly', '#f59e0b')" class="tab-btn text-amber-400 font-bold p-5 rounded-2xl flex flex-col items-center gap-3 bg-slate-900/50">
+            <i data-lucide="layers" class="w-8 h-8"></i> <span id="tab-ol" class="text-center leading-tight">Олигополия<br>(Стратегический анализ)</span>
+        </button>
+        <button onclick="switchTab(this, 'monopoly', '#f43f5e')" class="tab-btn text-rose-500 font-bold p-5 rounded-2xl flex flex-col items-center gap-3 bg-slate-900/50">
+            <i data-lucide="crown" class="w-8 h-8"></i> <span id="tab-mo" class="text-center leading-tight">Чистая<br>монополия</span>
+        </button>
+    </div>
+
+    <!-- Общий контейнер вкладок -->
+    <div id="content" class="glass rounded-3xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+        
+        <!-- ========================================== -->
+        <!-- ВКЛАДКА 1: СОВЕРШЕННАЯ КОНКУРЕНЦИЯ         -->
+        <!-- ========================================== -->
+        <div id="perfect" class="tab-content block">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-800 pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-blue-500/20 rounded-lg"><i data-lucide="trending-up" class="text-blue-400"></i></div>
+                    <div>
+                        <h2 id="pc-head-title" class="text-2xl font-black text-white">Совершенная конкуренция</h2>
+                        <p id="pc-head-sub" class="text-xs text-slate-400 uppercase tracking-widest">Анализ фирмы-ценополучателя</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="setPcScenario(131)" id="pc-btn-131" class="scenario-btn bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2 active">
+                        <i data-lucide="trending-up" class="w-4 h-4"></i> <span id="pc-sc-131">P=$131 (Рост)</span>
+                    </button>
+                    <button onclick="setPcScenario(81)" id="pc-btn-81" class="scenario-btn bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2">
+                        <i data-lucide="minus-circle" class="w-4 h-4"></i> <span id="pc-sc-81">P=$81 (Спад)</span>
+                    </button>
+                    <button onclick="setPcScenario(71)" id="pc-btn-71" class="scenario-btn bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-2">
+                        <i data-lucide="power-off" class="w-4 h-4"></i> <span id="pc-sc-71">P=$71 (Кризис)</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                <div class="xl:col-span-5 space-y-6">
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700">
+                        <div class="flex justify-between items-center mb-4">
+                            <label id="pc-lbl-q" class="text-xs font-bold text-slate-300 uppercase tracking-wider">Объем выпуска (Q)</label>
+                            <span id="pc-val-q" class="text-xl font-black text-blue-400 bg-blue-500/10 px-3 py-1 rounded-lg">0 ед.</span>
+                        </div>
+                        <input type="range" id="pc-slider-q" min="0" max="10" value="0" step="1" class="vintage-slider pc-slider-q">
+                        <div class="flex justify-between text-[10px] text-slate-500 mt-2 font-mono">
+                            <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-900/80 p-3 rounded-2xl border-l-4 border-blue-500">
+                            <span id="pc-lbl-tr" class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Выручка (TR)</span>
+                            <span id="pc-val-tr" class="text-lg font-mono font-bold text-white">$0</span>
+                            <div id="pc-sub-tr" class="text-[9px] text-slate-500 mt-1">P * Q</div>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-2xl border-l-4 border-rose-500">
+                            <span id="pc-lbl-tc" class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Общие издержки (TC)</span>
+                            <span id="pc-val-tc" class="text-lg font-mono font-bold text-white">$100</span>
+                            <div id="pc-sub-tc" class="text-[9px] text-slate-500 mt-1">TFC ($100) + TVC</div>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-2xl border-l-4 border-emerald-500">
+                            <span id="pc-lbl-mr" class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Пред. выручка (MR)</span>
+                            <span id="pc-val-mr" class="text-lg font-mono font-bold text-emerald-400">-</span>
+                            <div id="pc-sub-mr" class="text-[9px] text-slate-500 mt-1">Равна цене (P)</div>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-2xl border-l-4 border-amber-500">
+                            <span id="pc-lbl-mc" class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Пред. издержки (MC)</span>
+                            <span id="pc-val-mc" class="text-lg font-mono font-bold text-amber-400">-</span>
+                            <div id="pc-sub-mc" class="text-[9px] text-slate-500 mt-1">Зависит от Q</div>
+                        </div>
+                    </div>
+
+                    <div id="pc-profit-panel" class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700 transition-colors duration-300">
+                        <div class="flex justify-between items-end mb-4">
+                            <span id="pc-lbl-profit" class="text-xs font-bold text-slate-300 uppercase tracking-wider">Прибыль</span>
+                            <span id="pc-val-profit" class="text-3xl font-black font-mono">$-100</span>
+                        </div>
+                        <div class="h-px w-full bg-slate-700 my-4"></div>
+                        <h4 class="text-xs font-bold uppercase text-slate-400 mb-2 flex items-center gap-2">
+                            <i data-lucide="info" class="w-4 h-4"></i> <span id="pc-lbl-verdict-title">Управленческий анализ</span>
+                        </h4>
+                        <p id="pc-val-verdict" class="text-xs text-slate-300 leading-relaxed">Инициализация...</p>
+                    </div>
+                </div>
+
+                <div class="xl:col-span-7 flex flex-col gap-6">
+                    <div class="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl h-[280px] relative">
+                        <canvas id="pcTrTcChart"></canvas>
+                    </div>
+                    <div class="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl h-[280px] relative">
+                        <canvas id="pcMrMcChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ВКЛАДКА 2: МОНОПОЛИСТИЧЕСКАЯ КОНКУРЕНЦИЯ   -->
+        <!-- ========================================== -->
+        <div id="mono-comp" class="tab-content hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-800 pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-emerald-500/20 rounded-lg"><i data-lucide="sparkles" class="text-emerald-400"></i></div>
+                    <div>
+                        <h2 id="mc-head-title" class="text-2xl font-black text-white">Монополистическая конкуренция</h2>
+                        <p id="mc-head-sub" class="text-xs text-slate-400 uppercase tracking-widest">Анализ эффекта дифференциации и входа фирм</p>
+                    </div>
+                </div>
+                <div class="bg-emerald-900/30 border border-emerald-500/30 px-4 py-2 rounded-xl text-xs text-emerald-200">
+                    <strong id="mc-goal-lbl">Цель:</strong> <span id="mc-goal-txt">Сравнить краткосрочный и долгосрочный периоды</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                <div class="xl:col-span-5 space-y-6">
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700">
+                        <div class="flex gap-2 mb-6">
+                            <label class="period-toggle flex-1 cursor-pointer">
+                                <input type="radio" name="mc-period" value="SR" class="hidden" checked onchange="updateMonCompDashboard()">
+                                <div id="mc-toggle-sr" class="text-center py-2 rounded-lg border border-slate-600 text-sm font-semibold transition-colors">Краткосрочный</div>
+                            </label>
+                            <label class="period-toggle flex-1 cursor-pointer">
+                                <input type="radio" name="mc-period" value="LR" class="hidden" onchange="updateMonCompDashboard()">
+                                <div id="mc-toggle-lr" class="text-center py-2 rounded-lg border border-slate-600 text-sm font-semibold transition-colors">Долгосрочный</div>
+                            </label>
+                        </div>
+                        
+                        <div class="bg-blue-900/20 border border-blue-500/30 p-3 rounded-xl mb-6 text-[11px] text-blue-200 leading-relaxed flex gap-2">
+                            <i data-lucide="info" class="w-6 h-6 text-blue-400 shrink-0"></i>
+                            <p id="mc-theory-text">В <b>краткосрочном периоде</b> ваш бренд уникален. Вы ведете себя как монополист, устанавливая цену выше средних издержек (P > ATC) и получая экономическую прибыль.</p>
+                        </div>
+
+                        <div class="flex justify-between items-center mb-2">
+                            <label id="mc-lbl-q" class="text-xs font-bold text-slate-300 uppercase tracking-wider">Объем выпуска (Q)</label>
+                            <span id="mc-val-q" class="text-lg font-black text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-lg">4 ед.</span>
+                        </div>
+                        <input type="range" id="mc-slider-q" min="0" max="10" value="4" step="1" class="vintage-slider mc-slider-q">
+                        <div class="flex justify-between text-[10px] text-slate-500 mt-2 font-mono">
+                            <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-900/80 p-3 rounded-2xl border-l-4 border-purple-500">
+                            <span id="mc-lbl-p" class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Цена (Спрос)</span>
+                            <span id="mc-val-p" class="text-lg font-mono font-bold text-purple-400">$80</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-2xl border-l-4 border-slate-500">
+                            <span id="mc-lbl-atc" class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Средние издержки</span>
+                            <span id="mc-val-atc" class="text-lg font-mono font-bold text-slate-300">$65</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-2xl border-l-4 border-emerald-500">
+                            <span id="mc-lbl-mr" class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Пред. выручка (MR)</span>
+                            <span id="mc-val-mr" class="text-lg font-mono font-bold text-emerald-400">$50</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-2xl border-l-4 border-amber-500">
+                            <span id="mc-lbl-mc" class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Пред. издержки (MC)</span>
+                            <span id="mc-val-mc" class="text-lg font-mono font-bold text-amber-400">$50</span>
+                        </div>
+                    </div>
+
+                    <div id="mc-profit-panel" class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700 transition-colors duration-300">
+                        <div class="flex justify-between items-end mb-4">
+                            <span id="mc-lbl-profit" class="text-xs font-bold text-slate-300 uppercase tracking-wider">Экономическая прибыль</span>
+                            <span id="mc-val-profit" class="text-3xl font-black font-mono">+$60</span>
+                        </div>
+                        <div class="h-px w-full bg-slate-700 my-4"></div>
+                        <h4 class="text-xs font-bold uppercase text-slate-400 mb-2 flex items-center gap-2">
+                            <i data-lucide="pie-chart" class="w-4 h-4"></i> <span id="mc-lbl-verdict-title">Анализ ситуации</span>
+                        </h4>
+                        <p id="mc-val-verdict" class="text-xs text-slate-300 leading-relaxed">Инициализация...</p>
+                    </div>
+                </div>
+
+                <div class="xl:col-span-7 flex flex-col gap-6">
+                    <div class="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl h-[280px] relative">
+                        <canvas id="mcTrTcChart"></canvas>
+                    </div>
+                    <div class="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl h-[420px] relative">
+                        <canvas id="monCompChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ВКЛАДКА 3: ОЛИГОПОЛИЯ (СТРАТЕГИИ)          -->
+        <!-- ========================================== -->
+        <div id="oligopoly" class="tab-content hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-800 pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-amber-500/20 rounded-lg"><i data-lucide="layers" class="text-amber-400"></i></div>
+                    <div>
+                        <h2 id="ol-head-title" class="text-2xl font-black text-white">Стратегические Модели Олигополии</h2>
+                        <p id="ol-head-sub" class="text-xs text-slate-400 uppercase tracking-widest">Анализ взаимодействия: объемы, цены, лидерство и жесткость</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ВНУТРЕННИЕ ПОДВКЛАДКИ ОЛИГОПОЛИИ -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-6">
+                <button id="btn-cournot" class="subtab-btn active rounded-xl p-2.5 flex flex-col items-center" onclick="switchOligopolySubTab('cournot')">
+                    <span id="ol-subtab-cournot-title" class="font-bold text-xs text-amber-500">Модель Курно</span>
+                    <span id="ol-subtab-cournot-sub" class="text-[10px] text-slate-400">Конкуренция по объемам</span>
+                </button>
+                <button id="btn-stackelberg" class="subtab-btn rounded-xl p-2.5 flex flex-col items-center" onclick="switchOligopolySubTab('stackelberg')">
+                    <span id="ol-subtab-stack-title" class="font-bold text-xs text-slate-300">Модель Штакельберга</span>
+                    <span id="ol-subtab-stack-sub" class="text-[10px] text-slate-400">Асимметрия и лидерство</span>
+                </button>
+                <button id="btn-bertrand" class="subtab-btn rounded-xl p-2.5 flex flex-col items-center" onclick="switchOligopolySubTab('bertrand')">
+                    <span id="ol-subtab-bert-title" class="font-bold text-xs text-slate-300">Модель Бертрана</span>
+                    <span id="ol-subtab-bert-sub" class="text-[10px] text-slate-400">Ценовые войны</span>
+                </button>
+                <button id="btn-sweezy" class="subtab-btn rounded-xl p-2.5 flex flex-col items-center" onclick="switchOligopolySubTab('sweezy')">
+                    <span id="ol-subtab-sweezy-title" class="font-bold text-xs text-slate-300">Модель Суизи (Sweezy)</span>
+                    <span id="ol-subtab-sweezy-sub" class="text-[10px] text-slate-400">Жесткость цен</span>
+                </button>
+            </div>
+
+            <!-- SUBTAB 1: COURNOT -->
+            <div id="subtab-content-cournot" class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="glass rounded-2xl p-5 lg:col-span-3 flex flex-col">
+                    <h2 class="text-xs font-bold mb-2 text-amber-400 flex justify-between">
+                        <span id="cournot-chart-title">Матрица объемов (Кривые реагирования)</span>
+                        <span id="cournot-chart-sub" class="text-slate-400 font-normal text-[10px]">Mars vs Mondelez</span>
+                    </h2>
+                    <div class="chart-container-lg relative"><canvas id="chart-cournot"></canvas></div>
+                    <div class="mt-4 p-3 bg-slate-900/60 rounded-xl text-xs border border-amber-500/20 leading-relaxed">
+                        <span id="cournot-insight-lbl" class="font-bold text-amber-300">Инсайт (P&L):</span> <span id="cournot-insight-txt">В модели Курно компании управляют <b>объемами</b>. Если оба игрока бездумно увеличат выпуск, их Выручка может вырасти, но Издержки вырастут быстрее, а падение рыночной цены уничтожит Прибыль.</span>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <div class="glass rounded-2xl p-5">
+                        <div class="mb-3">
+                            <div class="flex justify-between text-xs mb-1"><span id="cournot-lbl-q1" class="text-amber-200 font-bold">Выпуск Mars (Q₁):</span><span id="cournot-val-q1" class="font-bold font-mono text-amber-400">30</span></div>
+                            <input type="range" id="cournot-slider-q1" min="0" max="50" value="30" class="gold-slider">
+                        </div>
+                        <div class="mb-3">
+                            <div class="flex justify-between text-xs mb-1"><span id="cournot-lbl-q2" class="text-sky-300 font-bold">Выпуск Mondelez (Q₂):</span><span id="cournot-val-q2" class="font-bold font-mono text-sky-400">30</span></div>
+                            <input type="range" id="cournot-slider-q2" min="0" max="50" value="30" class="gold-slider">
+                        </div>
+                        
+                        <div class="bg-black/60 p-3 text-center rounded-xl text-xs mb-4 border border-slate-700">
+                            <span id="cournot-lbl-price">Рыночная цена товара (формируется рынком):</span> <span id="cournot-val-p" class="text-yellow-400 font-bold text-sm font-mono">1500</span> ₸
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 text-[11px]">
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-amber-500/30">
+                                <div id="cournot-fin1-title" class="text-amber-400 font-bold mb-1.5 border-b border-amber-500/30 pb-1">ФИНАНСЫ MARS</div>
+                                <div class="flex justify-between text-slate-300 mb-1"><span id="cournot-lbl-tr1">Выручка (TR):</span> <span id="cournot-tr1" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between text-rose-300 mb-1"><span id="cournot-lbl-tc1">Издержки (TC):</span> <span id="cournot-tc1" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between font-bold text-emerald-400 mt-2 pt-1 border-t border-slate-700"><span id="cournot-lbl-pi1">ПРИБЫЛЬ:</span> <span id="cournot-val-pi1" class="font-mono">0 ₸</span></div>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-sky-500/30">
+                                <div id="cournot-fin2-title" class="text-sky-400 font-bold mb-1.5 border-b border-sky-500/30 pb-1">ФИНАНСЫ MONDELEZ</div>
+                                <div class="flex justify-between text-slate-300 mb-1"><span id="cournot-lbl-tr2">Выручка (TR):</span> <span id="cournot-tr2" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between text-rose-300 mb-1"><span id="cournot-lbl-tc2">Издержки (TC):</span> <span id="cournot-tc2" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between font-bold text-emerald-400 mt-2 pt-1 border-t border-slate-700"><span id="cournot-lbl-pi2">ПРИБЫЛЬ:</span> <span id="cournot-val-pi2" class="font-mono">0 ₸</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="cournot-panel" class="glass rounded-2xl p-4 border text-xs leading-relaxed"></div>
+                </div>
+            </div>
+
+            <!-- SUBTAB 2: STACKELBERG -->
+            <div id="subtab-content-stackelberg" class="hidden grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="glass rounded-2xl p-5 lg:col-span-3 flex flex-col">
+                    <h2 class="text-xs font-bold mb-2 text-amber-400 flex justify-between">
+                        <span id="stack-chart-title">Динамика доминирования на рынке</span>
+                        <span id="stack-chart-sub" class="text-slate-400 font-normal text-[10px]">On Running vs Brooks</span>
+                    </h2>
+                    <div class="chart-container-lg relative"><canvas id="chart-stackelberg"></canvas></div>
+                    <div class="mt-4 bg-slate-900/60 p-3 rounded-xl text-xs border border-amber-500/20 leading-relaxed">
+                        <span id="stack-insight-lbl" class="font-bold text-amber-300">Инсайт (P&L):</span> <span id="stack-insight-txt">В модели Штакельберга лидер (On Running) первым объявляет выпуск. Ведомый (Brooks) вынужден сокращать свою долю, чтобы избежать падения цены. Лидер забирает максимум прибыли.</span>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <div class="glass rounded-2xl p-5">
+                        <div class="mb-3">
+                            <div class="flex justify-between text-xs mb-1"><span id="stack-lbl-q1" class="text-amber-200 font-bold">Выпуск Лидера On (Q₁):</span><span id="stack-val-q1" class="font-bold font-mono text-amber-400">45</span></div>
+                            <input type="range" id="stack-slider-q1" min="0" max="90" value="45" class="gold-slider">
+                        </div>
+                        <div class="bg-black/60 p-3 rounded-xl mb-4 text-xs border border-slate-700 space-y-1.5">
+                            <div class="flex justify-between">
+                                <span id="stack-lbl-resp" class="text-slate-400">Ответ Ведомого (Brooks):</span>
+                                <span class="font-bold text-sky-400 font-mono">Q₂ = <span id="stack-val-q2">22.5</span> <span class="stack-unit-txt">тыс. пар</span></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span id="stack-lbl-price" class="text-slate-400">Рыночная цена товара:</span>
+                                <span class="font-bold text-yellow-400 font-mono"><span id="stack-val-p">130 000</span> ₸</span>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 text-[11px]">
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-amber-500/30">
+                                <div id="stack-fin1-title" class="text-amber-400 font-bold mb-1.5 border-b border-amber-500/30 pb-1">ФИНАНСЫ ON (ЛИДЕР)</div>
+                                <div class="flex justify-between text-slate-300 mb-1"><span id="stack-lbl-tr1">Выручка:</span> <span id="stack-tr1" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between text-rose-300 mb-1"><span id="stack-lbl-tc1">Издержки:</span> <span id="stack-tc1" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between font-bold text-emerald-400 mt-2 pt-1 border-t border-slate-700"><span id="stack-lbl-pi1">ПРИБЫЛЬ:</span> <span id="stack-val-pi1" class="font-mono">0 ₸</span></div>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-sky-500/30">
+                                <div id="stack-fin2-title" class="text-sky-400 font-bold mb-1.5 border-b border-sky-500/30 pb-1">ФИНАНСЫ BROOKS</div>
+                                <div class="flex justify-between text-slate-300 mb-1"><span id="stack-lbl-tr2">Выручка:</span> <span id="stack-tr2" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between text-rose-300 mb-1"><span id="stack-lbl-tc2">Издержки:</span> <span id="stack-tc2" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between font-bold text-emerald-400 mt-2 pt-1 border-t border-slate-700"><span id="stack-lbl-pi2">ПРИБЫЛЬ:</span> <span id="stack-val-pi2" class="font-mono">0 ₸</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="stack-panel" class="glass rounded-2xl p-4 border text-xs leading-relaxed"></div>
+                </div>
+            </div>
+
+            <!-- SUBTAB 3: BERTRAND -->
+            <div id="subtab-content-bertrand" class="hidden grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="glass rounded-2xl p-5 lg:col-span-3 flex flex-col">
+                    <h2 class="text-xs font-bold mb-2 text-amber-400 flex justify-between">
+                        <span id="bert-chart-title">Перетекание долей при ценовой войне</span>
+                        <span id="bert-chart-sub" class="text-slate-400 font-normal text-[10px]">Телеком-операторы</span>
+                    </h2>
+                    <div class="chart-container-lg relative"><canvas id="chart-bertrand"></canvas></div>
+                    <div class="mt-4 bg-slate-900/60 p-3 rounded-xl text-xs border border-rose-500/20 leading-relaxed">
+                        <span id="bert-insight-lbl" class="font-bold text-rose-300">Инсайт (P&L):</span> <span id="bert-insight-txt">В модели Бертрана игроки соперничают по **Ценам**. Снижая цену ниже конкурента, фирма забирает 100% рынка, но демпинг до уровня предельных издержек (MC) обнуляет всю прибыль.</span>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <div class="glass rounded-2xl p-5">
+                        <div class="mb-3">
+                            <div class="flex justify-between text-xs mb-1"><span id="bert-lbl-p1" class="text-rose-400 font-bold">Тариф Оператора 1 (P₁):</span><span class="font-bold font-mono text-rose-400"><span id="bertrand-val-p1">3000</span> ₸</span></div>
+                            <input type="range" id="bertrand-slider-p1" min="1000" max="6000" value="3000" step="100" class="gold-slider">
+                        </div>
+                        <div class="mb-4">
+                            <div class="flex justify-between text-xs mb-1"><span id="bert-lbl-p2" class="text-purple-400 font-bold">Тариф Оператора 2 (P₂):</span><span class="font-bold font-mono text-purple-400"><span id="bertrand-val-p2">3500</span> ₸</span></div>
+                            <input type="range" id="bertrand-slider-p2" min="1000" max="6000" value="3500" step="100" class="gold-slider">
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-3 text-[11px]">
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-rose-500/30">
+                                <div class="text-rose-400 font-bold mb-1.5 border-b border-rose-500/30 pb-1 flex justify-between"><span id="bert-op1-title">ОПЕРАТОР 1</span> <span id="bertrand-val-share1" class="font-mono">0%</span></div>
+                                <div class="flex justify-between text-slate-300 mb-1"><span id="bert-lbl-q1">Клиенты:</span> <span id="bertrand-q1" class="font-mono">0</span></div>
+                                <div class="flex justify-between text-slate-300 mb-1"><span id="bert-lbl-tr1">Выручка:</span> <span id="bertrand-tr1" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between text-rose-300 mb-1"><span id="bert-lbl-tc1">Издержки:</span> <span id="bertrand-tc1" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between font-bold text-emerald-400 mt-2 pt-1 border-t border-slate-700"><span id="bert-lbl-pi1">ПРИБЫЛЬ:</span> <span id="bertrand-profit1" class="font-mono">0 ₸</span></div>
+                            </div>
+                            <div class="bg-slate-900/80 p-3 rounded-xl border border-purple-500/30">
+                                <div class="text-purple-400 font-bold mb-1.5 border-b border-purple-500/30 pb-1 flex justify-between"><span id="bert-op2-title">ОПЕРАТОР 2</span> <span id="bertrand-val-share2" class="font-mono">0%</span></div>
+                                <div class="flex justify-between text-slate-300 mb-1"><span id="bert-lbl-q2">Клиенты:</span> <span id="bertrand-q2" class="font-mono">0</span></div>
+                                <div class="flex justify-between text-slate-300 mb-1"><span id="bert-lbl-tr2">Выручка:</span> <span id="bertrand-tr2" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between text-rose-300 mb-1"><span id="bert-lbl-tc2">Издержки:</span> <span id="bertrand-tc2" class="font-mono">0 ₸</span></div>
+                                <div class="flex justify-between font-bold text-emerald-400 mt-2 pt-1 border-t border-slate-700"><span id="bert-lbl-pi2">ПРИБЫЛЬ:</span> <span id="bertrand-profit2" class="font-mono">0 ₸</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="bertrand-panel" class="glass rounded-2xl p-4 border text-xs leading-relaxed"></div>
+                </div>
+            </div>
+
+            <!-- SUBTAB 4: SWEEZY -->
+            <div id="subtab-content-sweezy" class="hidden grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div class="glass rounded-2xl p-5 lg:col-span-3 flex flex-col">
+                    <h2 class="text-xs font-bold mb-2 text-amber-400 flex justify-between">
+                        <span id="sweezy-chart-title">Равновесие на изломе кривой спроса</span>
+                        <span id="sweezy-chart-sub" class="text-slate-400 font-normal text-[10px]">Сети АЗС</span>
+                    </h2>
+                    <div class="chart-container-lg relative"><canvas id="chart-sweezy"></canvas></div>
+                    <div class="mt-4 bg-slate-900/60 p-3 rounded-xl text-xs border border-cyan-500/20 leading-relaxed">
+                        <span id="sweezy-insight-lbl" class="font-bold text-cyan-300">Инсайт (P&L):</span> <span id="sweezy-insight-txt">Подвигайте слайдер издержек (MC). В пределах разрыва предельного дохода (MR) розничная цена и объем остаются абсолютно жесткими и не меняются.</span>
+                    </div>
+                </div>
+                <div class="lg:col-span-2 flex flex-col gap-4">
+                    <div class="glass rounded-2xl p-5">
+                        <div class="mb-4">
+                            <div class="flex justify-between text-xs mb-1">
+                                <span id="sweezy-lbl-mc" class="text-cyan-300 font-bold">Оптовые издержки АЗС (MC):</span>
+                                <span class="font-bold font-mono text-cyan-400"><span id="sweezy-val-mc">195</span> ₸</span>
+                            </div>
+                            <input type="range" id="sweezy-slider-mc" min="120" max="280" value="195" step="5" class="gold-slider">
+                        </div>
+                        
+                        <div class="bg-black/60 p-3 rounded-xl mb-4 text-xs border border-slate-700 flex justify-around text-center">
+                            <div>
+                                <div id="sweezy-lbl-retp" class="text-slate-400 mb-1">Розничная цена (P)</div>
+                                <div id="sweezy-val-p" class="font-bold text-yellow-400 text-sm font-mono">250 ₸</div>
+                            </div>
+                            <div>
+                                <div id="sweezy-lbl-vol" class="text-slate-400 mb-1">Объем продаж (Q)</div>
+                                <div id="sweezy-val-q" class="font-bold text-yellow-400 text-sm font-mono">40 <span id="sweezy-unit-k">тыс. л.</span></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900/80 p-4 rounded-xl border border-cyan-500/30 text-xs space-y-1.5">
+                            <div id="sweezy-fin-title" class="text-cyan-400 font-bold mb-2 border-b border-cyan-500/30 pb-1">ФИНАНСОВЫЙ РЕЗУЛЬТАТ АЗС</div>
+                            <div class="flex justify-between text-slate-300"><span id="sweezy-lbl-tr">Выручка (TR = P × Q):</span> <span id="sweezy-tr" class="font-mono">0 ₸</span></div>
+                            <div class="flex justify-between text-rose-300"><span id="sweezy-lbl-tc">Издержки (TC = MC × Q):</span> <span id="sweezy-tc" class="font-mono">0 ₸</span></div>
+                            <div class="flex justify-between font-bold text-emerald-400 mt-2 pt-2 border-t border-slate-700 text-sm"><span id="sweezy-lbl-pi">ЧИСТАЯ ПРИБЫЛЬ:</span> <span id="sweezy-pi" class="font-mono">0 ₸</span></div>
+                        </div>
+                    </div>
+                    <div id="sweezy-panel" class="glass rounded-2xl p-4 border text-xs leading-relaxed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- ВКЛАДКА 4: ЧИСТАЯ МОНОПОЛИЯ                -->
+        <!-- ========================================== -->
+        <div id="monopoly" class="tab-content hidden">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-800 pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 bg-rose-500/20 rounded-lg"><i data-lucide="crown" class="text-rose-500"></i></div>
+                    <div>
+                        <h2 id="mo-head-title" class="text-2xl font-black text-white">Чистая монополия</h2>
+                        <p id="mo-head-sub" class="text-xs text-slate-400 uppercase tracking-widest">Анализ фирмы-ценоустановителя (Price Maker)</p>
+                    </div>
+                </div>
+                <div class="bg-rose-900/30 border border-rose-500/30 px-4 py-2 rounded-xl text-xs text-rose-200">
+                    <strong id="mo-goal-lbl">Цель:</strong> <span id="mo-goal-txt">Найти оптимум монополиста (MR = MC)</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                <div class="xl:col-span-5 space-y-6">
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700">
+                        <div class="bg-blue-900/20 border border-blue-500/30 p-3 rounded-xl mb-6 text-[11px] text-blue-200 leading-relaxed flex gap-2">
+                            <i data-lucide="info" class="w-6 h-6 text-blue-400 shrink-0"></i>
+                            <p id="mo-info-txt"><strong>Почему цена падает?</strong> Монополист удовлетворяет весь спрос. Согласно Закону спроса, чтобы продать бóльший объем (Q), нужно снижать цену (P) для всех покупателей.</p>
+                        </div>
+
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-2">
+                                <label id="mo-lbl-p" class="text-xs font-bold text-slate-300 uppercase tracking-wider">Назначить цену (P)</label>
+                                <span id="mono-slider-val-p" class="text-lg font-black text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded-lg">$160</span>
+                            </div>
+                            <input type="range" id="mono-slider-p" min="60" max="160" value="160" step="10" class="vintage-slider mono-slider-p">
+                            <div class="flex justify-between text-[10px] text-slate-500 mt-2 font-mono">
+                                <span>$60</span><span>$110</span><span>$160</span>
+                            </div>
+                        </div>
+
+                        <div class="w-full h-px bg-slate-800 my-4"></div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label id="mo-lbl-q" class="text-xs font-bold text-slate-300 uppercase tracking-wider">Объем выпуска (Q)</label>
+                                <span id="mono-val-q" class="text-lg font-black text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-lg">0 ед.</span>
+                            </div>
+                            <input type="range" id="mono-slider-q" min="0" max="10" value="0" step="1" class="vintage-slider mono-slider-q">
+                            <div class="flex justify-between text-[10px] text-slate-500 mt-2 font-mono">
+                                <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-900/80 p-3 rounded-2xl border-l-4 border-emerald-500 relative overflow-hidden">
+                            <div class="absolute -right-2 -top-2 opacity-10"><i data-lucide="trending-down" class="w-12 h-12"></i></div>
+                            <span id="mo-lbl-mr" class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Пред. выручка (MR)</span>
+                            <span id="mono-val-mr" class="text-lg font-mono font-bold text-emerald-400">-</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-2xl border-l-4 border-rose-500 relative overflow-hidden">
+                            <div class="absolute -right-2 -top-2 opacity-10"><i data-lucide="calculator" class="w-12 h-12"></i></div>
+                            <span id="mo-lbl-atc" class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Сред. издержки (ATC)</span>
+                            <span id="mono-val-atc" class="text-lg font-mono font-bold text-rose-400">-</span>
+                        </div>
+                        <div class="bg-slate-900/80 p-3 rounded-2xl border-l-4 border-amber-500 relative overflow-hidden col-span-2">
+                            <div class="absolute right-2 top-0 opacity-10"><i data-lucide="activity" class="w-12 h-12"></i></div>
+                            <span id="mo-lbl-mc" class="text-[9px] uppercase font-bold text-slate-400 block mb-1">Пред. издержки (MC)</span>
+                            <span id="mono-val-mc" class="text-lg font-mono font-bold text-amber-400">-</span>
+                        </div>
+                    </div>
+
+                    <div id="mono-profit-panel" class="bg-slate-900/80 p-5 rounded-2xl border border-slate-700 transition-colors duration-300">
+                        <div class="flex justify-between items-end mb-4">
+                            <span id="mo-lbl-profit" class="text-xs font-bold text-slate-300 uppercase tracking-wider">Прибыль</span>
+                            <span id="mono-val-profit" class="text-3xl font-black font-mono">$-100</span>
+                        </div>
+                        <div class="h-px w-full bg-slate-700 my-4"></div>
+                        <h4 class="text-xs font-bold uppercase text-slate-400 mb-2 flex items-center gap-2">
+                            <i data-lucide="gavel" class="w-4 h-4"></i> <span id="mo-lbl-verdict-title">Управленческий анализ</span>
+                        </h4>
+                        <p id="mono-val-verdict" class="text-xs text-slate-300 leading-relaxed">Инициализация...</p>
+                    </div>
+                </div>
+
+                <div class="xl:col-span-7 flex flex-col gap-6">
+                    <div class="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl h-[280px] relative">
+                        <canvas id="monoTrTcChart"></canvas>
+                    </div>
+                    <div class="bg-slate-900/50 border border-slate-800 p-4 rounded-2xl h-[420px] relative">
+                        <canvas id="monoMarketChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <footer id="ftr-txt" class="text-center text-xs text-slate-600 pt-6 border-t border-slate-800 mt-8">
+        Принципы экономики • Экономика • Рыночная инфраструктура
+    </footer>
+</div>
+
+<script>
+    lucide.createIcons();
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.font.family = 'Inter';
+    const gridColor = 'rgba(255, 255, 255, 0.05)';
+
+    let currentLang = 'ru';
+
+    const i18n = {
+        ru: {
+            hdrTitle: "Рыночная инфраструктура",
+            hdrSubtitle: "Принципы экономики • Экономика",
+            hdrBadge: "Интерактивный Терминал",
+            tabPc: "Совершенная<br>конкуренция",
+            tabMc: "Монополистическая<br>конкуренция",
+            tabOl: "Олигополия<br>(Стратегический анализ)",
+            tabMo: "Чистая<br>монополия",
+            ftrTxt: "Принципы экономики • Экономика • Рыночная инфраструктура",
+            units: "ед.",
+
+            // PC
+            pcHeadTitle: "Совершенная конкуренция",
+            pcHeadSub: "Анализ фирмы-ценополучателя",
+            pcSc131: "P=$131 (Рост)",
+            pcSc81: "P=$81 (Спад)",
+            pcSc71: "P=$71 (Кризис)",
+            pcLblQ: "Объем выпуска (Q)",
+            pcLblTr: "Выручка (TR)",
+            pcSubTr: "P * Q",
+            pcLblTc: "Общие издержки (TC)",
+            pcSubTc: "TFC ($100) + TVC",
+            pcLblMr: "Пред. выручка (MR)",
+            pcSubMr: "Равна цене (P)",
+            pcLblMc: "Пред. издержки (MC)",
+            pcSubMc: "Зависит от Q",
+            pcLblProfit: "Прибыль",
+            pcLblVerdictTitle: "Управленческий анализ",
+            pcChart1Title: "Анализ Общих Показателей (TR - TC)",
+            pcChart2Title: "Анализ Предельных Показателей (MR - MC)",
+
+            // MC
+            mcHeadTitle: "Монополистическая конкуренция",
+            mcHeadSub: "Анализ эффекта дифференциации и входа фирм",
+            mcGoalLbl: "Цель:",
+            mcGoalTxt: "Сравнить краткосрочный и долгосрочный периоды",
+            mcToggleSr: "Краткосрочный",
+            mcToggleLr: "Долгосрочный",
+            mcLblQ: "Объем выпуска (Q)",
+            mcLblP: "Цена (Спрос)",
+            mcLblAtc: "Средние издержки",
+            mcLblMr: "Пред. выручка (MR)",
+            mcLblMc: "Пред. издержки (MC)",
+            mcLblProfit: "Экономическая прибыль",
+            mcLblVerdictTitle: "Анализ ситуации",
+            mcChart1Title: "Анализ Валовых Показателей (TR - TC)",
+            mcChart2SrTitle: "Удельные показатели (Краткосрочный период)",
+            mcChart2LrTitle: "Удельные показатели (Долгосрочный период)",
+
+            // OL
+            olHeadTitle: "Стратегические Модели Олигополии",
+            olHeadSub: "Анализ взаимодействия: объемы, цены, лидерство и жесткость",
+            olSubtabCournotTitle: "Модель Курно",
+            olSubtabCournotSub: "Конкуренция по объемам",
+            olSubtabStackTitle: "Модель Штакельберга",
+            olSubtabStackSub: "Асимметрия и лидерство",
+            olSubtabBertTitle: "Модель Бертрана",
+            olSubtabBertSub: "Ценовые войны",
+            olSubtabSweezyTitle: "Модель Суизи (Sweezy)",
+            olSubtabSweezySub: "Жесткость цен",
+
+            cournotChartTitle: "Матрица объемов (Кривые реагирования)",
+            cournotChartSub: "Mars vs Mondelez",
+            cournotInsightLbl: "Инсайт (P&L):",
+            cournotInsightTxt: "В модели Курно компании управляют <b>объемами</b>. Если оба игрока бездумно увеличат выпуск, их Выручка может вырасти, но Издержки вырастут быстрее, а падение рыночной цены уничтожит Прибыль.",
+            cournotLblQ1: "Выпуск Mars (Q₁):",
+            cournotLblQ2: "Выпуск Mondelez (Q₂):",
+            cournotLblPrice: "Рыночная цена товара (формируется рынком):",
+            cournotFin1Title: "ФИНАНСЫ MARS",
+            cournotFin2Title: "ФИНАНСЫ MONDELEZ",
+            cournotLegR1: "Реакция Mars",
+            cournotLegR2: "Реакция Mondelez",
+            cournotLegCur: "Текущие объемы",
+            cournotLegNash: "Равновесие Нэша",
+
+            stackChartTitle: "Динамика доминирования на рынке",
+            stackChartSub: "On Running vs Brooks",
+            stackInsightLbl: "Инсайт (P&L):",
+            stackInsightTxt: "В модели Штакельберга лидер (On Running) первым объявляет выпуск. Ведомый (Brooks) вынужден сокращать свою долю, чтобы избежать падения цены. Лидер забирает максимум прибыли.",
+            stackLblQ1: "Выпуск Лидера On (Q₁):",
+            stackLblResp: "Ответ Ведомого (Brooks):",
+            stackLblPrice: "Рыночная цена товара:",
+            stackUnitK: "тыс. пар",
+            stackFin1Title: "ФИНАНСЫ ON (ЛИДЕР)",
+            stackFin2Title: "ФИНАНСЫ BROOKS",
+            stackLegR2: "Реакция Brooks",
+            stackLegChoice: "Выбор On (Лидер)",
+            stackAxisX: "Q₁ (On, тыс. пар)",
+            stackAxisY: "Q₂ (Brooks, тыс. пар)",
+
+            bertChartTitle: "Перетекание долей при ценовой войне",
+            bertChartSub: "Телеком-операторы",
+            bertInsightLbl: "Инсайт (P&L):",
+            bertInsightTxt: "В модели Бертрана игроки соперничают по <b>Ценам</b>. Снижая цену ниже конкурента, фирма забирает 100% рынка, но демпинг до уровня предельных издержек (MC) обнуляет всю прибыль.",
+            bertLblP1: "Тариф Оператора 1 (P₁):",
+            bertLblP2: "Тариф Оператора 2 (P₂):",
+            bertOp1Title: "ОПЕРАТОР 1",
+            bertOp2Title: "ОПЕРАТОР 2",
+            bertLblQ: "Клиенты:",
+
+            sweezyChartTitle: "Равновесие на изломе кривой спроса",
+            sweezyChartSub: "Сети АЗС",
+            sweezyInsightLbl: "Инсайт (P&L):",
+            sweezyInsightTxt: "Подвигайте слайдер издержек (MC). В пределах разрыва предельного дохода (MR) розничная цена и объем остаются абсолютно жесткими и не меняются.",
+            sweezyLblMc: "Оптовые издержки АЗС (MC):",
+            sweezyLblRetp: "Розничная цена (P)",
+            sweezyLblVol: "Объем продаж (Q)",
+            sweezyUnitK: "тыс. л.",
+            sweezyFinTitle: "ФИНАНСОВЫЙ РЕЗУЛЬТАТ АЗС",
+            sweezyAxisX: "Q (тыс. л.)",
+
+            commonTr: "Выручка (TR):",
+            commonTc: "Издержки (TC):",
+            commonPi: "ПРИБЫЛЬ:",
+
+            // MO
+            moHeadTitle: "Чистая монополия",
+            moHeadSub: "Анализ фирмы-ценоустановителя (Price Maker)",
+            moGoalLbl: "Цель:",
+            moGoalTxt: "Найти оптимум монополиста (MR = MC)",
+            moInfoTxt: "<strong>Почему цена падает?</strong> Монополист удовлетворяет весь спрос. Согласно Закону спроса, чтобы продать бóльший объем (Q), нужно снижать цену (P) для всех покупателей.",
+            moLblP: "Назначить цену (P)",
+            moLblQ: "Объем выпуска (Q)",
+            moLblMr: "Пред. выручка (MR)",
+            moLblAtc: "Сред. издержки (ATC)",
+            moLblMc: "Пред. издержки (MC)",
+            moLblProfit: "Прибыль",
+            moLblVerdictTitle: "Управленческий анализ",
+            moChart1Title: "Анализ Валовых Показателей (TR - TC)",
+            moChart2Title: "Удельные показатели и Оптимум монополиста",
+
+            // Common Legends
+            legTR: "Совокупная выручка (TR)",
+            legTC: "Совокупные издержки (TC)",
+            legMR: "Предельная выручка (MR=P)",
+            legMC: "Предельные издержки (MC)",
+            legAVC: "Средние переменные издержки (AVC)",
+            legDemandP: "Спрос (Цена D=P)",
+            legMRMono: "Предельная выручка (MR)",
+            legMCMono: "Предельные издержки (MC)",
+            legATCMono: "Средние издержки (ATC)"
+        },
+        en: {
+            hdrTitle: "Market Infrastructure",
+            hdrSubtitle: "Principles of Economics • Economics",
+            hdrBadge: "Interactive Terminal",
+            tabPc: "Perfect<br>Competition",
+            tabMc: "Monopolistic<br>Competition",
+            tabOl: "Oligopoly<br>(Strategic Analysis)",
+            tabMo: "Pure<br>Monopoly",
+            ftrTxt: "Principles of Economics • Economics • Market Infrastructure",
+            units: "units",
+
+            // PC
+            pcHeadTitle: "Perfect Competition",
+            pcHeadSub: "Price Taker Firm Analysis",
+            pcSc131: "P=$131 (Expansion)",
+            pcSc81: "P=$81 (Downturn)",
+            pcSc71: "P=$71 (Shutdown)",
+            pcLblQ: "Production Output (Q)",
+            pcLblTr: "Total Revenue (TR)",
+            pcSubTr: "P * Q",
+            pcLblTc: "Total Cost (TC)",
+            pcSubTc: "TFC ($100) + TVC",
+            pcLblMr: "Marginal Revenue (MR)",
+            pcSubMr: "Equals Price (P)",
+            pcLblMc: "Marginal Cost (MC)",
+            pcSubMc: "Depends on Q",
+            pcLblProfit: "Profit",
+            pcLblVerdictTitle: "Managerial Analysis",
+            pcChart1Title: "Total Indicators Analysis (TR - TC)",
+            pcChart2Title: "Marginal Indicators Analysis (MR - MC)",
+
+            // MC
+            mcHeadTitle: "Monopolistic Competition",
+            mcHeadSub: "Product Differentiation & Entry Analysis",
+            mcGoalLbl: "Goal:",
+            mcGoalTxt: "Compare short-run and long-run equilibrium",
+            mcToggleSr: "Short-Run",
+            mcToggleLr: "Long-Run",
+            mcLblQ: "Production Output (Q)",
+            mcLblP: "Price (Demand)",
+            mcLblAtc: "Average Total Cost",
+            mcLblMr: "Marginal Revenue (MR)",
+            mcLblMc: "Marginal Cost (MC)",
+            mcLblProfit: "Economic Profit",
+            mcLblVerdictTitle: "Situation Analysis",
+            mcChart1Title: "Gross Indicators Analysis (TR - TC)",
+            mcChart2SrTitle: "Per-Unit Metrics (Short-Run)",
+            mcChart2LrTitle: "Per-Unit Metrics (Long-Run)",
+
+            // OL
+            olHeadTitle: "Strategic Oligopoly Models",
+            olHeadSub: "Strategic Interaction: Quantities, Prices, Leadership & Rigidity",
+            olSubtabCournotTitle: "Cournot Model",
+            olSubtabCournotSub: "Quantity Competition",
+            olSubtabStackTitle: "Stackelberg Model",
+            olSubtabStackSub: "Asymmetry & Leadership",
+            olSubtabBertTitle: "Bertrand Model",
+            olSubtabBertSub: "Price Competition",
+            olSubtabSweezyTitle: "Sweezy Model",
+            olSubtabSweezySub: "Price Rigidity",
+
+            cournotChartTitle: "Quantity Matrix (Reaction Curves)",
+            cournotChartSub: "Mars vs Mondelez",
+            cournotInsightLbl: "Insight (P&L):",
+            cournotInsightTxt: "In Cournot, firms compete via <b>Quantities</b>. If both players flood the market, Revenue may rise initially, but Costs accelerate faster while market price drops, destroying Profit.",
+            cournotLblQ1: "Mars Output (Q₁):",
+            cournotLblQ2: "Mondelez Output (Q₂):",
+            cournotLblPrice: "Market Price (Determined by Market):",
+            cournotFin1Title: "MARS FINANCIALS",
+            cournotFin2Title: "MONDELEZ FINANCIALS",
+            cournotLegR1: "Mars Reaction",
+            cournotLegR2: "Mondelez Reaction",
+            cournotLegCur: "Current Quantities",
+            cournotLegNash: "Nash Equilibrium",
+
+            stackChartTitle: "Market Dominance Dynamics",
+            stackChartSub: "On Running vs Brooks",
+            stackInsightLbl: "Insight (P&L):",
+            stackInsightTxt: "In Stackelberg, the leader (On Running) commits first. The follower (Brooks) restricts its output to prevent price collapse. The leader captures the lion's share of profits.",
+            stackLblQ1: "Leader On Output (Q₁):",
+            stackLblResp: "Follower Brooks Response:",
+            stackLblPrice: "Product Market Price:",
+            stackUnitK: "k pairs",
+            stackFin1Title: "ON FINANCIALS (LEADER)",
+            stackFin2Title: "BROOKS FINANCIALS",
+            stackLegR2: "Brooks Reaction",
+            stackLegChoice: "On Choice (Leader)",
+            stackAxisX: "Q₁ (On, k pairs)",
+            stackAxisY: "Q₂ (Brooks, k pairs)",
+
+            bertChartTitle: "Market Share Shift in Price Wars",
+            bertChartSub: "Telecom Operators",
+            bertInsightLbl: "Insight (P&L):",
+            bertInsightTxt: "In Bertrand, firms compete on <b>Price</b>. Undercutting captures 100% market share, but price wars driven down to marginal cost (MC) eliminate all economic profit.",
+            bertLblP1: "Operator 1 Tariff (P₁):",
+            bertLblP2: "Operator 2 Tariff (P₂):",
+            bertOp1Title: "OPERATOR 1",
+            bertOp2Title: "OPERATOR 2",
+            bertLblQ: "Subscribers:",
+
+            sweezyChartTitle: "Kinked Demand Curve Equilibrium",
+            sweezyChartSub: "Gas Station Networks",
+            sweezyInsightLbl: "Insight (P&L):",
+            sweezyInsightTxt: "Adjust marginal costs (MC). As long as MC fluctuates within the MR discontinuity gap, retail prices and output remain perfectly rigid.",
+            sweezyLblMc: "Gas Station Wholesale MC:",
+            sweezyLblRetp: "Retail Price (P)",
+            sweezyLblVol: "Sales Volume (Q)",
+            sweezyUnitK: "k liters",
+            sweezyFinTitle: "GAS STATION P&L RESULT",
+            sweezyAxisX: "Q (k liters)",
+
+            commonTr: "Revenue (TR):",
+            commonTc: "Costs (TC):",
+            commonPi: "NET PROFIT:",
+
+            // MO
+            moHeadTitle: "Pure Monopoly",
+            moHeadSub: "Price Maker Firm Analysis",
+            moGoalLbl: "Goal:",
+            moGoalTxt: "Find Monopolist's Optimum (MR = MC)",
+            moInfoTxt: "<strong>Why does price fall?</strong> The monopolist serves the entire market. Under the Law of Demand, selling a higher volume (Q) requires lowering the price (P) for all buyers.",
+            moLblP: "Set Price (P)",
+            moLblQ: "Production Output (Q)",
+            moLblMr: "Marginal Revenue (MR)",
+            moLblAtc: "Average Total Cost (ATC)",
+            moLblMc: "Marginal Cost (MC)",
+            moLblProfit: "Profit",
+            moLblVerdictTitle: "Managerial Analysis",
+            moChart1Title: "Gross Indicators Analysis (TR - TC)",
+            moChart2Title: "Per-Unit Metrics & Monopolist Optimum",
+
+            // Common Legends
+            legTR: "Total Revenue (TR)",
+            legTC: "Total Cost (TC)",
+            legMR: "Marginal Revenue (MR=P)",
+            legMC: "Marginal Cost (MC)",
+            legAVC: "Average Variable Cost (AVC)",
+            legDemandP: "Demand (Price D=P)",
+            legMRMono: "Marginal Revenue (MR)",
+            legMCMono: "Marginal Cost (MC)",
+            legATCMono: "Average Total Cost (ATC)"
+        }
+    };
+
+    let pcInitialized = false;
+    let monCompInitialized = false;
+    let oligopolyInitialized = false;
+    let monoInitialized = false;
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        const t = i18n[lang];
+
+        document.getElementById('btn-lang-ru').className = lang === 'ru' ? "px-3 py-1 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white" : "px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
+        document.getElementById('btn-lang-en').className = lang === 'en' ? "px-3 py-1 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white" : "px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
+
+        // Global
+        document.getElementById('hdr-title').innerText = t.hdrTitle;
+        document.getElementById('hdr-subtitle').innerText = t.hdrSubtitle;
+        document.getElementById('hdr-badge').innerText = t.hdrBadge;
+        document.getElementById('tab-pc').innerHTML = t.tabPc;
+        document.getElementById('tab-mc').innerHTML = t.tabMc;
+        document.getElementById('tab-ol').innerHTML = t.tabOl;
+        document.getElementById('tab-mo').innerHTML = t.tabMo;
+        document.getElementById('ftr-txt').innerText = t.ftrTxt;
+
+        // PC
+        document.getElementById('pc-head-title').innerText = t.pcHeadTitle;
+        document.getElementById('pc-head-sub').innerText = t.pcHeadSub;
+        document.getElementById('pc-sc-131').innerText = t.pcSc131;
+        document.getElementById('pc-sc-81').innerText = t.pcSc81;
+        document.getElementById('pc-sc-71').innerText = t.pcSc71;
+        document.getElementById('pc-lbl-q').innerText = t.pcLblQ;
+        document.getElementById('pc-lbl-tr').innerText = t.pcLblTr;
+        document.getElementById('pc-sub-tr').innerText = t.pcSubTr;
+        document.getElementById('pc-lbl-tc').innerText = t.pcLblTc;
+        document.getElementById('pc-sub-tc').innerText = t.pcSubTc;
+        document.getElementById('pc-lbl-mr').innerText = t.pcLblMr;
+        document.getElementById('pc-sub-mr').innerText = t.pcSubMr;
+        document.getElementById('pc-lbl-mc').innerText = t.pcLblMc;
+        document.getElementById('pc-sub-mc').innerText = t.pcSubMc;
+        document.getElementById('pc-lbl-profit').innerText = t.pcLblProfit;
+        document.getElementById('pc-lbl-verdict-title').innerText = t.pcLblVerdictTitle;
+
+        if (pcTrTcChartInst && pcMrMcChartInst) {
+            pcTrTcChartInst.options.plugins.title.text = t.pcChart1Title;
+            pcTrTcChartInst.data.datasets[0].label = t.legTR;
+            pcTrTcChartInst.data.datasets[1].label = t.legTC;
+            pcTrTcChartInst.update();
+
+            pcMrMcChartInst.options.plugins.title.text = t.pcChart2Title;
+            pcMrMcChartInst.data.datasets[0].label = t.legMR;
+            pcMrMcChartInst.data.datasets[1].label = t.legMC;
+            pcMrMcChartInst.data.datasets[2].label = t.legAVC;
+            pcMrMcChartInst.update();
+        }
+
+        // MC
+        document.getElementById('mc-head-title').innerText = t.mcHeadTitle;
+        document.getElementById('mc-head-sub').innerText = t.mcHeadSub;
+        document.getElementById('mc-goal-lbl').innerText = t.mcGoalLbl;
+        document.getElementById('mc-goal-txt').innerText = t.mcGoalTxt;
+        document.getElementById('mc-toggle-sr').innerText = t.mcToggleSr;
+        document.getElementById('mc-toggle-lr').innerText = t.mcToggleLr;
+        document.getElementById('mc-lbl-q').innerText = t.mcLblQ;
+        document.getElementById('mc-lbl-p').innerText = t.mcLblP;
+        document.getElementById('mc-lbl-atc').innerText = t.mcLblAtc;
+        document.getElementById('mc-lbl-mr').innerText = t.mcLblMr;
+        document.getElementById('mc-lbl-mc').innerText = t.mcLblMc;
+        document.getElementById('mc-lbl-profit').innerText = t.mcLblProfit;
+        document.getElementById('mc-lbl-verdict-title').innerText = t.mcLblVerdictTitle;
+
+        if (monCompTrTcChartInst && monCompChartInst) {
+            monCompTrTcChartInst.options.plugins.title.text = t.mcChart1Title;
+            monCompTrTcChartInst.data.datasets[0].label = t.legTR;
+            monCompTrTcChartInst.data.datasets[1].label = t.legTC;
+            monCompTrTcChartInst.update();
+
+            const period = document.querySelector('input[name="mc-period"]:checked').value;
+            monCompChartInst.options.plugins.title.text = period === 'SR' ? t.mcChart2SrTitle : t.mcChart2LrTitle;
+            monCompChartInst.update();
+        }
+
+        // OL
+        document.getElementById('ol-head-title').innerText = t.olHeadTitle;
+        document.getElementById('ol-head-sub').innerText = t.olHeadSub;
+        document.getElementById('ol-subtab-cournot-title').innerText = t.olSubtabCournotTitle;
+        document.getElementById('ol-subtab-cournot-sub').innerText = t.olSubtabCournotSub;
+        document.getElementById('ol-subtab-stack-title').innerText = t.olSubtabStackTitle;
+        document.getElementById('ol-subtab-stack-sub').innerText = t.olSubtabStackSub;
+        document.getElementById('ol-subtab-bert-title').innerText = t.olSubtabBertTitle;
+        document.getElementById('ol-subtab-bert-sub').innerText = t.olSubtabBertSub;
+        document.getElementById('ol-subtab-sweezy-title').innerText = t.olSubtabSweezyTitle;
+        document.getElementById('ol-subtab-sweezy-sub').innerText = t.olSubtabSweezySub;
+
+        document.getElementById('cournot-chart-title').innerText = t.cournotChartTitle;
+        document.getElementById('cournot-chart-sub').innerText = t.cournotChartSub;
+        document.getElementById('cournot-insight-lbl').innerText = t.cournotInsightLbl;
+        document.getElementById('cournot-insight-txt').innerHTML = t.cournotInsightTxt;
+        document.getElementById('cournot-lbl-q1').innerText = t.cournotLblQ1;
+        document.getElementById('cournot-lbl-q2').innerText = t.cournotLblQ2;
+        document.getElementById('cournot-lbl-price').innerText = t.cournotLblPrice;
+        document.getElementById('cournot-fin1-title').innerText = t.cournotFin1Title;
+        document.getElementById('cournot-fin2-title').innerText = t.cournotFin2Title;
+        document.getElementById('cournot-lbl-tr1').innerText = t.commonTr;
+        document.getElementById('cournot-lbl-tr2').innerText = t.commonTr;
+        document.getElementById('cournot-lbl-tc1').innerText = t.commonTc;
+        document.getElementById('cournot-lbl-tc2').innerText = t.commonTc;
+        document.getElementById('cournot-lbl-pi1').innerText = t.commonPi;
+        document.getElementById('cournot-lbl-pi2').innerText = t.commonPi;
+
+        document.getElementById('stack-chart-title').innerText = t.stackChartTitle;
+        document.getElementById('stack-chart-sub').innerText = t.stackChartSub;
+        document.getElementById('stack-insight-lbl').innerText = t.stackInsightLbl;
+        document.getElementById('stack-insight-txt').innerText = t.stackInsightTxt;
+        document.getElementById('stack-lbl-q1').innerText = t.stackLblQ1;
+        document.getElementById('stack-lbl-resp').innerText = t.stackLblResp;
+        document.getElementById('stack-lbl-price').innerText = t.stackLblPrice;
+        document.querySelectorAll('.stack-unit-txt').forEach(el => el.innerText = t.stackUnitK);
+        document.getElementById('stack-fin1-title').innerText = t.stackFin1Title;
+        document.getElementById('stack-fin2-title').innerText = t.stackFin2Title;
+        document.getElementById('stack-lbl-tr1').innerText = t.commonTr;
+        document.getElementById('stack-lbl-tr2').innerText = t.commonTr;
+        document.getElementById('stack-lbl-tc1').innerText = t.commonTc;
+        document.getElementById('stack-lbl-tc2').innerText = t.commonTc;
+        document.getElementById('stack-lbl-pi1').innerText = t.commonPi;
+        document.getElementById('stack-lbl-pi2').innerText = t.commonPi;
+
+        document.getElementById('bert-chart-title').innerText = t.bertChartTitle;
+        document.getElementById('bert-chart-sub').innerText = t.bertChartSub;
+        document.getElementById('bert-insight-lbl').innerText = t.bertInsightLbl;
+        document.getElementById('bert-insight-txt').innerHTML = t.bertInsightTxt;
+        document.getElementById('bert-lbl-p1').innerText = t.bertLblP1;
+        document.getElementById('bert-lbl-p2').innerText = t.bertLblP2;
+        document.getElementById('bert-op1-title').innerText = t.bertOp1Title;
+        document.getElementById('bert-op2-title').innerText = t.bertOp2Title;
+        document.getElementById('bert-lbl-q1').innerText = t.bertLblQ;
+        document.getElementById('bert-lbl-q2').innerText = t.bertLblQ;
+        document.getElementById('bert-lbl-tr1').innerText = t.commonTr;
+        document.getElementById('bert-lbl-tr2').innerText = t.commonTr;
+        document.getElementById('bert-lbl-tc1').innerText = t.commonTc;
+        document.getElementById('bert-lbl-tc2').innerText = t.commonTc;
+        document.getElementById('bert-lbl-pi1').innerText = t.commonPi;
+        document.getElementById('bert-lbl-pi2').innerText = t.commonPi;
+
+        document.getElementById('sweezy-chart-title').innerText = t.sweezyChartTitle;
+        document.getElementById('sweezy-chart-sub').innerText = t.sweezyChartSub;
+        document.getElementById('sweezy-insight-lbl').innerText = t.sweezyInsightLbl;
+        document.getElementById('sweezy-insight-txt').innerText = t.sweezyInsightTxt;
+        document.getElementById('sweezy-lbl-mc').innerText = t.sweezyLblMc;
+        document.getElementById('sweezy-lbl-retp').innerText = t.sweezyLblRetp;
+        document.getElementById('sweezy-lbl-vol').innerText = t.sweezyLblVol;
+        document.getElementById('sweezy-unit-k').innerText = t.sweezyUnitK;
+        document.getElementById('sweezy-fin-title').innerText = t.sweezyFinTitle;
+        document.getElementById('sweezy-lbl-tr').innerText = t.commonTr;
+        document.getElementById('sweezy-lbl-tc').innerText = t.commonTc;
+        document.getElementById('sweezy-lbl-pi').innerText = t.commonPi;
+
+        // MO
+        document.getElementById('mo-head-title').innerText = t.moHeadTitle;
+        document.getElementById('mo-head-sub').innerText = t.moHeadSub;
+        document.getElementById('mo-goal-lbl').innerText = t.moGoalLbl;
+        document.getElementById('mo-goal-txt').innerText = t.moGoalTxt;
+        document.getElementById('mo-info-txt').innerHTML = t.moInfoTxt;
+        document.getElementById('mo-lbl-p').innerText = t.moLblP;
+        document.getElementById('mo-lbl-q').innerText = t.moLblQ;
+        document.getElementById('mo-lbl-mr').innerText = t.moLblMr;
+        document.getElementById('mo-lbl-atc').innerText = t.moLblAtc;
+        document.getElementById('mo-lbl-mc').innerText = t.moLblMc;
+        document.getElementById('mo-lbl-profit').innerText = t.moLblProfit;
+        document.getElementById('mo-lbl-verdict-title').innerText = t.moLblVerdictTitle;
+
+        if (monoTrTcChartInst && monoMarketChartInst) {
+            monoTrTcChartInst.options.plugins.title.text = t.moChart1Title;
+            monoTrTcChartInst.data.datasets[0].label = t.legTR;
+            monoTrTcChartInst.data.datasets[1].label = t.legTC;
+            monoTrTcChartInst.update();
+
+            monoMarketChartInst.options.plugins.title.text = t.moChart2Title;
+            monoMarketChartInst.data.datasets[0].label = t.legDemandP;
+            monoMarketChartInst.data.datasets[1].label = t.legMRMono;
+            monoMarketChartInst.data.datasets[2].label = t.legMCMono;
+            monoMarketChartInst.data.datasets[3].label = t.legATCMono;
+            monoMarketChartInst.update();
+        }
+
+        updatePcDashboard();
+        updateMonCompDashboard();
+        if(oligopolyInitialized) {
+            updateCournot();
+            updateStackelberg();
+            updateBertrand();
+            updateSweezy();
+        }
+        updateMonoDashboard();
+    }
+
+    function switchTab(btn, id, color) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById(id).classList.remove('hidden');
+        
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('active');
+            b.style.borderColor = 'rgba(255,255,255,0.05)';
+            b.style.boxShadow = 'none';
+        });
+        
+        btn.classList.add('active');
+        btn.style.borderColor = color;
+        btn.style.boxShadow = `0 10px 25px -5px ${color}40`;
+
+        if (id === 'perfect') {
+            if (!pcInitialized) {
+                initPcCharts();
+                setPcScenario(131);
+                pcInitialized = true;
+            } else {
+                if(pcTrTcChartInst) pcTrTcChartInst.resize();
+                if(pcMrMcChartInst) pcMrMcChartInst.resize();
+            }
+        }
+        if (id === 'mono-comp') {
+            if (!monCompInitialized) {
+                initMonCompChart();
+                updateMonCompDashboard();
+                monCompInitialized = true;
+            } else {
+                if(monCompTrTcChartInst) monCompTrTcChartInst.resize();
+                if(monCompChartInst) monCompChartInst.resize();
+            }
+        }
+        if (id === 'oligopoly') {
+            if (!oligopolyInitialized) {
+                initCournot();
+                updateCournot();
+                oligopolyInitialized = true;
+            } else {
+                if(cournotChart) cournotChart.resize();
+                if(stackChart) stackChart.resize();
+                if(bertrandChart) bertrandChart.resize();
+                if(sweezyChart) sweezyChart.resize();
+            }
+        }
+        if (id === 'monopoly') {
+            if (!monoInitialized) {
+                initMonoCharts();
+                updateMonoDashboard();
+                monoInitialized = true;
+            } else {
+                if(monoTrTcChartInst) monoTrTcChartInst.resize();
+                if(monoMarketChartInst) monoMarketChartInst.resize();
+            }
+        }
+    }
+
+    // ----------------------------------------------------
+    // СКРИПТЫ: СОВЕРШЕННАЯ КОНКУРЕНЦИЯ
+    // ----------------------------------------------------
+    const pcTableData = [
+        { q: 0, tvc: 0, tc: 100, mc: null, avc: null, atc: null },
+        { q: 1, tvc: 90, tc: 190, mc: 90, avc: 90.00, atc: 190.00 },
+        { q: 2, tvc: 170, tc: 270, mc: 80, avc: 85.00, atc: 135.00 },
+        { q: 3, tvc: 240, tc: 340, mc: 70, avc: 80.00, atc: 113.33 },
+        { q: 4, tvc: 300, tc: 400, mc: 60, avc: 75.00, atc: 100.00 },
+        { q: 5, tvc: 370, tc: 470, mc: 70, avc: 74.00, atc: 94.00 },
+        { q: 6, tvc: 450, tc: 550, mc: 80, avc: 75.00, atc: 91.67 },
+        { q: 7, tvc: 540, tc: 640, mc: 90, avc: 77.14, atc: 91.43 },
+        { q: 8, tvc: 650, tc: 750, mc: 110, avc: 81.25, atc: 93.75 },
+        { q: 9, tvc: 780, tc: 880, mc: 130, avc: 86.67, atc: 97.78 },
+        { q: 10, tvc: 930, tc: 1030, mc: 150, avc: 93.00, atc: 103.00 }
+    ];
+
+    let pcCurrentPrice = 131;
+    let pcTrTcChartInst = null;
+    let pcMrMcChartInst = null;
+
+    const pcTrTcPlugin = {
+        id: 'pcTrTcProjection',
+        afterDraw: (chart) => {
+            const q = parseInt(document.getElementById('pc-slider-q').value);
+            const { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
+            const xPos = x.getPixelForValue(q);
+            const trVal = q * pcCurrentPrice;
+            const tcVal = pcTableData[q].tc;
+            const trY = y.getPixelForValue(trVal);
+            const tcY = y.getPixelForValue(tcVal);
+
+            ctx.save();
+            ctx.beginPath(); ctx.moveTo(xPos, bottom); ctx.lineTo(xPos, top);
+            ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'; ctx.setLineDash([5, 5]); ctx.stroke();
+
+            if (q > 0) {
+                const isProfit = trVal >= tcVal;
+                ctx.fillStyle = isProfit ? 'rgba(16, 185, 129, 0.4)' : 'rgba(244, 63, 94, 0.4)';
+                ctx.fillRect(xPos - 10, Math.min(trY, tcY), 20, Math.abs(trY - tcY));
+                ctx.strokeStyle = isProfit ? '#10b981' : '#f43f5e';
+                ctx.setLineDash([]); ctx.lineWidth = 1;
+                ctx.strokeRect(xPos - 10, Math.min(trY, tcY), 20, Math.abs(trY - tcY));
+            }
+            ctx.restore();
+        }
+    };
+
+    const pcMrMcPlugin = {
+        id: 'pcMrMcProjection',
+        afterDraw: (chart) => {
+            const q = parseInt(document.getElementById('pc-slider-q').value);
+            const { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
+            const xPos = x.getPixelForValue(q);
+            
+            ctx.save();
+            ctx.beginPath(); ctx.moveTo(xPos, bottom); ctx.lineTo(xPos, top);
+            ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)'; ctx.setLineDash([5, 5]); ctx.stroke();
+            
+            const mrY = y.getPixelForValue(pcCurrentPrice);
+            ctx.fillStyle = '#10b981'; ctx.beginPath(); ctx.arc(xPos, mrY, 5, 0, Math.PI * 2); ctx.fill();
+            
+            if(q > 0) {
+                const mcY = y.getPixelForValue(pcTableData[q].mc);
+                ctx.fillStyle = '#f59e0b'; ctx.beginPath(); ctx.arc(xPos, mcY, 5, 0, Math.PI * 2); ctx.fill();
+            }
+            ctx.restore();
+        }
+    };
+
+    function initPcCharts() {
+        const ctx1 = document.getElementById('pcTrTcChart').getContext('2d');
+        pcTrTcChartInst = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: pcTableData.map(d => d.q),
+                datasets: [
+                    { label: i18n[currentLang].legTR, data: [], borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.1, borderWidth: 3 },
+                    { label: i18n[currentLang].legTC, data: pcTableData.map(d => d.tc), borderColor: '#f43f5e', backgroundColor: '#f43f5e', tension: 0.4, borderWidth: 3 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: i18n[currentLang].pcChart1Title, color: '#fff' } },
+                scales: { y: { beginAtZero: true, grid: { color: '#1e293b' } }, x: { grid: { color: '#1e293b' } } },
+                animation: { duration: 200 }
+            },
+            plugins: [pcTrTcPlugin]
+        });
+
+        const ctx2 = document.getElementById('pcMrMcChart').getContext('2d');
+        pcMrMcChartInst = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: pcTableData.map(d => d.q),
+                datasets: [
+                    { label: i18n[currentLang].legMR, data: [], borderColor: '#10b981', borderDash: [5, 5], tension: 0, borderWidth: 2 },
+                    { label: i18n[currentLang].legMC, data: pcTableData.map(d => d.mc), borderColor: '#f59e0b', tension: 0.4, borderWidth: 3 },
+                    { label: i18n[currentLang].legAVC, data: pcTableData.map(d => d.avc), borderColor: '#a855f7', tension: 0.4, borderWidth: 2 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: i18n[currentLang].pcChart2Title, color: '#fff' } },
+                scales: { y: { min: 40, max: 200, grid: { color: '#1e293b' } }, x: { grid: { color: '#1e293b' } } },
+                animation: { duration: 200 }
+            },
+            plugins: [pcMrMcPlugin]
+        });
+    }
+
+    function setPcScenario(price) {
+        pcCurrentPrice = price;
+        
+        document.getElementById('pc-btn-131').classList.remove('active');
+        document.getElementById('pc-btn-81').classList.remove('active');
+        document.getElementById('pc-btn-71').classList.remove('active');
+        document.getElementById(`pc-btn-${price}`).classList.add('active');
+
+        pcTrTcChartInst.data.datasets[0].data = pcTableData.map(d => d.q * price);
+        pcTrTcChartInst.update();
+        pcMrMcChartInst.data.datasets[0].data = pcTableData.map(d => price);
+        pcMrMcChartInst.update();
+
+        const slider = document.getElementById('pc-slider-q');
+        if(price === 131) slider.value = 9;
+        if(price === 81) slider.value = 6;
+        if(price === 71) slider.value = 0;
+        
+        updatePcDashboard();
+    }
+
+    function updatePcDashboard() {
+        const q = parseInt(document.getElementById('pc-slider-q').value);
+        const data = pcTableData[q];
+        const tr = q * pcCurrentPrice;
+        const profit = tr - data.tc;
+
+        document.getElementById('pc-val-q').innerText = `${q} ${i18n[currentLang].units}`;
+        document.getElementById('pc-val-tr').innerText = `$${tr}`;
+        document.getElementById('pc-val-tc').innerText = `$${data.tc}`;
+        document.getElementById('pc-val-mr').innerText = q === 0 ? '-' : `$${pcCurrentPrice}`;
+        document.getElementById('pc-val-mc').innerText = data.mc ? `$${data.mc}` : '-';
+
+        const profitEl = document.getElementById('pc-val-profit');
+        const panelEl = document.getElementById('pc-profit-panel');
+        
+        profitEl.style.color = profit >= 0 ? '#10b981' : '#f43f5e';
+        profitEl.innerText = (profit >= 0 ? '+$' : '-$') + Math.abs(profit);
+
+        if(pcTrTcChartInst) pcTrTcChartInst.update('none');
+        if(pcMrMcChartInst) pcMrMcChartInst.update('none');
+
+        let verdict = "";
+        panelEl.classList.remove('border-emerald-500', 'border-rose-500', 'border-amber-500', 'bg-emerald-900/20', 'bg-rose-900/20', 'bg-amber-900/20');
+
+        if (currentLang === 'ru') {
+            if (pcCurrentPrice === 131) {
+                if (q === 9) {
+                    verdict = `<strong>Идеально! Точка максимизации прибыли.</strong> MR ($131) максимально близко к MC ($130). Производство 10-й единицы принесет убыток на марже.`;
+                    panelEl.classList.add('border-emerald-500', 'bg-emerald-900/20');
+                } else if (q < 9) {
+                    if (profit < 0) {
+                        verdict = `Вы пока в убытке, но MR ($131) выше MC, поэтому <strong>смело увеличивайте объем!</strong>`;
+                        panelEl.classList.add('border-rose-500');
+                    } else {
+                        verdict = `Вы получаете прибыль, но <strong>недопроизводите</strong>. Каждая следующая единица до Q=9 приносит дополнительную прибыль. Увеличьте объем!`;
+                        panelEl.classList.add('border-emerald-500');
+                    }
+                } else {
+                    verdict = `<strong>Перепроизводство.</strong> Производство 10-й единицы обошлось вам в $150 (MC), а продали вы ее за $131. Снизьте выпуск до Q=9.`;
+                    panelEl.classList.add('border-amber-500');
+                }
+            } else if (pcCurrentPrice === 81) {
+                if (q === 6) {
+                    verdict = `<strong>Минимизация убытков.</strong> Да, вы теряете $64. Но это правильное решение! При Q=6 вы полностью покрываете сырье (AVC=$75 < P=$81) и частично оплачиваете аренду.`;
+                    panelEl.classList.add('border-amber-500', 'bg-amber-900/20');
+                } else if (q === 0) {
+                    verdict = `Вы остановили производство и потеряли $100 (TFC). <strong>Ошибка:</strong> при цене $81 вы могли бы покрыть сырье и заработать немного для оплаты аренды, сократив убыток до $64 при Q=6.`;
+                    panelEl.classList.add('border-rose-500');
+                } else {
+                    verdict = `Вы терпите убытки. Оптимальная стратегия выживания — производить Q=6, где MR=MC, чтобы минимизировать потери до $64.`;
+                    panelEl.classList.add('border-amber-500');
+                }
+            } else if (pcCurrentPrice === 71) {
+                if (q === 0) {
+                    verdict = `<strong>Правильное решение: Точка закрытия (Shutdown).</strong> Цена упала ниже сырья (min AVC=$74). Выгоднее просто платить аренду ($100), чем производить и увеличивать долги.`;
+                    panelEl.classList.add('border-rose-500', 'bg-rose-900/20');
+                } else {
+                    verdict = `<strong>Критическая ошибка!</strong> Вы теряете больше фиксированных издержек. Вы доплачиваете клиентам за то, чтобы они забирали ваш товар. Немедленно остановите станки (Q=0)!`;
+                    panelEl.classList.add('border-rose-500');
+                }
+            }
+        } else {
+            if (pcCurrentPrice === 131) {
+                if (q === 9) {
+                    verdict = `<strong>Optimal! Profit Maximization Point.</strong> MR ($131) is closest to MC ($130) without exceeding it. Producing the 10th unit reduces net profit margin.`;
+                    panelEl.classList.add('border-emerald-500', 'bg-emerald-900/20');
+                } else if (q < 9) {
+                    if (profit < 0) {
+                        verdict = `Operating at a loss, but MR ($131) exceeds MC, so <strong>increase production volume!</strong>`;
+                        panelEl.classList.add('border-rose-500');
+                    } else {
+                        verdict = `Earning profit, but <strong>underproducing</strong>. Each additional unit up to Q=9 adds marginal profit. Expand output!`;
+                        panelEl.classList.add('border-emerald-500');
+                    }
+                } else {
+                    verdict = `<strong>Overproduction.</strong> The 10th unit costs $150 (MC) but sells for $131. Reduce output to Q=9.`;
+                    panelEl.classList.add('border-amber-500');
+                }
+            } else if (pcCurrentPrice === 81) {
+                if (q === 6) {
+                    verdict = `<strong>Loss Minimization Point.</strong> Loss is $64, but this is optimal. Revenue covers variable costs (AVC $75 < P $81) and contributes to fixed rent.`;
+                    panelEl.classList.add('border-amber-500', 'bg-amber-900/20');
+                } else if (q === 0) {
+                    verdict = `Stopped production incurring $100 loss (TFC). <strong>Suboptimal:</strong> At P=$81, variable costs are covered, reducing total loss to $64 at Q=6.`;
+                    panelEl.classList.add('border-rose-500');
+                } else {
+                    verdict = `Operating at a loss. The optimal strategy is Q=6 where MR=MC, capping losses at $64.`;
+                    panelEl.classList.add('border-amber-500');
+                }
+            } else if (pcCurrentPrice === 71) {
+                if (q === 0) {
+                    verdict = `<strong>Optimal Strategy: Shutdown Condition.</strong> Price fell below minimum AVC ($74). Revenue fails to cover raw materials. Ceasing operations caps loss at TFC ($100).`;
+                    panelEl.classList.add('border-rose-500', 'bg-rose-900/20');
+                } else {
+                    verdict = `<strong>Critical Misstep!</strong> Losses exceed total fixed costs. Market price ($71) is below average variable cost (AVC=$74 at Q=6). Shut down immediately (Q=0)!`;
+                    panelEl.classList.add('border-rose-500');
+                }
+            }
+        }
+
+        document.getElementById('pc-val-verdict').innerHTML = verdict;
+    }
+
+    document.getElementById('pc-slider-q').addEventListener('input', updatePcDashboard);
+
+    // ----------------------------------------------------
+    // СКРИПТЫ: МОНОПОЛИСТИЧЕСКАЯ КОНКУРЕНЦИЯ
+    // ----------------------------------------------------
+    const monCompData = {
+        'SR': [
+            { q: 0, p: 120, mr: null, mc: null, atc: null, tr: 0, tc: 100 },
+            { q: 1, p: 110, mr: 110, mc: 40, atc: 140.0, tr: 110, tc: 140 },
+            { q: 2, p: 100, mr: 90,  mc: 30, atc: 85.0,  tr: 200, tc: 170 },
+            { q: 3, p: 90,  mr: 70,  mc: 40, atc: 70.0,  tr: 270, tc: 210 },
+            { q: 4, p: 80,  mr: 50,  mc: 50, atc: 65.0,  tr: 320, tc: 260 }, 
+            { q: 5, p: 70,  mr: 30,  mc: 70, atc: 66.0,  tr: 350, tc: 330 },
+            { q: 6, p: 60,  mr: 10,  mc: 90, atc: 70.0,  tr: 360, tc: 420 },
+            { q: 7, p: 50,  mr: -10, mc: 110, atc: 75.7, tr: 350, tc: 530 },
+            { q: 8, p: 40,  mr: -30, mc: 130, atc: 82.5, tr: 320, tc: 660 },
+            { q: 9, p: 30,  mr: -50, mc: 150, atc: 90.0, tr: 270, tc: 810 },
+            { q: 10, p: 20, mr: -70, mc: 170, atc: 98.0, tr: 200, tc: 980 }
+        ],
+        'LR': [
+            { q: 0, p: 115, mr: null, mc: null, atc: null, tr: 0, tc: 100 },
+            { q: 1, p: 100, mr: 100, mc: 40, atc: 140.0, tr: 100, tc: 140 },
+            { q: 2, p: 85,  mr: 70,  mc: 30, atc: 85.0,  tr: 170, tc: 170 },
+            { q: 3, p: 70,  mr: 40,  mc: 40, atc: 70.0,  tr: 210, tc: 210 }, 
+            { q: 4, p: 55,  mr: 10,  mc: 50, atc: 65.0,  tr: 220, tc: 260 }, 
+            { q: 5, p: 40,  mr: -20, mc: 70, atc: 66.0,  tr: 200, tc: 330 },
+            { q: 6, p: 25,  mr: -50, mc: 90, atc: 70.0,  tr: 150, tc: 420 },
+            { q: 7, p: 10,  mr: -80, mc: 110, atc: 75.7, tr: 70,  tc: 530 },
+            { q: 8, p: 0,   mr: -110,mc: 130, atc: 82.5, tr: 0,   tc: 660 },
+            { q: 9, p: 0,   mr: -140,mc: 150, atc: 90.0, tr: 0,   tc: 810 },
+            { q: 10, p: 0,  mr: -170,mc: 170, atc: 98.0, tr: 0,   tc: 980 }
+        ]
+    };
+
+    let monCompTrTcChartInst = null;
+    let monCompChartInst = null;
+
+    const mcTrTcPlugin = {
+        id: 'mcTrTcProjection',
+        afterDraw: (chart) => {
+            const period = document.querySelector('input[name="mc-period"]:checked').value;
+            const q = parseInt(document.getElementById('mc-slider-q').value);
+            const dataset = monCompData[period];
+            const data = dataset.find(d => d.q === q);
+            const index = dataset.findIndex(d => d.q === q);
+
+            const { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
+            const xPos = x.getPixelForTick(index);
+            const trY = y.getPixelForValue(data.tr);
+            const tcY = y.getPixelForValue(data.tc);
+
+            ctx.save();
+            ctx.beginPath(); ctx.moveTo(xPos, bottom); ctx.lineTo(xPos, top);
+            ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; ctx.setLineDash([5, 5]); ctx.stroke();
+
+            if (q > 0) {
+                const isProfit = data.tr >= data.tc;
+                ctx.fillStyle = isProfit ? 'rgba(16, 185, 129, 0.3)' : 'rgba(244, 63, 94, 0.3)';
+                ctx.fillRect(xPos - 12, Math.min(trY, tcY), 24, Math.abs(trY - tcY));
+                
+                ctx.strokeStyle = isProfit ? '#10b981' : '#f43f5e';
+                ctx.setLineDash([]); ctx.lineWidth = 1.5;
+                ctx.strokeRect(xPos - 12, Math.min(trY, tcY), 24, Math.abs(trY - tcY));
+            }
+            ctx.restore();
+        }
+    };
+
+    const mcMarketPlugin = {
+        id: 'mcMarketProjection',
+        afterDraw: (chart) => {
+            const period = document.querySelector('input[name="mc-period"]:checked').value;
+            const q = parseInt(document.getElementById('mc-slider-q').value);
+            if (q === 0) return;
+
+            const dataset = monCompData[period];
+            const data = dataset.find(d => d.q === q);
+            const index = dataset.findIndex(d => d.q === q);
+
+            const { ctx, chartArea: { top, bottom, left }, scales: { x, y } } = chart;
+            const xPos = x.getPixelForTick(index);
+            const xZero = left;
+            
+            const pY = y.getPixelForValue(data.p);
+            const atcY = y.getPixelForValue(data.atc);
+
+            ctx.save();
+
+            const isProfit = data.p >= data.atc;
+            ctx.fillStyle = isProfit ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)';
+            ctx.fillRect(xZero, Math.min(pY, atcY), xPos - xZero, Math.abs(pY - atcY));
+            
+            ctx.strokeStyle = isProfit ? 'rgba(16, 185, 129, 0.8)' : 'rgba(244, 63, 94, 0.8)';
+            ctx.setLineDash([4, 4]); ctx.lineWidth = 1.5;
+            ctx.strokeRect(xZero, Math.min(pY, atcY), xPos - xZero, Math.abs(pY - atcY));
+
+            ctx.beginPath(); ctx.moveTo(xPos, bottom); ctx.lineTo(xPos, top);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.setLineDash([3, 3]); ctx.stroke();
+            
+            const drawDot = (yPos, color, label) => {
+                ctx.fillStyle = color; ctx.beginPath(); ctx.arc(xPos, yPos, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 10px sans-serif'; ctx.fillText(label, xPos + 8, yPos + 3);
+            };
+            
+            drawDot(pY, '#a855f7', `P=$${data.p}`); 
+            drawDot(atcY, '#cbd5e1', `ATC=$${data.atc.toFixed(1)}`); 
+            drawDot(y.getPixelForValue(data.mc), '#f59e0b', `MC=$${data.mc}`); 
+            drawDot(y.getPixelForValue(data.mr), '#34d399', `MR=$${data.mr}`); 
+
+            ctx.restore();
+        }
+    };
+
+    function initMonCompChart() {
+        const ctxTrTc = document.getElementById('mcTrTcChart').getContext('2d');
+        monCompTrTcChartInst = new Chart(ctxTrTc, {
+            type: 'line',
+            data: {
+                labels: monCompData['SR'].map(d => d.q),
+                datasets: [
+                    { label: i18n[currentLang].legTR, data: monCompData['SR'].map(d => d.tr), borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', tension: 0.4, borderWidth: 3 },
+                    { label: i18n[currentLang].legTC, data: monCompData['SR'].map(d => d.tc), borderColor: '#f43f5e', backgroundColor: '#f43f5e', tension: 0.4, borderWidth: 3 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: i18n[currentLang].mcChart1Title, color: '#fff' } },
+                scales: { y: { max: 1000, grid: { color: '#1e293b' } }, x: { grid: { color: '#1e293b' } } },
+                animation: { duration: 800 }
+            },
+            plugins: [mcTrTcPlugin]
+        });
+
+        const ctx = document.getElementById('monCompChart').getContext('2d');
+        monCompChartInst = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: monCompData['SR'].map(d => d.q),
+                datasets: [
+                    { label: 'P', data: monCompData['SR'].map(d => d.p), borderColor: '#a855f7', borderWidth: 3, tension: 0 },
+                    { label: 'MR', data: monCompData['SR'].map(d => d.mr), borderColor: '#34d399', borderWidth: 2, borderDash: [5, 5], tension: 0 },
+                    { label: 'MC', data: monCompData['SR'].map(d => d.mc), borderColor: '#f43f5e', borderWidth: 3, tension: 0.4 },
+                    { label: 'ATC', data: monCompData['SR'].map(d => d.atc), borderColor: '#cbd5e1', borderWidth: 3, tension: 0.4 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    title: { display: true, text: i18n[currentLang].mcChart2SrTitle, color: '#fff', font: {size: 14} }
+                },
+                scales: { 
+                    y: { grid: { color: '#1e293b' }, min: -200, max: 200, ticks: { stepSize: 50 } }, 
+                    x: { grid: { color: '#1e293b' } } 
+                },
+                animation: { duration: 800 }
+            },
+            plugins: [mcMarketPlugin]
+        });
+    }
+
+    function updateMonCompDashboard() {
+        const period = document.querySelector('input[name="mc-period"]:checked').value;
+        const q = parseInt(document.getElementById('mc-slider-q').value);
+        
+        const dataset = monCompData[period];
+        const data = dataset.find(d => d.q === q);
+        const profit = data.tr - data.tc;
+
+        if(monCompTrTcChartInst) {
+            monCompTrTcChartInst.data.datasets[0].data = dataset.map(d => d.tr);
+            monCompTrTcChartInst.data.datasets[1].data = dataset.map(d => d.tc);
+            monCompTrTcChartInst.update('none');
+        }
+
+        if(monCompChartInst) {
+            monCompChartInst.data.datasets[0].data = dataset.map(d => d.p);
+            monCompChartInst.data.datasets[1].data = dataset.map(d => d.mr);
+            monCompChartInst.options.plugins.title.text = period === 'SR' ? i18n[currentLang].mcChart2SrTitle : i18n[currentLang].mcChart2LrTitle;
+            monCompChartInst.update('none');
+        }
+
+        document.getElementById('mc-val-q').innerText = `${q} ${i18n[currentLang].units}`;
+        document.getElementById('mc-val-p').innerText = data.p !== null ? `$${data.p}` : '-';
+        document.getElementById('mc-val-atc').innerText = data.atc !== null ? `$${data.atc.toFixed(1)}` : '-';
+        document.getElementById('mc-val-mr').innerText = data.mr !== null ? `$${data.mr}` : '-';
+        document.getElementById('mc-val-mc').innerText = data.mc !== null ? `$${data.mc}` : '-';
+        
+        const profitEl = document.getElementById('mc-val-profit');
+        profitEl.style.color = profit >= 0 ? '#10b981' : '#f43f5e';
+        profitEl.innerText = (profit >= 0 ? '+$' : '-$') + Math.abs(profit);
+
+        const theoryText = document.getElementById('mc-theory-text');
+        const panel = document.getElementById('mc-profit-panel');
+        panel.className = 'bg-slate-900/80 p-5 rounded-2xl border transition-colors duration-300'; 
+
+        if (q === 0) {
+            theoryText.innerHTML = currentLang === 'ru' ? `Производство остановлено.` : `Production halted.`;
+            panel.classList.add('border-rose-500', 'bg-rose-900/20');
+            document.getElementById('mc-val-verdict').innerHTML = currentLang === 'ru' 
+                ? `<b>Остановка (Shutdown).</b> Вы несете убытки в размере постоянных издержек (TFC = $100). Сдвиньте ползунок, чтобы начать производство.`
+                : `<b>Shutdown Condition.</b> Operating at loss equal to total fixed costs (TFC = $100). Adjust slider to produce.`;
+        } else {
+            if (period === 'SR') {
+                theoryText.innerHTML = currentLang === 'ru' 
+                    ? `В <b>краткосрочном периоде</b> ваш бренд уникален. Кривая спроса находится высоко. Максимизация прибыли происходит по монопольному правилу: MR = MC.`
+                    : `In the <b>short run</b>, brand uniqueness grants monopoly power. Demand is relatively high. Profit maximization follows MR = MC.`;
+                if (q === 4) {
+                    panel.classList.add('border-emerald-500', 'bg-emerald-900/20');
+                    document.getElementById('mc-val-verdict').innerHTML = currentLang === 'ru'
+                        ? `<b>Оптимум краткосрочного периода!</b> P > ATC. Вы получаете максимальную экономическую квазиренту.`
+                        : `<b>Short-Run Optimum!</b> P > ATC. Maximizing economic quasi-rent.`;
+                } else if (q < 4) {
+                    panel.classList.add('border-amber-500');
+                    document.getElementById('mc-val-verdict').innerHTML = currentLang === 'ru'
+                        ? `Вы недопроизводите. Маржа хорошая, так как MR > MC. Увеличьте выпуск!`
+                        : `Underproducing. Positive marginal profit (MR > MC). Expand output!`;
+                } else {
+                    panel.classList.add('border-rose-500');
+                    document.getElementById('mc-val-verdict').innerHTML = currentLang === 'ru'
+                        ? `Перепроизводство. Создание дополнительной единицы стоит дороже, чем она приносит (MR < MC).`
+                        : `Overproducing. Additional unit cost exceeds revenue (MR < MC).`;
+                }
+            } else {
+                theoryText.innerHTML = currentLang === 'ru'
+                    ? `В <b>долгосрочном периоде</b> новые фирмы вошли в отрасль. Спрос на вашу продукцию упал (сдвиг влево). Теперь кривая спроса <b>касается</b> кривой ATC.`
+                    : `In the <b>long run</b>, market entry shifts firm demand leftward until the demand curve becomes <b>tangent</b> to ATC.`;
+                if (q === 3) {
+                    panel.classList.add('border-purple-500', 'bg-purple-900/20');
+                    document.getElementById('mc-val-verdict').innerHTML = currentLang === 'ru'
+                        ? `<b>Долгосрочное равновесие.</b> P = ATC. Экономическая прибыль = 0. <br><br><span class="text-xs text-purple-300"><b>Теорема об избыточной мощности:</b> Вы производите Q=3, хотя минимум издержек достигается при Q=4. Вы недоиспользуете мощности ради дифференциации продукта.</span>`
+                        : `<b>Long-Run Equilibrium.</b> P = ATC. Zero economic profit. <br><br><span class="text-xs text-purple-300"><b>Excess Capacity Theorem:</b> Output is Q=3 while minimum ATC is at Q=4. Capacity is underutilized for product variety.</span>`;
+                } else if (q > 3) {
+                    panel.classList.add('border-rose-500', 'bg-rose-900/20');
+                    document.getElementById('mc-val-verdict').innerHTML = currentLang === 'ru'
+                        ? `<b>Убыток!</b> Пытаясь произвести больше, вы вынуждены снижать цену ниже ваших средних издержек (P < ATC).`
+                        : `<b>Loss!</b> Increasing output forces price below average total cost (P < ATC).`;
+                } else {
+                     panel.classList.add('border-amber-500');
+                     document.getElementById('mc-val-verdict').innerHTML = currentLang === 'ru'
+                        ? `<b>Неэффективно.</b> P < ATC из-за слишком малого объема производства.`
+                        : `<b>Suboptimal.</b> P < ATC due to insufficient output volume.`;
+                }
+            }
+        }
+    }
+
+    document.getElementById('mc-slider-q').addEventListener('input', updateMonCompDashboard);
+
+    // ----------------------------------------------------
+    // СКРИПТЫ: ОЛИГОПОЛИЯ (ВСЕ 4 СТРАТЕГИЧЕСКИЕ МОДЕЛИ)
+    // ----------------------------------------------------
+    let cournotChart, stackChart, bertrandChart, sweezyChart;
+
+    function formatCurrency(num) {
+        return Math.round(num).toLocaleString('ru-RU') + ' ₸';
+    }
+
+    function switchOligopolySubTab(tabName) {
+        ['cournot', 'stackelberg', 'bertrand', 'sweezy'].forEach(t => {
+            const btn = document.getElementById(`btn-${t}`);
+            btn.classList.remove('active');
+            btn.querySelector('span').classList.remove('text-amber-500');
+            btn.querySelector('span').classList.add('text-slate-300');
+            document.getElementById(`subtab-content-${t}`).classList.add('hidden');
+        });
+        
+        const activeBtn = document.getElementById(`btn-${tabName}`);
+        activeBtn.classList.add('active');
+        activeBtn.querySelector('span').classList.remove('text-slate-300');
+        activeBtn.querySelector('span').classList.add('text-amber-500');
+        
+        document.getElementById(`subtab-content-${tabName}`).classList.remove('hidden');
+
+        if (tabName === 'cournot') { if (!cournotChart) initCournot(); updateCournot(); }
+        if (tabName === 'stackelberg') { if (!stackChart) initStackelberg(); updateStackelberg(); }
+        if (tabName === 'bertrand') { if (!bertrandChart) initBertrand(); updateBertrand(); }
+        if (tabName === 'sweezy') { if (!sweezyChart) initSweezy(); updateSweezy(); }
+    }
+
+    // --- COURNOT ---
+    function initCournot() {
+        const ctx = document.getElementById('chart-cournot').getContext('2d');
+        const t = i18n[currentLang];
+        cournotChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    { label: t.cournotLegR1, data: [{x: 45, y: 0}, {x: 0, y: 90}], showLine: true, borderColor: '#d4af37', backgroundColor: 'transparent', pointRadius: 0, borderWidth: 2 },
+                    { label: t.cournotLegR2, data: [{x: 0, y: 45}, {x: 90, y: 0}], showLine: true, borderColor: '#38bdf8', backgroundColor: 'transparent', pointRadius: 0, borderWidth: 2 },
+                    { label: t.cournotLegCur, data: [{x: 30, y: 30}], backgroundColor: '#fff', pointRadius: 6, z: 10 },
+                    { label: t.cournotLegNash, data: [{x: 30, y: 30}], backgroundColor: '#10b981', pointStyle: 'triangle', pointRadius: 8 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    x: { type: 'linear', title: { display: true, text: 'Q₁ (Mars)' }, min: 0, max: 60, grid: { color: gridColor } },
+                    y: { title: { display: true, text: 'Q₂ (Mondelez)' }, min: 0, max: 60, grid: { color: gridColor } }
+                }
+            }
+        });
+        document.getElementById('cournot-slider-q1').addEventListener('input', updateCournot);
+        document.getElementById('cournot-slider-q2').addEventListener('input', updateCournot);
+    }
+
+    function updateCournot() {
+        const t = i18n[currentLang];
+        const q1 = parseInt(document.getElementById('cournot-slider-q1').value);
+        const q2 = parseInt(document.getElementById('cournot-slider-q2').value);
+        document.getElementById('cournot-val-q1').innerText = q1;
+        document.getElementById('cournot-val-q2').innerText = q2;
+
+        let p = Math.max(0, 3000 - 25 * (q1 + q2));
+        document.getElementById('cournot-val-p').innerText = p;
+
+        const mc = 750;
+        const tr1 = p * q1 * 1000;
+        const tc1 = mc * q1 * 1000;
+        const pi1 = Math.max(0, tr1 - tc1);
+
+        const tr2 = p * q2 * 1000;
+        const tc2 = mc * q2 * 1000;
+        const pi2 = Math.max(0, tr2 - tc2);
+
+        document.getElementById('cournot-tr1').innerText = formatCurrency(tr1);
+        document.getElementById('cournot-tc1').innerText = formatCurrency(tc1);
+        document.getElementById('cournot-val-pi1').innerText = formatCurrency(pi1);
+
+        document.getElementById('cournot-tr2').innerText = formatCurrency(tr2);
+        document.getElementById('cournot-tc2').innerText = formatCurrency(tc2);
+        document.getElementById('cournot-val-pi2').innerText = formatCurrency(pi2);
+
+        if(cournotChart) { 
+            cournotChart.data.datasets[0].label = t.cournotLegR1;
+            cournotChart.data.datasets[1].label = t.cournotLegR2;
+            cournotChart.data.datasets[2].label = t.cournotLegCur;
+            cournotChart.data.datasets[3].label = t.cournotLegNash;
+            cournotChart.data.datasets[2].data = [{x: q1, y: q2}]; 
+            cournotChart.update(); 
+        }
+
+        const panel = document.getElementById('cournot-panel');
+        panel.className = 'glass rounded-2xl p-4 border text-xs leading-relaxed';
+        if(q1 === 30 && q2 === 30) {
+            panel.innerHTML = currentLang === 'ru' 
+                ? `<b>Равновесие Нэша!</b> Оптимальный баланс Выручки и Издержек достигнут. Ни одной из фирм невыгодно односторонне менять объем.`
+                : `<b>Nash Equilibrium!</b> Optimal balance of Revenue and Costs reached. Neither firm has an incentive to unilaterally change output.`;
+            panel.classList.add('border-emerald-500', 'bg-emerald-950/20');
+        } else {
+            panel.innerHTML = currentLang === 'ru'
+                ? `Рынок несбалансирован. Избыток объема снижает рыночную цену, разрушая маржинальность обоих игроков.`
+                : `Market off-equilibrium. Output excess depresses market clearing price, eroding margins.`;
+            panel.classList.add('border-slate-700');
+        }
+    }
+
+    // --- STACKELBERG ---
+    function initStackelberg() {
+        const ctx = document.getElementById('chart-stackelberg').getContext('2d');
+        const t = i18n[currentLang];
+        stackChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    { label: t.stackLegR2, data: [{x: 0, y: 45}, {x: 90, y: 0}], showLine: true, borderColor: '#94a3b8', borderDash: [4, 4], backgroundColor: 'transparent', pointRadius: 0 },
+                    { label: t.stackLegChoice, data: [{x: 45, y: 22.5}], backgroundColor: '#d4af37', pointRadius: 6, z: 10 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    x: { type: 'linear', title: { display: true, text: t.stackAxisX }, min: 0, max: 90, grid: { color: gridColor } },
+                    y: { title: { display: true, text: t.stackAxisY }, min: 0, max: 90, grid: { color: gridColor } }
+                }
+            }
+        });
+        document.getElementById('stack-slider-q1').addEventListener('input', updateStackelberg);
+    }
+
+    function updateStackelberg() {
+        const t = i18n[currentLang];
+        const q1 = parseInt(document.getElementById('stack-slider-q1').value);
+        const q2 = Math.max(0, 45 - 0.5 * q1);
+        document.getElementById('stack-val-q1').innerText = q1;
+        document.getElementById('stack-val-q2').innerText = q2.toFixed(1);
+
+        let p = Math.max(0, 220000 - 1333.33 * (q1 + q2));
+        document.getElementById('stack-val-p').innerText = Math.round(p).toLocaleString('ru-RU');
+        
+        const mc = 40000;
+        const tr1 = p * q1 * 1000;
+        const tc1 = mc * q1 * 1000;
+        const pi1 = Math.max(0, tr1 - tc1);
+
+        const tr2 = p * q2 * 1000;
+        const tc2 = mc * q2 * 1000;
+        const pi2 = Math.max(0, tr2 - tc2);
+
+        document.getElementById('stack-tr1').innerText = formatCurrency(tr1);
+        document.getElementById('stack-tc1').innerText = formatCurrency(tc1);
+        document.getElementById('stack-val-pi1').innerText = formatCurrency(pi1);
+
+        document.getElementById('stack-tr2').innerText = formatCurrency(tr2);
+        document.getElementById('stack-tc2').innerText = formatCurrency(tc2);
+        document.getElementById('stack-val-pi2').innerText = formatCurrency(pi2);
+
+        if(stackChart) { 
+            stackChart.data.datasets[0].label = t.stackLegR2;
+            stackChart.data.datasets[1].label = t.stackLegChoice;
+            stackChart.options.scales.x.title.text = t.stackAxisX;
+            stackChart.options.scales.y.title.text = t.stackAxisY;
+            stackChart.data.datasets[1].data = [{x: q1, y: q2}]; 
+            stackChart.update(); 
+        }
+
+        const panel = document.getElementById('stack-panel');
+        panel.className = 'glass rounded-2xl p-4 border text-xs leading-relaxed';
+        if(q1 === 45) {
+            panel.innerHTML = currentLang === 'ru'
+                ? `<b>Оптимум лидера!</b> Захватив инициативу первого хода, On Running получает $Q_1=45$, заставляя Brooks сойти к $Q_2=22.5$. Лидер максимизирует прибыль.`
+                : `<b>Leader's Optimum!</b> By leveraging first-mover advantage, On Running sets $Q_1=45$, constraining Brooks to $Q_2=22.5$. Profit maximized.`;
+            panel.classList.add('border-amber-500', 'bg-amber-950/20');
+        } else {
+            panel.innerHTML = currentLang === 'ru'
+                ? `Лидер действует неоптимально, уступая часть доли рынка и финансового результата конкуренту.`
+                : `Leader acting suboptimally, ceding market share and profits to follower.`;
+            panel.classList.add('border-slate-700');
+        }
+    }
+
+    // --- BERTRAND ---
+    function initBertrand() {
+        const ctx = document.getElementById('chart-bertrand').getContext('2d');
+        bertrandChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: [i18n[currentLang].bertOp1Title, i18n[currentLang].bertOp2Title],
+                datasets: [{ label: '% Market Share', data: [50, 50], backgroundColor: ['#fb7185', '#c084fc'], borderRadius: 6 }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: { y: { min: 0, max: 100, title: { display: true, text: '%' }, grid: { color: gridColor } } },
+                plugins: { legend: { display: false } }
+            }
+        });
+        document.getElementById('bertrand-slider-p1').addEventListener('input', updateBertrand);
+        document.getElementById('bertrand-slider-p2').addEventListener('input', updateBertrand);
+    }
+
+    function updateBertrand() {
+        const p1 = parseInt(document.getElementById('bertrand-slider-p1').value);
+        const p2 = parseInt(document.getElementById('bertrand-slider-p2').value);
+        document.getElementById('bertrand-val-p1').innerText = p1;
+        document.getElementById('bertrand-val-p2').innerText = p2;
+
+        const mc = 1500; 
+        const ms = 100;
+        let s1 = 0, s2 = 0; 
+        let q1 = 0, q2 = 0;
+
+        if(p1 < p2) { s1 = 100; s2 = 0; q1 = ms; q2 = 0; }
+        else if (p2 < p1) { s1 = 0; s2 = 100; q1 = 0; q2 = ms; }
+        else { s1 = 50; s2 = 50; q1 = ms/2; q2 = ms/2; }
+
+        const tr1 = p1 * q1 * 1000;
+        const tc1 = mc * q1 * 1000;
+        const prof1 = Math.max(0, tr1 - tc1);
+
+        const tr2 = p2 * q2 * 1000;
+        const tc2 = mc * q2 * 1000;
+        const prof2 = Math.max(0, tr2 - tc2);
+
+        document.getElementById('bertrand-val-share1').innerText = `${s1}%`;
+        document.getElementById('bertrand-q1').innerText = (q1 * 1000).toLocaleString('ru-RU');
+        document.getElementById('bertrand-tr1').innerText = formatCurrency(tr1);
+        document.getElementById('bertrand-tc1').innerText = formatCurrency(tc1);
+        document.getElementById('bertrand-profit1').innerText = formatCurrency(prof1);
+
+        document.getElementById('bertrand-val-share2').innerText = `${s2}%`;
+        document.getElementById('bertrand-q2').innerText = (q2 * 1000).toLocaleString('ru-RU');
+        document.getElementById('bertrand-tr2').innerText = formatCurrency(tr2);
+        document.getElementById('bertrand-tc2').innerText = formatCurrency(tc2);
+        document.getElementById('bertrand-profit2').innerText = formatCurrency(prof2);
+
+        if(bertrandChart) { 
+            bertrandChart.data.labels = [i18n[currentLang].bertOp1Title, i18n[currentLang].bertOp2Title];
+            bertrandChart.data.datasets[0].data = [s1, s2]; 
+            bertrandChart.update(); 
+        }
+
+        const panel = document.getElementById('bertrand-panel');
+        panel.className = 'glass rounded-2xl p-4 border text-xs leading-relaxed';
+        if(p1 === mc && p2 === mc) {
+            panel.innerHTML = currentLang === 'ru'
+                ? `<b>Парадокс Бертрана:</b> Ценовое соперничество снизило тариф до уровня MC ($1500 ₸). Выручка полностью поглощается издержками, экономическая прибыль равна нулю.`
+                : `<b>Bertrand Paradox:</b> Price warfare drives prices down to MC ($1500 ₸). Revenue is fully absorbed by costs; economic profit collapses to zero.`;
+            panel.classList.add('border-emerald-500', 'bg-emerald-950/20');
+        } else if (p1 !== p2) {
+            panel.innerHTML = currentLang === 'ru'
+                ? `<b>Ценовой демпинг:</b> Фирма с меньшей ценой захватывает 100% рынка. Конкурент теряет всю абонентскую базу.`
+                : `<b>Price Undercutting:</b> The lower-price firm captures 100% market share, driving competitor volume to zero.`;
+            panel.classList.add('border-rose-500');
+        } else {
+            panel.innerHTML = currentLang === 'ru'
+                ? `Рынок поделен 50/50. Но у каждой фирмы остается стимул демпинговать дальше.`
+                : `Market split 50/50. Strong incentive remains for further undercutting.`;
+            panel.classList.add('border-slate-700');
+        }
+    }
+
+    // --- SWEEZY ---
+    function initSweezy() {
+        const ctx = document.getElementById('chart-sweezy').getContext('2d');
+        const t = i18n[currentLang];
+        sweezyChart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    { label: 'Demand', data: [{x:0, y:290}, {x:40, y:250}, {x:80, y:170}], showLine: true, borderColor: '#22d3ee', backgroundColor: 'transparent', borderWidth: 2.5 },
+                    { label: 'MR', data: [{x:0, y:290}, {x:40, y:220}, {x:40, y:180}, {x:76, y:0}], showLine: true, borderColor: '#0ea5e9', borderDash: [4,4] },
+                    { label: 'MC', data: [{x:0, y:195}, {x:80, y:195}], showLine: true, borderColor: '#f43f5e', pointRadius: 0 },
+                    { label: 'Point P', data: [{x: 40, y: 250}], backgroundColor: '#d4af37', pointRadius: 6, z: 10 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    x: { min: 0, max: 80, title: { display: true, text: t.sweezyAxisX }, grid: { color: gridColor } },
+                    y: { min: 0, max: 320, title: { display: true, text: 'P (₸)' }, grid: { color: gridColor } }
+                }
+            }
+        });
+        document.getElementById('sweezy-slider-mc').addEventListener('input', updateSweezy);
+    }
+
+    function updateSweezy() {
+        const t = i18n[currentLang];
+        const mc = parseInt(document.getElementById('sweezy-slider-mc').value);
+        document.getElementById('sweezy-val-mc').innerText = mc;
+
+        let p = 250; let q = 40; let status = "stable";
+
+        if(mc > 220) {
+            q = (290 - mc) / 2; p = 290 - q; status = "high";
+        } else if(mc < 180) {
+            q = (330 - mc) / 4; p = 330 - 2 * q; status = "low";
+        }
+
+        document.getElementById('sweezy-val-p').innerText = `${Math.round(p)} ₸`;
+        document.getElementById('sweezy-val-q').innerText = `${q.toFixed(1)}`;
+
+        const tr = p * q * 1000;
+        const tc = mc * q * 1000;
+        const pi = tr - tc;
+
+        document.getElementById('sweezy-tr').innerText = formatCurrency(tr);
+        document.getElementById('sweezy-tc').innerText = formatCurrency(tc);
+        document.getElementById('sweezy-pi').innerText = formatCurrency(Math.max(0, pi));
+
+        if(sweezyChart) {
+            sweezyChart.options.scales.x.title.text = t.sweezyAxisX;
+            sweezyChart.data.datasets[2].data = [{x:0, y:mc}, {x:80, y:mc}];
+            sweezyChart.data.datasets[3].data = [{x: q, y: p}];
+            sweezyChart.update();
+        }
+
+        const panel = document.getElementById('sweezy-panel');
+        panel.className = 'glass rounded-2xl p-4 border text-xs leading-relaxed';
+        if(status === "stable") {
+            panel.innerHTML = currentLang === 'ru'
+                ? `<b>Эффект жесткости цен (Kinked Demand):</b> Издержки MC ($${mc} ₸) находятся внутри вертикального разрыва MR (180–220 ₸). Изменение розничной цены невыгодно.`
+                : `<b>Price Rigidity Effect:</b> MC ($${mc} ₸) fluctuates inside the vertical MR gap (180–220 ₸). Retail price remains perfectly rigid at 250 ₸.`;
+            panel.classList.add('border-cyan-500', 'bg-cyan-950/20');
+        } else if (status === "high") {
+            panel.innerHTML = currentLang === 'ru'
+                ? `<b>Рост розничной цены:</b> Оптовые издержки превысили порог 220 ₸. Фирма вынуждена повысить цену выше 250 ₸, что сокращает объем продаж.`
+                : `<b>Price Increase Forced:</b> MC breached upper limit (220 ₸). Firm raises price above 250 ₸, lowering sales.`;
+            panel.classList.add('border-rose-500');
+        } else {
+            panel.innerHTML = currentLang === 'ru'
+                ? `Сверхнизкие издержки пробили нижнюю границу (180 ₸), приводя к снижению цен.`
+                : `Substantial cost reduction below 180 ₸ induces lower equilibrium market prices.`;
+            panel.classList.add('border-amber-500');
+        }
+    }
+
+    // ----------------------------------------------------
+    // СКРИПТЫ: ЧИСТАЯ МОНОПОЛИЯ
+    // ----------------------------------------------------
+    const monoTableData = [
+        { q: 0, p: 160, tr: 0, mr: null, tc: 100, mc: null, atc: null },
+        { q: 1, p: 150, tr: 150, mr: 150, tc: 190, mc: 90, atc: 190.00 },
+        { q: 2, p: 140, tr: 280, mr: 130, tc: 270, mc: 80, atc: 135.00 },
+        { q: 3, p: 130, tr: 390, mr: 110, tc: 340, mc: 70, atc: 113.33 },
+        { q: 4, p: 120, tr: 480, mr: 90, tc: 400, mc: 60, atc: 100.00 },
+        { q: 5, p: 110, tr: 550, mr: 70, tc: 470, mc: 70, atc: 94.00 },
+        { q: 6, p: 100, tr: 600, mr: 50, tc: 550, mc: 80, atc: 91.67 },
+        { q: 7, p: 90, tr: 630, mr: 30, tc: 640, mc: 90, atc: 91.43 },
+        { q: 8, p: 80, tr: 640, mr: 10, tc: 750, mc: 110, atc: 93.75 },
+        { q: 9, p: 70, tr: 630, mr: -10, tc: 880, mc: 130, atc: 97.78 },
+        { q: 10, p: 60, tr: 600, mr: -30, tc: 1030, mc: 150, atc: 103.00 }
+    ];
+
+    let monoTrTcChartInst = null;
+    let monoMarketChartInst = null;
+
+    const monoTrTcPlugin = {
+        id: 'monoTrTcProjection',
+        afterDraw: (chart) => {
+            const q = parseInt(document.getElementById('mono-slider-q').value);
+            const { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
+            
+            const xPos = x.getPixelForValue(q);
+            const trVal = monoTableData[q].tr;
+            const tcVal = monoTableData[q].tc;
+            
+            const trY = y.getPixelForValue(trVal);
+            const tcY = y.getPixelForValue(tcVal);
+
+            ctx.save();
+            ctx.beginPath(); ctx.moveTo(xPos, bottom); ctx.lineTo(xPos, top);
+            ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)'; ctx.setLineDash([5, 5]); ctx.stroke();
+
+            if (q > 0) {
+                const isProfit = trVal >= tcVal;
+                ctx.fillStyle = isProfit ? 'rgba(16, 185, 129, 0.3)' : 'rgba(244, 63, 94, 0.3)';
+                ctx.fillRect(xPos - 12, Math.min(trY, tcY), 24, Math.abs(trY - tcY));
+                ctx.strokeStyle = isProfit ? '#10b981' : '#f43f5e';
+                ctx.setLineDash([]); ctx.lineWidth = 1.5;
+                ctx.strokeRect(xPos - 12, Math.min(trY, tcY), 24, Math.abs(trY - tcY));
+            }
+            ctx.restore();
+        }
+    };
+
+    const monoMarketPlugin = {
+        id: 'monoMarketProjection',
+        afterDraw: (chart) => {
+            const q = parseInt(document.getElementById('mono-slider-q').value);
+            if (q === 0) return;
+
+            const { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
+            const xPos = x.getPixelForValue(q);
+            const xZero = x.getPixelForValue(0);
+            
+            const pVal = monoTableData[q].p;
+            const atcVal = monoTableData[q].atc;
+            const mrVal = monoTableData[q].mr;
+            const mcVal = monoTableData[q].mc;
+            
+            const pY = y.getPixelForValue(pVal);
+            const atcY = y.getPixelForValue(atcVal);
+            const mrY = y.getPixelForValue(mrVal);
+            const mcY = y.getPixelForValue(mcVal);
+
+            ctx.save();
+
+            const isProfit = pVal >= atcVal;
+            ctx.fillStyle = isProfit ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)';
+            ctx.fillRect(xZero, Math.min(pY, atcY), xPos - xZero, Math.abs(pY - atcY));
+            
+            ctx.strokeStyle = isProfit ? 'rgba(16, 185, 129, 0.8)' : 'rgba(244, 63, 94, 0.8)';
+            ctx.setLineDash([4, 4]); ctx.lineWidth = 1.5;
+            ctx.strokeRect(xZero, Math.min(pY, atcY), xPos - xZero, Math.abs(pY - atcY));
+
+            ctx.beginPath(); ctx.moveTo(xPos, bottom); ctx.lineTo(xPos, pY);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; ctx.setLineDash([3, 3]); ctx.stroke();
+
+            const drawDot = (yPos, color, label) => {
+                ctx.fillStyle = color; ctx.beginPath(); ctx.arc(xPos, yPos, 5, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#fff'; ctx.font = 'bold 10px sans-serif'; ctx.fillText(label, xPos + 8, yPos + 3);
+            };
+            
+            drawDot(pY, '#3b82f6', `P=$${pVal}`); 
+            drawDot(atcY, '#f43f5e', `ATC=$${atcVal.toFixed(1)}`); 
+            drawDot(mcY, '#f59e0b', `MC=$${mcVal}`); 
+            drawDot(mrY, '#10b981', `MR=$${mrVal}`); 
+
+            ctx.restore();
+        }
+    };
+
+    function initMonoCharts() {
+        const ctx1 = document.getElementById('monoTrTcChart').getContext('2d');
+        monoTrTcChartInst = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: monoTableData.map(d => d.q),
+                datasets: [
+                    { label: i18n[currentLang].legTR, data: monoTableData.map(d => d.tr), borderColor: '#8b5cf6', backgroundColor: '#8b5cf6', tension: 0.4, borderWidth: 3 },
+                    { label: i18n[currentLang].legTC, data: monoTableData.map(d => d.tc), borderColor: '#f43f5e', backgroundColor: '#f43f5e', tension: 0.4, borderWidth: 3 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: i18n[currentLang].moChart1Title, color: '#fff' } },
+                scales: { y: { max: 1200, grid: { color: '#1e293b' } }, x: { grid: { color: '#1e293b' } } },
+                animation: { duration: 200 }
+            },
+            plugins: [monoTrTcPlugin]
+        });
+
+        const ctx2 = document.getElementById('monoMarketChart').getContext('2d');
+        monoMarketChartInst = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: monoTableData.map(d => d.q),
+                datasets: [
+                    { label: i18n[currentLang].legDemandP, data: monoTableData.map(d => d.p), borderColor: '#3b82f6', tension: 0, borderWidth: 3 },
+                    { label: i18n[currentLang].legMRMono, data: monoTableData.map(d => d.mr), borderColor: '#10b981', borderDash: [5, 5], tension: 0, borderWidth: 3 },
+                    { label: i18n[currentLang].legMCMono, data: monoTableData.map(d => d.mc), borderColor: '#f59e0b', tension: 0.4, borderWidth: 3 },
+                    { label: i18n[currentLang].legATCMono, data: monoTableData.map(d => d.atc), borderColor: '#f43f5e', tension: 0.4, borderWidth: 2 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: i18n[currentLang].moChart2Title, color: '#fff' } },
+                scales: { 
+                    y: { 
+                        min: -50, 
+                        max: 200, 
+                        ticks: { stepSize: 50 },
+                        grid: { color: '#1e293b' } 
+                    }, 
+                    x: { grid: { color: '#1e293b' } } 
+                },
+                animation: { duration: 200 }
+            },
+            plugins: [monoMarketPlugin]
+        });
+    }
+
+    function updateMonoDashboard() {
+        const q = parseInt(document.getElementById('mono-slider-q').value);
+        const data = monoTableData[q];
+        const profit = data.tr - data.tc;
+
+        document.getElementById('mono-val-q').innerText = `${q} ${i18n[currentLang].units}`;
+        document.getElementById('mono-slider-val-p').innerText = `$${data.p}`;
+        document.getElementById('mono-val-mr').innerText = data.mr !== null ? `$${data.mr}` : '-';
+        document.getElementById('mono-val-atc').innerText = data.atc !== null ? `$${data.atc.toFixed(1)}` : '-';
+        document.getElementById('mono-val-mc').innerText = data.mc !== null ? `$${data.mc}` : '-';
+
+        const profitEl = document.getElementById('mono-val-profit');
+        const panelEl = document.getElementById('mono-profit-panel');
+        
+        profitEl.style.color = profit >= 0 ? '#10b981' : '#f43f5e';
+        profitEl.innerText = (profit >= 0 ? '+$' : '-$') + Math.abs(profit);
+
+        if(monoTrTcChartInst) monoTrTcChartInst.update('none');
+        if(monoMarketChartInst) monoMarketChartInst.update('none');
+
+        let verdict = "";
+        panelEl.classList.remove('border-emerald-500', 'border-rose-500', 'border-amber-500', 'bg-emerald-900/20', 'bg-rose-900/20', 'bg-amber-900/20');
+
+        if (currentLang === 'ru') {
+            if (q === 0) {
+                verdict = `Производство остановлено. Цена установлена так высоко ($160), что никто не покупает товар. Вы несете убытки в размере постоянных издержек (FC = $100). Снизьте цену, чтобы начать продажи!`;
+                panelEl.classList.add('border-rose-500');
+            } else if (q < 5) {
+                if (profit < 0) {
+                    verdict = `Вы пока в убытке, но маржа хорошая! Предельная выручка (MR=$${data.mr}) значительно выше предельных издержек (MC=$${data.mc}). Снижайте цену и увеличивайте объем продаж!`;
+                    panelEl.classList.add('border-rose-500');
+                } else {
+                    verdict = `Вы получаете прибыль, но <strong>недопроизводите</strong>. Снизив цену до $110, дополнительная выручка (MR) всё ещё превысит затраты (MC). Упускаете выгоду!`;
+                    panelEl.classList.add('border-amber-500');
+                }
+            } else if (q === 5) {
+                verdict = `<strong>Оптимум монополиста! Максимизация прибыли.</strong> Идеальный баланс: MR ($70) = MC ($70). Как рациональный монополист, вы искусственно ограничиваете выпуск на уровне 5 единиц, чтобы удерживать высокую цену ($110).`;
+                panelEl.classList.add('border-emerald-500', 'bg-emerald-900/20');
+            } else {
+                verdict = `<strong>Ошибка: Перепроизводство.</strong> Чтобы рынок купил этот объем, пришлось обрушить цену до $${data.p}. Создание новой единицы стоит дороже (MC=$${data.mc}), чем она приносит (MR=$${data.mr}). Срочно повышайте цену!`;
+                panelEl.classList.add('border-rose-500'); 
+            }
+        } else {
+            if (q === 0) {
+                verdict = `Production halted. Price set too high ($160), yielding zero demand. Fixed costs ($100) induce losses. Lower price to initiate sales!`;
+                panelEl.classList.add('border-rose-500');
+            } else if (q < 5) {
+                if (profit < 0) {
+                    verdict = `Operating at a loss, but marginal profit is strong! MR ($${data.mr}) > MC ($${data.mc}). Lower price to expand sales volume!`;
+                    panelEl.classList.add('border-rose-500');
+                } else {
+                    verdict = `Earning profit, but <strong>underproducing</strong>. Lowering price toward $110 keeps MR above MC, generating uncaptured profits!`;
+                    panelEl.classList.add('border-amber-500');
+                }
+            } else if (q === 5) {
+                verdict = `<strong>Monopolist Optimum! Profit Maximized.</strong> Equilibrium reached where MR ($70) = MC ($70). As a rational price maker, output is constrained at 5 units to sustain price at $110.`;
+                panelEl.classList.add('border-emerald-500', 'bg-emerald-900/20');
+            } else {
+                verdict = `<strong>Overproduction Error.</strong> Market clearing requires price drop to $${data.p}. Marginal costs (MC=$${data.mc}) exceed marginal revenues (MR=$${data.mr}). Raise prices immediately!`;
+                panelEl.classList.add('border-rose-500'); 
+            }
+        }
+
+        document.getElementById('mono-val-verdict').innerHTML = verdict;
+    }
+
+    const sliderMonoQ = document.getElementById('mono-slider-q');
+    const sliderMonoP = document.getElementById('mono-slider-p');
+
+    sliderMonoQ.addEventListener('input', function(e) {
+        const q = parseInt(e.target.value);
+        sliderMonoP.value = monoTableData[q].p;
+        updateMonoDashboard();
+    });
+
+    sliderMonoP.addEventListener('input', function(e) {
+        const p = parseInt(e.target.value);
+        const match = monoTableData.find(d => d.p === p);
+        if (match) {
+            sliderMonoQ.value = match.q;
+            updateMonoDashboard();
+        }
+    });
+
+    // Инициализация при старте
+    initPcCharts();
+    setPcScenario(131);
+    pcInitialized = true;
+    setLanguage('ru');
+
+</script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Принципы экономики | Совершенная Конкуренция</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0b1121; color: #f8fafc; overflow-x: hidden; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
+        
+        /* Стилизация винтажного ползунка */
+        input[type="range"] { -webkit-appearance: none; width: 100%; background: #0f172a; height: 12px; border-radius: 6px; border: 1px solid #334155; }
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 32px; background: #3b82f6; border-radius: 4px; cursor: pointer; border: 2px solid #1e293b; box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); }
+        
+        .scenario-btn { transition: all 0.2s; }
+        .scenario-btn.active { box-shadow: 0 0 0 2px #fff; transform: scale(1.02); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+<div class="max-w-7xl mx-auto space-y-6">
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-800 pb-6">
+        <div>
+            <h1 id="lbl-title" class="text-3xl md:text-4xl font-black text-white tracking-tight">Совершенная конкуренция</h1>
+            <p id="lbl-subtitle" class="text-blue-400 font-bold uppercase tracking-widest text-xs mt-2">Принципы экономики • Экономика</p>
+        </div>
+        
+        <div class="flex flex-wrap items-center gap-3">
+            <!-- Переключатель языка -->
+            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl p-1 shadow-md">
+                <button id="btn-lang-ru" onclick="setLanguage('ru')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white">RU</button>
+                <button id="btn-lang-en" onclick="setLanguage('en')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200">EN</button>
+            </div>
+
+            <!-- Сценарии цен -->
+            <div class="flex gap-2">
+                <button onclick="setScenario(131)" id="btn-131" class="scenario-btn bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 active">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i> <span id="lbl-sc-131">P = $131 (Рост)</span>
+                </button>
+                <button onclick="setScenario(81)" id="btn-81" class="scenario-btn bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5">
+                    <i data-lucide="minus-circle" class="w-4 h-4"></i> <span id="lbl-sc-81">P = $81 (Спад)</span>
+                </button>
+                <button onclick="setScenario(71)" id="btn-71" class="scenario-btn bg-rose-600 hover:bg-rose-500 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5">
+                    <i data-lucide="power-off" class="w-4 h-4"></i> <span id="lbl-sc-71">P = $71 (Кризис)</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <div class="lg:col-span-5 space-y-6">
+            
+            <!-- Слайдер объема -->
+            <div class="glass-panel p-6 rounded-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <label id="lbl-slider-title" class="text-sm font-bold text-slate-300 uppercase tracking-wider">Объем выпуска (Q)</label>
+                    <span id="val-q" class="text-2xl font-black text-blue-400 bg-blue-500/10 px-3 py-1 rounded-lg">0 ед.</span>
+                </div>
+                <input type="range" id="slider-q" min="0" max="10" value="0" step="1">
+                <div class="flex justify-between text-xs text-slate-500 mt-2 font-mono">
+                    <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
+                </div>
+            </div>
+
+            <!-- Блоки данных -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="glass-panel p-4 rounded-2xl border-l-4 border-blue-500">
+                    <span id="lbl-kpi-tr" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Выручка (TR)</span>
+                    <span id="val-tr" class="text-xl font-mono font-bold text-white">$0</span>
+                    <div id="lbl-kpi-tr-sub" class="text-xs text-slate-500 mt-1">P * Q</div>
+                </div>
+                <div class="glass-panel p-4 rounded-2xl border-l-4 border-rose-500">
+                    <span id="lbl-kpi-tc" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Общие издержки (TC)</span>
+                    <span id="val-tc" class="text-xl font-mono font-bold text-white">$100</span>
+                    <div id="lbl-kpi-tc-sub" class="text-xs text-slate-500 mt-1">TFC ($100) + TVC</div>
+                </div>
+                <div class="glass-panel p-4 rounded-2xl border-l-4 border-emerald-500">
+                    <span id="lbl-kpi-mr" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Предельная выручка (MR)</span>
+                    <span id="val-mr" class="text-xl font-mono font-bold text-emerald-400">-</span>
+                    <div id="lbl-kpi-mr-sub" class="text-xs text-slate-500 mt-1">Равна цене (P)</div>
+                </div>
+                <div class="glass-panel p-4 rounded-2xl border-l-4 border-amber-500">
+                    <span id="lbl-kpi-mc" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Предельные издержки (MC)</span>
+                    <span id="val-mc" class="text-xl font-mono font-bold text-amber-400">-</span>
+                    <div id="lbl-kpi-mc-sub" class="text-xs text-slate-500 mt-1">Зависит от Q</div>
+                </div>
+            </div>
+
+            <!-- Итоговая прибыль и Вердикт -->
+            <div id="profit-panel" class="glass-panel p-6 rounded-2xl border border-slate-700 transition-colors duration-300 border-emerald-500">
+                <div class="flex justify-between items-end mb-4">
+                    <span id="lbl-profit-title" class="text-sm font-bold text-slate-300 uppercase tracking-wider">Экономическая прибыль</span>
+                    <span id="val-profit" class="text-4xl font-black font-mono" style="color: rgb(16, 185, 129);">$-100</span>
+                </div>
+                <div class="h-px w-full bg-slate-700 my-4"></div>
+                <h4 class="text-xs font-bold uppercase text-slate-400 mb-2 flex items-center gap-2">
+                    <i data-lucide="info" class="w-4 h-4"></i> <span id="lbl-verdict-title">Управленческий анализ</span>
+                </h4>
+                <p id="val-verdict" class="text-sm text-slate-300 leading-relaxed">Инициализация...</p>
+            </div>
+        </div>
+
+        <div class="lg:col-span-7 space-y-6">
+            <div class="glass-panel p-4 rounded-2xl h-[280px] relative">
+                <canvas id="trTcChart"></canvas>
+            </div>
+            <div class="glass-panel p-4 rounded-2xl h-[280px] relative">
+                <canvas id="mrMcChart"></canvas>
+            </div>
+        </div>
+
+    </div>
+
+    <footer class="text-center text-xs text-slate-600 pt-4 border-t border-slate-800">
+        AlmaU • SDTE
+    </footer>
+</div>
+
+<script>
+    lucide.createIcons();
+
+    let currentLang = 'ru';
+
+    const i18n = {
+        ru: {
+            title: "Совершенная конкуренция",
+            subtitle: "Принципы экономики • Экономика",
+            sc131: "P = $131 (Рост)",
+            sc81: "P = $81 (Спад)",
+            sc71: "P = $71 (Кризис)",
+            sliderTitle: "Объем выпуска (Q)",
+            units: "ед.",
+            trTitle: "Выручка (TR)",
+            trSub: "P * Q",
+            tcTitle: "Общие издержки (TC)",
+            tcSub: "TFC ($100) + TVC",
+            mrTitle: "Предельная выручка (MR)",
+            mrSub: "Равна цене (P)",
+            mcTitle: "Предельные издержки (MC)",
+            mcSub: "Зависит от Q",
+            profitTitle: "Экономическая прибыль",
+            verdictTitle: "Управленческий анализ",
+            chart1Title: "Анализ Общих Показателей (TR - TC)",
+            chart2Title: "Анализ Предельных Показателей (MR - MC)",
+            chart1LegTR: "Совокупная выручка (TR)",
+            chart1LegTC: "Совокупные издержки (TC)",
+            chart2LegMR: "Предельная выручка (MR=P)",
+            chart2LegMC: "Предельные издержки (MC)",
+            chart2LegAVC: "Средние переменные издержки (AVC)"
+        },
+        en: {
+            title: "Perfect Competition",
+            subtitle: "Principles of Economics • Economics",
+            sc131: "P = $131 (Expansion)",
+            sc81: "P = $81 (Downturn)",
+            sc71: "P = $71 (Shutdown)",
+            sliderTitle: "Production Output (Q)",
+            units: "units",
+            trTitle: "Total Revenue (TR)",
+            trSub: "P * Q",
+            tcTitle: "Total Cost (TC)",
+            tcSub: "TFC ($100) + TVC",
+            mrTitle: "Marginal Revenue (MR)",
+            mrSub: "Equals Price (P)",
+            mcTitle: "Marginal Cost (MC)",
+            mcSub: "Depends on Q",
+            profitTitle: "Economic Profit",
+            verdictTitle: "Managerial Analysis",
+            chart1Title: "Total Indicators Analysis (TR - TC)",
+            chart2Title: "Marginal Indicators Analysis (MR - MC)",
+            chart1LegTR: "Total Revenue (TR)",
+            chart1LegTC: "Total Cost (TC)",
+            chart2LegMR: "Marginal Revenue (MR=P)",
+            chart2LegMC: "Marginal Cost (MC)",
+            chart2LegAVC: "Average Variable Cost (AVC)"
+        }
+    };
+
+    // Точные данные из таблицы (TFC = $100)
+    const tableData = [
+        { q: 0, tvc: 0, tc: 100, mc: null, avc: null, atc: null },
+        { q: 1, tvc: 90, tc: 190, mc: 90, avc: 90.00, atc: 190.00 },
+        { q: 2, tvc: 170, tc: 270, mc: 80, avc: 85.00, atc: 135.00 },
+        { q: 3, tvc: 240, tc: 340, mc: 70, avc: 80.00, atc: 113.33 },
+        { q: 4, tvc: 300, tc: 400, mc: 60, avc: 75.00, atc: 100.00 },
+        { q: 5, tvc: 370, tc: 470, mc: 70, avc: 74.00, atc: 94.00 },
+        { q: 6, tvc: 450, tc: 550, mc: 80, avc: 75.00, atc: 91.67 },
+        { q: 7, tvc: 540, tc: 640, mc: 90, avc: 77.14, atc: 91.43 },
+        { q: 8, tvc: 650, tc: 750, mc: 110, avc: 81.25, atc: 93.75 },
+        { q: 9, tvc: 780, tc: 880, mc: 130, avc: 86.67, atc: 97.78 },
+        { q: 10, tvc: 930, tc: 1030, mc: 150, avc: 93.00, atc: 103.00 }
+    ];
+
+    let currentPrice = 131;
+    let trTcChartInst = null;
+    let mrMcChartInst = null;
+
+    // Плагин для отрисовки проекций и зон на верхнем графике TR/TC
+    const trTcPlugin = {
+        id: 'trTcProjection',
+        afterDraw: (chart) => {
+            const q = parseInt(document.getElementById('slider-q').value);
+            const { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
+            
+            const xPos = x.getPixelForValue(q);
+            const trVal = q * currentPrice;
+            const tcVal = tableData[q].tc;
+            
+            const trY = y.getPixelForValue(trVal);
+            const tcY = y.getPixelForValue(tcVal);
+
+            ctx.save();
+            
+            // 1. Пунктирная проекция
+            ctx.beginPath();
+            ctx.moveTo(xPos, bottom);
+            ctx.lineTo(xPos, top);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+
+            // 2. Зона прибыли/убытка (Gap)
+            if (q > 0) {
+                const isProfit = trVal >= tcVal;
+                ctx.fillStyle = isProfit ? 'rgba(16, 185, 129, 0.4)' : 'rgba(244, 63, 94, 0.4)';
+                ctx.fillRect(xPos - 10, Math.min(trY, tcY), 20, Math.abs(trY - tcY));
+                
+                ctx.strokeStyle = isProfit ? '#10b981' : '#f43f5e';
+                ctx.setLineDash([]);
+                ctx.lineWidth = 1;
+                ctx.strokeRect(xPos - 10, Math.min(trY, tcY), 20, Math.abs(trY - tcY));
+            }
+            
+            ctx.restore();
+        }
+    };
+
+    // Плагин для отрисовки проекций на нижнем графике MR/MC
+    const mrMcPlugin = {
+        id: 'mrMcProjection',
+        afterDraw: (chart) => {
+            const q = parseInt(document.getElementById('slider-q').value);
+            const { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
+            
+            const xPos = x.getPixelForValue(q);
+            
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(xPos, bottom);
+            ctx.lineTo(xPos, top);
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.setLineDash([5, 5]);
+            ctx.stroke();
+            
+            const mrY = y.getPixelForValue(currentPrice);
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath();
+            ctx.arc(xPos, mrY, 5, 0, Math.PI * 2);
+            ctx.fill();
+            
+            if(q > 0) {
+                const mcY = y.getPixelForValue(tableData[q].mc);
+                ctx.fillStyle = '#f59e0b';
+                ctx.beginPath();
+                ctx.arc(xPos, mcY, 5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+    };
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        const t = i18n[lang];
+
+        document.getElementById('btn-lang-ru').className = lang === 'ru' ? "px-3 py-1 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white" : "px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
+        document.getElementById('btn-lang-en').className = lang === 'en' ? "px-3 py-1 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white" : "px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
+
+        document.getElementById('lbl-title').innerText = t.title;
+        document.getElementById('lbl-subtitle').innerText = t.subtitle;
+        document.getElementById('lbl-sc-131').innerText = t.sc131;
+        document.getElementById('lbl-sc-81').innerText = t.sc81;
+        document.getElementById('lbl-sc-71').innerText = t.sc71;
+
+        document.getElementById('lbl-slider-title').innerText = t.sliderTitle;
+        document.getElementById('lbl-kpi-tr').innerText = t.trTitle;
+        document.getElementById('lbl-kpi-tr-sub').innerText = t.trSub;
+        document.getElementById('lbl-kpi-tc').innerText = t.tcTitle;
+        document.getElementById('lbl-kpi-tc-sub').innerText = t.tcSub;
+        document.getElementById('lbl-kpi-mr').innerText = t.mrTitle;
+        document.getElementById('lbl-kpi-mr-sub').innerText = t.mrSub;
+        document.getElementById('lbl-kpi-mc').innerText = t.mcTitle;
+        document.getElementById('lbl-kpi-mc-sub').innerText = t.mcSub;
+        document.getElementById('lbl-profit-title').innerText = t.profitTitle;
+        document.getElementById('lbl-verdict-title').innerText = t.verdictTitle;
+
+        if (trTcChartInst && mrMcChartInst) {
+            trTcChartInst.options.plugins.title.text = t.chart1Title;
+            trTcChartInst.data.datasets[0].label = t.chart1LegTR;
+            trTcChartInst.data.datasets[1].label = t.chart1LegTC;
+            trTcChartInst.update();
+
+            mrMcChartInst.options.plugins.title.text = t.chart2Title;
+            mrMcChartInst.data.datasets[0].label = t.chart2LegMR;
+            mrMcChartInst.data.datasets[1].label = t.chart2LegMC;
+            mrMcChartInst.data.datasets[2].label = t.chart2LegAVC;
+            mrMcChartInst.update();
+        }
+
+        updateDashboard();
+    }
+
+    function initCharts() {
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = 'Inter';
+
+        const ctx1 = document.getElementById('trTcChart').getContext('2d');
+        trTcChartInst = new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: tableData.map(d => d.q),
+                datasets: [
+                    { label: i18n.ru.chart1LegTR, data: [], borderColor: '#3b82f6', backgroundColor: '#3b82f6', tension: 0.1, borderWidth: 3 },
+                    { label: i18n.ru.chart1LegTC, data: tableData.map(d => d.tc), borderColor: '#f43f5e', backgroundColor: '#f43f5e', tension: 0.4, borderWidth: 3 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: i18n.ru.chart1Title, color: '#fff' } },
+                scales: { y: { beginAtZero: true, grid: { color: '#1e293b' } }, x: { grid: { color: '#1e293b' } } },
+                animation: { duration: 200 }
+            },
+            plugins: [trTcPlugin]
+        });
+
+        const ctx2 = document.getElementById('mrMcChart').getContext('2d');
+        mrMcChartInst = new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: tableData.map(d => d.q),
+                datasets: [
+                    { label: i18n.ru.chart2LegMR, data: [], borderColor: '#10b981', borderDash: [5, 5], tension: 0, borderWidth: 2 },
+                    { label: i18n.ru.chart2LegMC, data: tableData.map(d => d.mc), borderColor: '#f59e0b', tension: 0.4, borderWidth: 3 },
+                    { label: i18n.ru.chart2LegAVC, data: tableData.map(d => d.avc), borderColor: '#a855f7', tension: 0.4, borderWidth: 2 }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { title: { display: true, text: i18n.ru.chart2Title, color: '#fff' } },
+                scales: { y: { min: 40, max: 200, grid: { color: '#1e293b' } }, x: { grid: { color: '#1e293b' } } },
+                animation: { duration: 200 }
+            },
+            plugins: [mrMcPlugin]
+        });
+    }
+
+    function setScenario(price) {
+        currentPrice = price;
+        
+        document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(`btn-${price}`).classList.add('active');
+
+        const trData = tableData.map(d => d.q * price);
+        const mrData = tableData.map(d => price);
+        
+        trTcChartInst.data.datasets[0].data = trData;
+        trTcChartInst.update();
+        
+        mrMcChartInst.data.datasets[0].data = mrData;
+        mrMcChartInst.update();
+
+        const slider = document.getElementById('slider-q');
+        if(price === 131) slider.value = 9;
+        if(price === 81) slider.value = 6;
+        if(price === 71) slider.value = 0;
+        
+        updateDashboard();
+    }
+
+    function updateDashboard() {
+        const q = parseInt(document.getElementById('slider-q').value);
+        const data = tableData[q];
+        
+        const tr = q * currentPrice;
+        const profit = tr - data.tc;
+
+        document.getElementById('val-q').innerText = `${q} ${i18n[currentLang].units}`;
+        document.getElementById('val-tr').innerText = `$${tr}`;
+        document.getElementById('val-tc').innerText = `$${data.tc}`;
+        document.getElementById('val-mr').innerText = q === 0 ? '-' : `$${currentPrice}`;
+        document.getElementById('val-mc').innerText = data.mc ? `$${data.mc}` : '-';
+
+        const profitEl = document.getElementById('val-profit');
+        const panelEl = document.getElementById('profit-panel');
+        
+        profitEl.innerText = (profit > 0 ? '+' : '') + `$${profit}`;
+
+        trTcChartInst.update('none');
+        mrMcChartInst.update('none');
+
+        let verdict = "";
+        panelEl.classList.remove('border-emerald-500', 'border-rose-500', 'border-amber-500', 'bg-emerald-900/20', 'bg-rose-900/20', 'bg-amber-900/20');
+
+        if (currentLang === 'ru') {
+            if (currentPrice === 131) {
+                if (q === 9) {
+                    verdict = `<strong>Идеально! Точка максимизации прибыли.</strong> Вы производите до точки, где MR ($131) максимально близко к MC ($130), не превышая его. Ваша экономическая прибыль максимальна ($299). Производство 10-й единицы принесет убыток на марже (MC $150 > MR $131).`;
+                    panelEl.classList.add('border-emerald-500', 'bg-emerald-900/20');
+                    profitEl.style.color = '#10b981';
+                } else if (q < 9) {
+                    if (profit < 0) {
+                        verdict = `Вы пока в убытке (Q слишком мал, чтобы покрыть постоянные издержки). Но MR ($131) выше MC, поэтому <strong>смело увеличивайте объем!</strong>`;
+                        panelEl.classList.add('border-rose-500');
+                        profitEl.style.color = '#f43f5e';
+                    } else {
+                        verdict = `Вы получаете прибыль, но <strong>недопроизводите</strong>. Каждая следующая единица до Q=9 приносит дополнительную прибыль, так как предельная выручка (MR=$131) выше предельных издержек (MC). Увеличьте объем!`;
+                        panelEl.classList.add('border-emerald-500');
+                        profitEl.style.color = '#10b981';
+                    }
+                } else {
+                    verdict = `<strong>Перепроизводство.</strong> Производство 10-й единицы обошлось вам в $150 (MC), а продали вы ее за $131. Прибыль начала падать. Снизьте выпуск до Q=9.`;
+                    panelEl.classList.add('border-amber-500');
+                    profitEl.style.color = '#10b981';
+                }
+            } else if (currentPrice === 81) {
+                if (q === 6) {
+                    verdict = `<strong>Минимизация убытков (Loss Minimization).</strong> Да, вы теряете $64. Но это правильное управленческое решение! Если бы вы закрылись (Q=0), вы бы потеряли фиксированные издержки TFC = $100. При Q=6 вы полностью покрываете сырье (AVC=$75 < P=$81) и частично оплачиваете аренду.`;
+                    panelEl.classList.add('border-amber-500', 'bg-amber-900/20');
+                    profitEl.style.color = '#f59e0b';
+                } else if (q === 0) {
+                    verdict = `Вы остановили производство и потеряли $100 (TFC). <strong>Ошибка:</strong> при цене $81 вы могли бы покрыть сырье (AVC) и заработать немного "маржинальной прибыли" для оплаты аренды, сократив убыток до $64 при Q=6.`;
+                    panelEl.classList.add('border-rose-500');
+                    profitEl.style.color = '#f43f5e';
+                } else {
+                    verdict = `Вы терпите убытки. Оптимальная стратегия выживания в этом кризисе — производить Q=6, где MR=MC, чтобы минимизировать потери до $64.`;
+                    panelEl.classList.add('border-amber-500');
+                    profitEl.style.color = '#f59e0b';
+                }
+            } else if (currentPrice === 71) {
+                if (q === 0) {
+                    verdict = `<strong>Правильное решение: Точка закрытия (Shutdown).</strong> Цена $71 упала ниже минимальных средних переменных издержек (min AVC = $74). Выручка не покрывает даже закупку сырья. Выгоднее просто платить аренду ($100), чем производить и увеличивать долги.`;
+                    panelEl.classList.add('border-rose-500', 'bg-rose-900/20');
+                    profitEl.style.color = '#f43f5e';
+                } else {
+                    verdict = `<strong>Критическая ошибка!</strong> Вы теряете $124. Ваша цена продажи ($71) меньше себестоимости сырья (AVC=$74 при Q=6). Вы доплачиваете клиентам за то, чтобы они забирали ваш товар. Немедленно остановите станки (Q=0)!`;
+                    panelEl.classList.add('border-rose-500');
+                    profitEl.style.color = '#f43f5e';
+                }
+            }
+        } else {
+            if (currentPrice === 131) {
+                if (q === 9) {
+                    verdict = `<strong>Optimal! Profit Maximization Point.</strong> You produce up to the point where MR ($131) is closest to MC ($130) without exceeding it. Economic profit is maximized ($299). Producing the 10th unit reduces margin (MC $150 > MR $131).`;
+                    panelEl.classList.add('border-emerald-500', 'bg-emerald-900/20');
+                    profitEl.style.color = '#10b981';
+                } else if (q < 9) {
+                    if (profit < 0) {
+                        verdict = `Currently operating at a loss (Q is too small to cover fixed costs). However, MR ($131) exceeds MC, so <strong>increase production volume!</strong>`;
+                        panelEl.classList.add('border-rose-500');
+                        profitEl.style.color = '#f43f5e';
+                    } else {
+                        verdict = `You are earning profit, but <strong>underproducing</strong>. Every additional unit up to Q=9 adds marginal profit because MR ($131) > MC. Expand output!`;
+                        panelEl.classList.add('border-emerald-500');
+                        profitEl.style.color = '#10b981';
+                    }
+                } else {
+                    verdict = `<strong>Overproduction.</strong> The 10th unit costs $150 (MC) but sells for $131. Profit drops. Reduce output to Q=9.`;
+                    panelEl.classList.add('border-amber-500');
+                    profitEl.style.color = '#10b981';
+                }
+            } else if (currentPrice === 81) {
+                if (q === 6) {
+                    verdict = `<strong>Loss Minimization Point.</strong> Net loss is $64, but this is optimal. Shutting down (Q=0) incurs TFC = $100 loss. At Q=6, revenue covers variable costs (AVC $75 < P $81) and contributes to fixed rent.`;
+                    panelEl.classList.add('border-amber-500', 'bg-amber-900/20');
+                    profitEl.style.color = '#f59e0b';
+                } else if (q === 0) {
+                    verdict = `Operations stopped, incurring $100 loss (TFC). <strong>Suboptimal:</strong> At P=$81, variable costs (AVC) are covered with a contribution margin toward fixed costs, reducing loss to $64 at Q=6.`;
+                    panelEl.classList.add('border-rose-500');
+                    profitEl.style.color = '#f43f5e';
+                } else {
+                    verdict = `Operating at a loss. The optimal short-run survival strategy is Q=6 where MR=MC, capping losses at $64.`;
+                    panelEl.classList.add('border-amber-500');
+                    profitEl.style.color = '#f59e0b';
+                }
+            } else if (currentPrice === 71) {
+                if (q === 0) {
+                    verdict = `<strong>Optimal Strategy: Shutdown Condition.</strong> Price $71 fell below minimum AVC ($74). Revenue fails to cover even raw materials. Shutting down limits losses to fixed rent ($100).`;
+                    panelEl.classList.add('border-rose-500', 'bg-rose-900/20');
+                    profitEl.style.color = '#f43f5e';
+                } else {
+                    verdict = `<strong>Critical Misstep!</strong> Loss increases to $124. Market price ($71) is below average variable cost (AVC=$74 at Q=6). Every unit produced increases total losses. Cease production immediately (Q=0)!`;
+                    panelEl.classList.add('border-rose-500');
+                    profitEl.style.color = '#f43f5e';
+                }
+            }
+        }
+
+        document.getElementById('val-verdict').innerHTML = verdict;
+    }
+
+    document.getElementById('slider-q').addEventListener('input', updateDashboard);
+
+    initCharts();
+    setLanguage('ru');
+    setScenario(131);
+
+</script>
+
+</body>
+</html>
