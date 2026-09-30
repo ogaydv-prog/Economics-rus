@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topic 6 | Economics for Software Engineers</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px 20px;
+            position: relative;
+        }
+
+        /* Шапка: Логотип и Кнопка */
+        .top-left-logo {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 35px;
+            right: 30px;
+            text-decoration: none;
+            background-color: #001e50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-button:hover {
+            background-color: #003380;
+        }
+
+        header {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #001e50;
+            margin-bottom: 8px;
+            margin-top: 15px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #555555;
+            max-width: 680px;
+            line-height: 1.5;
+            margin: 0 auto;
+        }
+
+        /* Сетка карточек: 1 ряд на десктопе, адаптивная сетка на мобильных */
+        .grid-container {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 16px;
+            max-width: 1400px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 40px;
+        }
+
+        /* Подгоняем ширину и высоту карточки под пропорции обложки */
+        .card {
+            display: inline-block;
+            text-decoration: none;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 215px; 
+            height: 280px; 
+            position: relative;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill; /* Заполняет рамку ровно без обрезки по краям */
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        /* Ховер-эффект подсвечивания и подъема */
+        .card:hover {
+            transform: translateY(-8px) scale(1.03);
+            border-color: #001e50;
+            box-shadow: 0 16px 30px rgba(0, 30, 80, 0.18);
+        }
+
+        /* 3D-Flip эффект для 5-й карточки с видеолекциями */
+        .flip-card {
+            perspective: 1000px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+        }
+
+        .flip-card-front {
+            background-color: #ffffff;
+        }
+
+        .flip-card-back {
+            background: #001e50;
+            color: white;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 12px 10px;
+            gap: 8px;
+            box-shadow: 0 8px 20px rgba(0, 30, 80, 0.3);
+        }
+
+        .flip-card-back h4 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #38bdf8;
+            margin-bottom: 4px;
+            font-weight: 800;
+        }
+
+        .video-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            width: 100%;
+            padding: 7px 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .video-btn:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: #ffffff;
+            transform: scale(1.02);
+        }
+
+        footer {
+            margin-top: auto;
+            font-size: 14px;
+            color: #718096;
+            padding-top: 30px;
+            padding-bottom: 20px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Мобильная адаптивность (Smartphones & Tablets) */
+        @media (max-width: 992px) {
+            body {
+                padding: 10px 15px;
+            }
+
+            .top-left-logo {
+                position: static;
+                margin-bottom: 10px;
+                width: 48px;
+                height: 48px;
+            }
+
+            .back-button {
+                position: static;
+                margin-bottom: 15px;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            header {
+                margin-top: 5px;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin-top: 5px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            .grid-container {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+
+            .card {
+                width: 160px;
+                height: 210px;
+            }
+
+            .flip-card-back {
+                padding: 8px 6px;
+                gap: 5px;
+            }
+
+            .flip-card-back h4 {
+                font-size: 9px;
+            }
+
+            .video-btn {
+                padding: 5px 6px;
+                font-size: 8.5px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Логотип AlmaU -->
+    <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    
+    <!-- Кнопка возврата к списку тем -->
+    <a href="topics.html" class="back-button">← К темам курса</a>
+
+    <header>
+        <h1>Тема 6: Олигополия и монополистическая конкуренция</h1>
+        <p class="subtitle">
+            Выберите учебный материал ниже: презентация, интерактивные симуляторы рынков, практический кейс или видеолекции.
+        </p>
+    </header>
+
+    <main class="grid-container">
+        <!-- 1. Презентация (Google Presentation) -->
+        <a href="https://docs.google.com/presentation/d/1bhXfYlFtfbqE620LGPNWaC9D6wCWAMMp/edit?usp=sharing&ouid=109725301150629205728&rtpof=true&sd=true" 
+           target="_blank" rel="noopener noreferrer" class="card" title="Презентация: Рыночные структуры">
+            <img src="pic-preza6-pe.png" alt="Презентация по рыночным структурам">
+        </a>
+
+        <!-- 2. Симулятор совершенной конкуренции -->
+        <a href="sim-perfect-competition-se.html" class="card" title="Симулятор совершенной конкуренции">
+            <img src="pic-sim-compet-market.png" alt="Симулятор совершенной конкуренции">
+        </a>
+
+        <!-- 3. Практический кейс по конкурентным рынкам -->
+        <a href="sim-perfect-competition-task-se.html" class="card" title="Практический кейс по конкурентным рынкам">
+            <img src="pic-sim-task-compet-market.png" alt="Практический кейс по конкурентным рынкам">
+        </a>
+
+        <!-- 4. Симулятор рыночной инфраструктуры (PRO) -->
+        <a href="sim-market-infrastructure-pro-se.html" class="card" title="Симулятор рыночной инфраструктуры Pro">
+            <img src="pic-sim-market-infrusructure.png" alt="Симулятор рыночной инфраструктуры">
+        </a>
+
+        <!-- 5. Видеолекции (3D Flip Card с 4 видео) -->
+        <div class="card flip-card" title="Видеолекции: Рыночные структуры и конкуренция">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="pic-video6-pe.png" alt="Обложка видеолекций">
+                </div>
+                <div class="flip-card-back">
+                    <h4>🎬 Видеолекции</h4>
+                    <a href="https://www.youtube.com/watch?v=ZiuBWSFlfoU" target="_blank" rel="noopener noreferrer" class="video-btn">
+                        ▶ Лекция 1 (Введение)
+                    </a>
+                    <a href="https://www.youtube.com/watch?v=ZtSZNcaWbf4" target="_blank" rel="noopener noreferrer" class="video-btn">
+                        ▶ Лекция 2 (Конкуренция)
+                    </a>
+                    <a href="https://www.youtube.com/watch?v=8a3gXThQeK0&t=12s" target="_blank" rel="noopener noreferrer" class="video-btn">
+                        ▶ Лекция 3 (Монополия)
+                    </a>
+                    <a href="https://www.youtube.com/watch?v=ASVHu_uSxqo" target="_blank" rel="noopener noreferrer" class="video-btn">
+                        ▶ Лекция 4 (Олигополия)
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Разработано для студентов Software Engineering AlmaU 2026</p>
+        <p>© Almaty Management University | Школа цифровых технологий и экономики</p>
+    </footer>
+
+</body>
+</html>
