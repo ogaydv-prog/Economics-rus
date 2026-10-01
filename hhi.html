@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ru" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дашборд HHI: Индекс Херфиндаля-Хиршмана | AlmaU 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            background-color: #090d16;
+            color: #f1f5f9;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        .neon-border-green { box-shadow: 0 0 25px rgba(16, 185, 129, 0.2); border-color: #10b981; }
+        .neon-border-yellow { box-shadow: 0 0 25px rgba(245, 158, 11, 0.2); border-color: #f59e0b; }
+        .neon-border-red { box-shadow: 0 0 25px rgba(239, 68, 68, 0.25); border-color: #ef4444; }
+        
+        input[type=range] {
+            accent-color: #38bdf8;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 md:p-6">
+
+    <!-- Header -->
+    <header class="max-w-7xl mx-auto w-full flex flex-col lg:flex-row justify-between items-center gap-4 mb-6 bg-slate-900/90 p-5 rounded-2xl border border-slate-800/80 backdrop-blur-md shadow-2xl">
+        <div>
+            <h1 class="text-lg md:text-xl font-extrabold text-white tracking-wide flex items-center gap-2.5">
+                <i class="fa-solid fa-chart-pie text-sky-400"></i>
+                Индекс Херфиндаля-Хиршмана (HHI)
+            </h1>
+            <p class="text-xs text-slate-400 mt-0.5">Аналитическая модель оценки концентрации рынка и отраслевых кейсов</p>
+        </div>
+
+        <!-- Кнопки реальных отраслевых пресетов -->
+        <div class="flex flex-wrap gap-2 justify-center">
+            <button onclick="loadPreset('soda')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-[11px] font-bold text-amber-300 rounded-xl border border-amber-500/30 transition-all flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-bottle-water"></i> Безалкогольные напитки (США)
+            </button>
+            <button onclick="loadPreset('aircraft')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-[11px] font-bold text-rose-400 rounded-xl border border-rose-500/30 transition-all flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plane"></i> Гражданское авиастроение
+            </button>
+            <button onclick="loadPreset('telecom_kz')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-[11px] font-bold text-sky-300 rounded-xl border border-sky-500/30 transition-all flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-signal"></i> Мобильная связь (Казахстан)
+            </button>
+            <button onclick="loadPreset('smartphones')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-[11px] font-bold text-emerald-400 rounded-xl border border-emerald-500/30 transition-all flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-mobile-screen"></i> Рынок смартфонов
+            </button>
+            <button onclick="loadPreset('search')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-[11px] font-bold text-purple-400 rounded-xl border border-purple-500/30 transition-all flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-magnifying-glass"></i> Поисковые системы
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Grid -->
+    <main class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-6 my-auto">
+
+        <!-- Левая панель: Управление фирмой и слайдеры (5 колонок) -->
+        <div class="lg:col-span-5 bg-slate-900/80 rounded-2xl p-5 border border-slate-800/80 flex flex-col justify-between space-y-4 shadow-2xl backdrop-blur-md">
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xs font-extrabold uppercase text-slate-300 tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-sky-400"></i>
+                        Доли рынка компаний (%)
+                    </h2>
+                    <span class="text-[10px] text-slate-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800 font-mono">Сумма: 100%</span>
+                </div>
+                
+                <div id="sliders-container" class="space-y-3 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar">
+                    <!-- Генерируется из JS -->
+                </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-800/80 flex justify-between gap-2">
+                <button onclick="addFirm()" class="flex-1 py-2.5 bg-slate-950 hover:bg-slate-800 text-sky-400 text-xs font-bold rounded-xl border border-sky-500/30 transition-all flex items-center justify-center gap-1.5 shadow-md">
+                    <i class="fa-solid fa-plus"></i> Добавить компанию
+                </button>
+                <button onclick="removeFirm()" class="flex-1 py-2.5 bg-slate-950 hover:bg-slate-800 text-rose-400 text-xs font-bold rounded-xl border border-rose-500/30 transition-all flex items-center justify-center gap-1.5 shadow-md">
+                    <i class="fa-solid fa-minus"></i> Удалить компанию
+                </button>
+            </div>
+        </div>
+
+        <!-- Правая панель: Дашборд показателей и Графики (7 колонок) -->
+        <div class="lg:col-span-7 space-y-5">
+
+            <!-- Карточка Индикатора HHI -->
+            <div id="hhi-card" class="bg-slate-900/90 rounded-2xl p-6 border transition-all duration-300 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-2xl backdrop-blur-md">
+                <div>
+                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Текущий индекс HHI</span>
+                    <div class="flex items-baseline gap-3 mt-1">
+                        <span id="hhi-value" class="text-4xl md:text-5xl font-black text-white font-mono tracking-tight">2,500</span>
+                        <span id="hhi-status" class="text-[11px] font-extrabold px-3 py-1 rounded-full border uppercase tracking-wider">Высокая концентрация</span>
+                    </div>
+                    <p id="hhi-desc" class="text-xs text-slate-400 mt-2 leading-relaxed">Рынок контролируется ограниченным числом крупных игроков.</p>
+                </div>
+
+                <!-- Метрики CR4 и Неэквивалентные фирмы -->
+                <div class="grid grid-cols-2 gap-3 w-full sm:w-auto shrink-0">
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800/80 text-center shadow-inner">
+                        <span class="text-[10px] uppercase font-bold text-slate-500 block">Концентрация CR4</span>
+                        <span id="cr4-value" class="text-base font-black text-sky-400 font-mono mt-0.5 block">80%</span>
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800/80 text-center shadow-inner">
+                        <span class="text-[10px] uppercase font-bold text-slate-500 block">Эквивалент фирмам</span>
+                        <span id="neq-value" class="text-base font-black text-emerald-400 font-mono mt-0.5 block">4.0 игроков</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Графики -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Doughnut Chart -->
+                <div class="bg-slate-900/80 rounded-2xl p-4 border border-slate-800/80 flex flex-col items-center shadow-2xl backdrop-blur-md">
+                    <h3 class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">Структура долей рынка</h3>
+                    <div class="w-full h-44 relative flex items-center justify-center">
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Bar Chart -->
+                <div class="bg-slate-900/80 rounded-2xl p-4 border border-slate-800/80 flex flex-col items-center shadow-2xl backdrop-blur-md">
+                    <h3 class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">Вклад участников в HHI</h3>
+                    <div class="w-full h-44 relative flex items-center justify-center">
+                        <canvas id="barChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-7xl mx-auto w-full text-center text-xs text-slate-500 mt-6 pt-3 border-t border-slate-800/80">
+        <p>© Almaty Management University 2026 | Школа цифровых технологий и экономики</p>
+    </footer>
+
+    <!-- Logic -->
+    <script>
+        // Реальные отраслевые пресеты
+        const presets = {
+            soda: [
+                { name: "Coca-Cola Co.", share: 44 },
+                { name: "PepsiCo", share: 26 },
+                { name: "Keurig Dr Pepper", share: 21 },
+                { name: "Частные марки (Private Label)", share: 9 }
+            ],
+            aircraft: [
+                { name: "Airbus Group", share: 58 },
+                { name: "Boeing Commercial", share: 40 },
+                { name: "COMAC / Прочие", share: 2 }
+            ],
+            telecom_kz: [
+                { name: "Казахтелеком (Kcell/Tele2)", share: 62 },
+                { name: "Beeline Kazakhstan", share: 37 },
+                { name: "Частные операторы", share: 1 }
+            ],
+            smartphones: [
+                { name: "Samsung", share: 19 },
+                { name: "Apple", share: 18 },
+                { name: "Xiaomi", share: 14 },
+                { name: "Transsion (Tecno/Infinix)", share: 9 },
+                { name: "OPPO", share: 8 },
+                { name: "vivo", share: 8 },
+                { name: "Прочие бренды", share: 24 }
+            ],
+            search: [
+                { name: "Google Search", share: 90 },
+                { name: "Microsoft Bing", share: 4 },
+                { name: "Yandex / Baidu / DuckDuckGo", share: 6 }
+            ]
+        };
+
+        let firms = [...presets.soda];
+
+        const colors = [
+            '#38bdf8', '#818cf8', '#c084fc', '#f472b6', 
+            '#fb7185', '#34d399', '#fbbf24', '#a3e635'
+        ];
+
+        let pieChart, barChart;
+
+        function initCharts() {
+            const ctxPie = document.getElementById('pieChart').getContext('2d');
+            pieChart = new Chart(ctxPie, {
+                type: 'doughnut',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        backgroundColor: colors,
+                        borderWidth: 2,
+                        borderColor: '#090d16'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            const ctxBar = document.getElementById('barChart').getContext('2d');
+            barChart = new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Вклад в индекс',
+                        data: [],
+                        backgroundColor: colors,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { display: false } },
+                        y: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { color: '#1e293b' } }
+                    }
+                }
+            });
+        }
+
+        function renderSliders() {
+            const container = document.getElementById('sliders-container');
+            container.innerHTML = '';
+
+            firms.forEach((firm, index) => {
+                const div = document.createElement('div');
+                div.className = "bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 space-y-1.5 shadow-sm";
+                div.innerHTML = `
+                    <div class="flex justify-between text-xs font-bold">
+                        <span style="color: ${colors[index % colors.length]}">${firm.name}</span>
+                        <span class="font-mono text-slate-200">${firm.share.toFixed(1)}%</span>
+                    </div>
+                    <input type="range" min="1" max="100" value="${firm.share}" oninput="updateShare(${index}, this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateShare(index, val) {
+            firms[index].share = parseFloat(val);
+            normalizeShares(index);
+            calculateHHI();
+        }
+
+        function normalizeShares(changedIndex) {
+            let total = firms.reduce((acc, f) => acc + f.share, 0);
+            if (total === 100) return;
+
+            let remainingSum = 100 - firms[changedIndex].share;
+            let otherSum = total - firms[changedIndex].share;
+
+            firms.forEach((f, idx) => {
+                if (idx !== changedIndex) {
+                    f.share = otherSum > 0 ? (f.share / otherSum) * remainingSum : remainingSum / (firms.length - 1);
+                }
+            });
+        }
+
+        function calculateHHI() {
+            let hhi = 0;
+            let sortedShares = [...firms].map(f => f.share).sort((a,b) => b - a);
+            
+            firms.forEach(f => {
+                hhi += Math.pow(f.share, 2);
+            });
+
+            hhi = Math.round(hhi);
+
+            let cr4 = sortedShares.slice(0, 4).reduce((acc, v) => acc + v, 0);
+            let neq = hhi > 0 ? (10000 / hhi).toFixed(1) : 0;
+
+            document.getElementById('hhi-value').innerText = hhi.toLocaleString();
+            document.getElementById('cr4-value').innerText = Math.round(cr4) + '%';
+            document.getElementById('neq-value').innerText = neq;
+
+            const card = document.getElementById('hhi-card');
+            const status = document.getElementById('hhi-status');
+            const desc = document.getElementById('hhi-desc');
+
+            if (hhi < 1500) {
+                card.className = "bg-slate-900/90 rounded-2xl p-6 border transition-all duration-300 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-2xl backdrop-blur-md neon-border-green";
+                status.className = "text-[11px] font-extrabold px-3 py-1 rounded-full border border-emerald-500/50 bg-emerald-950 text-emerald-400 uppercase tracking-wider";
+                status.innerText = "Низкая концентрация";
+                desc.innerText = "Свободная конкуренция. Порог антимонопольного вмешательства не превышен.";
+            } else if (hhi <= 2500) {
+                card.className = "bg-slate-900/90 rounded-2xl p-6 border transition-all duration-300 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-2xl backdrop-blur-md neon-border-yellow";
+                status.className = "text-[11px] font-extrabold px-3 py-1 rounded-full border border-amber-500/50 bg-amber-950 text-amber-400 uppercase tracking-wider";
+                status.innerText = "Умеренная концентрация";
+                desc.innerText = "Умеренный уровень олигополии. Сделки слияний и поглощений требуют проверки.";
+            } else {
+                card.className = "bg-slate-900/90 rounded-2xl p-6 border transition-all duration-300 flex flex-col sm:flex-row justify-between items-center gap-4 shadow-2xl backdrop-blur-md neon-border-red";
+                status.className = "text-[11px] font-extrabold px-3 py-1 rounded-full border border-rose-500/50 bg-rose-950 text-rose-400 uppercase tracking-wider";
+                status.innerText = "Высокая концентрация";
+                desc.innerText = "Жёсткая олигополия / Монопольное положение. Высокие риски ограничений конкуренции.";
+            }
+
+            pieChart.data.labels = firms.map(f => f.name);
+            pieChart.data.datasets[0].data = firms.map(f => f.share);
+            pieChart.update();
+
+            barChart.data.labels = firms.map(f => f.name);
+            barChart.data.datasets[0].data = firms.map(f => Math.round(Math.pow(f.share, 2)));
+            barChart.update();
+
+            renderSliders();
+        }
+
+        function addFirm() {
+            if (firms.length >= 8) return;
+            firms.push({ name: `Компания ${firms.length + 1}`, share: 10 });
+            normalizeShares(firms.length - 1);
+            calculateHHI();
+        }
+
+        function removeFirm() {
+            if (firms.length <= 1) return;
+            firms.pop();
+            normalizeShares(0);
+            calculateHHI();
+        }
+
+        function loadPreset(key) {
+            if (presets[key]) {
+                firms = JSON.parse(JSON.stringify(presets[key]));
+                calculateHHI();
+            }
+        }
+
+        window.onload = function() {
+            initCharts();
+            calculateHHI();
+        };
+    </script>
+</body>
+</html>
