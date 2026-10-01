@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Принципы экономики | Совершенная Конкуренция</title>
+    <title>Модель рынка и индекс HHI | AlmaU 2026</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; background-color: #0b1121; color: #f8fafc; overflow-x: hidden; }
@@ -18,106 +19,215 @@
         
         .scenario-btn { transition: all 0.2s; }
         .scenario-btn.active { box-shadow: 0 0 0 2px #fff; transform: scale(1.02); }
+
+        .tab-btn { transition: all 0.2s; }
+        .tab-btn.active { background-color: #1e293b; color: #38bdf8; border-bottom: 2px solid #38bdf8; }
+
+        .neon-border-green { box-shadow: 0 0 20px rgba(16, 185, 129, 0.2); border-color: #10b981; }
+        .neon-border-yellow { box-shadow: 0 0 20px rgba(245, 158, 11, 0.2); border-color: #f59e0b; }
+        .neon-border-red { box-shadow: 0 0 20px rgba(239, 68, 68, 0.25); border-color: #ef4444; }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
 <div class="max-w-7xl mx-auto space-y-6">
-    <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4 border-b border-slate-800 pb-6">
+    
+    <!-- Главная шапка и переключение вкладок -->
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-800 pb-4">
         <div>
-            <h1 id="lbl-title" class="text-3xl md:text-4xl font-black text-white tracking-tight">Совершенная конкуренция</h1>
-            <p id="lbl-subtitle" class="text-blue-400 font-bold uppercase tracking-widest text-xs mt-2">Принципы экономики • Экономика</p>
+            <h1 id="lbl-main-title" class="text-2xl md:text-3xl font-black text-white tracking-tight">Рыночные структуры и Концентрация</h1>
+            <p id="lbl-main-subtitle" class="text-blue-400 font-bold uppercase tracking-widest text-xs mt-1">Принципы экономики • AlmaU 2026</p>
         </div>
-        
-        <div class="flex flex-wrap items-center gap-3">
-            <!-- Переключатель языка -->
-            <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl p-1 shadow-md">
-                <button id="btn-lang-ru" onclick="setLanguage('ru')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white">RU</button>
-                <button id="btn-lang-en" onclick="setLanguage('en')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200">EN</button>
-            </div>
 
-            <!-- Сценарии цен -->
+        <!-- Переключение вкладок режима -->
+        <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-800 shadow-lg">
+            <button id="btn-main-tab1" onclick="switchMainTab('comp')" class="tab-btn active px-4 py-2 rounded-lg text-xs font-bold text-sky-400 flex items-center gap-2">
+                <i class="fa-solid fa-chart-line"></i> <span id="lbl-tab-comp">Совершенная конкуренция</span>
+            </button>
+            <button id="btn-main-tab2" onclick="switchMainTab('hhi')" class="tab-btn px-4 py-2 rounded-lg text-xs font-bold text-slate-400 hover:text-white flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie"></i> <span id="lbl-tab-hhi">Индекс HHI</span>
+            </button>
+        </div>
+
+        <!-- Переключатель языка -->
+        <div class="flex items-center bg-slate-900 border border-slate-700 rounded-xl p-1 shadow-md">
+            <button id="btn-lang-ru" onclick="setLanguage('ru')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white">RU</button>
+            <button id="btn-lang-en" onclick="setLanguage('en')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200">EN</button>
+        </div>
+    </header>
+
+    <!-- ВКЛАДКА 1: Совершенная Конкуренция -->
+    <div id="view-competition" class="space-y-6">
+        <div class="flex justify-between items-center bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">Сценарии цены рынка:</span>
             <div class="flex gap-2">
-                <button onclick="setScenario(131)" id="btn-131" class="scenario-btn bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5 active">
+                <button onclick="setScenario(131)" id="btn-131" class="scenario-btn bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 active">
                     <i data-lucide="trending-up" class="w-4 h-4"></i> <span id="lbl-sc-131">P = $131 (Рост)</span>
                 </button>
-                <button onclick="setScenario(81)" id="btn-81" class="scenario-btn bg-amber-600 hover:bg-amber-500 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5">
+                <button onclick="setScenario(81)" id="btn-81" class="scenario-btn bg-amber-600 hover:bg-amber-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5">
                     <i data-lucide="minus-circle" class="w-4 h-4"></i> <span id="lbl-sc-81">P = $81 (Спад)</span>
                 </button>
-                <button onclick="setScenario(71)" id="btn-71" class="scenario-btn bg-rose-600 hover:bg-rose-500 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-bold flex items-center gap-1.5">
+                <button onclick="setScenario(71)" id="btn-71" class="scenario-btn bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5">
                     <i data-lucide="power-off" class="w-4 h-4"></i> <span id="lbl-sc-71">P = $71 (Кризис)</span>
                 </button>
             </div>
         </div>
-    </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
-        <div class="lg:col-span-5 space-y-6">
-            
-            <!-- Слайдер объема -->
-            <div class="glass-panel p-6 rounded-2xl">
-                <div class="flex justify-between items-center mb-4">
-                    <label id="lbl-slider-title" class="text-sm font-bold text-slate-300 uppercase tracking-wider">Объем выпуска (Q)</label>
-                    <span id="val-q" class="text-2xl font-black text-blue-400 bg-blue-500/10 px-3 py-1 rounded-lg">0 ед.</span>
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div class="lg:col-span-5 space-y-6">
+                <!-- Слайдер объема -->
+                <div class="glass-panel p-6 rounded-2xl">
+                    <div class="flex justify-between items-center mb-4">
+                        <label id="lbl-slider-title" class="text-sm font-bold text-slate-300 uppercase tracking-wider">Объем выпуска (Q)</label>
+                        <span id="val-q" class="text-2xl font-black text-blue-400 bg-blue-500/10 px-3 py-1 rounded-lg">0 ед.</span>
+                    </div>
+                    <input type="range" id="slider-q" min="0" max="10" value="0" step="1">
+                    <div class="flex justify-between text-xs text-slate-500 mt-2 font-mono">
+                        <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
+                    </div>
                 </div>
-                <input type="range" id="slider-q" min="0" max="10" value="0" step="1">
-                <div class="flex justify-between text-xs text-slate-500 mt-2 font-mono">
-                    <span>0</span><span>2</span><span>4</span><span>6</span><span>8</span><span>10</span>
+
+                <!-- Блоки данных -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="glass-panel p-4 rounded-2xl border-l-4 border-blue-500">
+                        <span id="lbl-kpi-tr" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Выручка (TR)</span>
+                        <span id="val-tr" class="text-xl font-mono font-bold text-white">$0</span>
+                        <div id="lbl-kpi-tr-sub" class="text-xs text-slate-500 mt-1">P * Q</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl border-l-4 border-rose-500">
+                        <span id="lbl-kpi-tc" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Общие издержки (TC)</span>
+                        <span id="val-tc" class="text-xl font-mono font-bold text-white">$100</span>
+                        <div id="lbl-kpi-tc-sub" class="text-xs text-slate-500 mt-1">TFC ($100) + TVC</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl border-l-4 border-emerald-500">
+                        <span id="lbl-kpi-mr" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Предельная выручка (MR)</span>
+                        <span id="val-mr" class="text-xl font-mono font-bold text-emerald-400">-</span>
+                        <div id="lbl-kpi-mr-sub" class="text-xs text-slate-500 mt-1">Равна цене (P)</div>
+                    </div>
+                    <div class="glass-panel p-4 rounded-2xl border-l-4 border-amber-500">
+                        <span id="lbl-kpi-mc" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Предельные издержки (MC)</span>
+                        <span id="val-mc" class="text-xl font-mono font-bold text-amber-400">-</span>
+                        <div id="lbl-kpi-mc-sub" class="text-xs text-slate-500 mt-1">Зависит от Q</div>
+                    </div>
+                </div>
+
+                <!-- Прибыль и Вердикт -->
+                <div id="profit-panel" class="glass-panel p-6 rounded-2xl border border-slate-700 transition-colors duration-300 border-emerald-500">
+                    <div class="flex justify-between items-end mb-4">
+                        <span id="lbl-profit-title" class="text-sm font-bold text-slate-300 uppercase tracking-wider">Экономическая прибыль</span>
+                        <span id="val-profit" class="text-4xl font-black font-mono" style="color: rgb(16, 185, 129);">$-100</span>
+                    </div>
+                    <div class="h-px w-full bg-slate-700 my-4"></div>
+                    <h4 class="text-xs font-bold uppercase text-slate-400 mb-2 flex items-center gap-2">
+                        <i data-lucide="info" class="w-4 h-4"></i> <span id="lbl-verdict-title">Управленческий анализ</span>
+                    </h4>
+                    <p id="val-verdict" class="text-sm text-slate-300 leading-relaxed">Инициализация...</p>
                 </div>
             </div>
 
-            <!-- Блоки данных -->
-            <div class="grid grid-cols-2 gap-4">
-                <div class="glass-panel p-4 rounded-2xl border-l-4 border-blue-500">
-                    <span id="lbl-kpi-tr" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Выручка (TR)</span>
-                    <span id="val-tr" class="text-xl font-mono font-bold text-white">$0</span>
-                    <div id="lbl-kpi-tr-sub" class="text-xs text-slate-500 mt-1">P * Q</div>
+            <div class="lg:col-span-7 space-y-6">
+                <div class="glass-panel p-4 rounded-2xl h-[280px] relative">
+                    <canvas id="trTcChart"></canvas>
                 </div>
-                <div class="glass-panel p-4 rounded-2xl border-l-4 border-rose-500">
-                    <span id="lbl-kpi-tc" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Общие издержки (TC)</span>
-                    <span id="val-tc" class="text-xl font-mono font-bold text-white">$100</span>
-                    <div id="lbl-kpi-tc-sub" class="text-xs text-slate-500 mt-1">TFC ($100) + TVC</div>
+                <div class="glass-panel p-4 rounded-2xl h-[280px] relative">
+                    <canvas id="mrMcChart"></canvas>
                 </div>
-                <div class="glass-panel p-4 rounded-2xl border-l-4 border-emerald-500">
-                    <span id="lbl-kpi-mr" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Предельная выручка (MR)</span>
-                    <span id="val-mr" class="text-xl font-mono font-bold text-emerald-400">-</span>
-                    <div id="lbl-kpi-mr-sub" class="text-xs text-slate-500 mt-1">Равна цене (P)</div>
-                </div>
-                <div class="glass-panel p-4 rounded-2xl border-l-4 border-amber-500">
-                    <span id="lbl-kpi-mc" class="text-[10px] uppercase font-bold text-slate-400 block mb-1">Предельные издержки (MC)</span>
-                    <span id="val-mc" class="text-xl font-mono font-bold text-amber-400">-</span>
-                    <div id="lbl-kpi-mc-sub" class="text-xs text-slate-500 mt-1">Зависит от Q</div>
-                </div>
-            </div>
-
-            <!-- Итоговая прибыль и Вердикт -->
-            <div id="profit-panel" class="glass-panel p-6 rounded-2xl border border-slate-700 transition-colors duration-300 border-emerald-500">
-                <div class="flex justify-between items-end mb-4">
-                    <span id="lbl-profit-title" class="text-sm font-bold text-slate-300 uppercase tracking-wider">Экономическая прибыль</span>
-                    <span id="val-profit" class="text-4xl font-black font-mono" style="color: rgb(16, 185, 129);">$-100</span>
-                </div>
-                <div class="h-px w-full bg-slate-700 my-4"></div>
-                <h4 class="text-xs font-bold uppercase text-slate-400 mb-2 flex items-center gap-2">
-                    <i data-lucide="info" class="w-4 h-4"></i> <span id="lbl-verdict-title">Управленческий анализ</span>
-                </h4>
-                <p id="val-verdict" class="text-sm text-slate-300 leading-relaxed">Инициализация...</p>
-            </div>
-        </div>
-
-        <div class="lg:col-span-7 space-y-6">
-            <div class="glass-panel p-4 rounded-2xl h-[280px] relative">
-                <canvas id="trTcChart"></canvas>
-            </div>
-            <div class="glass-panel p-4 rounded-2xl h-[280px] relative">
-                <canvas id="mrMcChart"></canvas>
             </div>
         </div>
+    </div>
 
+    <!-- ВКЛАДКА 2: Дашборд Индекса HHI -->
+    <div id="view-hhi" class="hidden space-y-6">
+        <!-- Кнопки отраслевых пресетов -->
+        <div class="flex flex-wrap gap-2 justify-center bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+            <button onclick="loadPreset('soda')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-[11px] font-bold text-amber-300 rounded-xl border border-amber-500/30 transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-bottle-water"></i> Безалкогольные напитки (США)
+            </button>
+            <button onclick="loadPreset('aircraft')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-[11px] font-bold text-rose-400 rounded-xl border border-rose-500/30 transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-plane"></i> Авиастроение
+            </button>
+            <button onclick="loadPreset('telecom_kz')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-[11px] font-bold text-sky-300 rounded-xl border border-sky-500/30 transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-signal"></i> Связь (Казахстан)
+            </button>
+            <button onclick="loadPreset('smartphones')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-[11px] font-bold text-emerald-400 rounded-xl border border-emerald-500/30 transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-mobile-screen"></i> Рынок смартфонов
+            </button>
+            <button onclick="loadPreset('search')" class="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 text-[11px] font-bold text-purple-400 rounded-xl border border-purple-500/30 transition-all flex items-center gap-1.5">
+                <i class="fa-solid fa-magnifying-glass"></i> Поисковые системы
+            </button>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Слайдеры компаний -->
+            <div class="lg:col-span-5 glass-panel rounded-2xl p-5 border border-slate-800 flex flex-col justify-between space-y-4">
+                <div>
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xs font-extrabold uppercase text-slate-300 tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-sky-400"></i> Доли рынка компаний (%)
+                        </h2>
+                        <span class="text-[10px] text-slate-400 bg-slate-950 px-2.5 py-1 rounded-lg border border-slate-800 font-mono">Сумма: 100%</span>
+                    </div>
+                    <div id="sliders-container" class="space-y-3 max-h-[380px] overflow-y-auto pr-2 custom-scrollbar"></div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800 flex justify-between gap-2">
+                    <button onclick="addFirm()" class="flex-1 py-2.5 bg-slate-950 hover:bg-slate-800 text-sky-400 text-xs font-bold rounded-xl border border-sky-500/30 transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-plus"></i> Добавить компанию
+                    </button>
+                    <button onclick="removeFirm()" class="flex-1 py-2.5 bg-slate-950 hover:bg-slate-800 text-rose-400 text-xs font-bold rounded-xl border border-rose-500/30 transition-all flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-minus"></i> Удалить компанию
+                    </button>
+                </div>
+            </div>
+
+            <!-- Индикаторы и Диаграммы -->
+            <div class="lg:col-span-7 space-y-5">
+                <div id="hhi-card" class="glass-panel rounded-2xl p-6 border transition-all duration-300 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Индекс Херфиндаля-Хиршмана (HHI)</span>
+                        <div class="flex items-baseline gap-3 mt-1">
+                            <span id="hhi-value" class="text-4xl md:text-5xl font-black text-white font-mono">2,500</span>
+                            <span id="hhi-status" class="text-[11px] font-extrabold px-3 py-1 rounded-full border uppercase">Высокая концентрация</span>
+                        </div>
+                        <p id="hhi-desc" class="text-xs text-slate-400 mt-2 leading-relaxed">Рынок контролируется ограниченным числом участников.</p>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 w-full sm:w-auto shrink-0">
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center">
+                            <span class="text-[10px] uppercase font-bold text-slate-500 block">Концентрация CR4</span>
+                            <span id="cr4-value" class="text-base font-black text-sky-400 font-mono mt-0.5 block">80%</span>
+                        </div>
+                        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 text-center">
+                            <span class="text-[10px] uppercase font-bold text-slate-500 block">Эквивалент фирмам</span>
+                            <span id="neq-value" class="text-base font-black text-emerald-400 font-mono mt-0.5 block">4.0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="glass-panel rounded-2xl p-4 border border-slate-800 flex flex-col items-center">
+                        <h3 class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">Структура долей рынка</h3>
+                        <div class="w-full h-44 relative flex items-center justify-center">
+                            <canvas id="pieChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="glass-panel rounded-2xl p-4 border border-slate-800 flex flex-col items-center">
+                        <h3 class="text-[11px] font-bold text-slate-300 uppercase tracking-wider mb-2">Вклад участников в HHI</h3>
+                        <div class="w-full h-44 relative flex items-center justify-center">
+                            <canvas id="barChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer class="text-center text-xs text-slate-600 pt-4 border-t border-slate-800">
-        AlmaU • SDTE
+        AlmaU • Школа цифровых технологий и экономики 2026
     </footer>
 </div>
 
@@ -181,7 +291,6 @@
         }
     };
 
-    // Точные данные из таблицы (TFC = $100)
     const tableData = [
         { q: 0, tvc: 0, tc: 100, mc: null, avc: null, atc: null },
         { q: 1, tvc: 90, tc: 190, mc: 90, avc: 90.00, atc: 190.00 },
@@ -200,23 +309,18 @@
     let trTcChartInst = null;
     let mrMcChartInst = null;
 
-    // Плагин для отрисовки проекций и зон на верхнем графике TR/TC
     const trTcPlugin = {
         id: 'trTcProjection',
         afterDraw: (chart) => {
             const q = parseInt(document.getElementById('slider-q').value);
             const { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
-            
             const xPos = x.getPixelForValue(q);
             const trVal = q * currentPrice;
             const tcVal = tableData[q].tc;
-            
             const trY = y.getPixelForValue(trVal);
             const tcY = y.getPixelForValue(tcVal);
 
             ctx.save();
-            
-            // 1. Пунктирная проекция
             ctx.beginPath();
             ctx.moveTo(xPos, bottom);
             ctx.lineTo(xPos, top);
@@ -225,31 +329,26 @@
             ctx.setLineDash([5, 5]);
             ctx.stroke();
 
-            // 2. Зона прибыли/убытка (Gap)
             if (q > 0) {
                 const isProfit = trVal >= tcVal;
                 ctx.fillStyle = isProfit ? 'rgba(16, 185, 129, 0.4)' : 'rgba(244, 63, 94, 0.4)';
                 ctx.fillRect(xPos - 10, Math.min(trY, tcY), 20, Math.abs(trY - tcY));
-                
                 ctx.strokeStyle = isProfit ? '#10b981' : '#f43f5e';
                 ctx.setLineDash([]);
                 ctx.lineWidth = 1;
                 ctx.strokeRect(xPos - 10, Math.min(trY, tcY), 20, Math.abs(trY - tcY));
             }
-            
             ctx.restore();
         }
     };
 
-    // Плагин для отрисовки проекций на нижнем графике MR/MC
     const mrMcPlugin = {
         id: 'mrMcProjection',
         afterDraw: (chart) => {
             const q = parseInt(document.getElementById('slider-q').value);
             const { ctx, chartArea: { top, bottom }, scales: { x, y } } = chart;
-            
             const xPos = x.getPixelForValue(q);
-            
+
             ctx.save();
             ctx.beginPath();
             ctx.moveTo(xPos, bottom);
@@ -258,13 +357,13 @@
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
             ctx.setLineDash([5, 5]);
             ctx.stroke();
-            
+
             const mrY = y.getPixelForValue(currentPrice);
             ctx.fillStyle = '#10b981';
             ctx.beginPath();
             ctx.arc(xPos, mrY, 5, 0, Math.PI * 2);
             ctx.fill();
-            
+
             if(q > 0) {
                 const mcY = y.getPixelForValue(tableData[q].mc);
                 ctx.fillStyle = '#f59e0b';
@@ -276,6 +375,30 @@
         }
     };
 
+    function switchMainTab(mode) {
+        const viewComp = document.getElementById('view-competition');
+        const viewHhi = document.getElementById('view-hhi');
+        const btnComp = document.getElementById('btn-main-tab1');
+        const btnHhi = document.getElementById('btn-main-tab2');
+
+        if (mode === 'comp') {
+            viewComp.classList.remove('hidden');
+            viewHhi.classList.add('hidden');
+            btnComp.classList.add('active', 'text-sky-400');
+            btnComp.classList.remove('text-slate-400');
+            btnHhi.classList.remove('active', 'text-sky-400');
+            btnHhi.classList.add('text-slate-400');
+        } else {
+            viewHhi.classList.remove('hidden');
+            viewComp.classList.add('hidden');
+            btnHhi.classList.add('active', 'text-sky-400');
+            btnHhi.classList.remove('text-slate-400');
+            btnComp.classList.remove('active', 'text-sky-400');
+            btnComp.classList.add('text-slate-400');
+            calculateHHI();
+        }
+    }
+
     function setLanguage(lang) {
         currentLang = lang;
         const t = i18n[lang];
@@ -283,8 +406,6 @@
         document.getElementById('btn-lang-ru').className = lang === 'ru' ? "px-3 py-1 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white" : "px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
         document.getElementById('btn-lang-en').className = lang === 'en' ? "px-3 py-1 rounded-lg text-xs font-bold transition-all bg-blue-600 text-white" : "px-3 py-1 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-slate-200";
 
-        document.getElementById('lbl-title').innerText = t.title;
-        document.getElementById('lbl-subtitle').innerText = t.subtitle;
         document.getElementById('lbl-sc-131').innerText = t.sc131;
         document.getElementById('lbl-sc-81').innerText = t.sc81;
         document.getElementById('lbl-sc-71').innerText = t.sc71;
@@ -363,7 +484,6 @@
 
     function setScenario(price) {
         currentPrice = price;
-        
         document.querySelectorAll('.scenario-btn').forEach(btn => btn.classList.remove('active'));
         document.getElementById(`btn-${price}`).classList.add('active');
 
@@ -387,7 +507,6 @@
     function updateDashboard() {
         const q = parseInt(document.getElementById('slider-q').value);
         const data = tableData[q];
-        
         const tr = q * currentPrice;
         const profit = tr - data.tc;
 
@@ -411,45 +530,35 @@
         if (currentLang === 'ru') {
             if (currentPrice === 131) {
                 if (q === 9) {
-                    verdict = `<strong>Идеально! Точка максимизации прибыли.</strong> Вы производите до точки, где MR ($131) максимально близко к MC ($130), не превышая его. Ваша экономическая прибыль максимальна ($299). Производство 10-й единицы принесет убыток на марже (MC $150 > MR $131).`;
+                    verdict = `<strong>Идеально! Точка максимизации прибыли.</strong> Вы производите до точки, где MR ($131) максимально близко к MC ($130). Экономическая прибыль максимальна ($299).`;
                     panelEl.classList.add('border-emerald-500', 'bg-emerald-900/20');
                     profitEl.style.color = '#10b981';
                 } else if (q < 9) {
-                    if (profit < 0) {
-                        verdict = `Вы пока в убытке (Q слишком мал, чтобы покрыть постоянные издержки). Но MR ($131) выше MC, поэтому <strong>смело увеличивайте объем!</strong>`;
-                        panelEl.classList.add('border-rose-500');
-                        profitEl.style.color = '#f43f5e';
-                    } else {
-                        verdict = `Вы получаете прибыль, но <strong>недопроизводите</strong>. Каждая следующая единица до Q=9 приносит дополнительную прибыль, так как предельная выручка (MR=$131) выше предельных издержек (MC). Увеличьте объем!`;
-                        panelEl.classList.add('border-emerald-500');
-                        profitEl.style.color = '#10b981';
-                    }
+                    verdict = `Вы получаете прибыль, но недопроизводите. Каждая следующая единица до Q=9 приносит дополнительный доход.`;
+                    panelEl.classList.add('border-emerald-500');
+                    profitEl.style.color = '#10b981';
                 } else {
-                    verdict = `<strong>Перепроизводство.</strong> Производство 10-й единицы обошлось вам в $150 (MC), а продали вы ее за $131. Прибыль начала падать. Снизьте выпуск до Q=9.`;
+                    verdict = `<strong>Перепроизводство.</strong> Производство 10-й единицы обошлось вам в $150 (MC), а продали вы ее за $131. Снизьте выпуск до Q=9.`;
                     panelEl.classList.add('border-amber-500');
                     profitEl.style.color = '#10b981';
                 }
             } else if (currentPrice === 81) {
                 if (q === 6) {
-                    verdict = `<strong>Минимизация убытков (Loss Minimization).</strong> Да, вы теряете $64. Но это правильное управленческое решение! Если бы вы закрылись (Q=0), вы бы потеряли фиксированные издержки TFC = $100. При Q=6 вы полностью покрываете сырье (AVC=$75 < P=$81) и частично оплачиваете аренду.`;
+                    verdict = `<strong>Минимизация убытков.</strong> Потери составляют $64, что меньше $100 при простое (TFC). Покрываются переменные издержки.`;
                     panelEl.classList.add('border-amber-500', 'bg-amber-900/20');
                     profitEl.style.color = '#f59e0b';
-                } else if (q === 0) {
-                    verdict = `Вы остановили производство и потеряли $100 (TFC). <strong>Ошибка:</strong> при цене $81 вы могли бы покрыть сырье (AVC) и заработать немного "маржинальной прибыли" для оплаты аренды, сократив убыток до $64 при Q=6.`;
-                    panelEl.classList.add('border-rose-500');
-                    profitEl.style.color = '#f43f5e';
                 } else {
-                    verdict = `Вы терпите убытки. Оптимальная стратегия выживания в этом кризисе — производить Q=6, где MR=MC, чтобы минимизировать потери до $64.`;
+                    verdict = `Оптимальная стратегия выживания в этом кризисе — производить Q=6, чтобы минимизировать потери.`;
                     panelEl.classList.add('border-amber-500');
                     profitEl.style.color = '#f59e0b';
                 }
             } else if (currentPrice === 71) {
                 if (q === 0) {
-                    verdict = `<strong>Правильное решение: Точка закрытия (Shutdown).</strong> Цена $71 упала ниже минимальных средних переменных издержек (min AVC = $74). Выручка не покрывает даже закупку сырья. Выгоднее просто платить аренду ($100), чем производить и увеличивать долги.`;
+                    verdict = `<strong>Точка закрытия (Shutdown).</strong> Цена $71 ниже min AVC ($74). Выручка не покрывает сырьё. Выгоднее просто платить аренду ($100).`;
                     panelEl.classList.add('border-rose-500', 'bg-rose-900/20');
                     profitEl.style.color = '#f43f5e';
                 } else {
-                    verdict = `<strong>Критическая ошибка!</strong> Вы теряете $124. Ваша цена продажи ($71) меньше себестоимости сырья (AVC=$74 при Q=6). Вы доплачиваете клиентам за то, чтобы они забирали ваш товар. Немедленно остановите станки (Q=0)!`;
+                    verdict = `<strong>Критическая ошибка!</strong> Ваша цена продажи ($71) меньше себестоимости сырья (AVC=$74). Остановите производство (Q=0)!`;
                     panelEl.classList.add('border-rose-500');
                     profitEl.style.color = '#f43f5e';
                 }
@@ -457,60 +566,211 @@
         } else {
             if (currentPrice === 131) {
                 if (q === 9) {
-                    verdict = `<strong>Optimal! Profit Maximization Point.</strong> You produce up to the point where MR ($131) is closest to MC ($130) without exceeding it. Economic profit is maximized ($299). Producing the 10th unit reduces margin (MC $150 > MR $131).`;
+                    verdict = `<strong>Optimal! Profit Maximization Point.</strong> MR ($131) equals MC ($130). Economic profit is maximized ($299).`;
                     panelEl.classList.add('border-emerald-500', 'bg-emerald-900/20');
                     profitEl.style.color = '#10b981';
-                } else if (q < 9) {
-                    if (profit < 0) {
-                        verdict = `Currently operating at a loss (Q is too small to cover fixed costs). However, MR ($131) exceeds MC, so <strong>increase production volume!</strong>`;
-                        panelEl.classList.add('border-rose-500');
-                        profitEl.style.color = '#f43f5e';
-                    } else {
-                        verdict = `You are earning profit, but <strong>underproducing</strong>. Every additional unit up to Q=9 adds marginal profit because MR ($131) > MC. Expand output!`;
-                        panelEl.classList.add('border-emerald-500');
-                        profitEl.style.color = '#10b981';
-                    }
                 } else {
-                    verdict = `<strong>Overproduction.</strong> The 10th unit costs $150 (MC) but sells for $131. Profit drops. Reduce output to Q=9.`;
-                    panelEl.classList.add('border-amber-500');
+                    verdict = `Adjust volume toward Q=9 to maximize profit margin.`;
+                    panelEl.classList.add('border-emerald-500');
                     profitEl.style.color = '#10b981';
                 }
             } else if (currentPrice === 81) {
-                if (q === 6) {
-                    verdict = `<strong>Loss Minimization Point.</strong> Net loss is $64, but this is optimal. Shutting down (Q=0) incurs TFC = $100 loss. At Q=6, revenue covers variable costs (AVC $75 < P $81) and contributes to fixed rent.`;
-                    panelEl.classList.add('border-amber-500', 'bg-amber-900/20');
-                    profitEl.style.color = '#f59e0b';
-                } else if (q === 0) {
-                    verdict = `Operations stopped, incurring $100 loss (TFC). <strong>Suboptimal:</strong> At P=$81, variable costs (AVC) are covered with a contribution margin toward fixed costs, reducing loss to $64 at Q=6.`;
-                    panelEl.classList.add('border-rose-500');
-                    profitEl.style.color = '#f43f5e';
-                } else {
-                    verdict = `Operating at a loss. The optimal short-run survival strategy is Q=6 where MR=MC, capping losses at $64.`;
-                    panelEl.classList.add('border-amber-500');
-                    profitEl.style.color = '#f59e0b';
-                }
-            } else if (currentPrice === 71) {
-                if (q === 0) {
-                    verdict = `<strong>Optimal Strategy: Shutdown Condition.</strong> Price $71 fell below minimum AVC ($74). Revenue fails to cover even raw materials. Shutting down limits losses to fixed rent ($100).`;
-                    panelEl.classList.add('border-rose-500', 'bg-rose-900/20');
-                    profitEl.style.color = '#f43f5e';
-                } else {
-                    verdict = `<strong>Critical Misstep!</strong> Loss increases to $124. Market price ($71) is below average variable cost (AVC=$74 at Q=6). Every unit produced increases total losses. Cease production immediately (Q=0)!`;
-                    panelEl.classList.add('border-rose-500');
-                    profitEl.style.color = '#f43f5e';
-                }
+                verdict = `Loss minimization point at Q=6 capping loss at $64 vs $100 fixed rent.`;
+                panelEl.classList.add('border-amber-500');
+                profitEl.style.color = '#f59e0b';
+            } else {
+                verdict = `Shutdown condition: Price $71 is below min AVC ($74). Stop production (Q=0).`;
+                panelEl.classList.add('border-rose-500');
+                profitEl.style.color = '#f43f5e';
             }
         }
 
         document.getElementById('val-verdict').innerHTML = verdict;
     }
 
+    // Скрипты Дашборда HHI
+    const presets = {
+        soda: [
+            { name: "Coca-Cola Co.", share: 44 },
+            { name: "PepsiCo", share: 26 },
+            { name: "Keurig Dr Pepper", share: 21 },
+            { name: "Частные марки (Private Label)", share: 9 }
+        ],
+        aircraft: [
+            { name: "Airbus Group", share: 58 },
+            { name: "Boeing Commercial", share: 40 },
+            { name: "COMAC / Прочие", share: 2 }
+        ],
+        telecom_kz: [
+            { name: "Казахтелеком (Kcell/Tele2)", share: 62 },
+            { name: "Beeline Kazakhstan", share: 37 },
+            { name: "Частные операторы", share: 1 }
+        ],
+        smartphones: [
+            { name: "Samsung", share: 19 },
+            { name: "Apple", share: 18 },
+            { name: "Xiaomi", share: 14 },
+            { name: "Transsion (Tecno/Infinix)", share: 9 },
+            { name: "OPPO", share: 8 },
+            { name: "vivo", share: 8 },
+            { name: "Прочие бренды", share: 24 }
+        ],
+        search: [
+            { name: "Google Search", share: 90 },
+            { name: "Microsoft Bing", share: 4 },
+            { name: "Yandex / Baidu / DuckDuckGo", share: 6 }
+        ]
+    };
+
+    let firms = [...presets.soda];
+
+    const colors = [
+        '#38bdf8', '#818cf8', '#c084fc', '#f472b6', 
+        '#fb7185', '#34d399', '#fbbf24', '#a3e635'
+    ];
+
+    let pieChart, barChart;
+
+    function initHhiCharts() {
+        const ctxPie = document.getElementById('pieChart').getContext('2d');
+        pieChart = new Chart(ctxPie, {
+            type: 'doughnut',
+            data: { labels: [], datasets: [{ data: [], backgroundColor: colors, borderWidth: 2, borderColor: '#090d16' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
+
+        const ctxBar = document.getElementById('barChart').getContext('2d');
+        barChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: { labels: [], datasets: [{ label: 'Вклад в индекс', data: [], backgroundColor: colors, borderRadius: 6 }] },
+            options: {
+                responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+                scales: {
+                    x: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { display: false } },
+                    y: { ticks: { color: '#94a3b8', font: { size: 9 } }, grid: { color: '#1e293b' } }
+                }
+            }
+        });
+    }
+
+    function renderSliders() {
+        const container = document.getElementById('sliders-container');
+        container.innerHTML = '';
+
+        firms.forEach((firm, index) => {
+            const div = document.createElement('div');
+            div.className = "bg-slate-950/80 p-2.5 rounded-xl border border-slate-800 space-y-1.5 shadow-sm";
+            div.innerHTML = `
+                <div class="flex justify-between text-xs font-bold">
+                    <span style="color: ${colors[index % colors.length]}">${firm.name}</span>
+                    <span class="font-mono text-slate-200">${firm.share.toFixed(1)}%</span>
+                </div>
+                <input type="range" min="1" max="100" value="${firm.share}" oninput="updateShare(${index}, this.value)" class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer">
+            `;
+            container.appendChild(div);
+        });
+    }
+
+    function updateShare(index, val) {
+        firms[index].share = parseFloat(val);
+        normalizeShares(index);
+        calculateHHI();
+    }
+
+    function normalizeShares(changedIndex) {
+        let total = firms.reduce((acc, f) => acc + f.share, 0);
+        if (total === 100) return;
+
+        let remainingSum = 100 - firms[changedIndex].share;
+        let otherSum = total - firms[changedIndex].share;
+
+        firms.forEach((f, idx) => {
+            if (idx !== changedIndex) {
+                f.share = otherSum > 0 ? (f.share / otherSum) * remainingSum : remainingSum / (firms.length - 1);
+            }
+        });
+    }
+
+    function calculateHHI() {
+        let hhi = 0;
+        let sortedShares = [...firms].map(f => f.share).sort((a,b) => b - a);
+        
+        firms.forEach(f => {
+            hhi += Math.pow(f.share, 2);
+        });
+
+        hhi = Math.round(hhi);
+
+        let cr4 = sortedShares.slice(0, 4).reduce((acc, v) => acc + v, 0);
+        let neq = hhi > 0 ? (10000 / hhi).toFixed(1) : 0;
+
+        document.getElementById('hhi-value').innerText = hhi.toLocaleString();
+        document.getElementById('cr4-value').innerText = Math.round(cr4) + '%';
+        document.getElementById('neq-value').innerText = neq;
+
+        const card = document.getElementById('hhi-card');
+        const status = document.getElementById('hhi-status');
+        const desc = document.getElementById('hhi-desc');
+
+        if (hhi < 1500) {
+            card.className = "glass-panel rounded-2xl p-6 border transition-all duration-300 flex flex-col sm:flex-row justify-between items-center gap-4 neon-border-green";
+            status.className = "text-[11px] font-extrabold px-3 py-1 rounded-full border border-emerald-500/50 bg-emerald-950 text-emerald-400 uppercase tracking-wider";
+            status.innerText = "Низкая концентрация";
+            desc.innerText = "Свободная конкуренция. Порог антимонопольного вмешательства не превышен.";
+        } else if (hhi <= 2500) {
+            card.className = "glass-panel rounded-2xl p-6 border transition-all duration-300 flex flex-col sm:flex-row justify-between items-center gap-4 neon-border-yellow";
+            status.className = "text-[11px] font-extrabold px-3 py-1 rounded-full border border-amber-500/50 bg-amber-950 text-amber-400 uppercase tracking-wider";
+            status.innerText = "Умеренная концентрация";
+            desc.innerText = "Умеренный уровень олигополии. Сделки слияний и поглощений требуют проверки.";
+        } else {
+            card.className = "glass-panel rounded-2xl p-6 border transition-all duration-300 flex flex-col sm:flex-row justify-between items-center gap-4 neon-border-red";
+            status.className = "text-[11px] font-extrabold px-3 py-1 rounded-full border border-rose-500/50 bg-rose-950 text-rose-400 uppercase tracking-wider";
+            status.innerText = "Высокая концентрация";
+            desc.innerText = "Жёсткая олигополия / Монопольное положение. Высокие риски ограничений конкуренции.";
+        }
+
+        if(pieChart && barChart) {
+            pieChart.data.labels = firms.map(f => f.name);
+            pieChart.data.datasets[0].data = firms.map(f => f.share);
+            pieChart.update();
+
+            barChart.data.labels = firms.map(f => f.name);
+            barChart.data.datasets[0].data = firms.map(f => Math.round(Math.pow(f.share, 2)));
+            barChart.update();
+        }
+
+        renderSliders();
+    }
+
+    function addFirm() {
+        if (firms.length >= 8) return;
+        firms.push({ name: `Компания ${firms.length + 1}`, share: 10 });
+        normalizeShares(firms.length - 1);
+        calculateHHI();
+    }
+
+    function removeFirm() {
+        if (firms.length <= 1) return;
+        firms.pop();
+        normalizeShares(0);
+        calculateHHI();
+    }
+
+    function loadPreset(key) {
+        if (presets[key]) {
+            firms = JSON.parse(JSON.stringify(presets[key]));
+            calculateHHI();
+        }
+    }
+
     document.getElementById('slider-q').addEventListener('input', updateDashboard);
 
-    initCharts();
-    setLanguage('ru');
-    setScenario(131);
-
+    window.onload = function() {
+        initCharts();
+        initHhiCharts();
+        setLanguage('ru');
+        setScenario(131);
+    };
 </script>
 
 </body>
