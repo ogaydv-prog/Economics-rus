@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тема 7: Общественные блага и экстерналии | Economics AlmaU 2026</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px 20px;
+            position: relative;
+        }
+
+        /* Шапка: Логотип и Кнопка */
+        .top-left-logo {
+            position: absolute;
+            top: 25px;
+            left: 30px;
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        .back-button {
+            position: absolute;
+            top: 35px;
+            right: 30px;
+            text-decoration: none;
+            background-color: #001e50;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
+        }
+
+        .back-button:hover {
+            background-color: #003380;
+            transform: translateY(-2px);
+        }
+
+        header {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #001e50;
+            margin-bottom: 8px;
+            margin-top: 15px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #555555;
+            max-width: 680px;
+            line-height: 1.5;
+            margin: 0 auto;
+        }
+
+        /* Сетка карточек */
+        .grid-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            max-width: 1400px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 40px;
+        }
+
+        /* Карточка */
+        .card {
+            display: inline-block;
+            text-decoration: none;
+            background: #ffffff;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 200px; 
+            height: 270px; 
+            position: relative;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill; /* Заполнение рамки ровно без обрезки и полей */
+            display: block;
+            border-radius: 10px;
+        }
+
+        .card:hover {
+            transform: translateY(-8px) scale(1.03);
+            border-color: #001e50;
+            box-shadow: 0 16px 30px rgba(0, 30, 80, 0.18);
+        }
+
+        /* 3D-Flip карточка для Видео */
+        .flip-card {
+            perspective: 1000px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .flip-card:hover .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid #e2e8f0;
+        }
+
+        .flip-card-front {
+            background-color: #ffffff;
+        }
+
+        .flip-card-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: fill;
+            display: block;
+        }
+
+        .flip-card-back {
+            background: #001e50;
+            color: white;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 16px 12px;
+            gap: 12px;
+            box-shadow: 0 8px 20px rgba(0, 30, 80, 0.3);
+        }
+
+        .flip-card-back h4 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #38bdf8;
+            margin-bottom: 4px;
+            font-weight: 800;
+        }
+
+        .video-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .video-btn:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: #ffffff;
+            transform: scale(1.04);
+        }
+
+        footer {
+            margin-top: auto;
+            font-size: 14px;
+            color: #718096;
+            padding-top: 30px;
+            padding-bottom: 20px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Мобильная адаптивность */
+        @media (max-width: 992px) {
+            body {
+                padding: 10px 15px;
+            }
+
+            .top-left-logo {
+                position: static;
+                margin-bottom: 10px;
+                width: 48px;
+                height: 48px;
+            }
+
+            .back-button {
+                position: static;
+                margin-bottom: 15px;
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            header {
+                margin-top: 5px;
+                margin-bottom: 20px;
+            }
+
+            h1 {
+                font-size: 22px;
+                margin-top: 5px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            .grid-container {
+                gap: 14px;
+            }
+
+            .card {
+                width: 155px;
+                height: 215px;
+            }
+
+            .video-btn {
+                padding: 8px 6px;
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Логотип AlmaU -->
+    <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    
+    <!-- Кнопка возврата к списку тем -->
+    <a href="topics.html" class="back-button">← К темам курса</a>
+
+    <header>
+        <h1>Тема 7: Общественные блага, экстерналии и государственное регулирование</h1>
+        <p class="subtitle">
+            Выберите учебный материал ниже: электронный конспект лекции, презентация, интерактивные симуляторы общественных благ и внешних эффектов или видеоматериалы.
+        </p>
+    </header>
+
+    <main class="grid-container">
+        <!-- 1. Конспект лекции (Reader) -->
+        <a href="gre.html" class="card" title="Электронный лекционный конспект">
+            <img src="pic-lecture9.png" alt="Конспект лекции">
+        </a>
+
+        <!-- 2. Презентация (Google Slides) -->
+        <a href="https://docs.google.com/presentation/d/1stX-mkcUYBy6hNQXsNonOZbKO6YZj51F/edit?usp=sharing&ouid=109725301150629205728&rtpof=true&sd=true" 
+           target="_blank" rel="noopener noreferrer" class="card" title="Презентация: Общественные блага и экстерналии">
+            <img src="pic-preza9.png" alt="Презентация по теме 7">
+        </a>
+
+        <!-- 3. Симулятор: Общественные блага и провалы рынка -->
+        <a href="sim-public.html" class="card" title="Симулятор общественных благ">
+            <img src="pic-sim-antitrust.png" alt="Симулятор общественных благ">
+        </a>
+
+        <!-- 4. Симулятор: Предельные выгоды и издержки (MC/MB) -->
+        <a href="sim-mc-mb.html" class="card" title="Симулятор предельных выгод и издержек">
+            <img src="pic-sim-mc-mb.png" alt="Симулятор MC и MB">
+        </a>
+
+        <!-- 5. Симулятор: Государственное регулирование -->
+        <a href="sim-state-reg-7.html" class="card" title="Симулятор государственного регулирования">
+            <img src="pic-sim-reg.png" alt="Симулятор государственного регулирования">
+        </a>
+
+        <!-- 6. Видеолекция (3D Flip Card) -->
+        <div class="card flip-card" title="Видеолекции: Общественные блага и экстерналии">
+            <div class="flip-card-inner">
+                <div class="flip-card-front">
+                    <img src="pic-video9.png" alt="Обложка видеолекций">
+                </div>
+                <div class="flip-card-back">
+                    <h4>🎬 Видеолекции</h4>
+                    <a href="https://www.youtube.com/watch?v=Lp9cvR6LNrE&t=8s" target="_blank" rel="noopener noreferrer" class="video-btn">
+                        ▶ Смотреть видео
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>Разработано для студентов AlmaU 2026 | Дисциплина: Экономика / Economics</p>
+        <p>© Almaty Management University | Школа цифровых технологий и экономики</p>
+    </footer>
+
+</body>
+</html>
