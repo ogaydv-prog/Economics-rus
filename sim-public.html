@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Симулятор: Государство и Рынки</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700;800&display=swap');
+        
+        body { 
+            background-color: #080a0f;
+            color: #f8fafc; 
+            font-family: 'Inter', sans-serif; 
+            min-height: 100vh; 
+            overflow-x: hidden;
+            background-image: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #080a0f 70%);
+        }
+
+        .font-mono-custom { font-family: 'JetBrains Mono', monospace; }
+        
+        .glass {
+            background: rgba(13, 18, 30, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .tab-btn {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-bottom: 2px solid transparent;
+            color: #94a3b8;
+        }
+        .tab-btn:hover {
+            color: #cbd5e1;
+            background: rgba(255,255,255,0.03);
+        }
+        .tab-btn.active {
+            border-bottom-color: #ef4444;
+            color: #f8fafc;
+            background: linear-gradient(to top, rgba(239, 68, 68, 0.15), transparent);
+            text-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            height: 24px;
+            margin: 8px 0;
+        }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 8px; cursor: pointer;
+            background: #090d16; border: 1px solid #1e293b; border-radius: 4px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+        }
+        input[type=range]::-webkit-slider-thumb {
+            height: 26px; width: 14px; border-radius: 3px;
+            background: linear-gradient(to right, #64748b 0%, #475569 40%, #ef4444 43%, #ef4444 57%, #475569 60%, #334155 100%);
+            border: 1px solid #0f172a; cursor: pointer; -webkit-appearance: none; margin-top: -9px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 0 10px rgba(239, 68, 68, 0.6); 
+            transition: box-shadow 0.15s ease;
+        }
+        input[type=range]:active::-webkit-slider-thumb {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 16px rgba(239, 68, 68, 0.9);
+        }
+
+        canvas {
+            background-color: #0b0f19;
+            border-radius: 0.75rem;
+            border: 1px solid #1e293b;
+            box-shadow: inset 0 0 25px rgba(0,0,0,0.7);
+            width: 100%;
+            max-width: 720px;
+            height: auto;
+            aspect-ratio: 3/2;
+            display: block;
+        }
+
+        .info-panel {
+            background: rgba(15, 23, 42, 0.9);
+            border-left: 4px solid #3b82f6;
+            border-radius: 0.5rem;
+            position: relative;
+        }
+
+        .fade-in { animation: fadeIn 0.35s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="p-3 md:p-6 selection:bg-red-500/30">
+
+    <header class="max-w-[1650px] mx-auto mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <div class="flex items-center gap-3">
+                <div class="p-2.5 bg-red-500/10 rounded-xl text-red-500 border border-red-500/20">
+                    <i data-lucide="landmark" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl md:text-3xl font-black tracking-tight text-white uppercase font-mono-custom" id="header-title">
+                        Государство & Рынки
+                    </h1>
+                    <p class="text-slate-400 text-xs font-mono-custom tracking-wider mt-0.5" id="header-subtitle">
+                        Микроэкономика • Принципы экономики
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <button id="lang-btn" onclick="toggleLanguage()" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 text-red-400 font-extrabold rounded-xl border border-red-500/30 font-mono-custom text-xs transition flex items-center gap-2 shadow-lg">
+            <i data-lucide="globe" class="w-4 h-4"></i> <span id="lang-str">EN</span>
+        </button>
+    </header>
+
+    <main class="max-w-[1650px] mx-auto glass rounded-2xl overflow-hidden shadow-2xl">
+        
+        <div class="flex border-b border-slate-800 bg-slate-950/60">
+            <button onclick="switchTab('tab-public-goods')" class="tab-btn active flex-1 py-4 text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 font-mono-custom" data-target="tab-public-goods">
+                <i data-lucide="users" class="w-4 h-4 text-cyan-400"></i> <span id="tab-1-title">Общественные блага</span>
+            </button>
+            <button onclick="switchTab('tab-quotas')" class="tab-btn flex-1 py-4 text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 font-mono-custom" data-target="tab-quotas">
+                <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-400"></i> <span id="tab-2-title">Квоты на импорт</span>
+            </button>
+            <button onclick="switchTab('tab-tariffs')" class="tab-btn flex-1 py-4 text-xs font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 font-mono-custom" data-target="tab-tariffs">
+                <i data-lucide="coins" class="w-4 h-4 text-amber-400"></i> <span id="tab-3-title">Импортные тарифы</span>
+            </button>
+        </div>
+
+        <div class="p-5 md:p-8">
+
+            <!-- ТАБ 1: ОБЩЕСТВЕННЫЕ БЛАГА -->
+            <div id="tab-public-goods" class="tab-content block fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div class="lg:col-span-5 flex flex-col gap-6">
+                        <div>
+                            <h2 class="text-xl font-bold text-cyan-400 mb-2 font-mono-custom flex items-center gap-2" id="pg-h2">
+                                <i data-lucide="layers" class="w-5 h-5"></i> Вертикальное суммирование
+                            </h2>
+                            <p class="text-xs md:text-sm text-slate-300 leading-relaxed mb-4" id="pg-desc">
+                                Из-за свойства <span class="text-white font-semibold">несоперничества (non-rivalry)</span> совокупный спрос (AD) на общественное благо вычисляется вертикальным сложением цен (готовности платить) всех жителей при каждом объеме Q.
+                            </p>
+                            <div class="bg-slate-950/80 p-4 rounded-lg border border-slate-800 text-xs font-mono-custom space-y-2 text-slate-400">
+                                <div class="flex justify-between"><span id="lbl-pa">Спрос гражданина A:</span> <span class="text-white font-bold">Pa = 30 - Q</span></div>
+                                <div class="flex justify-between"><span id="lbl-pb">Спрос гражданина B:</span> <span class="text-white font-bold">Pb = 30 - Q</span></div>
+                                <div class="border-t border-slate-800 pt-2 flex justify-between mt-1"><span class="font-bold text-cyan-400" id="lbl-sump">Социальный спрос (ΣP):</span> <span class="text-cyan-400 font-bold">P = 60 - 2Q</span></div>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-950/60 p-5 rounded-xl border border-slate-800">
+                            <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider font-mono-custom" id="lbl-mc-cost">Стоимость производства:</label>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs md:text-sm text-slate-300 font-medium" id="lbl-mc-name">Предельные издержки (MC)</span>
+                                <span class="text-xl font-black text-amber-400 font-mono-custom" id="val-mc">$15</span>
+                            </div>
+                            <input type="range" id="slider-mc" min="5" max="50" step="1" value="15" oninput="drawPublicGoods()">
+                        </div>
+
+                        <div class="info-panel p-5 bg-slate-900/90 rounded-xl border-l-4 border-cyan-500 shadow-xl">
+                            <span class="text-xs uppercase font-black text-cyan-400 tracking-widest block mb-3 flex items-center gap-2 font-mono-custom" id="pg-analysis-h">
+                                📊 Анализ рынка и провала частного сектора
+                            </span>
+                            <div id="pg-dynamic-text" class="text-xs text-slate-300 font-mono-custom leading-relaxed space-y-3"></div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 flex flex-col items-center">
+                        <span class="text-xs font-mono-custom text-slate-400 uppercase tracking-widest mb-3 block w-full text-left font-bold" id="graph-1-title">График: Оптимум общественного блага</span>
+                        <canvas id="canvas-pg" width="720" height="480"></canvas>
+                        <div class="flex flex-wrap gap-4 mt-4 text-xs font-mono-custom text-slate-400 uppercase w-full justify-center">
+                            <span class="flex items-center gap-1.5"><span class="w-3.5 h-1 bg-cyan-400 rounded"></span> <span id="leg-ind">Инд. спрос (Da, Db)</span></span>
+                            <span class="flex items-center gap-1.5"><span class="w-3.5 h-1 bg-rose-500 rounded"></span> <span id="leg-soc">Социальный спрос (ΣD)</span></span>
+                            <span class="flex items-center gap-1.5"><span class="w-3.5 h-1 bg-amber-400 rounded"></span> <span id="leg-mc">Издержки (MC)</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ТАБ 2: КВОТЫ -->
+            <div id="tab-quotas" class="tab-content hidden fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div class="lg:col-span-5 flex flex-col gap-6">
+                        <div>
+                            <h2 class="text-xl font-bold text-emerald-400 mb-2 font-mono-custom flex items-center gap-2" id="q-h2">
+                                <i data-lucide="shield-off" class="w-5 h-5"></i> Шок импортной квоты
+                            </h2>
+                            <p class="text-xs md:text-sm text-slate-300 leading-relaxed" id="q-desc">
+                                Правительство жестко лимитирует физический объем ввоза. При исчерпании квоты предложение становится жестким, а внутреннюю цену формирует внутренний спрос.
+                            </p>
+                        </div>
+
+                        <div class="bg-slate-950/60 p-5 rounded-xl border border-slate-800">
+                            <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider font-mono-custom" id="lbl-quota-instr">Инструмент протекционизма:</label>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs md:text-sm text-slate-300 font-medium" id="lbl-quota-size">Размер квоты (ед.)</span>
+                                <span class="text-xl font-black text-emerald-400 font-mono-custom" id="val-quota">20</span>
+                            </div>
+                            <input type="range" id="slider-quota" min="0" max="60" step="5" value="20" oninput="drawQuotas()">
+                        </div>
+
+                        <div class="info-panel p-5 border-l-4 border-emerald-500">
+                            <span class="text-xs uppercase font-bold text-emerald-400 tracking-wider block mb-2 font-mono-custom" id="q-analysis-h">Анализ рыночного равновесия:</span>
+                            <div class="grid grid-cols-2 gap-2 mb-3 border-b border-slate-800 pb-3 font-mono-custom">
+                                <div><span class="text-[11px] text-slate-400 block" id="lbl-pw">Мировая цена (Pw):</span> <span class="font-bold text-white">$20.0</span></div>
+                                <div><span class="text-[11px] text-slate-400 block" id="lbl-pdom">Внутренняя цена:</span> <span class="font-bold text-rose-400 text-sm" id="quota-new-price">$35.0</span></div>
+                            </div>
+                            <div id="quota-dynamic-text" class="text-xs text-slate-300 font-mono-custom leading-relaxed space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 flex flex-col items-center">
+                        <span class="text-xs font-mono-custom text-slate-400 uppercase tracking-widest mb-3 block w-full text-left font-bold" id="graph-2-title">График: Эффекты ограничения квоты</span>
+                        <canvas id="canvas-quota" width="720" height="480"></canvas>
+                        <div class="flex flex-wrap gap-4 mt-4 text-xs font-mono-custom text-slate-400 uppercase w-full justify-center">
+                            <span class="flex items-center gap-1.5"><span class="w-3.5 h-1 bg-indigo-400 rounded"></span> <span id="leg-sd">Местное (Sd)</span></span>
+                            <span class="flex items-center gap-1.5"><span class="w-3.5 h-1 bg-emerald-400 rounded"></span> <span id="leg-stotal">S_total (С квотой)</span></span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-amber-500/60 border border-amber-500 rounded-sm"></span> <span id="leg-qrent">Квотная рента</span></span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-rose-500/60 border border-rose-500 rounded-sm"></span> <span id="leg-dwl">Потери DWL</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ТАБ 3: ТАРИФЫ -->
+            <div id="tab-tariffs" class="tab-content hidden fade-in">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    <div class="lg:col-span-5 flex flex-col gap-6">
+                        <div>
+                            <h2 class="text-xl font-bold text-amber-400 mb-2 font-mono-custom flex items-center gap-2" id="t-h2">
+                                <i data-lucide="receipt" class="w-5 h-5"></i> Тарифное регулирование
+                            </h2>
+                            <p class="text-xs md:text-sm text-slate-300 leading-relaxed" id="t-desc">
+                                Модель малой открытой экономики. Налог на импорт поднимает внутреннюю цену до уровня <b>P<sub>w</sub> + Тариф</b>. Это обогащает местный бизнес и бюджет, но разрушает благосостояние потребителей.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-slate-950/60 p-5 rounded-xl border border-slate-800">
+                            <label class="block text-xs font-bold text-slate-400 mb-1 uppercase tracking-wider font-mono-custom" id="lbl-fiscal">Фискальный инструмент:</label>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs md:text-sm text-slate-300 font-medium" id="lbl-tariff-rate">Тариф (T) на единицу</span>
+                                <span class="text-xl font-black text-amber-400 font-mono-custom" id="val-tariff">$2.0</span>
+                            </div>
+                            <input type="range" id="slider-tariff" min="0" max="5" step="0.5" value="2" oninput="drawTariffs()">
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-3 text-center">
+                            <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl">
+                                <span class="block text-[10px] text-slate-400 uppercase tracking-widest font-mono-custom" id="lbl-local-prod">Местное пр-во</span>
+                                <span class="text-xl font-black text-indigo-400 font-mono-custom" id="tar-local">30</span>
+                            </div>
+                            <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl">
+                                <span class="block text-[10px] text-slate-400 uppercase tracking-widest font-mono-custom" id="lbl-imports">Импорт</span>
+                                <span class="text-xl font-black text-cyan-400 font-mono-custom" id="tar-import">40</span>
+                            </div>
+                            <div class="bg-slate-950/80 border border-slate-800 p-3 rounded-xl">
+                                <span class="block text-[10px] text-slate-400 uppercase tracking-widest font-mono-custom" id="lbl-rev">Доход бюджета</span>
+                                <span class="text-xl font-black text-amber-400 font-mono-custom" id="tar-rev">$80.0</span>
+                            </div>
+                        </div>
+
+                        <div class="info-panel p-5 border-l-4 border-rose-500">
+                            <span class="text-xs uppercase font-bold text-rose-400 tracking-wider block mb-2 font-mono-custom" id="t-dwl-h">Чистые потери общества (DWL):</span>
+                            <div id="tar-dynamic-text" class="text-xs text-slate-300 font-mono-custom leading-relaxed space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 flex flex-col items-center">
+                        <span class="text-xs font-mono-custom text-slate-400 uppercase tracking-widest mb-3 block w-full text-left font-bold" id="graph-3-title">График: Распределение излишков (Рынок Шоколада)</span>
+                        <canvas id="canvas-tariff" width="720" height="480"></canvas>
+                        
+                        <div class="flex flex-wrap gap-4 mt-4 text-xs font-mono-custom text-slate-400 uppercase w-full justify-center">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-amber-500/60 border border-amber-500 rounded-sm"></span> <span id="leg-rev">Доход государства</span></span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-3 bg-rose-500/60 border border-rose-500 rounded-sm"></span> <span id="leg-dwl2">Потери (DWL)</span></span>
+                            <span class="flex items-center gap-1.5"><span class="w-3.5 h-1 bg-rose-500 rounded"></span> <span id="leg-pwt">Pw + Тариф</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        lucide.createIcons();
+
+        let currentLang = 'RU';
+
+        const dict = {
+            RU: {
+                headerTitle: "Государство & Рынки",
+                headerSubtitle: "Микроэкономика • Принципы экономики",
+                tab1Title: "Общественные блага",
+                tab2Title: "Квоты на импорт",
+                tab3Title: "Импортные тарифы",
+                pgH2: "Вертикальное суммирование",
+                pgDesc: "Из-за свойства <span class='text-white font-semibold'>несоперничества (non-rivalry)</span> совокупный спрос (\\(\\Sigma D\\)) на общественное благо вычисляется вертикальным сложением цен (готовности платить) всех жителей при каждом объеме \\(Q\\).",
+                lblPa: "Спрос гражданина A:",
+                lblPb: "Спрос гражданина B:",
+                lblSumP: "Социальный спрос (ΣP):",
+                lblMcCost: "Стоимость производства:",
+                lblMcName: "Предельные издержки (MC)",
+                pgAnalysisH: "📊 Анализ рынка и провала частного сектора",
+                graph1Title: "График: Оптимум общественного блага",
+                legInd: "Инд. спрос (Da, Db)",
+                legSoc: "Социальный спрос (ΣD)",
+                legMc: "Издержки (MC)",
+                qH2: "Шок импортной квоты",
+                qDesc: "Правительство жестко лимитирует физический объем ввоза. При исчерпании квоты предложение становится жестким, а внутреннюю цену формирует внутренний спрос.",
+                lblQuotaInstr: "Инструмент протекционизма:",
+                lblQuotaSize: "Размер квоты (ед.)",
+                qAnalysisH: "Анализ рыночного равновесия:",
+                lblPw: "Мировая цена (Pw):",
+                lblPdom: "Внутренняя цена:",
+                graph2Title: "График: Эффекты ограничения квоты",
+                legSd: "Местное (Sd)",
+                legStotal: "S_total (С квотой)",
+                legQrent: "Квотная рента",
+                legDwl: "Потери DWL",
+                tH2: "Тарифное регулирование",
+                tDesc: "Модель малой открытой экономики. Налог на импорт поднимает внутреннюю цену до уровня <b>P<sub>w</sub> + Тариф</b>. Это обогащает местный бизнес и бюджет, но разрушает благосостояние потребителей.",
+                lblFiscal: "Фискальный инструмент:",
+                lblTariffRate: "Тариф (T) на единицу",
+                lblLocalProd: "Местное пр-во",
+                lblImports: "Импорт",
+                lblRev: "Доход бюджета",
+                tDwlH: "Чистые потери общества (DWL):",
+                graph3Title: "График: Распределение излишков (Рынок Шоколада)",
+                legRev: "Доход государства",
+                legDwl2: "Потери (DWL)",
+                legPwt: "Pw + Тариф",
+                axisQ: "Q (Объем)",
+                axisP: "P ($)",
+                axisQChoc: "Q (Шоколад, тонн)",
+                txtDemand: "Спрос (D)",
+                txtSupplyLocal: "Sd (Местное)",
+                txtWorldP: "Pw = $20 (Мировая цена)",
+                txtTariffP: "Pw + Тариф",
+                txtDemandTab3: "Спрос",
+                txtSupplyTab3: "Sd (Местные)"
+            },
+            EN: {
+                headerTitle: "Government & Markets",
+                headerSubtitle: "Microeconomics • Principles of Economics",
+                tab1Title: "Public Goods",
+                tab2Title: "Import Quotas",
+                tab3Title: "Import Tariffs",
+                pgH2: "Vertical Summation",
+                pgDesc: "Due to <span class='text-white font-semibold'>non-rivalry</span>, aggregate demand (\\(\\Sigma D\\)) for a public good is derived by vertically summing individual prices (willingness to pay) at each quantity \\(Q\\).",
+                lblPa: "Citizen A Demand:",
+                lblPb: "Citizen B Demand:",
+                lblSumP: "Social Demand (ΣP):",
+                lblMcCost: "Production Cost:",
+                lblMcName: "Marginal Cost (MC)",
+                pgAnalysisH: "📊 Market Analysis & Market Failure",
+                graph1Title: "Graph: Public Good Optimum",
+                legInd: "Indiv. Demand (Da, Db)",
+                legSoc: "Social Demand (ΣD)",
+                legMc: "Marginal Cost (MC)",
+                qH2: "Import Quota Shock",
+                qDesc: "The government strictly limits import volume. Once the quota is exhausted, supply becomes vertical, and domestic price is driven by domestic demand.",
+                lblQuotaInstr: "Protectionist Tool:",
+                lblQuotaSize: "Quota Limit (units)",
+                qAnalysisH: "Market Equilibrium Analysis:",
+                lblPw: "World Price (Pw):",
+                lblPdom: "Domestic Price:",
+                graph2Title: "Graph: Import Quota Effects",
+                legSd: "Domestic Supply (Sd)",
+                legStotal: "S_total (With Quota)",
+                legQrent: "Quota Rent",
+                legDwl: "Deadweight Loss (DWL)",
+                tH2: "Tariff Regulation",
+                tDesc: "Small open economy model. Import tax raises domestic price to <b>P<sub>w</sub> + Tariff</b>. This benefits domestic producers and treasury, but hurts consumer surplus.",
+                lblFiscal: "Fiscal Instrument:",
+                lblTariffRate: "Tariff Rate (T) per unit",
+                lblLocalProd: "Domestic Supply",
+                lblImports: "Imports",
+                lblRev: "Tariff Revenue",
+                tDwlH: "Deadweight Loss (DWL):",
+                graph3Title: "Graph: Welfare Allocation (Chocolate Market)",
+                legRev: "Govt Revenue",
+                legDwl2: "Deadweight Loss (DWL)",
+                legPwt: "Pw + Tariff",
+                axisQ: "Q (Quantity)",
+                axisP: "P ($)",
+                axisQChoc: "Q (Chocolate, tons)",
+                txtDemand: "Demand (D)",
+                txtSupplyLocal: "Sd (Domestic)",
+                txtWorldP: "Pw = $20 (World Price)",
+                txtTariffP: "Pw + Tariff",
+                txtDemandTab3: "Demand",
+                txtSupplyTab3: "Sd (Domestic)"
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'RU' ? 'EN' : 'RU';
+            document.getElementById('lang-str').innerText = currentLang === 'RU' ? 'EN' : 'RU';
+            
+            const l = dict[currentLang];
+            document.getElementById('header-title').innerText = l.headerTitle;
+            document.getElementById('header-subtitle').innerText = l.headerSubtitle;
+            document.getElementById('tab-1-title').innerText = l.tab1Title;
+            document.getElementById('tab-2-title').innerText = l.tab2Title;
+            document.getElementById('tab-3-title').innerText = l.tab3Title;
+
+            document.getElementById('pg-h2').innerHTML = `<i data-lucide="layers" class="w-5 h-5"></i> ${l.pgH2}`;
+            document.getElementById('pg-desc').innerHTML = l.pgDesc;
+            document.getElementById('lbl-pa').innerText = l.lblPa;
+            document.getElementById('lbl-pb').innerText = l.lblPb;
+            document.getElementById('lbl-sump').innerText = l.lblSumP;
+            document.getElementById('lbl-mc-cost').innerText = l.lblMcCost;
+            document.getElementById('lbl-mc-name').innerText = l.lblMcName;
+            document.getElementById('pg-analysis-h').innerText = l.pgAnalysisH;
+            document.getElementById('graph-1-title').innerText = l.graph1Title;
+            document.getElementById('leg-ind').innerText = l.legInd;
+            document.getElementById('leg-soc').innerText = l.legSoc;
+            document.getElementById('leg-mc').innerText = l.legMc;
+
+            document.getElementById('q-h2').innerHTML = `<i data-lucide="shield-off" class="w-5 h-5"></i> ${l.qH2}`;
+            document.getElementById('q-desc').innerText = l.qDesc;
+            document.getElementById('lbl-quota-instr').innerText = l.lblQuotaInstr;
+            document.getElementById('lbl-quota-size').innerText = l.lblQuotaSize;
+            document.getElementById('q-analysis-h').innerText = l.qAnalysisH;
+            document.getElementById('lbl-pw').innerText = l.lblPw;
+            document.getElementById('lbl-pdom').innerText = l.lblPdom;
+            document.getElementById('graph-2-title').innerText = l.graph2Title;
+            document.getElementById('leg-sd').innerText = l.legSd;
+            document.getElementById('leg-stotal').innerText = l.legStotal;
+            document.getElementById('leg-qrent').innerText = l.legQrent;
+            document.getElementById('leg-dwl').innerText = l.legDwl;
+
+            document.getElementById('t-h2').innerHTML = `<i data-lucide="receipt" class="w-5 h-5"></i> ${l.tH2}`;
+            document.getElementById('t-desc').innerHTML = l.tDesc;
+            document.getElementById('lbl-fiscal').innerText = l.lblFiscal;
+            document.getElementById('lbl-tariff-rate').innerText = l.lblTariffRate;
+            document.getElementById('lbl-local-prod').innerText = l.lblLocalProd;
+            document.getElementById('lbl-imports').innerText = l.lblImports;
+            document.getElementById('lbl-rev').innerText = l.lblRev;
+            document.getElementById('t-dwl-h').innerText = l.tDwlH;
+            document.getElementById('graph-3-title').innerText = l.graph3Title;
+            document.getElementById('leg-rev').innerText = l.legRev;
+            document.getElementById('leg-dwl2').innerText = l.legDwl2;
+            document.getElementById('leg-pwt').innerText = l.legPwt;
+
+            lucide.createIcons();
+
+            drawPublicGoods();
+            drawQuotas();
+            drawTariffs();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`[data-target="${tabId}"]`).classList.add('active');
+            
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('block', 'hidden'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(tabId).classList.add('block');
+
+            setTimeout(() => {
+                if(tabId === 'tab-public-goods') drawPublicGoods();
+                if(tabId === 'tab-quotas') drawQuotas();
+                if(tabId === 'tab-tariffs') drawTariffs();
+            }, 40);
+        }
+
+        class GraphSpace {
+            constructor(canvasId, logicalXMax, logicalYMax) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                
+                this.w = 720; 
+                this.h = 480;
+                
+                const dpr = window.devicePixelRatio || 1;
+                this.canvas.width = this.w * dpr;
+                this.canvas.height = this.h * dpr;
+                
+                this.canvas.style.width = '100%';
+                this.canvas.style.maxWidth = this.w + 'px';
+                
+                this.ctx.scale(dpr, dpr);
+
+                this.padX = 55;
+                this.padY = 45;
+                this.xMax = logicalXMax;
+                this.yMax = logicalYMax;
+            }
+
+            clear() {
+                this.ctx.clearRect(0, 0, this.w, this.h);
+            }
+
+            x(val) { return this.padX + (val / this.xMax) * (this.w - this.padX - 25); }
+            y(val) { return this.h - this.padY - (val / this.yMax) * (this.h - this.padY - 25); }
+
+            drawGrid(xStep, yStep) {
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
+                this.ctx.setLineDash([3, 3]);
+                
+                for (let x = 0; x <= this.xMax; x += xStep) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.x(x), this.y(0));
+                    this.ctx.lineTo(this.x(x), this.y(this.yMax));
+                    this.ctx.stroke();
+                }
+                for (let y = 0; y <= this.yMax; y += yStep) {
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.x(0), this.y(y));
+                    this.ctx.lineTo(this.x(this.xMax), this.y(y));
+                    this.ctx.stroke();
+                }
+                this.ctx.setLineDash([]);
+            }
+
+            drawAxes(xLabel, yLabel) {
+                const ctx = this.ctx;
+                ctx.beginPath();
+                ctx.moveTo(this.padX, 20);
+                ctx.lineTo(this.padX, this.h - this.padY);
+                ctx.lineTo(this.w - 15, this.h - this.padY);
+                ctx.strokeStyle = "#475569"; ctx.lineWidth = 2; ctx.stroke();
+
+                ctx.fillStyle = "#94a3b8"; ctx.font = "bold 11px 'JetBrains Mono', monospace";
+                ctx.fillText(xLabel, this.w - 110, this.h - 15);
+                ctx.fillText(yLabel, 12, 22);
+                ctx.fillText("0", this.padX - 16, this.h - this.padY + 16);
+            }
+
+            drawLine(x1, y1, x2, y2, color, width=2, dash=[]) {
+                const ctx = this.ctx;
+                ctx.beginPath();
+                ctx.setLineDash(dash);
+                ctx.moveTo(this.x(x1), this.y(y1));
+                ctx.lineTo(this.x(x2), this.y(y2));
+                ctx.strokeStyle = color; ctx.lineWidth = width; ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            drawText(text, x, y, color, bold=true) {
+                this.ctx.fillStyle = color;
+                this.ctx.font = (bold ? "bold " : "") + "11px 'JetBrains Mono', monospace";
+                this.ctx.fillText(text, this.x(x) + 6, this.y(y) - 6);
+            }
+        }
+
+        // ================= ТАБ 1: ОБЩЕСТВЕННЫЕ БЛАГА =================
+        function drawPublicGoods() {
+            let mcValue = parseFloat(document.getElementById('slider-mc').value);
+            document.getElementById('val-mc').innerText = "$" + mcValue;
+
+            let g = new GraphSpace('canvas-pg', 40, 70);
+            g.clear();
+            g.drawGrid(5, 10);
+            g.drawAxes(dict[currentLang].axisQ, dict[currentLang].axisP);
+
+            // Indiv demand Da, Db (P = 30 - Q)
+            g.drawLine(0, 30, 30, 0, "#22d3ee", 2, [4,4]); 
+            g.drawText("Da, Db", 28, 4, "#22d3ee", false);
+
+            // Social Demand (P = 60 - 2Q)
+            g.drawLine(0, 60, 30, 0, "#f43f5e", 3); 
+            g.drawText("ΣD = 60 - 2Q", 2, 58, "#f43f5e");
+
+            // Marginal Cost Line (MC)
+            g.drawLine(0, mcValue, 38, mcValue, "#fbbf24", 2); 
+            g.drawText("MC", 34, mcValue + 3, "#fbbf24");
+
+            let optQ = (60 - mcValue) / 2;
+            let textDyn = document.getElementById('pg-dynamic-text');
+            let privateQ = (30 - mcValue) > 0 ? (30 - mcValue) : 0;
+
+            if(optQ > 0) {
+                g.drawLine(optQ, 0, optQ, mcValue, "#94a3b8", 1, [4,4]);
+                g.drawText(optQ.toFixed(1), optQ - 1, -3, "#ffffff");
+                
+                g.ctx.beginPath();
+                g.ctx.arc(g.x(optQ), g.y(mcValue), 5.5, 0, 2*Math.PI);
+                g.ctx.fillStyle = "#ffffff"; g.ctx.fill();
+                g.ctx.lineWidth = 2.5; g.ctx.strokeStyle = "#f43f5e"; g.ctx.stroke();
+
+                let explanation = '';
+                if (currentLang === 'RU') {
+                    explanation = `<p><strong class="text-white">Текущее состояние:</strong> Издержки (MC) установлены на уровне <span class="text-amber-400 font-bold">$${mcValue}</span>. Социальный оптимум составляет <span class="text-cyan-400 font-bold">Q = ${optQ.toFixed(1)} ед.</span></p>`;
+                    explanation += `<p><strong class="text-white">Рыночный провал:</strong> В частном порядке люди произвели бы только <span class="text-rose-400 font-bold">${privateQ.toFixed(1)} ед.</span> `;
+                    if (mcValue >= 30) {
+                        explanation += `Издержки выше индивидуальной ценности ($30). Частный рынок даст <b>0 единиц</b>! Только учет суммарной ценности всех жителей ($\Sigma D$) дает возможность профинансировать блага.</p>`;
+                    } else {
+                        explanation += `Разница между социальным выбором (${optQ.toFixed(1)}) и частным (${privateQ.toFixed(1)}) возникает из-за «проблемы безбилетника» (Free-rider problem).</p>`;
+                    }
+                    explanation += `<p><strong class="text-cyan-400">Вердикт:</strong> Централизованно профинансировать ${optQ.toFixed(1)} единиц из бюджета.</p>`;
+                } else {
+                    explanation = `<p><strong class="text-white">Current Status:</strong> Marginal Cost (MC) is set to <span class="text-amber-400 font-bold">$${mcValue}</span>. Social optimum is <span class="text-cyan-400 font-bold">Q = ${optQ.toFixed(1)} units</span>.</p>`;
+                    explanation += `<p><strong class="text-white">Market Failure:</strong> Private market would produce only <span class="text-rose-400 font-bold">${privateQ.toFixed(1)} units</span>. `;
+                    if (mcValue >= 30) {
+                        explanation += `MC exceeds individual willingness to pay ($30). Private market yields <b>0 units</b>! Only aggregate demand ($\Sigma D$) justifies public provision.</p>`;
+                    } else {
+                        explanation += `Underprovision gap between social optimum (${optQ.toFixed(1)}) and private output (${privateQ.toFixed(1)}) is caused by the Free-Rider Problem.</p>`;
+                    }
+                    explanation += `<p><strong class="text-cyan-400">Verdict:</strong> Publicly fund ${optQ.toFixed(1)} units via taxation.</p>`;
+                }
+                textDyn.innerHTML = explanation;
+            } else {
+                textDyn.innerHTML = currentLang === 'RU' ? 
+                    `<p><strong class="text-rose-500">Проект отклонен:</strong> Издержки слишком высоки (<span class="text-amber-400 font-bold">$${mcValue}</span>). Суммарная полезность всех граждан не окупает даже 1-ю единицу.</p>` :
+                    `<p><strong class="text-rose-500">Project Rejected:</strong> Marginal costs are too high (<span class="text-amber-400 font-bold">$${mcValue}</span>). Total willingness to pay cannot cover even the 1st unit.</p>`;
+            }
+        }
+
+        // ================= ТАБ 2: КВОТЫ =================
+        function drawQuotas() {
+            let quota = parseFloat(document.getElementById('slider-quota').value);
+            document.getElementById('val-quota').innerText = quota;
+
+            let g = new GraphSpace('canvas-quota', 100, 60);
+            g.clear();
+            g.drawGrid(10, 10);
+            g.drawAxes(dict[currentLang].axisQ, dict[currentLang].axisP);
+
+            let pw = 20;
+            let q_sd_base = (pw - 10) / 0.5; // 20
+            let q_d_base = (60 - pw) / 0.5; // 80
+
+            g.drawLine(0, 60, 100, 10, "#94a3b8", 2); 
+            g.drawText(dict[currentLang].txtDemand, 88, 17, "#94a3b8");
+
+            g.drawLine(0, 10, 80, 50, "#818cf8", 2); 
+            g.drawText(dict[currentLang].txtSupplyLocal, 65, 45, "#818cf8");
+
+            g.drawLine(0, pw, 100, pw, "#cbd5e1", 1, [4,4]);
+            g.drawText(dict[currentLang].txtWorldP, 60, 22, "#cbd5e1", false);
+
+            let newQ = 50 + 0.5 * quota;
+            let newP = 60 - 0.5 * newQ;
+            let textDyn = document.getElementById('quota-dynamic-text');
+
+            if(newP <= pw) { 
+                newP = pw; newQ = q_d_base; 
+                document.getElementById('quota-new-price').innerText = "$" + newP.toFixed(1);
+                textDyn.innerHTML = currentLang === 'RU' ?
+                    `<p>Квота в <span class="text-emerald-400 font-bold">${quota} ед.</span> является <b>несвязывающей</b>. Импорт полностью перекрывает потребности по мировой цене $20. Рынок не искажен.</p>` :
+                    `<p>A quota of <span class="text-emerald-400 font-bold">${quota} units</span> is <b>non-binding</b>. World price of $20 prevails, causing zero market distortion.</p>`;
+            } else {
+                document.getElementById('quota-new-price').innerText = "$" + newP.toFixed(1);
+
+                let q_s_local = (newP - 10) / 0.5; 
+                let q_d_total = (60 - newP) / 0.5;
+
+                // 1. Quota Rent
+                g.ctx.fillStyle = "rgba(245, 158, 11, 0.4)";
+                g.ctx.fillRect(g.x(q_s_local - quota), g.y(newP), g.x(q_s_local) - g.x(q_s_local - quota), g.y(pw) - g.y(newP));
+                g.ctx.strokeStyle = "#f59e0b"; g.ctx.strokeRect(g.x(q_s_local - quota), g.y(newP), g.x(q_s_local) - g.x(q_s_local - quota), g.y(pw) - g.y(newP));
+
+                // 2. DWL Left
+                g.ctx.fillStyle = "rgba(244, 63, 94, 0.4)";
+                g.ctx.beginPath();
+                g.ctx.moveTo(g.x(q_sd_base), g.y(pw));
+                g.ctx.lineTo(g.x(q_s_local - quota), g.y(pw));
+                g.ctx.lineTo(g.x(q_s_local - quota), g.y(newP));
+                g.ctx.fill(); g.ctx.strokeStyle = "#e11d48"; g.ctx.stroke();
+
+                // 3. DWL Right
+                g.ctx.beginPath();
+                g.ctx.moveTo(g.x(q_d_base), g.y(pw));
+                g.ctx.lineTo(g.x(q_d_total), g.y(pw));
+                g.ctx.lineTo(g.x(q_d_total), g.y(newP));
+                g.ctx.fill(); g.ctx.stroke();
+
+                let dwlVal = 0.5 * ((q_s_local - quota - q_sd_base) + (q_d_base - q_d_total)) * (newP - pw);
+                let rentVal = quota * (newP - pw);
+
+                if (currentLang === 'RU') {
+                    textDyn.innerHTML = `<p>Квота подняла цену до <span class="text-rose-400 font-bold">$${newP.toFixed(1)}</span>. Импортеры забирают <b>квотную ренту</b> в размере <span class="text-amber-400 font-bold">$${rentVal.toFixed(1)}</span>. Чистые потери общества (DWL) равны <span class="text-rose-400 font-bold">$${dwlVal.toFixed(1)}</span>.</p>`;
+                } else {
+                    textDyn.innerHTML = `<p>Quota increases price to <span class="text-rose-400 font-bold">$${newP.toFixed(1)}</span>. License holders capture a <b>Quota Rent</b> of <span class="text-amber-400 font-bold">$${rentVal.toFixed(1)}</span>. Deadweight Loss (DWL) is <span class="text-rose-400 font-bold">$${dwlVal.toFixed(1)}</span>.</p>`;
+                }
+            }
+
+            // S_total Line
+            g.ctx.beginPath();
+            g.ctx.moveTo(g.x(0), g.y(10));
+            g.ctx.lineTo(g.x(q_sd_base), g.y(pw)); 
+            g.ctx.lineTo(g.x(q_sd_base + quota), g.y(pw)); 
+            let finalQ = 100;
+            let finalP = pw + 0.5 * (finalQ - (q_sd_base + quota));
+            g.ctx.lineTo(g.x(finalQ), g.y(finalP));
+            g.ctx.strokeStyle = "#10b981"; g.ctx.lineWidth = 3; g.ctx.stroke();
+
+            if(newP > pw) {
+                g.drawLine(0, newP, newQ, newP, "#f43f5e", 1, [3,3]);
+                g.drawLine(newQ, 0, newQ, newP, "#f43f5e", 1, [3,3]);
+                
+                g.ctx.beginPath();
+                g.ctx.arc(g.x(newQ), g.y(newP), 5.5, 0, 2*Math.PI);
+                g.ctx.fillStyle = "#10b981"; g.ctx.fill();
+                g.ctx.lineWidth = 2; g.ctx.strokeStyle = "#ffffff"; g.ctx.stroke();
+            }
+        }
+
+        // ================= ТАБ 3: ТАРИФЫ =================
+        function drawTariffs() {
+            let t = parseFloat(document.getElementById('slider-tariff').value);
+            document.getElementById('val-tariff').innerText = "$" + t.toFixed(1);
+
+            let g = new GraphSpace('canvas-tariff', 100, 15);
+            g.clear();
+            g.drawGrid(10, 2);
+            g.drawAxes(dict[currentLang].axisQChoc, dict[currentLang].axisP);
+
+            let pw = 4; // World Price
+            let autarkyP = 6.5; // Autarky Price
+
+            g.drawLine(0, 12, 100, 2, "#94a3b8", 2); 
+            g.drawText(dict[currentLang].txtDemandTab3, 85, 4, "#94a3b8", false);
+
+            g.drawLine(0, 1, 100, 11, "#818cf8", 2);
+            g.drawText(dict[currentLang].txtSupplyTab3, 85, 10, "#818cf8");
+
+            g.drawLine(0, pw, 100, pw, "#cbd5e1", 1.5, [5,5]);
+            g.drawText("Pw = $4", 90, pw + 0.5, "#cbd5e1", false);
+
+            let pt = pw + t;
+            let q_s1 = (pw - 1) / 0.1; // 30
+            let q_d1 = (12 - pw) / 0.1; // 80
+
+            let isProhibitive = pt >= autarkyP;
+
+            let q_s2, q_d2, imports, revenue;
+
+            if (isProhibitive) {
+                pt = autarkyP;
+                q_s2 = 55;
+                q_d2 = 55;
+                imports = 0;
+                revenue = 0;
+            } else {
+                q_s2 = (pt - 1) / 0.1;
+                q_d2 = (12 - pt) / 0.1;
+                imports = q_d2 - q_s2;
+                revenue = imports * t;
+            }
+
+            document.getElementById('tar-local').innerText = q_s2.toFixed(0);
+            document.getElementById('tar-import').innerText = imports.toFixed(0);
+            document.getElementById('tar-rev').innerText = "$" + revenue.toFixed(1);
+
+            let textDyn = document.getElementById('tar-dynamic-text');
+
+            if (!isProhibitive && t > 0) {
+                g.drawLine(0, pt, 100, pt, "#f43f5e", 2.5);
+                g.drawText(dict[currentLang].txtTariffP, 80, pt + 0.5, "#f43f5e");
+
+                // 1. Govt Revenue
+                g.ctx.fillStyle = "rgba(245, 158, 11, 0.4)";
+                g.ctx.fillRect(g.x(q_s2), g.y(pt), g.x(q_d2) - g.x(q_s2), g.y(pw) - g.y(pt));
+                g.ctx.strokeStyle = "#f59e0b"; g.ctx.strokeRect(g.x(q_s2), g.y(pt), g.x(q_d2) - g.x(q_s2), g.y(pw) - g.y(pt));
+                
+                // 2. DWL Left
+                g.ctx.fillStyle = "rgba(244, 63, 94, 0.4)";
+                g.ctx.beginPath();
+                g.ctx.moveTo(g.x(q_s1), g.y(pw));
+                g.ctx.lineTo(g.x(q_s2), g.y(pw));
+                g.ctx.lineTo(g.x(q_s2), g.y(pt));
+                g.ctx.fill(); g.ctx.strokeStyle = "#e11d48"; g.ctx.stroke();
+
+                // 3. DWL Right
+                g.ctx.beginPath();
+                g.ctx.moveTo(g.x(q_d1), g.y(pw));
+                g.ctx.lineTo(g.x(q_d2), g.y(pw));
+                g.ctx.lineTo(g.x(q_d2), g.y(pt));
+                g.ctx.fill(); g.ctx.stroke();
+
+                let total_dwl = 0.5 * (q_s2 - q_s1) * t + 0.5 * (q_d1 - q_d2) * t;
+                if (currentLang === 'RU') {
+                    textDyn.innerHTML = `<p>Тариф <span class="text-amber-400 font-bold">$${t.toFixed(1)}</span> приносит в бюджет <span class="text-amber-400 font-bold">$${revenue.toFixed(1)}</span>. Безвозвратные потери экономики (DWL) равны <span class="text-rose-400 font-bold">$${total_dwl.toFixed(1)}</span>.</p>`;
+                } else {
+                    textDyn.innerHTML = `<p>A tariff of <span class="text-amber-400 font-bold">$${t.toFixed(1)}</span> generates <span class="text-amber-400 font-bold">$${revenue.toFixed(1)}</span> in revenue. Deadweight Loss (DWL) equals <span class="text-rose-400 font-bold">$${total_dwl.toFixed(1)}</span>.</p>`;
+                }
+
+            } else if (isProhibitive) {
+                g.drawLine(0, autarkyP, 100, autarkyP, "#f43f5e", 2, [3,3]);
+                g.drawText("P_autarky = $6.5", 70, autarkyP + 0.5, "#f43f5e");
+
+                // Giant DWL Triangle
+                g.ctx.fillStyle = "rgba(244, 63, 94, 0.45)";
+                g.ctx.beginPath();
+                g.ctx.moveTo(g.x(q_s1), g.y(pw));
+                g.ctx.lineTo(g.x(q_d1), g.y(pw));
+                g.ctx.lineTo(g.x(55), g.y(autarkyP));
+                g.ctx.closePath();
+                g.ctx.fill();
+                g.ctx.strokeStyle = "#e11d48"; g.ctx.lineWidth = 2; g.ctx.stroke();
+
+                let max_dwl = 0.5 * (q_d1 - q_s1) * (autarkyP - pw);
+
+                if (currentLang === 'RU') {
+                    textDyn.innerHTML = `<p><strong class="text-rose-400">ЗАПРЕТИТЕЛЬНЫЙ ТАРИФ:</strong> Импорт вытеснен полностью (0 тонн). Страна изолирована в автаркии. Бюджет ничего не получает ($0), а **потери DWL достигают МАКСИМУМА — <span class="text-rose-400 font-bold">$${max_dwl.toFixed(1)}</span>**!</p>`;
+                } else {
+                    textDyn.innerHTML = `<p><strong class="text-rose-400">PROHIBITIVE TARIFF:</strong> Imports are completely eliminated (0 tons). The country enters autarky. Tariff revenue drops to $0, while **Deadweight Loss reaches its MAXIMUM of <span class="text-rose-400 font-bold">$${max_dwl.toFixed(1)}</span>**!</p>`;
+                }
+            } else {
+                textDyn.innerHTML = currentLang === 'RU' ?
+                    `<p>Свободная торговля (Free Trade). Импорт равен ${imports.toFixed(0)} тонн. Потери DWL отсутствуют ($0).</p>` :
+                    `<p>Free Trade environment. Imports equal ${imports.toFixed(0)} tons. Zero DWL distortion ($0).</p>`;
+            }
+        }
+
+        setTimeout(() => { drawPublicGoods(); }, 80);
+        
+        window.addEventListener('resize', () => {
+            const activeTab = document.querySelector('.tab-btn.active').getAttribute('data-target');
+            if(activeTab === 'tab-public-goods') drawPublicGoods();
+            if(activeTab === 'tab-quotas') drawQuotas();
+            if(activeTab === 'tab-tariffs') drawTariffs();
+        });
+    </script>
+</body>
+</html>

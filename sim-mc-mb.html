@@ -1,0 +1,1057 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализ общественных благ MC-MB</title>
+    <!-- Google Fonts & Tailwind CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+            color: #f1f5f9;
+            min-height: 100vh;
+        }
+        
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+        }
+        
+        .sidebar-dark {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1.5px solid rgba(197, 160, 89, 0.25);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar-dark:hover {
+            border-color: rgba(197, 160, 89, 0.45);
+        }
+        
+        .workspace-light {
+            background: #ffffff;
+            border: 1.5px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* ================= VINTAGE TAPE RECORDER SLIDER STYLES ================= */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            height: 28px;
+            margin: 4px 0;
+            outline: none;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 4px;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.9);
+        }
+        /* Vintage Heavy Metallic Slider Thumb with Red Indicator Stripe */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 28px;
+            width: 14px;
+            border-radius: 3px;
+            background: linear-gradient(180deg, #64748b 0%, #334155 42%, #ef4444 43%, #ef4444 57%, #334155 58%, #1e293b 100%);
+            border: 1px solid #020617;
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.3), 0 0 8px rgba(239, 68, 68, 0.5);
+            transition: transform 0.1s, box-shadow 0.15s;
+        }
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 0 12px rgba(239, 68, 68, 0.8);
+        }
+        input[type="range"]:active::-webkit-slider-thumb {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), inset 0 1px 0 rgba(255, 255, 255, 0.2), 0 0 16px rgba(239, 68, 68, 1);
+        }
+        
+        .custom-scroll::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        
+        .text-gold { color: #c5a059; }
+        .border-gold { border-color: #c5a059; }
+        
+        .project-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .project-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        @keyframes pulse-optimum {
+            0% { r: 6px; stroke-width: 1.5px; opacity: 0.8; }
+            50% { r: 10px; stroke-width: 3.5px; opacity: 1; filter: drop-shadow(0 0 8px #10b981); }
+            100% { r: 6px; stroke-width: 1.5px; opacity: 0.8; }
+        }
+        .pulse-dot {
+            animation: pulse-optimum 2.2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="p-3 md:p-6 flex flex-col justify-between min-h-screen">
+
+    <!-- Header -->
+    <header class="sidebar-dark max-w-7xl mx-auto w-full p-4 rounded-2xl text-center mb-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4">
+        <div class="text-left">
+            <h1 class="text-xl md:text-2xl font-black text-gold tracking-wide uppercase mb-0.5" id="txt-app-title">
+                Анализ издержек и выгод (MC-MB)
+            </h1>
+            <p class="text-xs text-slate-400 font-semibold tracking-wider uppercase" id="txt-app-subtitle">
+                Микроэкономика • Принципы экономики • Общественные блага
+            </p>
+        </div>
+        <div class="flex items-center gap-4 self-center">
+            <div class="flex items-center gap-3 bg-slate-900/80 p-2 md:p-3 rounded-xl border border-slate-800">
+                <span class="text-2xl">🏛️</span>
+                <div class="text-left text-[11px]">
+                    <span class="text-slate-400 font-medium block" id="txt-opt-title">Оптимальный масштаб проектов:</span>
+                    <span class="text-gold font-bold" id="txt-opt-sub">Оценка чистого благосостояния</span>
+                </div>
+            </div>
+            <!-- Language Switcher Button -->
+            <button id="lang-btn" onclick="toggleLanguage()" class="px-3.5 py-2.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 font-extrabold rounded-xl border border-amber-500/30 text-xs transition flex items-center gap-2 shadow-lg">
+                <span class="text-base">🌐</span> <span id="lang-str">EN</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch w-full flex-grow">
+        
+        <!-- Left Sidebar: Controls (4 Cols - Slightly narrower) -->
+        <section class="lg:col-span-4 sidebar-dark p-5 rounded-xl flex flex-col justify-between space-y-4 text-xs">
+            <div>
+                <div class="flex items-center gap-2 border-b border-slate-800 pb-2 mb-3">
+                    <span class="text-lg">⚙️</span>
+                    <h2 class="text-xs font-bold text-gold uppercase tracking-wider" id="txt-sec1-title">Параметры социального проекта</h2>
+                </div>
+
+                <!-- SECTION 1: PROJECT SELECTOR CARDS -->
+                <div class="space-y-2 mb-4">
+                    <h3 class="font-bold text-gold uppercase tracking-wider text-[10px]" id="txt-sel-proj-h">
+                        1. Выберите тип социального проекта:
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 gap-2.5">
+                        <!-- Park Card -->
+                        <div id="card-park" onclick="selectProject('park')" class="project-card cursor-pointer p-3 rounded-xl bg-slate-950/40 border border-slate-800 flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl bg-emerald-950/60 p-1.5 rounded-lg border border-emerald-500/20 text-emerald-400">🌳</span>
+                                <div>
+                                    <h4 class="font-bold text-slate-200 text-xs" id="proj-park-title">Парковая аллея</h4>
+                                    <p class="text-[9px] text-slate-400 mt-0.5" id="proj-park-desc">Влияние на экологию и зоны отдыха</p>
+                                </div>
+                            </div>
+                            <span class="text-slate-600 font-bold font-mono text-[10px]">#1</span>
+                        </div>
+
+                        <!-- Sport Card -->
+                        <div id="card-sport" onclick="selectProject('sport')" class="project-card cursor-pointer p-3 rounded-xl bg-slate-950/40 border border-slate-800 flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl bg-indigo-950/60 p-1.5 rounded-lg border border-indigo-500/20 text-indigo-400">🏀</span>
+                                <div>
+                                    <h4 class="font-bold text-slate-200 text-xs" id="proj-sport-title">Спортивный хаб</h4>
+                                    <p class="text-[9px] text-slate-400 mt-0.5" id="proj-sport-desc">Развитие массового спорта и здоровья</p>
+                                </div>
+                            </div>
+                            <span class="text-slate-600 font-bold font-mono text-[10px]">#2</span>
+                        </div>
+
+                        <!-- Med Card -->
+                        <div id="card-med" onclick="selectProject('med')" class="project-card cursor-pointer p-3 rounded-xl bg-slate-950/40 border border-slate-800 flex items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl bg-rose-950/60 p-1.5 rounded-lg border border-rose-500/20 text-rose-400">🩺</span>
+                                <div>
+                                    <h4 class="font-bold text-slate-200 text-xs" id="proj-med-title">Мобильный медосмотр</h4>
+                                    <p class="text-[9px] text-slate-400 mt-0.5" id="proj-med-desc">Предотвращение критического ущерба</p>
+                                </div>
+                            </div>
+                            <span class="text-slate-600 font-bold font-mono text-[10px]">#3</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: SLIDERS CONTROL WITH VINTAGE RECORDER THUMBS -->
+                <div class="space-y-4 bg-slate-950/40 p-3.5 rounded-lg border border-slate-900 mb-3">
+                    <h3 class="font-bold text-sky-400 uppercase tracking-wider text-[10px] flex justify-between">
+                        <span id="txt-sec2-title">2. Настройка факторов среды</span>
+                        <span class="text-slate-500 font-normal" id="txt-sec2-sub">Экономические веса</span>
+                    </h3>
+
+                    <!-- Slider Scale Q -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300 font-semibold text-[11px]" id="lbl-scale-q">Масштаб проекта (Объем Q, ед.):</span>
+                            <span class="text-gold font-bold text-sm font-mono" id="valQ">40</span>
+                        </div>
+                        <input type="range" id="inputQ" min="5" max="100" step="1" value="40">
+                        <p class="text-[9px] text-slate-500 mt-1 leading-tight" id="desc-scale-q">Количество обустроенных зон или проведенных миссий.</p>
+                    </div>
+
+                    <!-- Slider Social Premium -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300 text-[11px]" id="lbl-social-prem">Социальная ценность (Премия MB):</span>
+                            <span class="text-sky-400 font-bold font-mono text-sm" id="valSocial">1.0</span>
+                        </div>
+                        <input type="range" id="inputSocial" min="0.5" max="2.0" step="0.1" value="1.0">
+                        <p class="text-[9px] text-slate-500 mt-1 leading-tight" id="desc-social-prem">Мультипликатор непрямых выгод общества.</p>
+                    </div>
+
+                    <!-- Slider Cost Factor -->
+                    <div>
+                        <div class="flex justify-between mb-1">
+                            <span class="text-slate-300 text-[11px]" id="lbl-cost-factor">Фактор удорожания ресурсов (Сдвиг MC):</span>
+                            <span class="text-sky-400 font-bold font-mono text-sm" id="valCost">1.0</span>
+                        </div>
+                        <input type="range" id="inputCost" min="0.5" max="2.0" step="0.1" value="1.0">
+                        <p class="text-[9px] text-slate-500 mt-1 leading-tight" id="desc-cost-factor">Изменение цен на материалы и логистику.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 3: VISUALIZATION FILTERS -->
+                <div class="space-y-3 bg-slate-950/40 p-3 rounded-lg border border-slate-900">
+                    <h3 class="font-bold text-emerald-400 uppercase tracking-wider text-[10px]" id="txt-sec3-title">
+                        3. Световая индикация эффектов
+                    </h3>
+                    <div class="space-y-2 text-[11px]">
+                        <label class="flex items-center gap-2.5 cursor-pointer text-slate-300 hover:text-white transition-colors">
+                            <input type="checkbox" id="show-surplus" checked class="rounded border-slate-700 bg-slate-900 text-gold focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded bg-emerald-500/15 border border-emerald-500/40"></span>
+                                <span id="lbl-chk-surplus">Социальный излишек (Чистая польза)</span>
+                            </span>
+                        </label>
+                        <label class="flex items-center gap-2.5 cursor-pointer text-slate-300 hover:text-white transition-colors">
+                            <input type="checkbox" id="show-losses" checked class="rounded border-slate-700 bg-slate-900 text-gold focus:ring-0 focus:ring-offset-0 w-3.5 h-3.5">
+                            <span class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded bg-rose-500/15 border border-rose-500/40"></span>
+                                <span id="lbl-chk-losses">Потери неэффективности (DWL)</span>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theory footer sidebar -->
+            <div class="p-2.5 bg-slate-950/80 border-l-2 border-gold rounded-r text-[10px] text-slate-400 leading-normal mt-2">
+                <span class="font-bold text-gold block mb-0.5" id="txt-theory-h">Социальная точка оптимума (Q*):</span>
+                <span id="txt-theory-body">Достигается в месте пересечения кривых MC = MB. Любое отклонение масштаба влево порождает дефицит блага, а вправо — неэффективные избыточные государственные траты.</span>
+            </div>
+        </section>
+
+        <!-- Right Column: Results Dashboard (8 Cols - Wider space) -->
+        <section class="lg:col-span-8 flex flex-col justify-between space-y-4">
+            
+            <!-- Strategic KPI Cards (Now extra wide and readable!) -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-slate-800">
+                <div id="kpi-efficiency" class="workspace-light p-3.5 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-amber-500 transition-all">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5" id="kpi-lbl-status">Статус бюджета</span>
+                    <h3 class="text-xs md:text-sm font-black uppercase tracking-tight leading-tight" id="status-box">Анализ</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5" id="status-desc">Сбор метрик...</p>
+                </div>
+
+                <div class="workspace-light p-3.5 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-blue-600">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5" id="kpi-lbl-mbmc">Текущая цена ед. (MB / MC)</span>
+                    <h3 class="text-sm md:text-base font-black text-blue-700 font-mono" id="current-m-disp">0 ₸</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5" id="current-m-desc">MB и MC на текущем Q</p>
+                </div>
+
+                <div class="workspace-light p-3.5 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-purple-600">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5" id="kpi-lbl-nsb">Чистая выгода (NSB)</span>
+                    <h3 class="text-sm md:text-base font-black text-purple-700 font-mono" id="nsb-disp">0 млн ₸</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5" id="kpi-sub-nsb">Интегральный профицит</p>
+                </div>
+
+                <div class="workspace-light p-3.5 rounded-xl text-center flex flex-col justify-center border-l-4 border-l-emerald-600">
+                    <span class="text-[9px] text-slate-500 uppercase tracking-wider font-semibold block mb-0.5" id="kpi-lbl-optq">Оптимум блага (Q*)</span>
+                    <h3 class="text-sm md:text-base font-black text-emerald-600 font-mono" id="optimum-q-disp">0 ед</h3>
+                    <p class="text-[8px] text-slate-400 mt-0.5" id="kpi-sub-optq">Точка равенства MC=MB</p>
+                </div>
+            </div>
+
+            <!-- Live Economic Audit Narrative Board -->
+            <div class="workspace-light p-4 rounded-xl text-slate-800">
+                <div class="flex items-center gap-2 mb-1 border-b border-slate-100 pb-1">
+                    <h4 class="text-[10px] font-extrabold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                        <span>📊</span>
+                        <span id="txt-audit-title">Экономический аудит социального благосостояния проекта</span>
+                    </h4>
+                </div>
+                <div id="verdict-content" class="text-[10.5px] text-slate-600 leading-relaxed font-medium">
+                    Рассчитываем баланс выгод и издержек развития общественного фонда...
+                </div>
+            </div>
+
+            <!-- Interactive Dynamic SVG Chart -->
+            <div class="workspace-light p-4 rounded-xl flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-1.5 border-b border-slate-100 pb-1.5">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1">
+                        <span id="chart-project-emoji">🌳</span>
+                        <span id="chart-project-title">Модель предельного анализа издержек и выгод</span>
+                    </h4>
+                    <span class="text-[8px] text-slate-400 font-mono" id="txt-chart-click-hint">*Кликните или ведите по полю графика для смены Q</span>
+                </div>
+                
+                <!-- SVG Container with interactive crosshair -->
+                <div class="w-full h-64 relative bg-slate-50 rounded border border-slate-100 overflow-hidden">
+                    <div id="waste-alert-badge" class="absolute top-2 right-2 px-2 py-0.5 rounded text-[8px] font-bold shadow-sm border flex items-center gap-1 transition-all opacity-0 pointer-events-none">
+                        <span>🚨</span>
+                        <span id="txt-waste-alert">Перерасход средств!</span>
+                    </div>
+
+                    <svg viewBox="0 0 650 260" class="w-full h-full select-none cursor-crosshair" id="svg-chart">
+                    </svg>
+                </div>
+
+                <!-- Custom Interactive Legends -->
+                <div class="flex justify-center flex-wrap gap-x-4 gap-y-1 text-[8.5px] mt-2 font-bold text-slate-500">
+                    <div class="flex items-center gap-1">
+                        <span class="w-3 h-0.5 bg-emerald-500 block"></span>
+                        <span id="leg-mb">Предельная польза (MB)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-3 h-0.5 bg-rose-500 block"></span>
+                        <span id="leg-mc">Предельные затраты (MC)</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-2.5 h-2.5 rounded bg-emerald-500/10 border border-emerald-500/30 block"></span>
+                        <span id="leg-surplus">Социальный излишек</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-2.5 h-2.5 rounded bg-rose-500/10 border border-rose-500/30 block"></span>
+                        <span id="leg-losses">Потери эффективности</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500 block"></span>
+                        <span id="leg-currentq">Выбранный масштаб (Q)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Opportunity Cost & Welfare Breakdown Table -->
+            <div class="workspace-light p-4 rounded-xl text-slate-800">
+                <div class="flex justify-between items-center mb-1.5">
+                    <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider" id="txt-tbl-header">Инспекция эффективности распределения бюджета</h4>
+                    <span class="text-[8px] text-slate-400 font-mono" id="txt-tbl-sub">Анализ излишков (Surplus Analysis)</span>
+                </div>
+                <div class="overflow-x-auto custom-scroll">
+                    <table class="w-full text-left border-collapse text-[10px] font-mono">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-slate-500 uppercase text-[8px] tracking-wider">
+                                <th class="pb-1.5" id="th-metric">Метрика благосостояния</th>
+                                <th class="pb-1.5 text-right" id="th-currq">Текущее Q</th>
+                                <th class="pb-1.5 text-right" id="th-optq">Оптимум Q*</th>
+                                <th class="pb-1.5 text-right" id="th-conclusion">Экономическое заключение</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-slate-700">
+                            <tr>
+                                <td class="py-1.5 text-slate-500 font-bold" id="td-mb-lbl">Оценка предельной пользы (MB):</td>
+                                <td class="text-right font-black text-emerald-600 font-mono" id="table-curr-mb">0 ₸</td>
+                                <td class="text-right font-black text-slate-700 font-mono" id="table-opt-mb">0 ₸</td>
+                                <td class="text-right text-slate-400 text-[9px]" id="td-mb-desc">Польза последней созданной единицы блага.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-1.5 text-slate-500 font-bold" id="td-mc-lbl">Предельные затраты бюджета (MC):</td>
+                                <td class="text-right font-black text-rose-600 font-mono" id="table-curr-mc">0 ₸</td>
+                                <td class="text-right font-black text-slate-700 font-mono" id="table-opt-mc">0 ₸</td>
+                                <td class="text-right text-slate-400 text-[9px]" id="td-mc-desc">Стоимость возведения последней единицы.</td>
+                            </tr>
+                            <tr class="bg-indigo-50/40">
+                                <td class="py-1.5 text-indigo-800 font-bold" id="td-loss-lbl">Упущенный общественный излишек (Loss):</td>
+                                <td class="text-right font-black text-indigo-700 font-mono" id="table-loss-value">0 ₸</td>
+                                <td class="text-right text-indigo-500 font-bold" id="table-loss-status">0%</td>
+                                <td class="text-right text-indigo-600 text-[9px] font-bold" id="td-loss-desc">Потери от отклонения от точки Парето-равновесия.</td>
+                            </tr>
+                            <tr class="bg-emerald-50">
+                                <td class="py-1.5 text-emerald-800 font-bold" id="td-pi-lbl">Коэффициент эффективности трат (PI):</td>
+                                <td class="text-right font-black text-emerald-600 font-mono" id="table-pi-curr">0.0</td>
+                                <td class="text-right text-emerald-500 font-black" id="table-pi-opt">1.00</td>
+                                <td class="text-right text-emerald-500 text-[9px]" id="td-pi-desc">Индикатор окупаемости инвестиций (MB/MC).</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Technical Footer -->
+    <footer class="text-center text-[10px] text-slate-500 mt-4 border-t border-slate-900/60 pt-2 font-bold tracking-wide" id="txt-footer">
+        Школа цифровых технологий и экономики •  AlmaU 2026
+    </footer>
+
+    <!-- Interactive Simulation Script -->
+    <script>
+        let currentLang = 'RU';
+
+        const dict = {
+            RU: {
+                appTitle: "Анализ издержек и выгод (MC-MB)",
+                appSubtitle: "Микроэкономика • Принципы экономики • Общественные блага",
+                optTitle: "Оптимальный масштаб проектов:",
+                optSub: "Оценка чистого благосостояния",
+                sec1Title: "Параметры социального проекта",
+                selProjH: "1. Выберите тип социального проекта:",
+                projParkTitle: "Парковая аллея",
+                projParkDesc: "Влияние на экологию и зоны отдыха",
+                projSportTitle: "Спортивный хаб",
+                projSportDesc: "Развитие массового спорта и здоровья",
+                projMedTitle: "Мобильный медосмотр",
+                projMedDesc: "Предотвращение критического ущерба",
+                sec2Title: "2. Настройка факторов среды",
+                sec2Sub: "Экономические веса",
+                lblScaleQ: "Масштаб проекта (Объем Q, ед.):",
+                descScaleQ: "Количество обустроенных зон или проведенных миссий.",
+                lblSocialPrem: "Социальная ценность (Премия MB):",
+                descSocialPrem: "Мультипликатор непрямых выгод общества.",
+                lblCostFactor: "Фактор удорожания ресурсов (Сдвиг MC):",
+                descCostFactor: "Изменение цен на материалы и логистику.",
+                sec3Title: "3. Световая индикация эффектов",
+                lblChkSurplus: "Социальный излишек (Чистая польза)",
+                lblChkLosses: "Потери неэффективности (DWL)",
+                theoryH: "Социальная точка оптимума (Q*):",
+                theoryBody: "Достигается в месте пересечения кривых MC = MB. Любое отклонение масштаба влево порождает дефицит блага, а вправо — неэффективные избыточные государственные траты.",
+                kpiStatus: "Статус бюджета",
+                kpiMbmc: "Текущая цена ед. (MB / MC)",
+                kpiMbmcSub: "MB и MC на текущем Q",
+                kpiNsb: "Чистая выгода (NSB)",
+                kpiNsbSub: "Интегральный профицит",
+                kpiOptq: "Оптимум блага (Q*)",
+                kpiOptqSub: "Точка равенства MC=MB",
+                auditTitle: "Экономический аудит социального благосостояния проекта",
+                chartClickHint: "*Кликните или ведите по полю графика для смены Q",
+                wasteAlert: "Перерасход средств!",
+                legMb: "Предельная польза (MB)",
+                legMc: "Предельные затраты (MC)",
+                legSurplus: "Социальный излишек",
+                legLosses: "Потери эффективности",
+                legCurrentq: "Выбранный масштаб (Q)",
+                tblHeader: "Инспекция эффективности распределения бюджета",
+                tblSub: "Анализ излишков (Surplus Analysis)",
+                thMetric: "Метрика благосостояния",
+                thCurrq: "Текущее Q",
+                thOptq: "Оптимум Q*",
+                thConclusion: "Экономическое заключение",
+                tdMbLbl: "Оценка предельной пользы (MB):",
+                tdMbDesc: "Польза последней созданной единицы блага.",
+                tdMcLbl: "Предельные затраты бюджета (MC):",
+                tdMcDesc: "Стоимость возведения последней единицы.",
+                tdLossLbl: "Упущенный общественный излишек (Loss):",
+                tdLossDesc: "Потери от отклонения от точки Парето-равновесия.",
+                tdPiLbl: "Коэффициент эффективности трат (PI):",
+                tdPiDesc: "Индикатор окупаемости инвестиций (MB/MC).",
+                footer: "Школа цифровых технологий и экономики • AlmaU 2026",
+                unitUnits: "ед",
+                unitMlnTenge: "млн ₸",
+                statusOptimal: "Парето-оптимум",
+                statusDeficit: "Дефицит",
+                statusOver: "Перерасход",
+                statusOptimalDesc: "Оптимальный масштаб",
+                statusDeficitDesc: "Проект недофинансирован",
+                statusOverDesc: "Избыточный масштаб"
+            },
+            EN: {
+                appTitle: "Cost-Benefit Analysis (MC-MB)",
+                appSubtitle: "Microeconomics • Principles of Economics • Public Goods",
+                optTitle: "Optimal Project Scale:",
+                optSub: "Net Social Welfare Valuation",
+                sec1Title: "Public Project Parameters",
+                selProjH: "1. Select Public Project Type:",
+                projParkTitle: "Park Alley",
+                projParkDesc: "Ecological and recreational impact",
+                projSportTitle: "Sports Hub",
+                projSportDesc: "Mass sports & health development",
+                projMedTitle: "Mobile Health Check",
+                projMedDesc: "Critical illness prevention",
+                sec2Title: "2. Environmental Factors",
+                sec2Sub: "Economic Weights",
+                lblScaleQ: "Project Scale (Quantity Q, units):",
+                descScaleQ: "Number of renovated zones or mobile missions.",
+                lblSocialPrem: "Social Value (MB Premium):",
+                descSocialPrem: "Multiplier of indirect social benefits.",
+                lblCostFactor: "Resource Cost Factor (MC Shift):",
+                descCostFactor: "Price shifts in materials and logistics.",
+                sec3Title: "3. Welfare Indicators",
+                lblChkSurplus: "Social Surplus (Net Benefit)",
+                lblChkLosses: "Efficiency Losses (DWL)",
+                theoryH: "Social Optimum Point (Q*):",
+                theoryBody: "Achieved at the intersection where MC = MB. Any leftward deviation causes underprovision, while rightward causes excessive public waste.",
+                kpiStatus: "Budget Status",
+                kpiMbmc: "Current Unit Price (MB / MC)",
+                kpiMbmcSub: "MB & MC at current Q",
+                kpiNsb: "Net Social Benefit (NSB)",
+                kpiNsbSub: "Integral Surplus",
+                kpiOptq: "Good Optimum (Q*)",
+                kpiOptqSub: "Equilibrium point MC=MB",
+                auditTitle: "Economic Audit of Project Welfare",
+                chartClickHint: "*Click or drag on the chart area to change Q",
+                wasteAlert: "Budget Waste!",
+                legMb: "Marginal Benefit (MB)",
+                legMc: "Marginal Cost (MC)",
+                legSurplus: "Social Surplus",
+                legLosses: "Efficiency Losses",
+                legCurrentq: "Selected Scale (Q)",
+                tblHeader: "Budget Allocation Efficiency Audit",
+                tblSub: "Surplus Analysis",
+                thMetric: "Welfare Metric",
+                thCurrq: "Current Q",
+                thOptq: "Optimum Q*",
+                thConclusion: "Economic Conclusion",
+                tdMbLbl: "Marginal Benefit Valuation (MB):",
+                tdMbDesc: "Utility generated by the last produced unit.",
+                tdMcLbl: "Marginal Budget Cost (MC):",
+                tdMcDesc: "Cost required to build the last unit.",
+                tdLossLbl: "Deadweight Loss (DWL):",
+                tdLossDesc: "Losses from deviating from Pareto equilibrium.",
+                tdPiLbl: "Profitability Index (PI):",
+                tdPiDesc: "Benefit-Cost ratio indicator (MB/MC).",
+                footer: "School Digital Technologies & Economics • AlmaU 2026",
+                unitUnits: "units",
+                unitMlnTenge: "M ₸",
+                statusOptimal: "Pareto Optimum",
+                statusDeficit: "Underprovision",
+                statusOver: "Overallocation",
+                statusOptimalDesc: "Optimal Scale",
+                statusDeficitDesc: "Underfunded Project",
+                statusOverDesc: "Excessive Scale"
+            }
+        };
+
+        const projects = {
+            park: {
+                title: { RU: "Парковая аллея", EN: "Park Alley" },
+                emoji: "🌳",
+                baseMB: 160,
+                baseMC: 1.4,
+                mbSlope: 1.6,
+                mcBase: 12
+            },
+            sport: {
+                title: { RU: "Спортивный хаб", EN: "Sports Hub" },
+                emoji: "🏀",
+                baseMB: 110,
+                baseMC: 1.1,
+                mbSlope: 1.1,
+                mcBase: 15
+            },
+            med: {
+                title: { RU: "Мобильный медосмотр", EN: "Mobile Health Check" },
+                emoji: "🩺",
+                baseMB: 230,
+                baseMC: 2.3,
+                mbSlope: 2.2,
+                mcBase: 20
+            }
+        };
+
+        let currentProjectKey = 'park';
+
+        // DOM elements cache
+        const rangeQ = document.getElementById('inputQ');
+        const rangeSocial = document.getElementById('inputSocial');
+        const rangeCost = document.getElementById('inputCost');
+
+        const valQ = document.getElementById('valQ');
+        const valSocial = document.getElementById('valSocial');
+        const valCost = document.getElementById('valCost');
+
+        const showSurplusCheck = document.getElementById('show-surplus');
+        const showLossesCheck = document.getElementById('show-losses');
+
+        const statusBox = document.getElementById('status-box');
+        const statusDesc = document.getElementById('status-desc');
+        const kpiEfficiency = document.getElementById('kpi-efficiency');
+        const currentMDisp = document.getElementById('current-m-disp');
+        const nsbDisp = document.getElementById('nsb-disp');
+        const optimumQDisp = document.getElementById('optimum-q-disp');
+
+        const verdictContent = document.getElementById('verdict-content');
+        const wasteAlertBadge = document.getElementById('waste-alert-badge');
+        
+        const chartProjectEmoji = document.getElementById('chart-project-emoji');
+        const chartProjectTitle = document.getElementById('chart-project-title');
+
+        const tableCurrMB = document.getElementById('table-curr-mb');
+        const tableOptMB = document.getElementById('table-opt-mb');
+        const tableCurrMC = document.getElementById('table-curr-mc');
+        const tableOptMC = document.getElementById('table-opt-mc');
+        const tableLossValue = document.getElementById('table-loss-value');
+        const tableLossStatus = document.getElementById('table-loss-status');
+        const tablePiCurr = document.getElementById('table-pi-curr');
+
+        const svgChart = document.getElementById('svg-chart');
+
+        const maxScaleX = 100;
+        const maxScaleY = 300;
+
+        function gx(q) { return 45 + (q / maxScaleX) * 580; }
+        function gy(p) { return 230 - (p / maxScaleY) * 200; }
+        function unmapX(px) { return ((px - 45) / 580) * maxScaleX; }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'RU' ? 'EN' : 'RU';
+            document.getElementById('lang-str').innerText = currentLang === 'RU' ? 'EN' : 'RU';
+            
+            const l = dict[currentLang];
+            document.getElementById('txt-app-title').innerText = l.appTitle;
+            document.getElementById('txt-app-subtitle').innerText = l.appSubtitle;
+            document.getElementById('txt-opt-title').innerText = l.optTitle;
+            document.getElementById('txt-opt-sub').innerText = l.optSub;
+            document.getElementById('txt-sec1-title').innerText = l.sec1Title;
+            document.getElementById('txt-sel-proj-h').innerText = l.selProjH;
+            document.getElementById('proj-park-title').innerText = l.projParkTitle;
+            document.getElementById('proj-park-desc').innerText = l.projParkDesc;
+            document.getElementById('proj-sport-title').innerText = l.projSportTitle;
+            document.getElementById('proj-sport-desc').innerText = l.projSportDesc;
+            document.getElementById('proj-med-title').innerText = l.projMedTitle;
+            document.getElementById('proj-med-desc').innerText = l.projMedDesc;
+            document.getElementById('txt-sec2-title').innerText = l.sec2Title;
+            document.getElementById('txt-sec2-sub').innerText = l.sec2Sub;
+            document.getElementById('lbl-scale-q').innerText = l.lblScaleQ;
+            document.getElementById('desc-scale-q').innerText = l.descScaleQ;
+            document.getElementById('lbl-social-prem').innerText = l.lblSocialPrem;
+            document.getElementById('desc-social-prem').innerText = l.descSocialPrem;
+            document.getElementById('lbl-cost-factor').innerText = l.lblCostFactor;
+            document.getElementById('desc-cost-factor').innerText = l.descCostFactor;
+            document.getElementById('txt-sec3-title').innerText = l.sec3Title;
+            document.getElementById('lbl-chk-surplus').innerText = l.lblChkSurplus;
+            document.getElementById('lbl-chk-losses').innerText = l.lblChkLosses;
+            document.getElementById('txt-theory-h').innerText = l.theoryH;
+            document.getElementById('txt-theory-body').innerText = l.theoryBody;
+            document.getElementById('kpi-lbl-status').innerText = l.kpiStatus;
+            document.getElementById('kpi-lbl-mbmc').innerText = l.kpiMbmc;
+            document.getElementById('current-m-desc').innerText = l.kpiMbmcSub;
+            document.getElementById('kpi-lbl-nsb').innerText = l.kpiNsb;
+            document.getElementById('kpi-sub-nsb').innerText = l.kpiNsbSub;
+            document.getElementById('kpi-lbl-optq').innerText = l.kpiOptq;
+            document.getElementById('kpi-sub-optq').innerText = l.kpiOptqSub;
+            document.getElementById('txt-audit-title').innerText = l.auditTitle;
+            document.getElementById('txt-chart-click-hint').innerText = l.chartClickHint;
+            document.getElementById('txt-waste-alert').innerText = l.wasteAlert;
+            document.getElementById('leg-mb').innerText = l.legMb;
+            document.getElementById('leg-mc').innerText = l.legMc;
+            document.getElementById('leg-surplus').innerText = l.legSurplus;
+            document.getElementById('leg-losses').innerText = l.legLosses;
+            document.getElementById('leg-currentq').innerText = l.legCurrentq;
+            document.getElementById('txt-tbl-header').innerText = l.tblHeader;
+            document.getElementById('txt-tbl-sub').innerText = l.tblSub;
+            document.getElementById('th-metric').innerText = l.thMetric;
+            document.getElementById('th-currq').innerText = l.thCurrq;
+            document.getElementById('th-optq').innerText = l.thOptq;
+            document.getElementById('th-conclusion').innerText = l.thConclusion;
+            document.getElementById('td-mb-lbl').innerText = l.tdMbLbl;
+            document.getElementById('td-mb-desc').innerText = l.tdMbDesc;
+            document.getElementById('td-mc-lbl').innerText = l.tdMcLbl;
+            document.getElementById('td-mc-desc').innerText = l.tdMcDesc;
+            document.getElementById('td-loss-lbl').innerText = l.tdLossLbl;
+            document.getElementById('td-loss-desc').innerText = l.tdLossDesc;
+            document.getElementById('td-pi-lbl').innerText = l.tdPiLbl;
+            document.getElementById('td-pi-desc').innerText = l.tdPiDesc;
+            document.getElementById('txt-footer').innerText = l.footer;
+
+            chartProjectTitle.innerText = projects[currentProjectKey].title[currentLang] + " • " + (currentLang === 'RU' ? "Предельный анализ" : "Marginal Analysis");
+
+            updateModel();
+        }
+
+        function selectProject(key) {
+            currentProjectKey = key;
+            
+            const cards = ['park', 'sport', 'med'];
+            cards.forEach(c => {
+                const element = document.getElementById(`card-${c}`);
+                if (c === key) {
+                    element.className = "project-card cursor-pointer p-3 rounded-xl bg-slate-900 border-2 border-amber-500/70 shadow-lg shadow-amber-500/5 flex items-center justify-between gap-3";
+                } else {
+                    element.className = "project-card cursor-pointer p-3 rounded-xl bg-slate-950/40 border border-slate-800 flex items-center justify-between gap-3";
+                }
+            });
+
+            chartProjectEmoji.innerText = projects[key].emoji;
+            chartProjectTitle.innerText = projects[key].title[currentLang] + " • " + (currentLang === 'RU' ? "Предельный анализ" : "Marginal Analysis");
+
+            updateModel();
+        }
+
+        function updateModel() {
+            const p = projects[currentProjectKey];
+            const q = parseFloat(rangeQ.value);
+            const social = parseFloat(rangeSocial.value);
+            const cost = parseFloat(rangeCost.value);
+            const l = dict[currentLang];
+
+            valQ.innerText = q;
+            valSocial.innerText = social.toFixed(1);
+            valCost.innerText = cost.toFixed(1);
+
+            const denominator = p.mbSlope + (p.baseMC * cost);
+            let qOpt = 0;
+            if (denominator > 0) {
+                qOpt = (p.baseMB * social - p.mcBase) / denominator;
+            }
+            qOpt = Math.min(100, Math.max(0, qOpt));
+            optimumQDisp.innerText = Math.round(qOpt) + ' ' + l.unitUnits;
+
+            const mbCurr = Math.max(0, (p.baseMB * social) - (p.mbSlope * q));
+            const mcCurr = (p.baseMC * cost * q) + p.mcBase;
+
+            currentMDisp.innerText = Math.round(mbCurr) + ' / ' + Math.round(mcCurr);
+
+            const piCurr = mcCurr > 0 ? (mbCurr / mcCurr) : 0;
+            tablePiCurr.innerText = piCurr.toFixed(2);
+            if (piCurr >= 1.0) {
+                tablePiCurr.className = "text-right font-black text-emerald-600 font-mono";
+            } else {
+                tablePiCurr.className = "text-right font-black text-rose-600 font-mono";
+            }
+
+            const tbCurr = (p.baseMB * social * q) - (0.5 * p.mbSlope * Math.pow(q, 2));
+            const tcCurr = (0.5 * p.baseMC * cost * Math.pow(q, 2)) + (p.mcBase * q);
+            const nsbCurr = tbCurr - tcCurr;
+            
+            nsbDisp.innerText = Math.round(nsbCurr) + ' ' + l.unitMlnTenge;
+            if (nsbCurr >= 0) {
+                nsbDisp.className = "text-sm md:text-base font-black text-purple-700 font-mono";
+            } else {
+                nsbDisp.className = "text-sm md:text-base font-black text-rose-600 font-mono";
+            }
+
+            const mbOpt = Math.max(0, (p.baseMB * social) - (p.mbSlope * qOpt));
+            const mcOpt = (p.baseMC * cost * qOpt) + p.mcBase;
+
+            tableCurrMB.innerText = Math.round(mbCurr) + ' ' + l.unitMlnTenge;
+            tableOptMB.innerText = Math.round(mbOpt) + ' ' + l.unitMlnTenge;
+            tableCurrMC.innerText = Math.round(mcCurr) + ' ' + l.unitMlnTenge;
+            tableOptMC.innerText = Math.round(mcOpt) + ' ' + l.unitMlnTenge;
+
+            let lossVal = 0;
+            if (q < qOpt) {
+                const tbOpt = (p.baseMB * social * qOpt) - (0.5 * p.mbSlope * Math.pow(qOpt, 2));
+                const tcOpt = (0.5 * p.baseMC * cost * Math.pow(qOpt, 2)) + (p.mcBase * qOpt);
+                const nsbOpt = tbOpt - tcOpt;
+                lossVal = Math.max(0, nsbOpt - nsbCurr);
+                tableLossStatus.innerText = l.statusDeficit;
+                tableLossStatus.className = "text-right text-amber-500 font-extrabold font-mono text-[9px]";
+            } else {
+                const tbOpt = (p.baseMB * social * qOpt) - (0.5 * p.mbSlope * Math.pow(qOpt, 2));
+                const tcOpt = (0.5 * p.baseMC * cost * Math.pow(qOpt, 2)) + (p.mcBase * qOpt);
+                const nsbOpt = tbOpt - tcOpt;
+                lossVal = Math.max(0, nsbOpt - nsbCurr);
+                tableLossStatus.innerText = l.statusOver;
+                tableLossStatus.className = "text-right text-rose-500 font-extrabold font-mono text-[9px]";
+            }
+            tableLossValue.innerText = Math.round(lossVal) + ' ' + l.unitMlnTenge;
+
+            const diffQ = q - qOpt;
+            const tolerance = 3;
+            
+            let statusText = l.statusOptimal;
+            let descText = l.statusOptimalDesc;
+            let statusColor = "text-emerald-600";
+            let borderStyle = "border-l-emerald-600";
+            let kpiBg = "rgba(16, 185, 129, 0.1)";
+
+            if (diffQ > tolerance) {
+                statusText = l.statusOver;
+                descText = l.statusOverDesc;
+                statusColor = "text-rose-600";
+                borderStyle = "border-l-rose-500";
+                kpiBg = "rgba(239, 68, 68, 0.05)";
+                wasteAlertBadge.className = "absolute top-2 right-2 px-2.5 py-1 rounded-md text-[9px] font-bold shadow-sm border bg-rose-950 border-rose-500/50 text-rose-300 flex items-center gap-1.5 transition-all opacity-100";
+            } else if (diffQ < -tolerance) {
+                statusText = l.statusDeficit;
+                descText = l.statusDeficitDesc;
+                statusColor = "text-amber-600";
+                borderStyle = "border-l-amber-500";
+                kpiBg = "rgba(245, 158, 11, 0.05)";
+                wasteAlertBadge.className = "absolute top-2 right-2 px-2.5 py-1 rounded-md text-[9px] font-bold shadow-sm border flex items-center gap-1.5 transition-all opacity-0";
+            } else {
+                wasteAlertBadge.className = "absolute top-2 right-2 px-2.5 py-1 rounded-md text-[9px] font-bold shadow-sm border flex items-center gap-1.5 transition-all opacity-0";
+            }
+
+            statusBox.innerText = statusText;
+            statusBox.className = `text-xs md:text-sm font-black uppercase tracking-tight leading-tight ${statusColor}`;
+            statusDesc.innerText = descText;
+            kpiEfficiency.className = `workspace-light p-3.5 rounded-xl text-center flex flex-col justify-center border-l-4 ${borderStyle} transition-all`;
+            kpiEfficiency.style.backgroundColor = kpiBg;
+
+            let verdict = "";
+            if (currentLang === 'RU') {
+                if (diffQ < -tolerance) {
+                    verdict += `⚠️ <strong>Дефицит масштаба:</strong> Текущий объем <strong>(${q} ед.)</strong> оставляет проект недофинансированным. Предельная выгода общества (MB: <strong>${Math.round(mbCurr)} млн ₸</strong>) превышает предельные издержки (MC: <strong>${Math.round(mcCurr)} млн ₸</strong>). `;
+                    verdict += `Общество недополучает ценность. <span class="text-amber-600 font-bold">Увеличьте Q до ${Math.round(qOpt)} ед.</span>, чтобы покрыть спрос и ликвидировать упущенный излишек в <strong>${Math.round(lossVal)} млн ₸</strong>.`;
+                } else if (diffQ > tolerance) {
+                    verdict += `🚨 <strong>Перерасход бюджета:</strong> Проект раздут до <strong>${q} ед.</strong> Предельные издержки (MC: <strong>${Math.round(mcCurr)} млн ₸</strong>) превысили предельную выгоду (MB: <strong>${Math.round(mbCurr)} млн ₸</strong>). `;
+                    verdict += `<span class="text-rose-600 font-bold">Совет:</span> Сократите масштаб блага до <strong>${Math.round(qOpt)} ед.</strong>, чтобы ликвидировать растрату средств в объеме <strong>${Math.round(lossVal)} млн ₸</strong>.`;
+                } else {
+                    verdict += `🌟 <strong>Парето-оптимум достигнут!</strong> Масштаб в <strong>${q} ед.</strong> является идеально сбалансированным (MB ≈ MC). `;
+                    verdict += `Чистый профицит общественного благосостояния максимизирован и составляет <strong class="text-emerald-600">${Math.round(nsbCurr)} млн ₸</strong>.`;
+                }
+            } else {
+                if (diffQ < -tolerance) {
+                    verdict += `⚠️️ <strong>Scale Underprovision:</strong> Current scale of <strong>(${q} units)</strong> leaves the project underfunded. Marginal benefit (MB: <strong>${Math.round(mbCurr)} M ₸</strong>) exceeds marginal cost (MC: <strong>${Math.round(mcCurr)} M ₸</strong>). `;
+                    verdict += `<span class="text-amber-600 font-bold">Increase Q to ${Math.round(qOpt)} units</span> to cover demand and eliminate the underprovision loss of <strong>${Math.round(lossVal)} M ₸</strong>.`;
+                } else if (diffQ > tolerance) {
+                    verdict += `🚨 <strong>Budget Overallocation:</strong> Project expanded to <strong>${q} units</strong> where marginal cost (MC: <strong>${Math.round(mcCurr)} M ₸</strong>) exceeds marginal benefit (MB: <strong>${Math.round(mbCurr)} M ₸</strong>). `;
+                    verdict += `<span class="text-rose-600 font-bold">Recommendation:</span> Scale down to <strong>${Math.round(qOpt)} units</strong> to eliminate public waste of <strong>${Math.round(lossVal)} M ₸</strong>.`;
+                } else {
+                    verdict += `🌟 <strong>Pareto Optimum Achieved!</strong> Current scale of <strong>${q} units</strong> is fully balanced (MB ≈ MC). `;
+                    verdict += `Net social surplus is maximized at <strong class="text-emerald-600">${Math.round(nsbCurr)} M ₸</strong> with zero welfare loss.`;
+                }
+            }
+            verdictContent.innerHTML = verdict;
+
+            drawCurves(p, social, cost, q, qOpt);
+        }
+
+        function drawCurves(p, social, cost, currentQ, qOpt) {
+            svgChart.innerHTML = '';
+
+            const showSurplus = showSurplusCheck.checked;
+            const showLosses = showLossesCheck.checked;
+
+            function getMB(x) { return Math.max(0, (p.baseMB * social) - (p.mbSlope * x)); }
+            function getMC(x) { return (p.baseMC * cost * x) + p.mcBase; }
+
+            // 1. SURPLUS polygon
+            if (showSurplus) {
+                const limitQ = Math.min(currentQ, qOpt);
+                let points = [];
+                points.push(`${gx(0)},${gy(getMC(0))}`);
+                for (let x = 1; x <= limitQ; x += 1) {
+                    points.push(`${gx(x)},${gy(getMC(x))}`);
+                }
+                for (let x = Math.floor(limitQ); x >= 0; x -= 1) {
+                    points.push(`${gx(x)},${gy(getMB(x))}`);
+                }
+                const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                poly.setAttribute("points", points.join(" "));
+                poly.setAttribute("fill", "rgba(16, 185, 129, 0.12)");
+                poly.setAttribute("stroke", "rgba(16, 185, 129, 0.2)");
+                svgChart.appendChild(poly);
+            }
+
+            // 2. LOSSES polygon
+            if (showLosses) {
+                if (currentQ < qOpt) {
+                    let points = [];
+                    points.push(`${gx(currentQ)},${gy(getMC(currentQ))}`);
+                    for (let x = currentQ; x <= qOpt; x += 1) {
+                        points.push(`${gx(x)},${gy(getMC(x))}`);
+                    }
+                    for (let x = Math.floor(qOpt); x >= currentQ; x -= 1) {
+                        points.push(`${gx(x)},${gy(getMB(x))}`);
+                    }
+                    const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                    poly.setAttribute("points", points.join(" "));
+                    poly.setAttribute("fill", "rgba(245, 158, 11, 0.12)");
+                    poly.setAttribute("stroke", "rgba(245, 158, 11, 0.2)");
+                    svgChart.appendChild(poly);
+                } else if (currentQ > qOpt) {
+                    let points = [];
+                    points.push(`${gx(qOpt)},${gy(getMB(qOpt))}`);
+                    for (let x = qOpt; x <= currentQ; x += 1) {
+                        points.push(`${gx(x)},${gy(getMB(x))}`);
+                    }
+                    for (let x = Math.floor(currentQ); x >= qOpt; x -= 1) {
+                        points.push(`${gx(x)},${gy(getMC(x))}`);
+                    }
+                    const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+                    poly.setAttribute("points", points.join(" "));
+                    poly.setAttribute("fill", "rgba(239, 68, 68, 0.12)");
+                    poly.setAttribute("stroke", "rgba(239, 68, 68, 0.2)");
+                    svgChart.appendChild(poly);
+                }
+            }
+
+            // Background grid
+            for (let i = 1; i <= 4; i++) {
+                const xVal = (maxScaleX / 4) * i;
+                const yVal = (maxScaleY / 4) * i;
+
+                const lineV = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                lineV.setAttribute("x1", gx(xVal)); lineV.setAttribute("y1", gy(0));
+                lineV.setAttribute("x2", gx(xVal)); lineV.setAttribute("y2", gy(maxScaleY));
+                lineV.setAttribute("stroke", "#e2e8f0");
+                svgChart.appendChild(lineV);
+
+                const lineH = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                lineH.setAttribute("x1", gx(0)); lineH.setAttribute("y1", gy(yVal));
+                lineH.setAttribute("x2", gx(maxScaleX)); lineH.setAttribute("y2", gy(yVal));
+                lineH.setAttribute("stroke", "#e2e8f0");
+                svgChart.appendChild(lineH);
+
+                const labelX = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                labelX.setAttribute("x", gx(xVal)); labelX.setAttribute("y", "242");
+                labelX.setAttribute("fill", "#94a3b8"); labelX.setAttribute("font-size", "7.5");
+                labelX.setAttribute("text-anchor", "middle");
+                labelX.textContent = `${Math.round(xVal)}`;
+                svgChart.appendChild(labelX);
+
+                const labelY = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                labelY.setAttribute("x", "38"); labelY.setAttribute("y", gy(yVal) + 3);
+                labelY.setAttribute("fill", "#94a3b8"); labelY.setAttribute("font-size", "7.5");
+                labelY.setAttribute("text-anchor", "end");
+                labelY.textContent = `${Math.round(yVal)}`;
+                svgChart.appendChild(labelY);
+            }
+
+            // Boundary axes
+            const axisX = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            axisX.setAttribute("x1", "45"); axisX.setAttribute("y1", "230");
+            axisX.setAttribute("x2", "635"); axisX.setAttribute("y2", "230");
+            axisX.setAttribute("stroke", "#475569"); axisX.setAttribute("stroke-width", "1.5");
+            svgChart.appendChild(axisX);
+
+            const axisY = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            axisY.setAttribute("x1", "45"); axisY.setAttribute("y1", "10");
+            axisY.setAttribute("x2", "45"); axisY.setAttribute("y2", "230");
+            axisY.setAttribute("stroke", "#475569"); axisY.setAttribute("stroke-width", "1.5");
+            svgChart.appendChild(axisY);
+
+            // Curves
+            let mbPathPoints = [];
+            let mcPathPoints = [];
+            for (let x = 0; x <= 100; x += 1) {
+                mbPathPoints.push(`${gx(x)},${gy(getMB(x))}`);
+                mcPathPoints.push(`${gx(x)},${gy(getMC(x))}`);
+            }
+
+            const pathMB = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            pathMB.setAttribute("d", "M " + mbPathPoints.join(" L "));
+            pathMB.setAttribute("fill", "none");
+            pathMB.setAttribute("stroke", "#10b981");
+            pathMB.setAttribute("stroke-width", "3.5");
+            svgChart.appendChild(pathMB);
+
+            const pathMC = document.createElementNS("http://www.w3.org/2000/svg", "path");
+            pathMC.setAttribute("d", "M " + mcPathPoints.join(" L "));
+            pathMC.setAttribute("fill", "none");
+            pathMC.setAttribute("stroke", "#f43f5e");
+            pathMC.setAttribute("stroke-width", "3.5");
+            svgChart.appendChild(pathMC);
+
+            // Projections
+            const mbAtQ = getMB(currentQ);
+            const mcAtQ = getMC(currentQ);
+
+            const projLineX = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            projLineX.setAttribute("x1", gx(currentQ)); projLineX.setAttribute("y1", gy(Math.max(mbAtQ, mcAtQ)));
+            projLineX.setAttribute("x2", gx(currentQ)); projLineX.setAttribute("y2", gy(0));
+            projLineX.setAttribute("stroke", "#6366f1"); projLineX.setAttribute("stroke-width", "1.5");
+            projLineX.setAttribute("stroke-dasharray", "2,2");
+            svgChart.appendChild(projLineX);
+
+            const projLineMB = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            projLineMB.setAttribute("x1", gx(currentQ)); projLineMB.setAttribute("y1", gy(mbAtQ));
+            projLineMB.setAttribute("x2", gx(0)); projLineMB.setAttribute("y2", gy(mbAtQ));
+            projLineMB.setAttribute("stroke", "#10b981"); projLineMB.setAttribute("stroke-dasharray", "1.5,1.5");
+            svgChart.appendChild(projLineMB);
+
+            const projLineMC = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            projLineMC.setAttribute("x1", gx(currentQ)); projLineMC.setAttribute("y1", gy(mcAtQ));
+            projLineMC.setAttribute("x2", gx(0)); projLineMC.setAttribute("y2", gy(mcAtQ));
+            projLineMC.setAttribute("stroke", "#f43f5e"); projLineMC.setAttribute("stroke-dasharray", "1.5,1.5");
+            svgChart.appendChild(projLineMC);
+
+            const labelXValue = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            labelXValue.setAttribute("x", gx(currentQ)); labelXValue.setAttribute("y", "244");
+            labelXValue.setAttribute("fill", "#4f46e5"); labelXValue.setAttribute("font-size", "8");
+            labelXValue.setAttribute("font-weight", "extrabold");
+            labelXValue.setAttribute("text-anchor", "middle");
+            labelXValue.textContent = `Q=${Math.round(currentQ)}`;
+            svgChart.appendChild(labelXValue);
+
+            const dotMB = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            dotMB.setAttribute("cx", gx(currentQ)); dotMB.setAttribute("cy", gy(mbAtQ));
+            dotMB.setAttribute("r", "4.5"); dotMB.setAttribute("fill", "#10b981");
+            dotMB.setAttribute("stroke", "#ffffff"); dotMB.setAttribute("stroke-width", "1.5");
+            svgChart.appendChild(dotMB);
+
+            const dotMC = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            dotMC.setAttribute("cx", gx(currentQ)); dotMC.setAttribute("cy", gy(mcAtQ));
+            dotMC.setAttribute("r", "4.5"); dotMC.setAttribute("fill", "#f43f5e");
+            dotMC.setAttribute("stroke", "#ffffff"); dotMC.setAttribute("stroke-width", "1.5");
+            svgChart.appendChild(dotMC);
+
+            // Optimum marker E*
+            const optimalY = getMB(qOpt);
+            const dotOpt = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            dotOpt.setAttribute("cx", gx(qOpt)); dotOpt.setAttribute("cy", gy(optimalY));
+            dotOpt.setAttribute("r", "5.5"); dotOpt.setAttribute("fill", "#10b981");
+            dotOpt.setAttribute("stroke", "#ffffff"); dotOpt.setAttribute("stroke-width", "1.8");
+            dotOpt.setAttribute("class", "pulse-dot");
+            svgChart.appendChild(dotOpt);
+
+            const optLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            optLabel.setAttribute("x", gx(qOpt) + 8); optLabel.setAttribute("y", gy(optimalY) - 5);
+            optLabel.setAttribute("fill", "#10b981"); optLabel.setAttribute("font-size", "7.5");
+            optLabel.setAttribute("font-weight", "black");
+            optLabel.textContent = `E* (${currentLang === 'RU' ? 'Оптимум' : 'Optimum'})`;
+            svgChart.appendChild(optLabel);
+        }
+
+        let isDrawing = false;
+
+        function handleInteractiveDrag(evt) {
+            const rect = svgChart.getBoundingClientRect();
+            let clientX = evt.clientX || (evt.touches && evt.touches[0].clientX);
+            if (!clientX) return;
+
+            const xPx = clientX - rect.left;
+            const mappedQ = unmapX((xPx / rect.width) * 650);
+
+            if (mappedQ >= 5 && mappedQ <= 100) {
+                rangeQ.value = Math.round(mappedQ);
+                updateModel();
+            }
+        }
+
+        svgChart.addEventListener('mousedown', (e) => {
+            isDrawing = true;
+            handleInteractiveDrag(e);
+        });
+        svgChart.addEventListener('mousemove', (e) => {
+            if (isDrawing) handleInteractiveDrag(e);
+        });
+        window.addEventListener('mouseup', () => { isDrawing = false; });
+
+        svgChart.addEventListener('touchstart', (e) => {
+            isDrawing = true;
+            handleInteractiveDrag(e);
+            e.preventDefault();
+        });
+        svgChart.addEventListener('touchmove', (e) => {
+            if (isDrawing) handleInteractiveDrag(e);
+        });
+        window.addEventListener('touchend', () => { isDrawing = false; });
+
+        const inputControls = [rangeQ, rangeSocial, rangeCost, showSurplusCheck, showLossesCheck];
+        inputControls.forEach(inp => inp.addEventListener('input', updateModel));
+
+        selectProject('park');
+    </script>
+</body>
+</html>

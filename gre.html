@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Государство на рынке | Микроэкономика</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        
+        /* Адаптивные контейнеры графиков Chart.js */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 380px;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 230px !important;
+            }
+        }
+
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .nav-item.active {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            border-right: 4px solid #4338ca;
+            font-weight: 700;
+        }
+
+        /* Стили для мобильных табов */
+        .mobile-tab.active {
+            background-color: #4338ca;
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .view-section {
+            display: none;
+            animation: fadeIn 0.35s ease-in-out;
+        }
+        .view-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Оформление формул */
+        .formula-box {
+            background-color: #f1f5f9;
+            border-left: 4px solid #4338ca;
+            padding: 0.75rem 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1rem;
+            margin: 0.75rem 0;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row h-screen overflow-hidden antialiased">
+
+    <!-- Sidebar Navigation (для десктопа) -->
+    <aside class="w-64 bg-white border-r border-slate-200 flex-col hidden md:flex z-10 shadow-sm shrink-0 justify-between">
+        <div>
+            <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+                <div>
+                    <h1 class="text-base font-extrabold text-indigo-900 leading-tight" id="sidebar-title">🏛️ Государство на рынке</h1>
+                    <p class="text-[10px] text-slate-500 mt-0.5 font-semibold uppercase tracking-wider" id="sidebar-subtitle">Микроэкономика • Лекция</p>
+                </div>
+            </div>
+            
+            <!-- Переключатель языка на десктопе -->
+            <div class="px-6 py-3 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-500" id="lbl-lang">Язык / Lang:</span>
+                <button onclick="toggleLanguage()" class="px-2.5 py-1 bg-indigo-600 text-white font-extrabold rounded text-xs hover:bg-indigo-700 transition flex items-center gap-1 shadow-sm">
+                    🌐 <span id="lang-btn-text">EN</span>
+                </button>
+            </div>
+
+            <nav class="flex-1 overflow-y-auto py-2">
+                <ul class="space-y-1">
+                    <li><button class="nav-item active w-full text-left px-6 py-3 text-xs text-slate-600 hover:bg-slate-50 transition-colors" data-target="view-overview" id="nav-overview">📋 Провалы рынка</button></li>
+                    <li><button class="nav-item w-full text-left px-6 py-3 text-xs text-slate-600 hover:bg-slate-50 transition-colors" data-target="view-monopoly" id="nav-monopoly">⚖️ Монополии и HHI</button></li>
+                    <li><button class="nav-item w-full text-left px-6 py-3 text-xs text-slate-600 hover:bg-slate-50 transition-colors" data-target="view-public-goods" id="nav-public">🌳 Общественные блага</button></li>
+                    <li><button class="nav-item w-full text-left px-6 py-3 text-xs text-slate-600 hover:bg-slate-50 transition-colors" data-target="view-international" id="nav-trade">🛳️ Международные рынки</button></li>
+                    <li><button class="nav-item w-full text-left px-6 py-3 text-xs text-slate-600 hover:bg-slate-50 transition-colors" data-target="view-insights" id="nav-insights">💡 Бизнес-инсайты</button></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="p-4 border-t border-slate-100 text-center text-[10px] text-slate-400 font-bold" id="sidebar-footer">
+            School of Economics and Digital Technologies • Almaty, AlmaU 2026
+        </div>
+    </aside>
+
+    <!-- Header & Mobile Tabs (для смартфонов) -->
+    <div class="md:hidden bg-white border-b border-slate-200 sticky top-0 z-20 shadow-sm">
+        <div class="p-3 flex justify-between items-center border-b border-slate-100">
+            <h1 class="text-xs font-black text-indigo-950 uppercase tracking-wide" id="mob-title">🏛️ Государство на рынке</h1>
+            <button onclick="toggleLanguage()" class="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded-md font-bold">🌐 <span id="mob-lang-btn">EN</span></button>
+        </div>
+        <!-- Горизонтальная прокрутка разделов на смартфоне -->
+        <div class="flex overflow-x-auto p-2 gap-1.5 no-scrollbar bg-slate-50">
+            <button class="mobile-tab active text-xs whitespace-nowrap px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700" data-target="view-overview" id="mob-tab-overview">📋 Провалы</button>
+            <button class="mobile-tab text-xs whitespace-nowrap px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700" data-target="view-monopoly" id="mob-tab-monopoly">⚖️ HHI</button>
+            <button class="mobile-tab text-xs whitespace-nowrap px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700" data-target="view-public-goods" id="mob-tab-public">🌳 Общественные</button>
+            <button class="mobile-tab text-xs whitespace-nowrap px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700" data-target="view-international" id="mob-tab-trade">🛳️ Тарифы</button>
+            <button class="mobile-tab text-xs whitespace-nowrap px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700" data-target="view-insights" id="mob-tab-insights">💡 Инсайты</button>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 h-full overflow-y-auto bg-slate-50 relative flex flex-col justify-between">
+        <div class="p-4 md:p-8 max-w-5xl mx-auto w-full">
+
+            <!-- ================= VIEW: OVERVIEW ================= -->
+            <section id="view-overview" class="view-section active">
+                <header class="mb-6 md:mb-8">
+                    <h2 class="text-xl md:text-3xl font-extrabold text-slate-900 mb-2" id="ov-h2">Концепция провалов рынка</h2>
+                    <p class="text-slate-600 leading-relaxed text-sm md:text-base" id="ov-p">
+                        Обзор фундаментальных причин, по которым свободный рынок не обеспечивает социально оптимальное распределение ресурсов.
+                    </p>
+                </header>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6 mb-6">
+                    <p class="mb-4 text-sm md:text-base text-slate-700" id="ov-intro">
+                        В идеальных условиях рынок ведёт к Парето-эффективности (<span class="font-bold text-indigo-700">P = MC</span>). Однако на практике возникают <strong>провалы рынка (Market Failures)</strong>, требующие государственного вмешательства:
+                    </p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4 mt-4">
+                        <div class="p-4 bg-indigo-50/70 rounded-xl border border-indigo-100">
+                            <div class="text-xl mb-1">⚖️</div>
+                            <h3 class="font-bold text-indigo-950 text-sm md:text-base mb-1" id="mf1-title">1. Рыночная власть</h3>
+                            <p class="text-xs md:text-sm text-slate-600 leading-snug" id="mf1-desc">Монополии устанавливают P > MC, вызывая безвозвратные потери общества (Deadweight Loss).</p>
+                        </div>
+                        <div class="p-4 bg-teal-50/70 rounded-xl border border-teal-100">
+                            <div class="text-xl mb-1">🏭</div>
+                            <h3 class="font-bold text-teal-950 text-sm md:text-base mb-1" id="mf2-title">2. Внешние эффекты</h3>
+                            <p class="text-xs md:text-sm text-slate-600 leading-snug" id="mf2-desc">Издержки или выгоды перекладываются на третьих лиц (MSC = MC + MEC).</p>
+                        </div>
+                        <div class="p-4 bg-emerald-50/70 rounded-xl border border-emerald-100">
+                            <div class="text-xl mb-1">🌳</div>
+                            <h3 class="font-bold text-emerald-950 text-sm md:text-base mb-1" id="mf3-title">3. Общественные блага</h3>
+                            <p class="text-xs md:text-sm text-slate-600 leading-snug" id="mf3-desc">Несоперничество и неисключаемость порождают «проблему безбилетника» (Free-Rider).</p>
+                        </div>
+                        <div class="p-4 bg-rose-50/70 rounded-xl border border-rose-100">
+                            <div class="text-xl mb-1">🕵️‍♂️</div>
+                            <h3 class="font-bold text-rose-950 text-sm md:text-base mb-1" id="mf4-title">4. Асимметрия информации</h3>
+                            <p class="text-xs md:text-sm text-slate-600 leading-snug" id="mf4-desc">Ведёт к неблагоприятному отбору (Adverse Selection) и моральному риску (Moral Hazard).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-amber-50/80 rounded-xl shadow-sm border border-amber-200 p-4 md:p-6">
+                    <h3 class="font-bold text-amber-950 mb-1 flex items-center gap-2 text-sm md:text-base" id="rent-title"><span>💰</span> Поиск ренты (Rent Seeking)</h3>
+                    <p class="text-xs md:text-sm text-amber-900 leading-relaxed" id="rent-desc">
+                        Деятельность фирм по лоббированию своих интересов в правительстве для получения монопольных прав, квот или тарифов. Ресурсы тратятся не на создание ценности, а на перераспределение богатства.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ================= VIEW: MONOPOLY & HHI ================= -->
+            <section id="view-monopoly" class="view-section">
+                <header class="mb-6 md:mb-8">
+                    <h2 class="text-xl md:text-3xl font-extrabold text-slate-900 mb-2" id="mon-h2">Антимонопольный анализ и HHI</h2>
+                    <p class="text-slate-600 leading-relaxed text-sm md:text-base" id="mon-p">
+                        Оценка рыночной концентрации. Введите доли рынка компаний в калькулятор для расчёта индекса Херфиндаля-Хиршмана (HHI).
+                    </p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Formulas -->
+                    <div class="space-y-4">
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+                            <h3 class="font-bold text-slate-800 text-sm md:text-base mb-1" id="dwl-title">Безвозвратные потери (DWL)</h3>
+                            <div class="formula-box">
+                                DWL = ½ × (P<sub>M</sub> - MC) × (Q<sub>C</sub> - Q<sub>M</sub>)
+                            </div>
+                            <p class="text-xs text-slate-500" id="dwl-sub">P<sub>M</sub>, Q<sub>M</sub> — монополия; Q<sub>C</sub> — конкуренция.</p>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+                            <h3 class="font-bold text-slate-800 text-sm md:text-base mb-1" id="hhi-formula-title">Индекс HHI</h3>
+                            <div class="formula-box">
+                                HHI = ∑ (w<sub>i</sub>)<sup>2</sup>
+                            </div>
+                            <ul class="text-xs md:text-sm text-slate-600 space-y-1.5 mt-3">
+                                <li>🟢 <span class="font-semibold" id="hhi-scale-low">HHI < 1500: Низкая концентрация</span></li>
+                                <li>🟡 <span class="font-semibold" id="hhi-scale-mod">1500 – 2500: Умеренная концентрация</span></li>
+                                <li>🔴 <span class="font-semibold" id="hhi-scale-high">HHI > 2500: Высокая концентрация</span></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Calculator -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6 flex flex-col">
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base mb-3" id="calc-title">Калькулятор HHI</h3>
+                        
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                                <label class="text-xs font-semibold w-16" id="lbl-f1">Фирма 1:</label>
+                                <input type="number" id="firm1" value="40" min="0" max="100" class="border border-slate-300 rounded px-2 py-1 w-14 text-xs hhi-input"> %
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                                <label class="text-xs font-semibold w-16" id="lbl-f2">Фирма 2:</label>
+                                <input type="number" id="firm2" value="30" min="0" max="100" class="border border-slate-300 rounded px-2 py-1 w-14 text-xs hhi-input"> %
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                                <label class="text-xs font-semibold w-16" id="lbl-f3">Фирма 3:</label>
+                                <input type="number" id="firm3" value="20" min="0" max="100" class="border border-slate-300 rounded px-2 py-1 w-14 text-xs hhi-input"> %
+                            </div>
+                            <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                                <label class="text-xs font-semibold w-16" id="lbl-f4">Фирма 4:</label>
+                                <input type="number" id="firm4" value="10" min="0" max="100" class="border border-slate-300 rounded px-2 py-1 w-14 text-xs hhi-input"> %
+                            </div>
+                        </div>
+                        <div class="text-xs text-rose-500 hidden font-semibold mb-2" id="hhi-error">Сумма долей > 100%!</div>
+
+                        <!-- Chart Container -->
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="hhiChart"></canvas>
+                        </div>
+                        
+                        <div class="text-center mt-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <div class="text-xs text-slate-500 uppercase font-bold" id="lbl-hhi-val">Значение HHI:</div>
+                            <div id="hhi-result" class="text-2xl md:text-3xl font-black text-indigo-700">2500</div>
+                            <div id="hhi-status" class="text-xs md:text-sm font-bold text-rose-600">Высокая концентрация</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW: PUBLIC GOODS ================= -->
+            <section id="view-public-goods" class="view-section">
+                <header class="mb-6 md:mb-8">
+                    <h2 class="text-xl md:text-3xl font-extrabold text-slate-900 mb-2" id="pg-h2">Общественные блага</h2>
+                    <p class="text-slate-600 leading-relaxed text-sm md:text-base" id="pg-p">
+                        Вертикальное суммирование спроса и поиск оптимального Q* при изменении издержек (MC).
+                    </p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 space-y-4">
+                        <div class="bg-emerald-50/80 rounded-xl p-4 border border-emerald-100">
+                            <h3 class="font-bold text-emerald-950 text-sm mb-1" id="pg-props-title">Свойства благ:</h3>
+                            <ul class="text-xs text-emerald-800 space-y-1 list-disc pl-4">
+                                <li id="pg-prop1"><strong>Несоперничество</strong></li>
+                                <li id="pg-prop2"><strong>Неисключаемость</strong></li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+                            <h3 class="font-bold text-slate-800 text-sm mb-1" id="vsum-title">Вертикальное суммирование</h3>
+                            <p class="text-xs text-slate-600 mb-2" id="vsum-desc">Суммируется готовность платить (P), а не количество (Q):</p>
+                            <div class="formula-box text-xs py-1">
+                                ∑P<sub>T</sub> = 60 - 2Q
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+                        <div class="flex justify-between items-center mb-3">
+                            <h3 class="font-bold text-slate-800 text-sm md:text-base" id="pg-opt-title">Оптимум (∑P = MC)</h3>
+                            <div class="text-right">
+                                <span class="text-xs text-slate-500 uppercase font-bold">Q*: </span>
+                                <span id="pg-optimal-q" class="text-xl font-black text-teal-600">22.5</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1"><span id="lbl-mc">Издержки (MC):</span> <span id="mc-val-display" class="font-bold text-indigo-600">15</span></label>
+                            <input type="range" id="mc-slider" min="0" max="60" value="15" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-indigo-600">
+                        </div>
+
+                        <div class="chart-container">
+                            <canvas id="publicGoodsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW: INTERNATIONAL MARKETS ================= -->
+            <section id="view-international" class="view-section">
+                <header class="mb-6 md:mb-8">
+                    <h2 class="text-xl md:text-3xl font-extrabold text-slate-900 mb-2" id="tr-h2">Тарифы и Квоты</h2>
+                    <p class="text-slate-600 leading-relaxed text-sm md:text-base" id="tr-p">
+                        Моделирование специфицированного импортного тарифа и его влияние на рынок.
+                    </p>
+                </header>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 space-y-4">
+                        <div class="bg-indigo-900 text-white rounded-xl p-4 shadow-sm">
+                            <h3 class="font-bold text-sm mb-1" id="tr-card-title">Импортный тариф (T)</h3>
+                            <p class="text-xs text-indigo-200 mb-3" id="tr-card-desc">Поднимает цену до P<sub>t</sub> = P<sub>w</sub> + T.</p>
+                            
+                            <label class="block text-xs font-semibold text-indigo-300 mb-1"><span id="lbl-tariff">Тариф (T):</span> <span id="tariff-val-display" class="font-bold text-white">2.0</span></label>
+                            <input type="range" id="tariff-slider" min="0" max="6" step="0.5" value="2" class="w-full h-2 bg-indigo-700 rounded-lg appearance-none cursor-pointer accent-white mb-4">
+                            
+                            <div class="grid grid-cols-2 gap-2 text-center">
+                                <div class="bg-indigo-800/60 p-2 rounded-lg">
+                                    <div class="text-[9px] uppercase text-indigo-300" id="lbl-local-prod">Пр-во</div>
+                                    <div id="metric-local" class="text-base font-bold text-teal-300">30</div>
+                                </div>
+                                <div class="bg-indigo-800/60 p-2 rounded-lg">
+                                    <div class="text-[9px] uppercase text-indigo-300" id="lbl-import-vol">Импорт</div>
+                                    <div id="metric-import" class="text-base font-bold text-rose-300">40</div>
+                                </div>
+                                <div class="bg-indigo-800/60 p-2 rounded-lg col-span-2">
+                                    <div class="text-[9px] uppercase text-indigo-300" id="lbl-budget-rev">Доход бюджета</div>
+                                    <div id="metric-revenue" class="text-lg font-bold text-amber-400">80.0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base mb-2" id="tr-model-title">Модель тарифа</h3>
+                        <div class="chart-container">
+                            <canvas id="tariffChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ================= VIEW: BUSINESS INSIGHTS ================= -->
+            <section id="view-insights" class="view-section">
+                <header class="mb-6 md:mb-8">
+                    <h2 class="text-xl md:text-3xl font-extrabold text-slate-900 mb-2" id="ins-h2">Стратегические выводы</h2>
+                    <p class="text-slate-600 leading-relaxed text-sm md:text-base" id="ins-p">
+                        Применение теории провалов рынка в управленческих решениях.
+                    </p>
+                </header>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-base mb-2">⚖️</div>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base mb-1" id="ins1-title">1. Антимонопольный контроль</h3>
+                        <p class="text-xs md:text-sm text-slate-600 leading-relaxed" id="ins1-desc">
+                            Оценивайте M&A через HHI. Слияния на концентрированных рынках (HHI > 2500) будут заблокированы.
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+                        <div class="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-600 text-base mb-2">🌱</div>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base mb-1" id="ins2-title">2. Экстерналии и ESG</h3>
+                        <p class="text-xs md:text-sm text-slate-600 leading-relaxed" id="ins2-desc">
+                            Превращайте экологические риски в бренд-преимущества до введения жестких налогов Пигу.
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+                        <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 text-base mb-2">📡</div>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base mb-1" id="ins3-title">3. Платформенные модели</h3>
+                        <p class="text-xs md:text-sm text-slate-600 leading-relaxed" id="ins3-desc">
+                            Общественные блага монетизируются косвенно — через рекламу и агрегацию внимания.
+                        </p>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 md:p-6">
+                        <div class="w-8 h-8 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 text-base mb-2">🛡️</div>
+                        <h3 class="font-bold text-slate-800 text-sm md:text-base mb-1" id="ins4-title">4. Сигналы и Скрининг</h3>
+                        <p class="text-xs md:text-sm text-slate-600 leading-relaxed" id="ins4-desc">
+                            Преодолевайте асимметрию информации гарантиями (signaling) и проверкой контрагентов (screening).
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Main Footer -->
+        <footer class="text-center text-[11px] text-slate-400 py-4 border-t border-slate-200 bg-white font-semibold">
+            Школа цифровых технологий и экономики • AlmaU 2026
+        </footer>
+    </main>
+
+    <!-- Application Logic -->
+    <script>
+        let currentLang = 'RU';
+
+        const dict = {
+            RU: {
+                sidebarTitle: "🏛️ Государство на рынке",
+                sidebarSubtitle: "Микроэкономика • Экономика • Лекция ",
+                lblLang: "Язык / Lang:",
+                navOverview: "📋 Провалы рынка",
+                navMonopoly: "⚖️ Монополии и HHI",
+                navPublic: "🌳 Общественные блага",
+                navTrade: "🛳️ Международные рынки",
+                navInsights: "💡 Бизнес-инсайты",
+                mobOverview: "📋 Провалы",
+                mobMonopoly: "⚖️ HHI",
+                mobPublic: "🌳 Общественные",
+                mobTrade: "🛳️ Тарифы",
+                mobInsights: "💡 Инсайты",
+                ovH2: "Концепция провалов рынка",
+                ovP: "Обзор фундаментальных причин, по которым свободный рынок не обеспечивает социально оптимальное распределение ресурсов.",
+                ovIntro: "В идеальных условиях рынок ведёт к Парето-эффективности (P = MC). Однако на практике возникают провалы рынка (Market Failures), требующие государственного вмешательства:",
+                mf1Title: "1. Рыночная власть",
+                mf1Desc: "Монополии устанавливают P > MC, вызывая безвозвратные потери общества (Deadweight Loss).",
+                mf2Title: "2. Внешние эффекты",
+                mf2Desc: "Издержки или выгоды перекладываются на третьих лиц (MSC = MC + MEC).",
+                mf3Title: "3. Общественные блага",
+                mf3Desc: "Несоперничество и неисключаемость порождают «проблему безбилетника» (Free-Rider).",
+                mf4Title: "4. Асимметрия информации",
+                mf4Desc: "Ведёт к неблагоприятному отбору (Adverse Selection) и моральному риску (Moral Hazard).",
+                rentTitle: "💰 Поиск ренты (Rent Seeking)",
+                rentDesc: "Деятельность фирм по лоббированию своих интересов в правительстве для получения монопольных прав, квот или тарифов. Ресурсы тратятся не на создание ценности, а на перераспределение богатства.",
+                monH2: "Антимонопольный анализ и HHI",
+                monP: "Оценка рыночной концентрации. Введите доли рынка компаний в калькулятор для расчёта индекса Херфиндаля-Хиршмана (HHI).",
+                dwlTitle: "Безвозвратные потери (DWL)",
+                dwlSub: "PM, QM — монополия; QC — конкуренция.",
+                hhiFormulaTitle: "Индекс HHI",
+                hhiScaleLow: "HHI < 1500: Низкая концентрация",
+                hhiScaleMod: "1500 – 2500: Умеренная концентрация",
+                hhiScaleHigh: "HHI > 2500: Высокая концентрация",
+                calcTitle: "Калькулятор HHI",
+                lblF1: "Фирма 1:",
+                lblF2: "Фирма 2:",
+                lblF3: "Фирма 3:",
+                lblF4: "Фирма 4:",
+                lblHhiVal: "Значение HHI:",
+                pgH2: "Общественные блага",
+                pgP: "Вертикальное суммирование спроса и поиск оптимального Q* при изменении издержек (MC).",
+                pgPropsTitle: "Свойства благ:",
+                pgProp1: "Несоперничество",
+                pgProp2: "Неисключаемость",
+                vsumTitle: "Вертикальное суммирование",
+                vsumDesc: "Суммируется готовность платить (P), а не количество (Q):",
+                pgOptTitle: "Оптимум (∑P = MC)",
+                lblMc: "Издержки (MC):",
+                trH2: "Тарифы и Квоты",
+                trP: "Моделирование специфицированного импортного тарифа и его влияние на рынок.",
+                trCardTitle: "Импортный тариф (T)",
+                trCardDesc: "Поднимает цену до Pt = Pw + T.",
+                lblTariff: "Тариф (T):",
+                lblLocalProd: "Пр-во",
+                lblImportVol: "Импорт",
+                lblBudgetRev: "Доход бюджета",
+                trModelTitle: "Модель тарифа",
+                insH2: "Стратегические выводы",
+                insP: "Применение теории провалов рынка в управленческих решениях.",
+                ins1Title: "1. Антимонопольный контроль",
+                ins1Desc: "Оценивайте M&A через HHI. Слияния на концентрированных рынках (HHI > 2500) будут заблокированы.",
+                ins2Title: "2. Экстерналии и ESG",
+                ins2Desc: "Превращайте экологические риски в бренд-преимущества до введения жестких налогов Пигу.",
+                ins3Title: "3. Платформенные модели",
+                ins3Desc: "Общественные блага монетизируются косвенно — через рекламу и агрегацию внимания.",
+                ins4Title: "4. Сигналы и Скрининг",
+                ins4Desc: "Преодолевайте асимметрию информации гарантиями (signaling) и проверкой контрагентов (screening).",
+                hhiLow: "Низкая концентрация",
+                hhiMod: "Умеренная концентрация",
+                hhiHigh: "Высокая концентрация",
+                firmLabels: ['Фирма 1', 'Фирма 2', 'Фирма 3', 'Фирма 4'],
+                pgDatasetInd: 'Индив. (A,B)',
+                pgDatasetTotal: 'Совокуп. (∑P)',
+                trDatasetDemand: 'Спрос',
+                trDatasetSupply: 'Предложение',
+                trDatasetPt: 'Pt (с Тарифом)'
+            },
+            EN: {
+                sidebarTitle: "🏛️ Government in the Market",
+                sidebarSubtitle: "Microeconomics • Economics • Lecture",
+                lblLang: "Language / Язык:",
+                navOverview: "📋 Market Failures",
+                navMonopoly: "⚖️ Monopolies & HHI",
+                navPublic: "🌳 Public Goods",
+                navTrade: "🛳️️ Trade & Tariffs",
+                navInsights: "💡 Business Insights",
+                mobOverview: "📋 Failures",
+                mobMonopoly: "⚖️ HHI",
+                mobPublic: "🌳 Public",
+                mobTrade: "🛳️ Tariffs",
+                mobInsights: "💡 Insights",
+                ovH2: "Concept of Market Failures",
+                ovP: "Overview of fundamental reasons why the free market fails to allocate resources socially optimally.",
+                ovIntro: "Under ideal conditions, market competition achieves Pareto efficiency (P = MC). However, real-world Market Failures require state intervention:",
+                mf1Title: "1. Market Power",
+                mf1Desc: "Monopolies set P > MC, creating social Deadweight Loss (DWL).",
+                mf2Title: "2. Externalities",
+                mf2Desc: "Costs or benefits are spilled over onto third parties (MSC = MC + MEC).",
+                mf3Title: "3. Public Goods",
+                mf3Desc: "Non-rivalry and non-excludability trigger the Free-Rider problem.",
+                mf4Title: "4. Asymmetric Information",
+                mf4Desc: "Leads to Adverse Selection and Moral Hazard.",
+                rentTitle: "💰 Rent Seeking",
+                rentDesc: "Lobbying efforts by firms to secure government privileges, quotas, or tariffs. Resources are spent on wealth redistribution rather than value creation.",
+                monH2: "Antitrust Analysis & HHI",
+                monP: "Measuring market concentration. Input firm market shares to calculate the Herfindahl-Hirschman Index (HHI).",
+                dwlTitle: "Deadweight Loss (DWL)",
+                dwlSub: "PM, QM — monopoly; QC — competition.",
+                hhiFormulaTitle: "HHI Index",
+                hhiScaleLow: "HHI < 1500: Unconcentrated Market",
+                hhiScaleMod: "1500 – 2500: Moderately Concentrated",
+                hhiScaleHigh: "HHI > 2500: Highly Concentrated",
+                calcTitle: "HHI Calculator",
+                lblF1: "Firm 1:",
+                lblF2: "Firm 2:",
+                lblF3: "Firm 3:",
+                lblF4: "Firm 4:",
+                lblHhiVal: "HHI Value:",
+                pgH2: "Public Goods",
+                pgP: "Vertical summation of demand and finding optimal Q* as MC varies.",
+                pgPropsTitle: "Good Properties:",
+                pgProp1: "Non-rivalry",
+                pgProp2: "Non-excludability",
+                vsumTitle: "Vertical Summation",
+                vsumDesc: "Willingness to pay (P) is summed vertically, not quantity (Q):",
+                pgOptTitle: "Optimum (∑P = MC)",
+                lblMc: "Marginal Cost (MC):",
+                trH2: "Tariffs & Quotas",
+                trP: "Modeling specific import tariff impacts on local and international welfare.",
+                trCardTitle: "Import Tariff (T)",
+                trCardDesc: "Raises price to Pt = Pw + T.",
+                lblTariff: "Tariff (T):",
+                lblLocalProd: "Local Qs",
+                lblImportVol: "Imports",
+                lblBudgetRev: "Tariff Revenue",
+                trModelTitle: "Tariff Model",
+                insH2: "Strategic Insights",
+                insP: "Applying market failure theory in executive decision making.",
+                ins1Title: "1. Antitrust Policy",
+                ins1Desc: "Evaluate M&A using HHI. Mergers in concentrated markets (HHI > 2500) face regulatory blockades.",
+                ins2Title: "2. Externalities & ESG",
+                ins2Desc: "Turn environmental risks into brand advantages before Pigouvian taxes are imposed.",
+                ins3Title: "3. Platform Models",
+                ins3Desc: "Public goods can be monetized indirectly via advertising and attention aggregation.",
+                ins4Title: "4. Signaling & Screening",
+                ins4Desc: "Overcome information asymmetry using warranties (signaling) and vendor screening.",
+                hhiLow: "Low Concentration",
+                hhiMod: "Moderate Concentration",
+                hhiHigh: "High Concentration",
+                firmLabels: ['Firm 1', 'Firm 2', 'Firm 3', 'Firm 4'],
+                pgDatasetInd: 'Indiv. (A,B)',
+                pgDatasetTotal: 'Total (∑P)',
+                trDatasetDemand: 'Demand',
+                trDatasetSupply: 'Supply',
+                trDatasetPt: 'Pt (with Tariff)'
+            }
+        };
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'RU' ? 'EN' : 'RU';
+            document.getElementById('lang-btn-text').innerText = currentLang === 'RU' ? 'EN' : 'RU';
+            document.getElementById('mob-lang-btn').innerText = currentLang === 'RU' ? 'EN' : 'RU';
+
+            const l = dict[currentLang];
+            document.getElementById('sidebar-title').innerText = l.sidebarTitle;
+            document.getElementById('sidebar-subtitle').innerText = l.sidebarSubtitle;
+            document.getElementById('mob-title').innerText = l.sidebarTitle;
+            document.getElementById('lbl-lang').innerText = l.lblLang;
+
+            document.getElementById('nav-overview').innerText = l.navOverview;
+            document.getElementById('nav-monopoly').innerText = l.navMonopoly;
+            document.getElementById('nav-public').innerText = l.navPublic;
+            document.getElementById('nav-trade').innerText = l.navTrade;
+            document.getElementById('nav-insights').innerText = l.navInsights;
+
+            document.getElementById('mob-tab-overview').innerText = l.mobOverview;
+            document.getElementById('mob-tab-monopoly').innerText = l.mobMonopoly;
+            document.getElementById('mob-tab-public').innerText = l.mobPublic;
+            document.getElementById('mob-tab-trade').innerText = l.mobTrade;
+            document.getElementById('mob-tab-insights').innerText = l.mobInsights;
+
+            document.getElementById('ov-h2').innerText = l.ovH2;
+            document.getElementById('ov-p').innerText = l.ovP;
+            document.getElementById('ov-intro').innerHTML = l.ovIntro;
+            document.getElementById('mf1-title').innerText = l.mf1Title;
+            document.getElementById('mf1-desc').innerText = l.mf1Desc;
+            document.getElementById('mf2-title').innerText = l.mf2Title;
+            document.getElementById('mf2-desc').innerText = l.mf2Desc;
+            document.getElementById('mf3-title').innerText = l.mf3Title;
+            document.getElementById('mf3-desc').innerText = l.mf3Desc;
+            document.getElementById('mf4-title').innerText = l.mf4Title;
+            document.getElementById('mf4-desc').innerText = l.mf4Desc;
+            document.getElementById('rent-title').innerHTML = l.rentTitle;
+            document.getElementById('rent-desc').innerText = l.rentDesc;
+
+            document.getElementById('mon-h2').innerText = l.monH2;
+            document.getElementById('mon-p').innerText = l.monP;
+            document.getElementById('dwl-title').innerText = l.dwlTitle;
+            document.getElementById('dwl-sub').innerHTML = l.dwlSub;
+            document.getElementById('hhi-formula-title').innerText = l.hhiFormulaTitle;
+            document.getElementById('hhi-scale-low').innerText = l.hhiScaleLow;
+            document.getElementById('hhi-scale-mod').innerText = l.hhiScaleMod;
+            document.getElementById('hhi-scale-high').innerText = l.hhiScaleHigh;
+            document.getElementById('calc-title').innerText = l.calcTitle;
+            document.getElementById('lbl-f1').innerText = l.lblF1;
+            document.getElementById('lbl-f2').innerText = l.lblF2;
+            document.getElementById('lbl-f3').innerText = l.lblF3;
+            document.getElementById('lbl-f4').innerText = l.lblF4;
+            document.getElementById('lbl-hhi-val').innerText = l.lblHhiVal;
+
+            document.getElementById('pg-h2').innerText = l.pgH2;
+            document.getElementById('pg-p').innerText = l.pgP;
+            document.getElementById('pg-props-title').innerText = l.pgPropsTitle;
+            document.getElementById('pg-prop1').innerHTML = `<strong>${l.pgProp1}</strong>`;
+            document.getElementById('pg-prop2').innerHTML = `<strong>${l.pgProp2}</strong>`;
+            document.getElementById('vsum-title').innerText = l.vsumTitle;
+            document.getElementById('vsum-desc').innerText = l.vsumDesc;
+            document.getElementById('pg-opt-title').innerText = l.pgOptTitle;
+            document.getElementById('lbl-mc').innerText = l.lblMc;
+
+            document.getElementById('tr-h2').innerText = l.trH2;
+            document.getElementById('tr-p').innerText = l.trP;
+            document.getElementById('tr-card-title').innerText = l.trCardTitle;
+            document.getElementById('tr-card-desc').innerHTML = l.trCardDesc;
+            document.getElementById('lbl-tariff').innerText = l.lblTariff;
+            document.getElementById('lbl-local-prod').innerText = l.lblLocalProd;
+            document.getElementById('lbl-import-vol').innerText = l.lblImportVol;
+            document.getElementById('lbl-budget-rev').innerText = l.lblBudgetRev;
+            document.getElementById('tr-model-title').innerText = l.trModelTitle;
+
+            document.getElementById('ins-h2').innerText = l.insH2;
+            document.getElementById('ins-p').innerText = l.insP;
+            document.getElementById('ins1-title').innerText = l.ins1Title;
+            document.getElementById('ins1-desc').innerText = l.ins1Desc;
+            document.getElementById('ins2-title').innerText = l.ins2Title;
+            document.getElementById('ins2-desc').innerText = l.ins2Desc;
+            document.getElementById('ins3-title').innerText = l.ins3Title;
+            document.getElementById('ins3-desc').innerText = l.ins3Desc;
+            document.getElementById('ins4-title').innerText = l.ins4Title;
+            document.getElementById('ins4-desc').innerText = l.ins4Desc;
+
+            // Chart labels
+            hhiChart.data.labels = l.firmLabels;
+            pgChart.data.datasets[0].label = l.pgDatasetInd;
+            pgChart.data.datasets[1].label = l.pgDatasetTotal;
+            tariffChart.data.datasets[0].label = l.trDatasetDemand;
+            tariffChart.data.datasets[1].label = l.trDatasetSupply;
+            tariffChart.data.datasets[3].label = l.trDatasetPt;
+
+            updateHHI();
+            pgChart.update();
+            tariffChart.update();
+        }
+
+        // Navigation Logic
+        const navItems = document.querySelectorAll('.nav-item');
+        const mobileTabs = document.querySelectorAll('.mobile-tab');
+        const sections = document.querySelectorAll('.view-section');
+
+        function activateSection(targetId) {
+            navItems.forEach(item => {
+                if(item.dataset.target === targetId) item.classList.add('active');
+                else item.classList.remove('active');
+            });
+            mobileTabs.forEach(tab => {
+                if(tab.dataset.target === targetId) tab.classList.add('active');
+                else tab.classList.remove('active');
+            });
+            sections.forEach(sec => {
+                if(sec.id === targetId) sec.classList.add('active');
+                else sec.classList.remove('active');
+            });
+        }
+
+        navItems.forEach(item => item.addEventListener('click', (e) => activateSection(e.target.dataset.target)));
+        mobileTabs.forEach(tab => tab.addEventListener('click', (e) => activateSection(e.target.dataset.target)));
+
+        // HHI Chart
+        const hhiCtx = document.getElementById('hhiChart').getContext('2d');
+        const hhiChart = new Chart(hhiCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Фирма 1', 'Фирма 2', 'Фирма 3', 'Фирма 4'],
+                datasets: [{
+                    data: [40, 30, 20, 10],
+                    backgroundColor: ['#4f46e5', '#0ea5e9', '#10b981', '#f59e0b'],
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '65%',
+                plugins: {
+                    legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10, family: 'Inter'} } }
+                }
+            }
+        });
+
+        const inputs = document.querySelectorAll('.hhi-input');
+        const hhiResult = document.getElementById('hhi-result');
+        const hhiStatus = document.getElementById('hhi-status');
+        const hhiError = document.getElementById('hhi-error');
+
+        function updateHHI() {
+            let totalShare = 0, hhi = 0, dataArr = [];
+            const l = dict[currentLang];
+            inputs.forEach(input => {
+                let val = parseFloat(input.value) || 0;
+                totalShare += val;
+                hhi += (val * val);
+                dataArr.push(val);
+            });
+
+            if (totalShare > 100) {
+                hhiError.classList.remove('hidden');
+                hhiResult.innerText = "Error";
+                hhiStatus.innerText = "Sum > 100%";
+            } else {
+                hhiError.classList.add('hidden');
+                let roundedHhi = Math.round(hhi);
+                hhiResult.innerText = roundedHhi.toLocaleString();
+                
+                if (roundedHhi < 1500) {
+                    hhiStatus.innerText = l.hhiLow;
+                    hhiStatus.className = "text-xs md:text-sm font-bold text-emerald-600";
+                } else if (roundedHhi <= 2500) {
+                    hhiStatus.innerText = l.hhiMod;
+                    hhiStatus.className = "text-xs md:text-sm font-bold text-amber-600";
+                } else {
+                    hhiStatus.innerText = l.hhiHigh;
+                    hhiStatus.className = "text-xs md:text-sm font-bold text-rose-600";
+                }
+                hhiChart.data.datasets[0].data = dataArr;
+                hhiChart.update();
+            }
+        }
+        inputs.forEach(input => input.addEventListener('input', updateHHI));
+        updateHHI();
+
+        // Public Goods Chart
+        const pgCtx = document.getElementById('publicGoodsChart').getContext('2d');
+        const qPoints = Array.from({length: 31}, (_, i) => i);
+        const d_individual = qPoints.map(q => Math.max(0, 30 - q));
+        const d_total = qPoints.map(q => Math.max(0, 60 - 2 * q));
+
+        const pgChart = new Chart(pgCtx, {
+            type: 'line',
+            data: {
+                labels: qPoints,
+                datasets: [
+                    { label: 'Индив. (A,B)', data: d_individual, borderColor: '#94a3b8', borderWidth: 1.5, borderDash: [4, 4], pointRadius: 0 },
+                    { label: 'Совокуп. (∑P)', data: d_total, borderColor: '#4338ca', borderWidth: 2.5, pointRadius: 0 },
+                    { label: 'MC', data: Array(31).fill(15), borderColor: '#f59e0b', borderWidth: 2.5, pointRadius: 0 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { ticks: { font: { size: 9 } } },
+                    y: { min: 0, max: 65, ticks: { font: { size: 9 } } }
+                },
+                plugins: { legend: { labels: { boxWidth: 10, font: { size: 10 } } } }
+            }
+        });
+
+        const mcSlider = document.getElementById('mc-slider');
+        const mcValDisplay = document.getElementById('mc-val-display');
+        const pgOptimalQ = document.getElementById('pg-optimal-q');
+
+        mcSlider.addEventListener('input', (e) => {
+            const mc = parseFloat(e.target.value);
+            mcValDisplay.innerText = mc;
+            pgChart.data.datasets[2].data = Array(31).fill(mc);
+            pgChart.update();
+
+            let optQ = 30 - 0.5 * mc;
+            if (optQ < 0 || mc > 60) optQ = 0;
+            pgOptimalQ.innerText = optQ.toFixed(1);
+        });
+
+        // Tariff Chart
+        const tariffCtx = document.getElementById('tariffChart').getContext('2d');
+        const tQPoints = Array.from({length: 121}, (_, i) => i);
+        const tDemand = tQPoints.map(q => Math.max(0, 12 - 0.1 * q));
+        const tSupply = tQPoints.map(q => 1 + 0.1 * q);
+        const Pw = 4;
+
+        const tariffChart = new Chart(tariffCtx, {
+            type: 'line',
+            data: {
+                labels: tQPoints,
+                datasets: [
+                    { label: 'Спрос', data: tDemand, borderColor: '#6366f1', borderWidth: 2, pointRadius: 0 },
+                    { label: 'Предложение', data: tSupply, borderColor: '#14b8a6', borderWidth: 2, pointRadius: 0 },
+                    { label: 'Pw', data: Array(121).fill(Pw), borderColor: '#94a3b8', borderWidth: 1.5, borderDash: [4, 4], pointRadius: 0 },
+                    { label: 'Pt (с Тарифом)', data: Array(121).fill(6), borderColor: '#e11d48', borderWidth: 2.5, pointRadius: 0 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { ticks: { font: { size: 9 } } },
+                    y: { min: 0, max: 13, ticks: { font: { size: 9 } } }
+                },
+                plugins: { legend: { labels: { boxWidth: 10, font: { size: 10 } } } }
+            }
+        });
+
+        const tSlider = document.getElementById('tariff-slider');
+        const tValDisplay = document.getElementById('tariff-val-display');
+        const mLocal = document.getElementById('metric-local');
+        const mImport = document.getElementById('metric-import');
+        const mRev = document.getElementById('metric-revenue');
+
+        tSlider.addEventListener('input', (e) => {
+            const T = parseFloat(e.target.value);
+            tValDisplay.innerText = T.toFixed(1);
+            const Pt = Pw + T;
+            
+            tariffChart.data.datasets[3].data = Array(121).fill(Pt);
+            tariffChart.update();
+
+            let Qs = Math.max(0, (Pt - 1) * 10);
+            let Qd = Math.max(0, (12 - Pt) * 10);
+            let imports = Math.max(0, Qd - Qs);
+            let revenue = imports * T;
+
+            mLocal.innerText = Qs.toFixed(0);
+            mImport.innerText = imports.toFixed(0);
+            mRev.innerText = revenue.toFixed(1);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microeconomics: Monopoly Regulation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: radial-gradient(circle at center, #1b1c22 0%, #0c0d0e 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        h1, h2, h3 { font-family: 'Playfair Display', serif; }
+        
+        .maya-neon-border {
+            border: 1.5px solid #c5a059;
+            box-shadow: 0 0 15px rgba(197, 160, 89, 0.15);
+            background: #141519;
+        }
+        .neon-box {
+            background: #15171c;
+            border: 1px solid rgba(197, 160, 89, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Винтажные слайдеры */
+        .retro-slider-container {
+            position: relative;
+            background: #101114;
+            padding: 5px 8px;
+            border-radius: 6px;
+            border: 1px solid #2a2d37;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.8);
+        }
+        .retro-ticks {
+            height: 3px;
+            background: repeating-linear-gradient(90deg, #475569, #475569 1px, transparent 1px, transparent 8px);
+            margin-bottom: 3px;
+            opacity: 0.6;
+        }
+        input[type="range"].retro-range {
+            -webkit-appearance: none;
+            width: 100%;
+            background: #1f222a;
+            height: 5px;
+            border-radius: 3px;
+            outline: none;
+            border: 1px solid #334155;
+        }
+        input[type="range"].retro-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 8px;
+            height: 20px;
+            background: #ef4444;
+            border: 1px solid #fca5a5;
+            border-radius: 2px;
+            cursor: pointer;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+            transition: transform 0.1s;
+        }
+        input[type="range"].retro-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+
+        /* Переключатели */
+        .vintage-switch {
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 20px;
+        }
+        .vintage-switch input { opacity: 0; width: 0; height: 0; }
+        .vintage-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #262933;
+            transition: .3s;
+            border-radius: 20px;
+            border: 1px solid #475569;
+        }
+        .vintage-slider:before {
+            position: absolute;
+            content: "";
+            height: 12px;
+            width: 12px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #94a3b8;
+            transition: .3s;
+            border-radius: 50%;
+        }
+        input:checked + .vintage-slider { background-color: #c5a059; border-color: #fef08a; }
+        input:checked + .vintage-slider:before { transform: translateX(22px); background-color: #1e293b; }
+
+        .graph-grid { stroke: #475569; stroke-width: 0.8; stroke-dasharray: 4,4; opacity: 0.4; }
+        .drag-handle { cursor: grab; touch-action: none; }
+        .drag-handle:active { cursor: grabbing; }
+    </style>
+</head>
+<body class="p-2 md:p-3 flex flex-col justify-between min-h-screen">
+
+    <!-- Header -->
+    <header class="maya-neon-border max-w-6xl mx-auto w-full p-2.5 rounded-xl text-center mb-2.5 relative">
+        <div class="absolute right-3 top-2.5">
+            <button id="lang-btn" class="px-3 py-1 text-[10px] font-bold bg-[#c5a059] text-black rounded hover:bg-amber-400 transition shadow">
+                EN
+            </button>
+        </div>
+        <h1 class="text-lg md:text-xl font-extrabold text-[#c5a059] tracking-wide uppercase mb-0.5" id="txt-title">
+            Антимонопольное регулирование
+        </h1>
+        <p class="text-[11px] text-amber-100/80 font-medium" id="txt-subtitle">
+            Предельное ценообразование и анализ общественных потерь
+        </p>
+        <p class="text-[9px] text-slate-400 font-semibold tracking-widest uppercase mt-0.5" id="txt-tagline">
+            Микроэкономика • Принципы экономики
+        </p>
+    </header>
+
+    <main class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch w-full flex-grow">
+        
+        <!-- Controls Panel -->
+        <section class="lg:col-span-4 neon-box p-3 rounded-xl flex flex-col justify-between space-y-2 text-xs">
+            <div>
+                <div class="border-b border-slate-700/60 pb-1 mb-2">
+                    <h2 class="text-xs font-bold text-[#c5a059] uppercase tracking-wider" id="txt-params-header">Параметры рынка</h2>
+                </div>
+
+                <!-- Tariff Dropdown -->
+                <div class="mb-2 bg-[#101115] p-2 rounded-lg border border-amber-600/30">
+                    <label class="block text-[10px] text-amber-400 font-bold mb-1 uppercase tracking-wider" id="txt-lbl-esalmaty">
+                        ⚡ Тарифы «АлматыЭнергоСбыт» (сент. 2026):
+                    </label>
+                    <select id="tariff-select" class="w-full bg-[#1a1c23] text-slate-200 text-xs p-1.5 rounded border border-slate-700 focus:outline-none focus:border-[#c5a059]">
+                        <option value="custom">-- Произвольный тариф --</option>
+                        <option value="37.92">Базовый единый тариф (37.92 тг/кВт·ч)</option>
+                        <option value="34.28">1 уровень (до 90 кВт·ч) — 34.28 тг</option>
+                        <option value="45.51">2 уровень (90–160 кВт·ч) — 45.51 тг</option>
+                        <option value="56.89">3 уровень (свыше 160 кВт·ч) — 56.89 тг</option>
+                    </select>
+                </div>
+
+                <!-- Demand Intercept Slider -->
+                <div class="mb-2">
+                    <div class="flex justify-between mb-0.5">
+                        <span class="font-semibold text-slate-300" id="txt-lbl-demand">Параметр спроса (a)</span>
+                        <span class="text-[#c5a059] font-bold font-mono text-sm" id="a-val">75</span>
+                    </div>
+                    <div class="retro-slider-container">
+                        <div class="retro-ticks"></div>
+                        <input type="range" id="a-slider" class="retro-range" min="50" max="120" step="1" value="75">
+                    </div>
+                </div>
+
+                <!-- Base MC Slider -->
+                <div class="mb-2">
+                    <div class="flex justify-between mb-0.5">
+                        <span class="font-semibold text-slate-300" id="txt-lbl-mc">Издержки генерации (MC0)</span>
+                        <span class="text-[#c5a059] font-bold font-mono text-sm" id="mc-val">15</span>
+                    </div>
+                    <div class="retro-slider-container">
+                        <div class="retro-ticks"></div>
+                        <input type="range" id="mc-slider" class="retro-range" min="5" max="45" step="1" value="15">
+                    </div>
+                </div>
+
+                <!-- Switches -->
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <div class="bg-[#101115] p-1.5 rounded-lg border border-slate-800 flex items-center justify-between">
+                        <span class="text-[10px] font-semibold text-slate-300" id="txt-lbl-show-welfare">Излишки (CS, PS)</span>
+                        <label class="vintage-switch">
+                            <input type="checkbox" id="welfare-toggle" checked>
+                            <span class="vintage-slider"></span>
+                        </label>
+                    </div>
+                    <div class="bg-[#101115] p-1.5 rounded-lg border border-slate-800 flex items-center justify-between">
+                        <span class="text-[10px] font-semibold text-slate-300" id="txt-lbl-reg">Потолок цен Ph</span>
+                        <label class="vintage-switch">
+                            <input type="checkbox" id="reg-toggle">
+                            <span class="vintage-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Ph Slider -->
+                <div id="ph-container" class="mb-2 bg-[#101115] p-2 rounded-lg border border-red-900/40 hidden">
+                    <div class="flex justify-between mb-0.5">
+                        <span class="font-semibold text-red-400" id="txt-lbl-ph">Предельный тариф (Ph)</span>
+                        <span class="text-red-400 font-bold font-mono text-sm" id="ph-val">37.92 тг</span>
+                    </div>
+                    <div class="retro-slider-container">
+                        <div class="retro-ticks"></div>
+                        <input type="range" id="ph-slider" class="retro-range" min="15" max="80" step="0.5" value="37.92">
+                    </div>
+                </div>
+
+                <!-- Explanations -->
+                <div class="p-2.5 bg-[#0f1013] rounded-lg border border-slate-800 text-[10px] space-y-1.5 text-slate-300">
+                    <div class="font-bold text-[#c5a059] border-b border-slate-800 pb-1" id="txt-exp-header">СТРУКТУРА И ПОЯСНЕНИЯ МОДЕЛИ:</div>
+                    <p id="exp-demand"><b>Макс. цена (a):</b> Максимальная готовность потребителей платить за 1 кВт·ч.</p>
+                    <p id="exp-mc"><b>Издержки генерации (MC0):</b> Базовые расходы электростанций на стартовый кВт·ч.</p>
+                    <p id="exp-ph"><b>Тарифный потолок (Ph):</b> Верхняя граница тарифа, устанавливаемая ДКРЕМ.</p>
+                    <p id="exp-dwl"><b>Общественные потери (DWL):</b> Утраченная выгода общества от ограничения выпуска монополией.</p>
+                </div>
+            </div>
+
+            <div class="mt-2">
+                <div id="regulation-status-box" class="p-2 bg-[#101115] border-l-2 border-[#c5a059] rounded-r text-[10px] leading-relaxed text-slate-300">
+                    <span class="font-bold text-[#c5a059] block mb-0.5" id="txt-welfare-header">АНАЛИЗ БЛАГОСОСТОЯНИЯ:</span>
+                    <span id="analysis-text">Монополия устанавливает выпуск при MR=MC.</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dynamic Perfectly Scaled Graph Section -->
+        <section class="lg:col-span-8 bg-[#14161d] p-3 rounded-xl shadow-2xl flex flex-col justify-between border border-slate-800 relative text-slate-200 h-full min-h-[520px]">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2 mb-1">
+                <h3 class="text-xs font-extrabold text-red-500 uppercase tracking-wider" id="graph-title">
+                    АНТИМОНОПОЛЬНОЕ РЕГУЛИРОВАНИЕ РЫНКА ЭЛЕКТРОЭНЕРГИИ
+                </h3>
+                <span class="text-[9px] text-slate-400 font-mono">P (тг/кВт·ч) / Q (кВт·ч)</span>
+            </div>
+
+            <div class="relative w-full h-full bg-[#1e2026] rounded-lg border border-slate-800 overflow-hidden flex-grow flex items-center justify-center">
+                <svg viewBox="0 0 340 240" class="w-full h-full select-none" id="graph-svg">
+
+                    <!-- Grid Lines (X0 = 42, Width = 275) -->
+                    <g class="graph-grid">
+                        <line x1="42" y1="20" x2="317" y2="20" />
+                        <line x1="42" y1="56" x2="317" y2="56" />
+                        <line x1="42" y1="92" x2="317" y2="92" />
+                        <line x1="42" y1="128" x2="317" y2="128" />
+                        <line x1="42" y1="164" x2="317" y2="164" />
+                        <line x1="42" y1="200" x2="317" y2="200" />
+
+                        <line x1="42" y1="20" x2="42" y2="200" />
+                        <line x1="97" y1="20" x2="97" y2="200" />
+                        <line x1="152" y1="20" x2="152" y2="200" />
+                        <line x1="207" y1="20" x2="207" y2="200" />
+                        <line x1="262" y1="20" x2="262" y2="200" />
+                        <line x1="317" y1="20" x2="317" y2="200" />
+                    </g>
+
+                    <!-- Dynamic Axis Y Numbers -->
+                    <g fill="#94a3b8" font-size="5.5" font-weight="600" text-anchor="end" id="y-axis-labels">
+                        <!-- Rendered by JS -->
+                    </g>
+
+                    <!-- Dynamic Axis X Numbers -->
+                    <g fill="#94a3b8" font-size="5.5" font-weight="600" text-anchor="middle" id="x-axis-labels">
+                        <!-- Rendered by JS -->
+                    </g>
+
+                    <!-- Welfare Polygons -->
+                    <polygon id="cs-area" points="" fill="#3b82f6" fill-opacity="0.4" /> 
+                    <polygon id="ps-area" points="" fill="#22c55e" fill-opacity="0.4" /> 
+                    <polygon id="dwl-triangle" points="" fill="#ef4444" fill-opacity="0.75" /> 
+
+                    <!-- Axes -->
+                    <line x1="42" y1="200" x2="330" y2="200" stroke="#64748b" stroke-width="1.5" />
+                    <line x1="42" y1="10" x2="42" y2="200" stroke="#64748b" stroke-width="1.5" />
+                    <text x="5" y="12" fill="#cbd5e1" font-size="6.5" font-weight="bold">P (тг)</text>
+                    <text x="312" y="222" fill="#cbd5e1" font-size="6.5" font-weight="bold">Q (кВт·ч)</text>
+
+                    <!-- Curves -->
+                    <line id="line-D" x1="42" y1="20" x2="317" y2="200" stroke="#60a5fa" stroke-width="2.5" />
+                    <line id="line-MR" x1="42" y1="20" x2="179" y2="200" stroke="#f87171" stroke-width="2" stroke-dasharray="3,3" />
+                    <line id="line-MC" x1="42" y1="164" x2="317" y2="56" stroke="#4ade80" stroke-width="2.5" />
+                    <line id="line-Ph" x1="42" y1="92" x2="330" y2="92" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="4,4" style="display:none;" />
+
+                    <!-- Projections -->
+                    <line id="proj-Pm" x1="42" y1="92" x2="120" y2="92" stroke="#94a3b8" stroke-dasharray="2,2" />
+                    <line id="proj-Qm" x1="120" y1="92" x2="120" y2="200" stroke="#94a3b8" stroke-dasharray="2,2" />
+
+                    <!-- Dynamic Labels -->
+                    <text id="lbl-axis-Pm" x="38" y="92" fill="#93c5fd" font-size="6" font-weight="extrabold" text-anchor="end">Pm</text>
+                    <text id="lbl-axis-Qm" x="120" y="222" fill="#93c5fd" font-size="6" font-weight="extrabold" text-anchor="middle">Qm</text>
+
+                    <!-- Equilibrium Points -->
+                    <circle id="pt-A" cx="0" cy="0" r="4" fill="#ef4444" />
+                    <circle id="pt-B" cx="0" cy="0" r="4.5" fill="#3b82f6" />
+                    <circle id="pt-C" cx="0" cy="0" r="4" fill="#22c55e" />
+
+                    <!-- Drag Handles -->
+                    <circle id="handle-D" cx="0" cy="0" r="7" fill="#60a5fa" stroke="#fff" stroke-width="2" class="drag-handle" />
+                    <circle id="handle-MC" cx="0" cy="0" r="7" fill="#4ade80" stroke="#fff" stroke-width="2" class="drag-handle" />
+
+                    <!-- Curve Labels -->
+                    <text id="txt-D-lbl" x="320" y="195" fill="#60a5fa" font-size="7.5" font-weight="bold">D</text>
+                    <text id="txt-MR-lbl" x="182" y="195" fill="#f87171" font-size="7.5" font-weight="bold">MR</text>
+                    <text id="txt-MC-lbl" x="320" y="50" fill="#4ade80" font-size="7.5" font-weight="bold">MC</text>
+                </svg>
+            </div>
+        </section>
+    </main>
+
+    <footer class="text-center text-[8px] text-slate-500 mt-2 border-t border-slate-800/60 pt-1" id="txt-footer">
+        Микроэкономика • Интерактивный симулятор монопольного рынка
+    </footer>
+
+    <script>
+        let currentLang = 'RU';
+        const dictionary = {
+            RU: {
+                title: "Антимонопольное регулирование",
+                subtitle: "Предельное ценообразование и анализ общественных потерь",
+                tagline: "Микроэкономика • Принципы экономики",
+                paramsHeader: "Параметры рынка",
+                lblEsAlmaty: "⚡ Тарифы «АлматыЭнергоСбыт» (сент. 2026):",
+                lblDemand: "Параметр спроса (a)",
+                lblMC: "Издержки генерации (MC0)",
+                lblShowWelfare: "Излишки (CS, PS)",
+                lblReg: "Потолок цен Ph",
+                lblPh: "Предельный тариф (Ph)",
+                expHeader: "СТРУКТУРА И ПОЯСНЕНИЯ МОДЕЛИ:",
+                expDemand: "<b>Макс. цена (a):</b> Максимальная готовность потребителей платить за 1 кВт·ч.",
+                expMC: "<b>Издержки генерации (MC0):</b> Базовые расходы электростанций на стартовый кВт·ч.",
+                expPh: "<b>Тарифный потолок (Ph):</b> Верхняя граница тарифа, устанавливаемая ДКРЕМ.",
+                expDwl: "<b>Общественные потери (DWL):</b> Утраченная выгода общества от ограничения выпуска монополией.",
+                welfareHeader: "АНАЛИЗ БЛАГОСОСТОЯНИЯ:",
+                graphTitle: "АНТИМОНОПОЛЬНОЕ РЕГУЛИРОВАНИЕ РЫНКА ЭЛЕКТРОЭНЕРГИИ",
+                footer: "Микроэкономика • Интерактивный симулятор монопольного рынка",
+                msgMonopoly: "<b>Монопольное равновесие:</b> Синяя зона — выигрыш покупателей (CS), зеленая — прибыль монополиста (PS). Красный треугольник — потери общества (DWL).",
+                msgRegActive: "<b>Регулирование эффективно:</b> Тариф P_h ограничивает маржу монополии, расширяет выпуск и уменьшает DWL.",
+                msgRegShortage: "<b>Дефицит!</b> Тариф P_h опущен ниже издержек MC. Генерировать электроэнергию становится убыточно."
+            },
+            EN: {
+                title: "Antitrust Regulation",
+                subtitle: "Price Cap Regulation & Welfare Loss Analysis",
+                tagline: "Microeconomics • Principles of Economics",
+                paramsHeader: "Market Parameters",
+                lblEsAlmaty: "⚡ EsAlmaty Tariffs (Sept. 2026):",
+                lblDemand: "Demand Intercept (a)",
+                lblMC: "Generation Cost Base (MC0)",
+                lblShowWelfare: "Surplus (CS, PS)",
+                lblReg: "Price Cap Ph",
+                lblPh: "Price Cap (Ph)",
+                expHeader: "MODEL STRUCTURE & EXPLANATIONS:",
+                expDemand: "<b>Max Price (a):</b> Max willingness to pay per kWh.",
+                expMC: "<b>Generation Cost (MC0):</b> Initial marginal cost of producing the first kWh.",
+                expPh: "<b>Price Ceiling (Ph):</b> Maximum tariff limit imposed by energy regulators.",
+                expDwl: "<b>Deadweight Loss (DWL):</b> Net social welfare lost due to monopoly output restriction.",
+                welfareHeader: "WELFARE ANALYSIS:",
+                graphTitle: "ELECTRICITY MARKET ANTITRUST REGULATION",
+                footer: "Microeconomics • Interactive Monopoly Market Simulator",
+                msgMonopoly: "<b>Monopoly Equilibrium:</b> Blue area is Consumer Surplus (CS), green is Producer Surplus (PS). Red triangle is Deadweight Loss (DWL).",
+                msgRegActive: "<b>Effective Regulation:</b> Price cap P_h reduces monopoly markup, increases output, and shrinks DWL.",
+                msgRegShortage: "<b>Supply Deficit!</b> Price cap P_h is set below marginal cost MC."
+            }
+        };
+
+        const svg = document.getElementById('graph-svg');
+        const aSlider = document.getElementById('a-slider');
+        const mcSlider = document.getElementById('mc-slider');
+        const phSlider = document.getElementById('ph-slider');
+        const regToggle = document.getElementById('reg-toggle');
+        const welfareToggle = document.getElementById('welfare-toggle');
+        const langBtn = document.getElementById('lang-btn');
+        const tariffSelect = document.getElementById('tariff-select');
+
+        let activeDrag = null;
+
+        // Auto-Scale Max Bounds to prevent clipping at ANY demand 'a'
+        function getDynamicYMax(aVal, phVal) {
+            let maxVal = Math.max(aVal, phVal || 0, 80);
+            return Math.ceil(maxVal / 20) * 20; // Bound to multiples of 20
+        }
+
+        function getDynamicXMax(aVal, b) {
+            let maxQ = aVal / b;
+            return Math.max(100, Math.ceil(maxQ / 20) * 20);
+        }
+
+        function update() {
+            const a = parseFloat(aSlider.value);
+            const mc0 = parseFloat(mcSlider.value);
+            const isRegulated = regToggle.checked;
+            const Ph = isRegulated ? parseFloat(phSlider.value) : 0;
+            const b = 0.5; 
+            const c = 0.3; 
+
+            const yMax = getDynamicYMax(a, Ph);
+            const xMax = getDynamicXMax(a, b);
+
+            // Dynamic Coordinate Transformation (No Clipping)
+            const mapX = (val) => 42 + (val / xMax) * 275;
+            const mapY = (val) => 200 - (val / yMax) * 180;
+
+            // Render Y Axis Numbers
+            const yLabelsGroup = document.getElementById('y-axis-labels');
+            let yTicksHTML = '';
+            for (let i = 0; i <= 5; i++) {
+                let tickVal = (yMax / 5) * i;
+                let tickY = 200 - (i * 36);
+                yTicksHTML += `<text x="36" y="${tickY + 2}">${tickVal.toFixed(0)}</text>`;
+            }
+            yLabelsGroup.innerHTML = yTicksHTML;
+
+            // Render X Axis Numbers
+            const xLabelsGroup = document.getElementById('x-axis-labels');
+            let xTicksHTML = '';
+            for (let i = 0; i <= 5; i++) {
+                let tickVal = (xMax / 5) * i;
+                let tickX = 42 + (i * 55);
+                xTicksHTML += `<text x="${tickX}" y="210">${tickVal.toFixed(0)}</text>`;
+            }
+            xLabelsGroup.innerHTML = xTicksHTML;
+
+            document.getElementById('a-val').innerText = a.toFixed(0);
+            document.getElementById('mc-val').innerText = mc0.toFixed(0);
+
+            // Calculations
+            const Qm = Math.max(0, (a - mc0) / (2 * b + c));
+            const Pm = a - b * Qm;
+            const MC_m = mc0 + c * Qm;
+
+            const Qc = Math.max(0, (a - mc0) / (b + c));
+            const Pc = a - b * Qc;
+
+            // Render Curves
+            document.getElementById('line-D').setAttribute('x1', mapX(0));
+            document.getElementById('line-D').setAttribute('y1', mapY(a));
+            document.getElementById('line-D').setAttribute('x2', mapX(a/b));
+            document.getElementById('line-D').setAttribute('y2', mapY(0));
+
+            document.getElementById('line-MR').setAttribute('x1', mapX(0));
+            document.getElementById('line-MR').setAttribute('y1', mapY(a));
+            document.getElementById('line-MR').setAttribute('x2', mapX(a/(2*b)));
+            document.getElementById('line-MR').setAttribute('y2', mapY(0));
+
+            document.getElementById('line-MC').setAttribute('x1', mapX(0));
+            document.getElementById('line-MC').setAttribute('y1', mapY(mc0));
+            document.getElementById('line-MC').setAttribute('x2', mapX(xMax));
+            document.getElementById('line-MC').setAttribute('y2', mapY(mc0 + c * xMax));
+
+            // Handles
+            document.getElementById('handle-D').setAttribute('cx', mapX(a/b));
+            document.getElementById('handle-D').setAttribute('cy', mapY(0));
+
+            document.getElementById('handle-MC').setAttribute('cx', mapX(xMax));
+            document.getElementById('handle-MC').setAttribute('cy', mapY(mc0 + c * xMax));
+
+            // Points
+            const pxQm = mapX(Qm), pyPm = mapY(Pm), pyMCm = mapY(MC_m);
+            const pxQc = mapX(Qc), pyPc = mapY(Pc);
+
+            document.getElementById('proj-Pm').setAttribute('y1', pyPm);
+            document.getElementById('proj-Pm').setAttribute('y2', pyPm);
+            document.getElementById('proj-Pm').setAttribute('x2', pxQm);
+
+            document.getElementById('proj-Qm').setAttribute('x1', pxQm);
+            document.getElementById('proj-Qm').setAttribute('x2', pxQm);
+            document.getElementById('proj-Qm').setAttribute('y1', pyPm);
+
+            document.getElementById('lbl-axis-Pm').setAttribute('y', pyPm + 2);
+            document.getElementById('lbl-axis-Pm').textContent = `Pm (${Pm.toFixed(1)})`;
+            document.getElementById('lbl-axis-Qm').setAttribute('x', pxQm);
+            document.getElementById('lbl-axis-Qm').textContent = `Qm (${Qm.toFixed(1)})`;
+
+            document.getElementById('pt-A').setAttribute('cx', pxQm);
+            document.getElementById('pt-A').setAttribute('cy', pyMCm);
+
+            document.getElementById('pt-B').setAttribute('cx', pxQm);
+            document.getElementById('pt-B').setAttribute('cy', pyPm);
+
+            document.getElementById('pt-C').setAttribute('cx', pxQc);
+            document.getElementById('pt-C').setAttribute('cy', pyPc);
+
+            // Regulation Logic
+            const phContainer = document.getElementById('ph-container');
+            const linePh = document.getElementById('line-Ph');
+
+            let effQ = Qm;
+            let effP = Pm;
+
+            if (isRegulated) {
+                phContainer.classList.remove('hidden');
+                linePh.style.display = 'block';
+                document.getElementById('ph-val').innerText = Ph.toFixed(2) + " тг";
+                linePh.setAttribute('y1', mapY(Ph));
+                linePh.setAttribute('y2', mapY(Ph));
+
+                effP = Ph;
+                if (Ph >= Pc) {
+                    effQ = Math.max(0, (a - Ph) / b);
+                } else {
+                    effQ = Math.max(0, (Ph - mc0) / c);
+                }
+
+                if (Ph < Pc) {
+                    document.getElementById('analysis-text').innerHTML = dictionary[currentLang].msgRegShortage;
+                } else {
+                    document.getElementById('analysis-text').innerHTML = dictionary[currentLang].msgRegActive;
+                }
+            } else {
+                phContainer.classList.add('hidden');
+                linePh.style.display = 'none';
+                document.getElementById('analysis-text').innerHTML = dictionary[currentLang].msgMonopoly;
+            }
+
+            // Continuous Welfare Polygons
+            if (welfareToggle.checked) {
+                const pxEffQ = mapX(effQ);
+                const pyEffP = mapY(effP);
+                const effMC = mc0 + c * effQ;
+                const pyEffMC = mapY(effMC);
+
+                document.getElementById('cs-area').setAttribute('points', 
+                    `${mapX(0)},${mapY(a)} ${pxEffQ},${pyEffP} ${mapX(0)},${pyEffP}`
+                );
+                
+                document.getElementById('ps-area').setAttribute('points', 
+                    `${mapX(0)},${pyEffP} ${pxEffQ},${pyEffP} ${pxEffQ},${pyEffMC} ${mapX(0)},${mapY(mc0)}`
+                );
+
+                if (effQ < Qc) {
+                    document.getElementById('dwl-triangle').setAttribute('points', 
+                        `${pxEffQ},${pyEffP} ${pxEffQ},${pyEffMC} ${pxQc},${pyPc}`
+                    );
+                    document.getElementById('dwl-triangle').style.display = 'block';
+                } else {
+                    document.getElementById('dwl-triangle').style.display = 'none';
+                }
+
+                document.getElementById('cs-area').style.display = 'block';
+                document.getElementById('ps-area').style.display = 'block';
+            } else {
+                document.getElementById('cs-area').style.display = 'none';
+                document.getElementById('ps-area').style.display = 'none';
+                document.getElementById('dwl-triangle').style.display = 'none';
+            }
+        }
+
+        // SVG Dragging with Auto-Scales
+        function getSVGPoint(evt) {
+            const pt = svg.createSVGPoint();
+            pt.x = evt.clientX || (evt.touches && evt.touches[0].clientX);
+            pt.y = evt.clientY || (evt.touches && evt.touches[0].clientY);
+            return pt.matrixTransform(svg.getScreenCTM().inverse());
+        }
+
+        svg.addEventListener('mousedown', (e) => {
+            if (e.target.id === 'handle-D' || e.target.id === 'handle-MC') activeDrag = e.target.id;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!activeDrag) return;
+            const pt = getSVGPoint(e);
+            const aVal = parseFloat(aSlider.value);
+            const Ph = regToggle.checked ? parseFloat(phSlider.value) : 0;
+            const yMax = getDynamicYMax(aVal, Ph);
+
+            const valY = ((200 - pt.y) / 180) * yMax;
+
+            if (activeDrag === 'handle-D') {
+                aSlider.value = Math.max(50, Math.min(120, valY));
+                update();
+            } else if (activeDrag === 'handle-MC') {
+                mcSlider.value = Math.max(5, Math.min(45, valY));
+                update();
+            }
+        });
+
+        window.addEventListener('mouseup', () => activeDrag = null);
+
+        svg.addEventListener('touchstart', (e) => {
+            if (e.target.id === 'handle-D' || e.target.id === 'handle-MC') activeDrag = e.target.id;
+        }, { passive: false });
+        window.addEventListener('touchmove', (e) => {
+            if (!activeDrag) return;
+            const pt = getSVGPoint(e);
+            const aVal = parseFloat(aSlider.value);
+            const Ph = regToggle.checked ? parseFloat(phSlider.value) : 0;
+            const yMax = getDynamicYMax(aVal, Ph);
+
+            const valY = ((200 - pt.y) / 180) * yMax;
+
+            if (activeDrag === 'handle-D') {
+                aSlider.value = Math.max(50, Math.min(120, valY));
+                update();
+            } else if (activeDrag === 'handle-MC') {
+                mcSlider.value = Math.max(5, Math.min(45, valY));
+                update();
+            }
+        }, { passive: false });
+        window.addEventListener('touchend', () => activeDrag = null);
+
+        // Tariff selector
+        tariffSelect.addEventListener('change', (e) => {
+            if (e.target.value !== 'custom') {
+                regToggle.checked = true;
+                phSlider.value = parseFloat(e.target.value);
+                update();
+            }
+        });
+
+        // Language Switcher
+        langBtn.addEventListener('click', () => {
+            currentLang = currentLang === 'RU' ? 'EN' : 'RU';
+            langBtn.innerText = currentLang === 'RU' ? 'EN' : 'RU';
+
+            const dict = dictionary[currentLang];
+            document.getElementById('txt-title').innerText = dict.title;
+            document.getElementById('txt-subtitle').innerText = dict.subtitle;
+            document.getElementById('txt-tagline').innerText = dict.tagline;
+            document.getElementById('txt-params-header').innerText = dict.paramsHeader;
+            document.getElementById('txt-lbl-esalmaty').innerText = dict.lblEsAlmaty;
+            document.getElementById('txt-lbl-demand').innerText = dict.lblDemand;
+            document.getElementById('txt-lbl-mc').innerText = dict.lblMC;
+            document.getElementById('txt-lbl-show-welfare').innerText = dict.lblShowWelfare;
+            document.getElementById('txt-lbl-reg').innerText = dict.lblReg;
+            document.getElementById('txt-lbl-ph').innerText = dict.lblPh;
+            document.getElementById('txt-exp-header').innerText = dict.expHeader;
+            document.getElementById('exp-demand').innerHTML = dict.expDemand;
+            document.getElementById('exp-mc').innerHTML = dict.expMC;
+            document.getElementById('exp-ph').innerHTML = dict.expPh;
+            document.getElementById('exp-dwl').innerHTML = dict.expDwl;
+            document.getElementById('txt-welfare-header').innerText = dict.welfareHeader;
+            document.getElementById('graph-title').innerText = dict.graphTitle;
+            document.getElementById('txt-footer').innerText = dict.footer;
+
+            update();
+        });
+
+        aSlider.addEventListener('input', update);
+        mcSlider.addEventListener('input', update);
+        phSlider.addEventListener('input', update);
+        regToggle.addEventListener('change', update);
+        welfareToggle.addEventListener('change', update);
+
+        update();
+    </script>
+</body>
+</html>
