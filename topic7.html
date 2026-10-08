@@ -56,11 +56,11 @@
         header {
             text-align: center;
             margin-top: 15px;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         h1 {
-            font-size: 30px;
+            font-size: 28px;
             font-weight: 700;
             color: #001e50;
             margin-bottom: 8px;
@@ -68,37 +68,38 @@
         }
 
         .subtitle {
-            font-size: 15px;
+            font-size: 14px;
             color: #555555;
             max-width: 680px;
             line-height: 1.5;
             margin: 0 auto;
         }
 
-        /* Сетка карточек */
+        /* Сетка карточек: аккуратный обхват оригинальных пропорций */
         .grid-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
-            max-width: 1400px;
+            gap: 18px;
+            max-width: 1300px;
             width: 100%;
             justify-content: center;
             align-items: center;
-            padding-bottom: 40px;
+            padding-bottom: 30px;
         }
 
-        /* Карточка */
+        /* Карточка: подстраивается точно под размер и пропорции оригинальной картинки */
         .card {
-            display: inline-block;
+            display: inline-flex;
             text-decoration: none;
             background: #ffffff;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
             overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            width: 200px; 
-            height: 270px; 
+            height: 230px; /* Оптимальная фиксированная высота */
+            width: auto;  /* Ширина обжимает внутреннее содержимое */
+            max-width: 170px;
             position: relative;
             flex-shrink: 0;
             cursor: pointer;
@@ -107,15 +108,14 @@
         .card img {
             width: 100%;
             height: 100%;
-            object-fit: fill; /* Заполнение рамки ровно без обрезки и полей */
+            object-fit: contain; /* Сохраняет оригинальные пропорции изображения без искажений */
             display: block;
-            border-radius: 10px;
         }
 
         .card:hover {
-            transform: translateY(-8px) scale(1.03);
+            transform: translateY(-6px) scale(1.03);
             border-color: #001e50;
-            box-shadow: 0 16px 30px rgba(0, 30, 80, 0.18);
+            box-shadow: 0 14px 26px rgba(0, 30, 80, 0.18);
         }
 
         /* 3D-Flip карточка для Видео */
@@ -124,6 +124,8 @@
             background: transparent;
             border: none;
             box-shadow: none;
+            width: 160px;
+            height: 230px;
         }
 
         .flip-card-inner {
@@ -145,9 +147,9 @@
             height: 100%;
             -webkit-backface-visibility: hidden;
             backface-visibility: hidden;
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
-            border: 2px solid #e2e8f0;
+            border: 2px solid #cbd5e1;
         }
 
         .flip-card-front {
@@ -157,7 +159,7 @@
         .flip-card-front img {
             width: 100%;
             height: 100%;
-            object-fit: fill;
+            object-fit: contain;
             display: block;
         }
 
@@ -169,17 +171,17 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 16px 12px;
-            gap: 12px;
+            padding: 12px 8px;
+            gap: 10px;
             box-shadow: 0 8px 20px rgba(0, 30, 80, 0.3);
         }
 
         .flip-card-back h4 {
-            font-size: 13px;
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.8px;
+            letter-spacing: 0.6px;
             color: #38bdf8;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             font-weight: 800;
         }
 
@@ -187,14 +189,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
             width: 100%;
-            padding: 10px 12px;
+            padding: 8px 6px;
             background: rgba(255, 255, 255, 0.15);
             color: #ffffff;
             text-decoration: none;
-            border-radius: 8px;
-            font-size: 12px;
+            border-radius: 6px;
+            font-size: 11px;
             font-weight: 700;
             border: 1px solid rgba(255, 255, 255, 0.3);
             transition: all 0.2s ease;
@@ -204,65 +206,64 @@
             background: #ef4444;
             border-color: #ef4444;
             color: #ffffff;
-            transform: scale(1.04);
+            transform: scale(1.03);
         }
 
         footer {
             margin-top: auto;
-            font-size: 14px;
+            font-size: 13px;
             color: #718096;
-            padding-top: 30px;
-            padding-bottom: 20px;
+            padding-top: 25px;
+            padding-bottom: 15px;
             text-align: center;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
-        /* Мобильная адаптивность */
+        /* Адаптируемость под экраны */
         @media (max-width: 992px) {
             body {
-                padding: 10px 15px;
+                padding: 10px 12px;
             }
 
             .top-left-logo {
                 position: static;
-                margin-bottom: 10px;
-                width: 48px;
-                height: 48px;
+                margin-bottom: 8px;
+                width: 45px;
+                height: 45px;
             }
 
             .back-button {
                 position: static;
-                margin-bottom: 15px;
+                margin-bottom: 12px;
                 padding: 6px 12px;
                 font-size: 12px;
             }
 
             header {
                 margin-top: 5px;
-                margin-bottom: 20px;
+                margin-bottom: 18px;
             }
 
             h1 {
-                font-size: 22px;
-                margin-top: 5px;
+                font-size: 21px;
             }
 
             .subtitle {
-                font-size: 13px;
+                font-size: 12.5px;
             }
 
             .grid-container {
-                gap: 14px;
+                gap: 12px;
             }
 
-            .card {
-                width: 155px;
-                height: 215px;
+            .card, .flip-card {
+                max-width: 145px;
+                height: 200px;
             }
 
             .video-btn {
-                padding: 8px 6px;
-                font-size: 10px;
+                padding: 6px 4px;
+                font-size: 9.5px;
             }
         }
     </style>
