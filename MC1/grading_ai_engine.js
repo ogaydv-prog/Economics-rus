@@ -4,7 +4,7 @@
    Module: Midterm Control 1 (MC1)
    ========================================================================== */
 
-// URL Вашего Google Web App (замените на свой после выполнения инструкции ниже)
+// URL вашей Google Таблицы "Economics MC1 SE RUS":
 const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwzzVi2L5YHIpCmUEpv3sUy5YkpKN2SdGZMQKghjTBglU-R-llziHnQ9dLAELmzKg4M/exec";
 
 // ==========================================
@@ -21,7 +21,52 @@ function verifyTeacherKey() {
 }
 
 // ==========================================
-// 2. ОТПРАВКА СЕССИИ И РАСЧЕТ ИТОГОВОГО БАЛЛА
+// 2. РАСЧЕТ ИИ-РИСКА ДЛЯ ЭССЕ
+// ==========================================
+
+function calculateAIRisk(text) {
+    if (!text) return "0% Risk (No text)";
+
+    const lowerText = text.toLowerCase();
+    let aiRisk = 10;
+
+    const simulatorActions = [
+        "switched the model", "switched to the", "looked at the graph", "second graph", 
+        "first graph", "fist graph", "demand curve", "go up to", "tr line", "tc line",
+        "переключил модель", "посмотрел на график", "кривая спроса", "поднимаюсь к", "линия tr"
+    ];
+
+    let actionCount = 0;
+    simulatorActions.forEach(act => {
+        if (lowerText.includes(act)) actionCount++;
+    });
+    if (actionCount > 0) aiRisk += actionCount * 20;
+
+    const missingSpaceMatches = text.match(/[a-zа-я]\.[A-ZА-Я]/g);
+    if (missingSpaceMatches && missingSpaceMatches.length > 0) {
+        aiRisk += missingSpaceMatches.length * 15;
+    }
+
+    const aiCliches = [
+        "furthermore", "it is crucial to note", "in conclusion", "moreover", 
+        "в данном контексте", "следует отметить", "таким образом", "важно подчеркнуть"
+    ];
+
+    let clichéCount = 0;
+    aiCliches.forEach(cliche => {
+        if (lowerText.includes(cliche)) clichéCount++;
+    });
+    if (clichéCount > 0) aiRisk += clichéCount * 15;
+
+    aiRisk = Math.min(99, Math.max(5, Math.round(aiRisk)));
+
+    if (aiRisk <= 30) return `${aiRisk}% (Низкий риск / Собственный текст)`;
+    if (aiRisk <= 65) return `${aiRisk}% (Средний риск / Помощь ИИ)`;
+    return `${aiRisk}% (Высокий риск ИИ)`;
+}
+
+// ==========================================
+// 3. ОТПРАВКА СЕССИИ И РАСЧЕТ БАЛЛОВ ПО ЧАСТЯМ
 // ==========================================
 
 function compileFinalToken() {
@@ -98,8 +143,7 @@ function compileFinalToken() {
         }
     }
 
-    // 2) Проверка таблицы издержек (+5 баллов)
-    // Разрешается максимум 1 пустая ячейка в графе MC (например, для Q=1 или Q=10)
+    // 2) Проверка таблицы издержек (+5 баллов, допускается максимум 1 пустая в MC)
     let mcEmptyCount = 0;
     let otherEmptyCount = 0;
 
@@ -114,7 +158,7 @@ function compileFinalToken() {
     }
 
     if (mcEmptyCount <= 1 && otherEmptyCount === 0) {
-        t4Score += 5; // Заполнение правильное (не более 1 пропущенной в MC)
+        t4Score += 5;
     }
 
     // 3) Отрисовка графиков (+5 баллов)
@@ -125,7 +169,7 @@ function compileFinalToken() {
         if (valATC && valAVC) filledGraphPoints++;
     }
     if (filledGraphPoints >= 9) {
-        t4Score += 5; // Графики успешно построены
+        t4Score += 5;
     }
 
     scoreP3 += t4Score;
@@ -142,11 +186,9 @@ function compileFinalToken() {
         return;
     }
 
-    // Оценка точности выбора Q на слайдере (до 20 баллов)
     let rawSliderRatio = (typeof p4_getSliderScore === 'function') ? Math.max(0, p4_getSliderScore() / 10) : 1;
     let sliderScore = Math.round(rawSliderRatio * 20);
 
-    // Смысловой анализ эссе (до 20 баллов)
     const econKeywords = [
         "прибыль", "убыт", "издержк", "предельн", "постоянн", "переменн", 
         "выпуск", "отдач", "покрыв", "затрат", "цена", "монопол", "спрос", "равновес",
@@ -167,17 +209,23 @@ function compileFinalToken() {
 
     let scoreP4 = Math.min(40, sliderScore + textScore);
 
-    // Итоговый балл по всей сессии (MAX 100)
-    let calculatedScore = Math.min(100, Math.round(scoreP1P2 + scoreP3 + scoreP4));
+    // Итоговый балл (MAX 100)
+    let calculatedTotalScore = Math.min(100, Math.round(scoreP1P2 + scoreP3 + scoreP4));
+    let aiRiskText = calculateAIRisk(p4_essay);
 
     const payload = {
         studentIdx: currentStudentIdx,
         studentName: STUDENTS_LIST[currentStudentIdx],
+        variant: currentStudentIdx + 1,
         timestamp: new Date().toLocaleString(),
+        scoreP1P2: scoreP1P2,
+        scoreP3: scoreP3,
+        scoreP4: scoreP4,
+        scoreTotal: calculatedTotalScore,
+        essay: p4_essay,
+        aiRisk: aiRiskText,
         p1_p2: p1_p2_answers,
-        p3: p3_answers,
-        p4: p4_essay,
-        score: calculatedScore
+        p3: p3_answers
     };
 
     const jsonStr = JSON.stringify(payload);
@@ -188,7 +236,7 @@ function compileFinalToken() {
     const pTime = document.getElementById('p-time');
 
     if (pStudent) pStudent.innerText = payload.studentName;
-    if (pVariant) pVariant.innerText = `Вариант #${currentStudentIdx + 1}`;
+    if (pVariant) pVariant.innerText = `Вариант #${payload.variant}`;
     if (pTime) pTime.innerText = payload.timestamp;
 
     const tokenDisplay = document.getElementById('p-token');
@@ -201,7 +249,7 @@ function compileFinalToken() {
 }
 
 function sendDirectToGoogleSheet(payload, token) {
-    if (!GOOGLE_SHEET_WEBAPP_URL || GOOGLE_SHEET_WEBAPP_URL.includes("PASTE_YOUR_SCRIPT_URL_HERE")) {
+    if (!GOOGLE_SHEET_WEBAPP_URL || GOOGLE_SHEET_WEBAPP_URL.includes("ВСТАВЬТЕ_СЮДА")) {
         notify(typeof currentLang !== 'undefined' && currentLang === 'en' ? "Session completed successfully!" : "Работа успешно завершена!");
         return;
     }
@@ -213,20 +261,24 @@ function sendDirectToGoogleSheet(payload, token) {
         body: JSON.stringify({
             timestamp: payload.timestamp,
             studentName: payload.studentName,
-            variant: payload.studentIdx + 1,
-            score: payload.score,
-            essay: payload.p4,
-            rawToken: token
+            variant: payload.variant,
+            scoreP1P2: payload.scoreP1P2,
+            scoreP3: payload.scoreP3,
+            scoreP4: payload.scoreP4,
+            scoreTotal: payload.scoreTotal,
+            essay: payload.essay,
+            rawToken: token,
+            aiRisk: payload.aiRisk
         })
     }).then(() => {
-        notify(typeof currentLang !== 'undefined' && currentLang === 'en' ? "Exam recorded in Professor's Gradebook!" : "Работа записана в ведомость Google Таблицы!");
+        notify(typeof currentLang !== 'undefined' && currentLang === 'en' ? "Exam recorded in Google Sheet!" : "Работа записана в ведомость Google Таблицы!");
     }).catch(err => {
         console.error("Sync Error:", err);
     });
 }
 
 // ==========================================
-// 3. РАСШИФРОВКА И ИИ-АУДИТ В ПАНЕЛИ
+// 4. РАСШИФРОВКА И ИИ-АУДИТ В ПАНЕЛИ
 // ==========================================
 
 function decryptAndScoreToken() {
@@ -247,11 +299,11 @@ function decryptAndScoreToken() {
         const decBrief = document.getElementById('dec-brief');
 
         if (decStudent) decStudent.innerText = data.studentName;
-        if (decVariant) decVariant.innerText = `Вариант #${data.studentIdx + 1}`;
-        if (decScore) decScore.innerText = `${data.score} / 100`;
-        if (decBrief) decBrief.innerText = `"${data.p4}"`;
+        if (decVariant) decVariant.innerText = `Вариант #${data.variant}`;
+        if (decScore) decScore.innerText = `${data.scoreTotal} / 100 (Ч1-2: ${data.scoreP1P2}, Ч3: ${data.scoreP3}, Ч4: ${data.scoreP4})`;
+        if (decBrief) decBrief.innerText = `"${data.essay}"`;
 
-        runAIAudit(data.p4);
+        runAIAudit(data.essay);
 
         const gradePanelOutput = document.getElementById('grade-panel-output');
         if (gradePanelOutput) gradePanelOutput.classList.remove('hidden');
@@ -261,70 +313,18 @@ function decryptAndScoreToken() {
     }
 }
 
-// ГИБРИДНЫЙ ИИ-ДЕТЕКТОР ЧЕСТНОСТИ
 function runAIAudit(text) {
     if (!text) return;
-
-    const lowerText = text.toLowerCase();
-    let aiRisk = 10;
-    const detectedTriggers = [];
-
-    const simulatorActions = [
-        "switched the model", "switched to the", "looked at the graph", "second graph", 
-        "first graph", "fist graph", "demand curve", "go up to", "tr line", "tc line",
-        "переключил модель", "посмотрел на график", "кривая спроса", "поднимаюсь к", "линия tr"
-    ];
-
-    let actionCount = 0;
-    simulatorActions.forEach(act => {
-        if (lowerText.includes(act)) {
-            actionCount++;
-            detectedTriggers.push(`Действие в симуляторе: "${act}"`);
-        }
-    });
-    if (actionCount > 0) aiRisk += actionCount * 20;
-
-    const missingSpaceMatches = text.match(/[a-zа-я]\.[A-ZА-Я]/g);
-    if (missingSpaceMatches && missingSpaceMatches.length > 0) {
-        aiRisk += missingSpaceMatches.length * 15;
-        detectedTriggers.push(`Пропуски пробелов после точек: ${missingSpaceMatches.length}`);
-    }
-
-    const aiCliches = [
-        "furthermore", "it is crucial to note", "in conclusion", "moreover", 
-        "в данном контексте", "следует отметить", "таким образом", "важно подчеркнуть", "необходимо заметить"
-    ];
-
-    let clichéCount = 0;
-    aiCliches.forEach(cliche => {
-        if (lowerText.includes(cliche)) {
-            clichéCount++;
-            detectedTriggers.push(`Штамп ИИ: "${cliche}"`);
-        }
-    });
-    if (clichéCount > 0) aiRisk += clichéCount * 15;
-
-    aiRisk = Math.min(99, Math.max(5, Math.round(aiRisk)));
+    const aiRiskText = calculateAIRisk(text);
 
     const badge = document.getElementById('ai-score-badge');
     if (badge) {
-        if (aiRisk <= 30) {
-            badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
-            badge.innerText = `${aiRisk}% Риск (Собственный текст)`;
-        } else if (aiRisk <= 65) {
-            badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/20 text-amber-400 border border-amber-500/30";
-            badge.innerText = `${aiRisk}% Риск (Частичная помощь ИИ)`;
-        } else {
-            badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/20 text-rose-400 border border-rose-500/30";
-            badge.innerText = `${aiRisk}% Риск (Высокая вероятность ИИ)`;
-        }
+        badge.className = "px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
+        badge.innerText = aiRiskText;
     }
 
     const details = document.getElementById('ai-analysis-details');
     if (details) {
-        details.innerHTML = `
-            <div>• <b>Статус проверки:</b> Проведено через Гибридный ИИ-Аудитор</div>
-            <div>• <b>Обнаруженные маркеры (${detectedTriggers.length}):</b> ${detectedTriggers.length ? detectedTriggers.join(' | ') : 'Не обнаружено'}</div>
-        `;
+        details.innerHTML = `<div>• <b>Результат проверки:</b> ${aiRiskText}</div>`;
     }
 }
