@@ -5,7 +5,7 @@
    ========================================================================== */
 
 // URL Вашего Google Web App (замените на свой после выполнения инструкции ниже)
-const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbz-fH9jFhcBpC0g5DFh9mKhB9wSo4WKtYNsa1-Cqv06ND1-0GbNemCR4VH1j2uUefAY/exec";
+const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbwzzVi2L5YHIpCmUEpv3sUy5YkpKN2SdGZMQKghjTBglU-R-llziHnQ9dLAELmzKg4M/exec";
 
 // ==========================================
 // 1. АВТОРИЗАЦИЯ ПРЕПОДАВАТЕЛЯ
