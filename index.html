@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Интерактивный хаб курса Экономика | AlmaU</title>
+    <title>Economics Dashboard | AlmaU SE</title>
     <style>
         * {
             box-sizing: border-box;
@@ -19,7 +19,7 @@
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 15px 20px;
+            padding: 20px;
             position: relative;
         }
 
@@ -35,7 +35,8 @@
         header {
             text-align: center;
             margin-top: 10px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
+            width: 100%;
         }
 
         h1 {
@@ -43,7 +44,8 @@
             font-weight: 700;
             color: #001e50;
             margin-bottom: 12px;
-            margin-top: 20px;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
         }
 
         .subtitle {
@@ -54,7 +56,6 @@
             margin: 0 auto;
         }
 
-        /* Сетка для 10 карточек */
         .grid-container {
             display: flex;
             flex-wrap: wrap;
@@ -66,7 +67,6 @@
             padding-bottom: 30px;
         }
 
-        /* Строго одинаковые пропорции карточек */
         .card {
             display: inline-block;
             text-decoration: none;
@@ -79,12 +79,14 @@
             width: 190px;
             height: 250px;
             position: relative;
+            flex-shrink: 0;
+            cursor: pointer;
         }
 
         .card img {
             width: 100%;
             height: 100%;
-            object-fit: fill; /* Заполняет рамку ровно без обрезки */
+            object-fit: fill;
             display: block;
             transition: transform 0.3s ease;
         }
@@ -99,7 +101,6 @@
             transform: scale(1.02);
         }
 
-        /* Карточки без активных ссылок */
         .card.disabled {
             cursor: default;
             opacity: 0.85;
@@ -119,125 +120,99 @@
             padding-bottom: 20px;
             text-align: center;
             line-height: 1.6;
+            width: 100%;
         }
 
-        /* === АДАПТАЦИЯ ДЛЯ СМАРТФОНОВ И ПЛАНШЕТОВ === */
         @media (max-width: 768px) {
-            body {
-                padding: 10px 15px;
-            }
-
+            body { padding: 15px 10px; }
             .top-left-logo {
-                position: relative;
-                top: 0;
-                left: 0;
-                margin: 10px auto 10px auto;
+                position: static;
                 display: block;
+                margin: 10px auto 15px auto;
+                width: 60px;
+                height: 60px;
             }
-
-            header {
-                margin-top: 0;
-                margin-bottom: 20px;
-            }
-
-            h1 {
-                font-size: 26px;
-                margin-top: 5px;
-            }
-
-            .subtitle {
-                font-size: 13px !important;
-                padding: 0 10px;
-            }
-
-            .grid-container {
-                gap: 12px;
-                padding-bottom: 20px;
-            }
-
-            .card {
-                width: calc(50% - 6px);
-                height: auto;
-                aspect-ratio: 190 / 250;
-            }
+            header { margin-top: 0; margin-bottom: 20px; padding: 0 10px; }
+            h1 { font-size: 24px; margin-top: 0; margin-bottom: 8px; }
+            .subtitle { font-size: 13px; line-height: 1.4; }
+            .grid-container { gap: 12px; padding-bottom: 20px; }
+            .card { width: 150px; height: 200px; border-radius: 12px; }
+            footer { font-size: 12px; padding-top: 20px; padding-bottom: 15px; }
         }
 
         @media (max-width: 360px) {
-            .card {
-                width: 100%;
-                max-width: 230px;
-            }
+            .card { width: 135px; height: 180px; }
         }
     </style>
 </head>
 <body>
 
     <!-- Логотип AlmaU Economics-se -->
-    <img src="https://ogaydv-prog.github.io/Economics-se/almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo">
 
     <header>
-        <h1>ЭКОНОМИКА</h1>
+        <h1>ECONOMICS</h1>
         <p class="subtitle">
-            Интерактивный образовательный портал | Школа Цифровых Технологий и Экономики <br>
-            AlmaU 2026 
+            Interactive Learning Hub | Software Engineering (SE) 2026 <br>
+            Almaty Management University
         </p>
     </header>
 
     <main class="grid-container">
-        <!-- 1. Темы курса -->
-        <a href="topics.html" class="card" title="Темы и материалы курса">
-            <img src="pic-topics-rus.png" alt="Темы курса">
+        <!-- 1. Topics -->
+        <a href="topics.html" class="card" title="Course Topics">
+            <img src="pic-topics-se.png" alt="Course Topics">
         </a>
 
-        <!-- 2. Силлабус -->
-        <a href="syllabus.html" class="card" title="Силлабус и программа курса">
-            <img src="pic-sillabus-rus.png" alt="Силлабус">
-         </a>
-
-        <!-- 3. Учебники -->
-        <a href="https://drive.google.com/file/d/1JaaFr7DnzFRNhBwd49AMFlXhXln8_B5a/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="card" title="Учебники и основная литература">
-            <img src="pic-books-rus.png" alt="Учебники и литература">
+        <!-- 2. Syllabus -->
+        <a href="syllabus.html" class="card" title="Syllabus">
+            <img src="pic-sill-se.png" alt="Syllabus">
         </a>
 
-        <!-- 4. Глоссарий -->
-        <a href="https://www.economist.com/economics-a-to-z" target="_blank" rel="noopener noreferrer" class="card" title="Экономический глоссарий и термины">
-            <img src="pic-gloss-rus.png" alt="Глоссарий">
+        <!-- 3. Textbooks -->
+        <a href="https://drive.google.com/file/d/1kUkhmBb-sgYD5qQoQza12CgiUu6R9dEE/view?usp=sharing" target="_blank" rel="noopener noreferrer" class="card" title="Textbooks & Literature">
+            <img src="pic-book-se.png" alt="Textbooks & Literature">
         </a>
 
-        <!-- 5. Экономические новости -->
-        <a href="news.html" class="card" title="Экономические новости и аналитика">
-            <img src="pic-news-rus.png" alt="Экономические новости">
+        <!-- 4. Glossary -->
+        <a href="https://www.economist.com/economics-a-to-z" target="_blank" rel="noopener noreferrer" class="card" title="Glossary">
+            <img src="pic-gloss-se.png" alt="Glossary">
         </a>
 
-        <!-- 6. Видеоматериалы -->
-        <a href="video.html" class="card" title="Видеолекции и видеоматериалы">
-            <img src="pic-video-rus.png" alt="Видеоматериалы">
+        <!-- 5. Economic News -->
+        <a href="news.html" class="card" title="Economic News & Analysis">
+            <img src="pic-news-se.png" alt="Economic News">
         </a>
 
-        <!-- 7. Рубежный контроль 1 -->
-        <div class="card disabled" title="Рубежный контроль 1 — Скоро">
-            <img src="pic-mc1-rus.png" alt="Рубежный контроль 1">
+        <!-- 6. Video Materials -->
+        <a href="https://www.youtube.com/watch?v=NdbbcO35arw" target="_blank" rel="noopener noreferrer" class="card" title="Video Lectures">
+            <img src="pic-video-se.png" alt="Video Lectures">
+        </a>
+
+        <!-- 7. Midterm Control 1 (ПРЯМОЙ ПЕРЕХОД БЕЗ ПАРОЛЯ) -->
+        <a href="MC1/index_mc1.html" class="card" title="Midterm Control 1">
+            <img src="pic-mc1-se.png" alt="Midterm Control 1">
+        </a>
+
+        <!-- 8. Midterm Control 2 -->
+        <div class="card disabled" title="Midterm Control 2 - Coming Soon">
+            <img src="pic-mc2-se.png" alt="Midterm Control 2">
         </div>
 
-        <!-- 8. Рубежный контроль 2 -->
-        <div class="card disabled" title="Рубежный контроль 2 — Скоро">
-            <img src="pic-mc2-rus.png" alt="Рубежный контроль 2">
+        <!-- 9. Final Exam -->
+        <div class="card disabled" title="Final Exam - Coming Soon">
+            <img src="pic-exam-se.png" alt="Final Exam Preparation">
         </div>
 
-        <!-- 9. Финальный экзамен -->
-        <div class="card disabled" title="Финальный экзамен — Подготовка">
-            <img src="pic-exam-rus.png" alt="Финальный экзамен">
-        </div>
-
-        <!-- 10. Оценки и критерии -->
-        <a href="grade.html" class="card" title="Система оценивания и успеваемость">
-            <img src="pic-grade-rus.png" alt="Система оценивания">
+        <!-- 10. Grade -->
+        <a href="grade.html" class="card" title="Grading & Evaluation">
+            <img src="pic-grade-se.png" alt="Grading & Evaluation">
         </a>
     </main>
 
     <footer>
-        <p>Разработано для студентов специальностей SE DS PM IS AlmaU 2026 | Дисциплина: Экономика</p>
-        <p>© Almaty Management University | Школа цифровых технологий и экономики</p>
+        <p>Developed for Software Engineering Team AlmaU 2026 | Course: Economics</p>
+        <p>© Almaty Management University | School of Digital Technologies & Economics</p>
     </footer>
 
 </body>
