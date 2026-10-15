@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Промежуточный контроль 1 • Экономика • AlmaU SDTE 2026</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { 
+            background: radial-gradient(circle at top right, #0f172a 0%, #020617 100%); 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            color: #e2e8f0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        input, textarea {
+            user-select: text !important;
+            -webkit-user-select: text !important;
+        }
+        .card { 
+            background: rgba(30, 41, 59, 0.7); 
+            border: 1px solid rgba(255,255,255,0.08); 
+            border-radius: 16px; 
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(99, 102, 241, 0.15);
+        }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 3px; }
+        .tab-btn.active { background-color: rgb(79, 70, 229); color: white; border-color: rgb(99, 102, 241); }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8 flex flex-col justify-between" oncontextmenu="return false;" ondragstart="return false;">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div id="toast-bg" class="bg-indigo-600 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 border border-indigo-400/30">
+            <i class="fas fa-info-circle text-lg"></i>
+            <span id="toast-msg" class="text-sm font-semibold">Уведомление</span>
+        </div>
+    </div>
+
+    <!-- Floating Calculator Button -->
+    <button onclick="toggleCalc()" class="fixed bottom-5 right-5 bg-indigo-600 hover:bg-indigo-500 text-white font-bold p-3.5 rounded-full shadow-2xl z-40 flex items-center justify-center transition border border-indigo-400/30" title="Калькулятор">
+        🧮 <span class="text-xs ml-1 font-mono">Calc</span>
+    </button>
+
+    <!-- Mini Floating Calculator Window -->
+    <div id="mini-calc" class="hidden fixed bottom-20 right-5 bg-slate-900 border border-slate-700 p-4 rounded-2xl shadow-2xl z-50 w-64 space-y-3">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+            <span class="text-xs font-bold text-indigo-400 uppercase tracking-wider">Калькулятор</span>
+            <button onclick="toggleCalc()" class="text-slate-400 hover:text-white font-bold text-xs">✕</button>
+        </div>
+        
+        <input type="text" id="calc-display" readonly class="w-full bg-slate-950 border border-slate-800 text-right p-2.5 rounded-lg text-emerald-400 font-mono text-lg font-bold outline-none" value="0">
+        
+        <div class="grid grid-cols-4 gap-1.5 text-xs font-mono font-bold">
+            <button onclick="calcClear()" class="col-span-2 bg-rose-950/60 text-rose-300 p-2.5 rounded-lg border border-rose-800/40 hover:bg-rose-900">C</button>
+            <button onclick="calcPress('/')" class="bg-indigo-950/80 text-indigo-300 p-2.5 rounded-lg border border-indigo-700/50 hover:bg-indigo-900">÷</button>
+            <button onclick="calcPress('*')" class="bg-indigo-950/80 text-indigo-300 p-2.5 rounded-lg border border-indigo-700/50 hover:bg-indigo-900">×</button>
+
+            <button onclick="calcPress('7')" class="bg-slate-800 text-white p-2.5 rounded-lg hover:bg-slate-700">7</button>
+            <button onclick="calcPress('8')" class="bg-slate-800 text-white p-2.5 rounded-lg hover:bg-slate-700">8</button>
+            <button onclick="calcPress('9')" class="bg-slate-800 text-white p-2.5 rounded-lg hover:bg-slate-700">9</button>
+            <button onclick="calcPress('-')" class="bg-indigo-950/80 text-indigo-300 p-2.5 rounded-lg border border-indigo-700/50 hover:bg-indigo-900">-</button>
+
+            <button onclick="calcPress('4')" class="bg-slate-800 text-white p-2.5 rounded-lg hover:bg-slate-700">4</button>
+            <button onclick="calcPress('5')" class="bg-slate-800 text-white p-2.5 rounded-lg hover:bg-slate-700">5</button>
+            <button onclick="calcPress('6')" class="bg-slate-800 text-white p-2.5 rounded-lg hover:bg-slate-700">6</button>
+            <button onclick="calcPress('+')" class="bg-indigo-950/80 text-indigo-300 p-2.5 rounded-lg border border-indigo-700/50 hover:bg-indigo-900">+</button>
+
+            <button onclick="calcPress('1')" class="bg-slate-800 text-white p-2.5 rounded-lg hover:bg-slate-700">1</button>
+            <button onclick="calcPress('2')" class="bg-slate-800 text-white p-2.5 rounded-lg hover:bg-slate-700">2</button>
+            <button onclick="calcPress('3')" class="bg-slate-800 text-white p-2.5 rounded-lg hover:bg-slate-700">3</button>
+            <button onclick="calcEval()" class="row-span-2 bg-emerald-600 text-white p-2.5 rounded-lg hover:bg-emerald-500 font-black text-sm flex items-center justify-center">=</button>
+
+            <button onclick="calcPress('0')" class="col-span-2 bg-slate-800 text-white p-2.5 rounded-lg hover:bg-slate-700">0</button>
+            <button onclick="calcPress('.')" class="bg-slate-800 text-white p-2.5 rounded-lg hover:bg-slate-700">.</button>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="max-w-[1500px] mx-auto w-full space-y-6">
+        
+        <!-- Header: Белый блок с логотипом AlmaU -->
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-6 rounded-2xl shadow-xl border-b-4 border-indigo-600 text-slate-900 gap-4">
+            <div class="flex items-center gap-5">
+                <img src="almau.jpg" alt="AlmaU Logo" class="h-14 md:h-16 object-contain rounded-lg">
+                <div>
+                    <h1 class="text-xl md:text-2xl font-black tracking-tight text-slate-900" data-lang-en="Economics • Midterm Control 1" data-lang-ru="Экономика • Промежуточный контроль 1">Экономика • Промежуточный контроль 1</h1>
+                    <div class="flex flex-wrap items-center gap-2 mt-1 text-xs text-slate-600 font-medium">
+                        <span class="font-bold tracking-widest text-indigo-700 uppercase">Школа цифровых технологий и экономики</span>
+                        <span>•</span>
+                        <span class="uppercase tracking-wider">AlmaU 2026</span>
+                    </div>
+                </div>
+            </div>
+            <!-- Language Switcher -->
+            <div class="mt-2 md:mt-0 flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-300">
+                <button onclick="setLanguage('en')" id="lang-btn-en" class="px-3 py-1 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition">EN</button>
+                <button onclick="setLanguage('ru')" id="lang-btn-ru" class="px-3 py-1 text-xs font-bold rounded-lg bg-indigo-600 text-white transition">RU</button>
+            </div>
+        </header>
+
+        <!-- Student Verification -->
+        <section class="card p-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs uppercase font-bold text-slate-400 tracking-wider mb-2" data-lang-en="Student Credentials (Select Your Name)" data-lang-ru="Идентификация студента (Выберите ФИО)">Идентификация студента (Выберите ФИО)</label>
+                    <input type="text" id="student-name" list="students-list" placeholder="Начните вводить имя..." 
+                           class="w-full bg-slate-950 border border-slate-800 p-3.5 rounded-lg text-base text-white focus:ring-2 focus:ring-indigo-500 outline-none transition"
+                           oninput="detectStudentAndLoadExam()" onchange="detectStudentAndLoadExam()" onkeyup="detectStudentAndLoadExam()">
+                    <datalist id="students-list">
+                        <!-- Динамический список из questions_p1_p2.js -->
+                    </datalist>
+                    <p class="text-xs text-slate-500 mt-2" data-lang-en="Personalized variant parameters load automatically upon validation." data-lang-ru="Индивидуальные параметры варианта загружаются автоматически после выбора ФИО.">Индивидуальные параметры варианта загружаются автоматически после выбора ФИО.</p>
+                </div>
+                <div class="flex flex-col justify-center bg-slate-950/40 border border-slate-800/60 p-4 rounded-xl">
+                    <div class="text-xs uppercase font-bold text-slate-500 tracking-wider" data-lang-en="Assigned Variant Status" data-lang-ru="Статус персонального варианта">Статус персонального варианта</div>
+                    <div id="student-status-box" class="flex items-center gap-3 mt-2 text-indigo-300 font-bold text-lg">
+                        <i class="fas fa-user-graduate text-2xl text-slate-700 animate-pulse"></i>
+                        <span class="text-slate-500 font-normal" data-lang-en="Awaiting authentic name selection..." data-lang-ru="Ожидание выбора имени студента...">Ожидание выбора имени студента...</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Exam Workspace -->
+        <div id="exam-hub" class="hidden space-y-6">
+            
+            <!-- Navigation Tabs -->
+            <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-2">
+                <button onclick="switchTab('tab-part1')" class="tab-btn active px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider rounded-lg border border-slate-800 bg-slate-950 text-slate-400 transition hover:text-white">
+                    <i class="fas fa-brain mr-1.5"></i> <span data-lang-en="Part 1: Foundations (4 Qs)" data-lang-ru="Часть 1: Основы (4 вопр.)">Часть 1: Основы (4 вопр.)</span>
+                </button>
+                <button onclick="switchTab('tab-part2')" class="tab-btn px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider rounded-lg border border-slate-800 bg-slate-950 text-slate-400 transition hover:text-white">
+                    <i class="fas fa-chart-line mr-1.5"></i> <span data-lang-en="Part 2: Markets & Supply (6 Qs)" data-lang-ru="Часть 2: Рынки и Предложение (6 вопр.)">Часть 2: Рынки и Предложение (6 вопр.)</span>
+                </button>
+                <button onclick="switchTab('tab-part3')" class="tab-btn px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider rounded-lg border border-slate-800 bg-slate-950 text-slate-400 transition hover:text-white">
+                    <i class="fas fa-calculator mr-1.5"></i> <span data-lang-en="Part 3: Computational Tasks" data-lang-ru="Часть 3: Задачи и Издержки">Часть 3: Задачи и Издержки</span>
+                </button>
+                <button onclick="switchTab('tab-part4')" class="tab-btn px-4 py-2.5 text-xs md:text-sm font-semibold uppercase tracking-wider rounded-lg border border-slate-800 bg-slate-950 text-slate-400 transition hover:text-white">
+                    <i class="fas fa-lightbulb mr-1.5"></i> <span data-lang-en="Part 4: Case Analysis" data-lang-ru="Часть 4: Аналитический Кейс">Часть 4: Аналитический Кейс</span>
+                </button>
+                <button onclick="switchTab('tab-submit')" class="tab-btn px-4 py-2.5 text-xs md:text-sm font-bold uppercase tracking-wider rounded-lg border border-emerald-800 bg-emerald-950/20 text-emerald-400 ml-auto transition hover:bg-emerald-600 hover:text-white">
+                    <i class="fas fa-paper-plane mr-1.5"></i> <span data-lang-en="Finalize Session" data-lang-ru="Завершить и Отправить">Завершить и Отправить</span>
+                </button>
+            </div>
+
+            <!-- TAB 1 -->
+            <div id="tab-part1" class="tab-pane space-y-6">
+                <div id="part1-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            </div>
+
+            <!-- TAB 2 -->
+            <div id="tab-part2" class="tab-pane space-y-6 hidden">
+                <div id="part2-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+            </div>
+
+            <!-- TAB 3 -->
+            <div id="tab-part3" class="tab-pane space-y-6 hidden">
+                <div id="part3-container"></div>
+            </div>
+
+            <!-- TAB 4 -->
+            <div id="tab-part4" class="tab-pane space-y-6 hidden">
+                <div id="part4-container"></div>
+            </div>
+
+            <!-- TAB SUBMIT -->
+            <div id="tab-submit" class="tab-pane space-y-6 hidden">
+                <div class="text-center py-8 space-y-2">
+                    <div class="inline-flex p-4 bg-emerald-500/10 rounded-full text-emerald-400 border border-emerald-500/20 mb-2">
+                        <i class="fas fa-stamp text-4xl"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-slate-100" data-lang-en="Finalize Exam Session" data-lang-ru="Финализация и Подтверждение">Финализация и Подтверждение</h2>
+                    <p class="text-xs md:text-sm text-slate-400 max-w-md mx-auto" data-lang-en="Compiles all responses into a secure token for evaluation." data-lang-ru="Формирует защищенный шифрованный токен для отправки преподавателю.">Формирует защищенный шифрованный токен для отправки преподавателю.</p>
+                    <button onclick="compileFinalToken()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-lg text-sm tracking-wider uppercase transition shadow-lg shadow-emerald-950/50" data-lang-en="Compile & Generate Token" data-lang-ru="Сформировать Токен Проверки">
+                        Сформировать Токен Проверки
+                    </button>
+                </div>
+
+                <div id="passport-block" class="hidden card p-6 border-t-4 border-emerald-500 bg-slate-900/20 space-y-6">
+                    <div class="flex justify-between items-start border-b border-slate-800 pb-4 flex-wrap gap-4">
+                        <div>
+                            <h3 class="text-md md:text-lg font-black text-white tracking-tight">ALMAU MIDTERM CONTROL 1 CERTIFICATE</h3>
+                            <p class="text-xs text-slate-400 font-mono">Economics • Spring 2026</p>
+                        </div>
+                        <div class="text-right text-xs">
+                            <span class="text-slate-400" data-lang-en="Protocol Status:" data-lang-ru="Статус токена:">Статус токена:</span>
+                            <span class="font-mono text-emerald-400 font-bold block">SECURED-TOKEN</span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                        <div class="bg-slate-950/50 p-3 rounded border border-slate-800">
+                            <span class="text-xs text-slate-500 uppercase block" data-lang-en="Candidate Name:" data-lang-ru="Студент:">Студент:</span>
+                            <span class="font-bold text-slate-200" id="p-student"></span>
+                        </div>
+                        <div class="bg-slate-950/50 p-3 rounded border border-slate-800">
+                            <span class="text-xs text-slate-500 uppercase block" data-lang-en="Assigned Variant:" data-lang-ru="Вариант:">Вариант:</span>
+                            <span class="font-bold text-indigo-400" id="p-variant"></span>
+                        </div>
+                        <div class="bg-slate-950/50 p-3 rounded border border-slate-800">
+                            <span class="text-xs text-slate-500 uppercase block" data-lang-en="Completion Time:" data-lang-ru="Время сборки:">Время сборки:</span>
+                            <span class="font-bold text-slate-200" id="p-time"></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-950 border border-emerald-500/20 p-4 rounded-lg text-center space-y-2">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider block" data-lang-en="VERIFICATION KEY (CLICK TO COPY & TRANSMIT TO INSTRUCTOR)" data-lang-ru="КЛЮЧ ПРОВЕРКИ (НАЖМИТЕ ЧТОБЫ СКОПИРОВАТЬ И ОТПРАВИТЬ ПРЕПОДАВАТЕЛЮ)">КЛЮЧ ПРОВЕРКИ (НАЖМИТЕ ЧТОБЫ СКОПИРОВАТЬ И ОТПРАВИТЬ ПРЕПОДАВАТЕЛЮ)</span>
+                        <div class="font-mono text-xs md:text-sm text-emerald-400 break-all select-all cursor-pointer bg-slate-900/60 p-3 rounded" id="p-token" onclick="copyToClipboard()">Формирование...</div>
+                    </div>
+                </div>
+
+                <!-- Professor Panel -->
+                <div id="prof-grade-panel" class="hidden card p-6 border-t-4 border-indigo-500 bg-indigo-950/10 space-y-4">
+                    <div class="border-b border-slate-800 pb-2">
+                        <h4 class="font-bold text-sm text-indigo-400 uppercase tracking-wider"><i class="fas fa-user-shield mr-1.5"></i> <span data-lang-en="Professor Verification & AI Audit Hub" data-lang-ru="Панель Оценки и ИИ-Аудита Эссе">Панель Оценки и ИИ-Аудита Эссе</span></h4>
+                        <p class="text-xs text-slate-400" data-lang-en="Paste student verification token below to decrypt answers, auto-grade and run AI generation check." data-lang-ru="Вставьте токен студента ниже для расшифровки, оценки и запуска детектора ИИ-генерации.">Вставьте токен студента ниже для расшифровки, оценки и запуска детектора ИИ-генерации.</p>
+                    </div>
+                    <div class="space-y-3">
+                        <textarea id="prof-token-input" class="w-full bg-slate-950 border border-slate-800 rounded-md p-2 text-xs text-slate-200 h-16 resize-none custom-scrollbar" placeholder="Вставьте зашифрованный токен студента..."></textarea>
+                        <button onclick="decryptAndScoreToken()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded text-xs uppercase tracking-wider transition" data-lang-en="Decrypt, Grade & Audit AI" data-lang-ru="Расшифровать, Оценить и Проверить ИИ">
+                            Расшифровать, Оценить и Проверить ИИ
+                        </button>
+                    </div>
+
+                    <div id="grade-panel-output" class="hidden bg-slate-950/80 p-4 rounded-lg border border-slate-800 text-xs space-y-4">
+                        <h5 class="font-bold text-indigo-400 border-b border-slate-800 pb-1 uppercase text-xs">Аналитика Сессии</h5>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-slate-300">
+                            <div>Студент: <span class="text-white font-bold block" id="dec-student"></span></div>
+                            <div>Вариант: <span class="text-white font-bold block" id="dec-variant"></span></div>
+                            <div>Итоговый балл: <span class="text-emerald-400 font-bold block text-sm" id="dec-score"></span></div>
+                            <div>Статус: <span class="text-indigo-300 font-bold block" id="dec-tasks">Проверено</span></div>
+                        </div>
+
+                        <!-- AI Generation Audit Result Box -->
+                        <div class="bg-slate-900/80 p-3.5 rounded-lg border border-slate-800 space-y-2">
+                            <div class="flex justify-between items-center border-b border-slate-800 pb-1.5">
+                                <span class="text-xs font-bold text-slate-400 uppercase"><i class="fas fa-robot mr-1 text-indigo-400"></i> Оценка Риска ИИ-Генерации</span>
+                                <span id="ai-score-badge" class="px-2 py-0.5 rounded text-xs font-bold">0% Risk</span>
+                            </div>
+                            <p class="text-slate-200 italic text-xs" id="dec-brief"></p>
+                            <div id="ai-analysis-details" class="text-xs text-slate-400 font-mono space-y-1 border-t border-slate-800/60 pt-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Centered Footer -->
+    <footer class="border-t border-slate-800/80 bg-slate-950/60 py-5 text-center text-xs text-slate-500 w-full mt-10">
+        <div class="max-w-[1500px] mx-auto px-4 flex justify-center items-center gap-4 relative">
+            <p class="text-slate-500 text-center">Школа цифровых технологий и экономики • AlmaU 2026</p>
+            <button onclick="openProfessorPanelDirectly()" class="text-slate-800 hover:text-indigo-500/30 transition text-sm focus:outline-none absolute right-4" title="Панель Преподавателя">
+                <i class="fas fa-key"></i>
+            </button>
+        </div>
+    </footer>
+
+    <!-- Load Sub-Modules -->
+    <script src="questions_p1_p2.js"></script>
+    <script src="tasks_p3.js"></script>
+    <script src="case_p4.js"></script>
+    <script src="grading_ai_engine.js"></script>
+    
+    <!-- Main Logic Script -->
+    <script>
+        let currentLang = 'ru';
+        let currentStudentIdx = -1;
+
+        // ПРЯМОЙ ВХОД В ПАНЕЛЬ ПРЕПОДАВАТЕЛЯ БЕЗ ПАРОЛЯ
+        function openProfessorPanelDirectly() {
+            document.getElementById('prof-grade-panel').classList.remove('hidden');
+            switchTab('tab-submit');
+            notify("Панель преподавателя открыта!", false);
+        }
+
+        // СОХРАНЕНИЕ СОСТОЯНИЯ (ОТВЕТОВ) ПРИ СМЕНЕ ЯЗЫКА ИЛИ ВКЛАДОК
+        function saveExamState() {
+            const state = {
+                radios: {},
+                inputs: {},
+                ranges: {},
+                textareas: {}
+            };
+
+            document.querySelectorAll('#exam-hub input[type="radio"]:checked').forEach(r => {
+                if (r.name) state.radios[r.name] = r.value;
+            });
+
+            document.querySelectorAll('#exam-hub input[type="text"], #exam-hub input[type="number"]').forEach(inp => {
+                if (inp.id) state.inputs[inp.id] = inp.value;
+            });
+
+            document.querySelectorAll('#exam-hub input[type="range"]').forEach(rng => {
+                if (rng.id) state.ranges[rng.id] = rng.value;
+            });
+
+            document.querySelectorAll('#exam-hub textarea').forEach(ta => {
+                if (ta.id) state.textareas[ta.id] = ta.value;
+            });
+
+            return state;
+        }
+
+        // ВОССТАНОВЛЕНИЕ ВСЕХ ВВЕДЕННЫХ ДАННЫХ
+        function restoreExamState(state) {
+            if (!state) return;
+
+            for (const [id, val] of Object.entries(state.textareas)) {
+                const ta = document.getElementById(id);
+                if (ta) {
+                    ta.value = val;
+                    ta.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+
+            for (const [id, val] of Object.entries(state.inputs)) {
+                const inp = document.getElementById(id);
+                if (inp) {
+                    inp.value = val;
+                    inp.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+
+            for (const [name, val] of Object.entries(state.radios)) {
+                const radio = document.querySelector(`#exam-hub input[type="radio"][name="${CSS.escape(name)}"][value="${CSS.escape(val)}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    radio.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+
+            for (const [id, val] of Object.entries(state.ranges)) {
+                const rng = document.getElementById(id);
+                if (rng) {
+                    rng.value = val;
+                    rng.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('lang-btn-en').className = lang === 'en' ? 'px-3 py-1 text-xs font-bold rounded-lg bg-indigo-600 text-white transition' : 'px-3 py-1 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition';
+            document.getElementById('lang-btn-ru').className = lang === 'ru' ? 'px-3 py-1 text-xs font-bold rounded-lg bg-indigo-600 text-white transition' : 'px-3 py-1 text-xs font-bold rounded-lg text-slate-600 hover:text-slate-900 transition';
+
+            document.querySelectorAll('[data-lang-en]').forEach(el => {
+                el.innerText = lang === 'en' ? el.getAttribute('data-lang-en') : el.getAttribute('data-lang-ru');
+            });
+
+            if (currentStudentIdx !== -1) {
+                const savedState = saveExamState();
+                generatePersonalizedExam(currentStudentIdx);
+                setTimeout(() => {
+                    restoreExamState(savedState);
+                }, 80);
+            }
+        }
+
+        function notify(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const bg = document.getElementById('toast-bg');
+            document.getElementById('toast-msg').innerText = msg;
+            if (isError) {
+                bg.classList.remove('bg-indigo-600', 'border-indigo-400/30');
+                bg.classList.add('bg-rose-600', 'border-rose-400/30');
+            } else {
+                bg.classList.add('bg-indigo-600', 'border-indigo-400/30');
+                bg.classList.remove('bg-rose-600', 'border-rose-400/30');
+            }
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 4000);
+        }
+
+        function populateDatalist() {
+            const list = document.getElementById('students-list');
+            if (!list || typeof STUDENTS_LIST === 'undefined') return;
+            list.innerHTML = '';
+            STUDENTS_LIST.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s;
+                list.appendChild(opt);
+            });
+        }
+
+        function detectStudentAndLoadExam() {
+            const val = document.getElementById('student-name').value.trim().toLowerCase();
+            const statusBox = document.getElementById('student-status-box');
+            const examHub = document.getElementById('exam-hub');
+
+            if (typeof STUDENTS_LIST === 'undefined') {
+                console.error("STUDENTS_LIST не найден!");
+                return;
+            }
+
+            let foundIdx = STUDENTS_LIST.findIndex(s => s.toLowerCase().includes(val) && val.length >= 3);
+
+            if (foundIdx !== -1) {
+                currentStudentIdx = foundIdx;
+                const name = STUDENTS_LIST[foundIdx];
+                statusBox.innerHTML = `
+                    <i class="fas fa-check-circle text-2xl text-emerald-400"></i>
+                    <span class="text-emerald-300 font-bold">Вариант #${foundIdx + 1} (${name})</span>
+                `;
+                examHub.classList.remove('hidden');
+                generatePersonalizedExam(foundIdx);
+            } else {
+                currentStudentIdx = -1;
+                statusBox.innerHTML = `
+                    <i class="fas fa-user-graduate text-2xl text-slate-700 animate-pulse"></i>
+                    <span class="text-slate-500 font-normal">Ожидание выбора имени студента...</span>
+                `;
+                examHub.classList.add('hidden');
+            }
+        }
+
+        function generatePersonalizedExam(idx) {
+            try {
+                if (typeof renderQuestionsP1P2 === 'function') renderQuestionsP1P2(idx, currentLang);
+            } catch(e) { console.error("Error in Questions P1/P2:", e); }
+
+            try {
+                if (typeof renderTasksP3 === 'function') renderTasksP3(idx, currentLang);
+            } catch(e) { console.error("Error in Tasks P3:", e); }
+
+            try {
+                if (typeof renderCaseP4 === 'function') renderCaseP4(idx, currentLang);
+            } catch(e) { console.error("Error in Case P4:", e); }
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.getAttribute('onclick').includes(tabId));
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        function copyToClipboard() {
+            const range = document.createRange();
+            range.selectNode(document.getElementById('p-token'));
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            notify("Токен проверки скопирован в буфер обмена!");
+        }
+
+        // ==========================================
+        // MINI CALCULATOR CONTROLLER
+        // ==========================================
+        let calcExpr = "";
+        function toggleCalc() {
+            document.getElementById('mini-calc').classList.toggle('hidden');
+        }
+        function calcPress(val) {
+            if (calcExpr === "0") calcExpr = "";
+            calcExpr += val;
+            document.getElementById('calc-display').value = calcExpr;
+        }
+        function calcClear() {
+            calcExpr = "";
+            document.getElementById('calc-display').value = "0";
+        }
+        function calcEval() {
+            try {
+                let res = eval(calcExpr);
+                if (res !== undefined) {
+                    res = Math.round(res * 100) / 100;
+                    document.getElementById('calc-display').value = res;
+                    calcExpr = res.toString();
+                }
+            } catch (e) {
+                document.getElementById('calc-display').value = "Ошибка";
+                calcExpr = "";
+            }
+        }
+
+        // ==========================================
+        // SAFE ANTI-CHEATING SYSTEM
+        // ==========================================
+        let tabSwitchCount = 0;
+        let isLockActive = false;
+
+        function playWarningSound() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.type = 'sawtooth'; 
+                osc.frequency.setValueAtTime(880, audioCtx.currentTime); 
+                osc.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.4);
+
+                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } catch (e) {
+                console.log("AudioContext blocked", e);
+            }
+        }
+
+        function handleViolation(reason) {
+            if (typeof currentStudentIdx === 'undefined' || currentStudentIdx === -1) return;
+            if (isLockActive) return;
+
+            tabSwitchCount++;
+            playWarningSound();
+
+            if (tabSwitchCount === 1) {
+                showTeacherUnlockModal(reason);
+            } else {
+                triggerPermanentLock(reason);
+            }
+        }
+
+        function showTeacherUnlockModal(reason) {
+            if (document.getElementById('exam-warning-overlay')) return;
+            isLockActive = true;
+
+            const warnOverlay = document.createElement('div');
+            warnOverlay.id = 'exam-warning-overlay';
+            warnOverlay.className = 'fixed inset-0 bg-slate-950/95 backdrop-blur-md z-[9998] flex flex-col items-center justify-center p-6 text-center select-none';
+
+            warnOverlay.innerHTML = `
+                <div class="max-w-md w-full bg-slate-900 border-2 border-amber-500 rounded-2xl p-6 space-y-5 shadow-2xl">
+                    <div class="w-16 h-16 bg-amber-500/10 border border-amber-500/30 rounded-full flex items-center justify-center mx-auto text-amber-400 text-3xl">
+                        ⚠️
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <span class="text-[10px] font-black text-amber-400 uppercase tracking-widest bg-amber-950/60 border border-amber-800/50 px-3 py-1 rounded-full">
+                            Предупреждение №1
+                        </span>
+                        <h3 class="text-xl font-bold text-white">ДОСТУП ПРИОСТАНОВЛЕН</h3>
+                        <p class="text-xs text-slate-300 leading-relaxed">
+                            Зафиксирована попытка нарушения порядка экзамена:<br>
+                            <span class="text-amber-400 font-mono font-bold">${reason}</span>.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-slate-300 text-xs text-center font-bold">
+                        Обратитесь к преподавателю (Ogay D.V.) для разблокировки страницы.
+                    </div>
+
+                    <div class="bg-slate-950/80 p-4 rounded-xl border border-indigo-900/50 space-y-3 text-left">
+                        <label class="block text-[11px] uppercase font-bold text-indigo-400 tracking-wider">
+                            <i class="fas fa-key mr-1"></i> Введите пароль преподавателя
+                        </label>
+                        <div class="flex gap-2">
+                            <input type="password" id="first-unlock-pass" placeholder="Пароль преподавателя" 
+                                   class="w-full bg-slate-900 border border-slate-700 p-2.5 rounded-lg text-xs text-white focus:border-indigo-500 outline-none font-mono">
+                            <button onclick="unlockFirstWarning()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-4 py-2.5 rounded-lg text-xs uppercase tracking-wider transition whitespace-nowrap">
+                                Разблокировать
+                            </button>
+                        </div>
+                        <p id="first-unlock-err" class="text-[11px] text-rose-400 font-bold hidden">Неверный пароль!</p>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(warnOverlay);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function unlockFirstWarning() {
+            const inputVal = document.getElementById('first-unlock-pass')?.value.trim();
+            const errMsg = document.getElementById('first-unlock-err');
+
+            // Пароль разблокировки 1-го предупреждения
+            if (inputVal === "SE-15102026MC1OK") {
+                const el = document.getElementById('exam-warning-overlay');
+                if (el) el.remove();
+                document.body.style.overflow = 'auto';
+                
+                setTimeout(() => { isLockActive = false; }, 1000);
+                notify("Экзамен разблокирован преподавателем!");
+            } else {
+                if (errMsg) errMsg.classList.remove('hidden');
+            }
+        }
+
+        function triggerPermanentLock(reason) {
+            const warnEl = document.getElementById('exam-warning-overlay');
+            if (warnEl) warnEl.remove();
+
+            if (document.getElementById('exam-lock-overlay')) return;
+            isLockActive = true;
+
+            const lockOverlay = document.createElement('div');
+            lockOverlay.id = 'exam-lock-overlay';
+            lockOverlay.className = 'fixed inset-0 bg-slate-950 z-[9999] flex flex-col items-center justify-center p-6 text-center select-none';
+
+            lockOverlay.innerHTML = `
+                <div class="max-w-md w-full bg-slate-900 border-2 border-rose-600 rounded-2xl p-8 space-y-5 shadow-2xl">
+                    <div class="w-20 h-20 bg-rose-500/10 border border-rose-500/30 rounded-full flex items-center justify-center mx-auto text-rose-500 text-3xl font-bold">
+                        🔒
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <span class="text-[10px] font-black text-rose-500 uppercase tracking-widest bg-rose-950/60 border border-rose-800/50 px-3 py-1 rounded-full">
+                            Disqualified / Окончательно Заблокировано
+                        </span>
+                        <h2 class="text-2xl font-black text-white">ЭКЗАМЕН АННУЛИРОВАН</h2>
+                        <p class="text-xs text-slate-400 leading-relaxed">
+                            Зафиксировано повторное нарушение правил:<br>
+                            <span class="text-rose-400 font-mono font-bold">${reason}</span>.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 text-left space-y-1 text-xs">
+                        <div class="text-slate-500 font-mono">Статус: <span class="text-rose-400 font-bold">Полная дисквалификация</span></div>
+                        <div class="text-slate-500 font-mono">Время фиксации: <span class="text-slate-300">${new Date().toLocaleTimeString()}</span></div>
+                    </div>
+
+                    <p class="text-[11px] text-slate-500">
+                        Работа заблокирована без права повторного восстановления.
+                    </p>
+                </div>
+            `;
+
+            document.body.appendChild(lockOverlay);
+            document.body.style.overflow = 'hidden';
+        }
+
+        // ДЕТЕКТОРЫ И БЛОКИРОВЩИКИ IT-ХИТРОСТЕЙ
+        document.addEventListener('DOMContentLoaded', () => {
+            populateDatalist();
+        });
+
+        document.addEventListener('selectstart', (e) => {
+            const tag = e.target.tagName.toLowerCase();
+            if (tag !== 'input' && tag !== 'textarea') {
+                handleViolation("Попытка выделения текста задания");
+            }
+        });
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                handleViolation("Смена вкладки, открытие нового окна или сворачивание браузера");
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (
+                e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'J' || e.key === 'C')) || 
+                (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 'c' || e.key === 'C'))
+            ) {
+                const tag = e.target.tagName.toLowerCase();
+                if (tag !== 'input' && tag !== 'textarea') {
+                    e.preventDefault();
+                    handleViolation("Попытка вызова инструментов разработчика или горячих клавиш копирования");
+                }
+            }
+        });
+    </script>
+</body>
+</html>
