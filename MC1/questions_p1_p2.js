@@ -101,7 +101,7 @@ const PART1_POOL = [
     },
     {
         q_en: "Scarcity exists because?",
-        q_ru: "Проблема ограниченности (редкости) существует потому, что:",
+        q_ru: "Проблема ограниченности существует потому, что:",
         opts_en: ["A) Human wants exceed productive capacity", "B) Resources are unlimited", "C) Capital does not wear out", "D) Population growth declines", "E) Innovation creates unemployment"],
         opts_ru: ["A) Человеческие потребности превышают производственные возможности", "B) Запасы ресурсов неограничены", "C) Капитал не изнашивается", "D) Рост населения замедляется", "E) Инновации вызывают безработицу"],
         ans: "A"
@@ -129,14 +129,14 @@ const PART1_POOL = [
     },
     {
         q_en: "Total costs (TC) of a firm are defined as:",
-        q_ru: "Общие издержки фирмы (TC) — это:",
+        q_ru: " (TC) — это:",
         opts_en: ["A) Marginal costs", "B) Sum of total fixed and total variable costs", "C) Cost per unit of output", "D) Costs varying with output", "E) Fixed costs only"],
         opts_ru: ["A) Предельные издержки", "B) Сумма общих постоянных и переменных издержек", "C) Издержки на производство единицы продукции", "D) Издержки, меняющиеся с выпуском", "E) Издержки, не зависящие от выпуска"],
         ans: "B"
     },
     {
-        q_en: "Marginal cost (MC) is defined as:",
-        q_ru: "MC (предельные издержки) — это:",
+        q_en: "MC is defined as:",
+        q_ru: "MC — это:",
         opts_en: ["A) Average cost", "B) Marginal revenue", "C) Marginal cost", "D) Average revenue", "E) Fixed cost"],
         opts_ru: ["A) Средние издержки", "B) Предельный доход", "C) Предельные издержки", "D) Средний доход", "E) Постоянные издержки"],
         ans: "C"
