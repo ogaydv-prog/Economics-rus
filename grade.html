@@ -70,7 +70,7 @@
                     Личный кабинет успеваемости
                 </h2>
                 <p class="text-sm sm:text-base text-slate-400">
-                    Введите ваше полное ФИО для просмотра оценок, баллов, аналитики и комментария преподавателя.
+                    Введите ваше полное ФИО для просмотра оценок, баллов РК1, аналитики и комментария преподавателя.
                 </p>
             </div>
 
@@ -100,7 +100,7 @@
                         <h3 id="sr-name" class="text-xl font-extrabold text-white mt-1.5">ФИО Студента</h3>
                     </div>
                     <div class="text-right">
-                        <span class="text-xs text-slate-400 block font-medium">Итоговый балл</span>
+                        <span class="text-xs text-slate-400 block font-medium">Набранный балл</span>
                         <div class="flex items-center justify-end space-x-2.5 mt-1">
                             <span id="sr-letter" class="text-2xl font-black bg-indigo-600 px-3 py-1 rounded-xl text-white shadow-md">-</span>
                             <span id="sr-total-score" class="text-3xl font-extrabold text-slate-100">0.0</span>
@@ -193,10 +193,10 @@
                         <div class="text-base font-black text-indigo-400" id="sr-val-ca1">0 / 100</div>
                         <p class="text-[8px] text-indigo-300 font-bold">Вес: 10%</p>
                     </div>
-                    <div class="p-3 text-center space-y-1">
-                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">РК 1</h4>
-                        <div class="text-base font-bold text-amber-400" id="sr-val-mc1">0 / 100</div>
-                        <p class="text-[8px] text-slate-500">Вес: <strong class="text-amber-400">10%</strong></p>
+                    <div class="p-3 text-center space-y-1 bg-amber-950/30">
+                        <h4 class="text-[9px] font-semibold text-amber-300 uppercase tracking-wider">РК 1</h4>
+                        <div class="text-base font-black text-amber-400" id="sr-val-mc1">0 / 100</div>
+                        <p class="text-[8px] text-amber-300 font-bold">Вес: 10%</p>
                     </div>
                     <div class="p-3 text-center space-y-1">
                         <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">СРСП 2</h4>
@@ -221,7 +221,7 @@
                     <div>
                         <h5 class="text-xs font-bold text-slate-300">Политика оценивания</h5>
                         <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                            Формула расчета: Посещаемость (10%) + Активность (10%) + СРСП1 (10%) + РК1 (10%) + СРСП2 (10%) + РК2 (10%) + Экзамен (40%). Минимальный проходной балл: 50 (Оценка D).
+                            Формула расчета: Посещаемость (10%) + Активность (10%) + СРСП1 (10%) + РК1 (10%) + СРСП2 (10%) + РК2 (10%) + Экзамен (40%).
                         </p>
                     </div>
                 </div>
@@ -272,13 +272,13 @@
                 </div>
                 <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Средний балл группы</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Средний балл РК1</p>
                         <div class="flex items-baseline space-x-1.5 mt-1">
-                            <h3 class="text-3xl font-extrabold text-white" id="stat-average-grade">0.0</h3>
+                            <h3 class="text-3xl font-extrabold text-amber-400" id="stat-average-grade">0.0</h3>
                             <span class="text-xs font-bold text-indigo-400" id="stat-average-letter">-</span>
                         </div>
                     </div>
-                    <div class="h-12 w-12 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center text-xl border border-emerald-500/20">
+                    <div class="h-12 w-12 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center text-xl border border-amber-500/20">
                         <i class="fa-solid fa-chart-line"></i>
                     </div>
                 </div>
@@ -293,12 +293,34 @@
                 </div>
                 <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Лучший результат</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Лучший результат РК1</p>
                         <h3 class="text-sm font-bold text-violet-400 mt-2 truncate max-w-[150px]" id="stat-best-student">—</h3>
                     </div>
                     <div class="h-12 w-12 bg-violet-500/10 text-violet-400 rounded-xl flex items-center justify-center text-xl border border-violet-500/20">
                         <i class="fa-solid fa-trophy"></i>
                     </div>
+                </div>
+            </div>
+
+            <!-- BELL CURVE (NORMAL DISTRIBUTION) CHART WIDGET -->
+            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-2xl space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-800 pb-4">
+                    <div>
+                        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-area text-indigo-400"></i>
+                            Кривая нормального распределения баллов (Bell Curve / Кривая Гаусса)
+                        </h3>
+                        <p class="text-xs text-slate-400 mt-0.5">
+                            Сравнение фактического распределения оценок РК1 с теоретической кривой Гаусса
+                        </p>
+                    </div>
+                    <div class="flex items-center space-x-3 text-xs bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800 font-mono">
+                        <span class="text-indigo-400 font-bold">μ (Среднее): <span id="bell-mean-val" class="text-white">0.0</span></span>
+                        <span class="text-violet-400 font-bold">σ (Отклонение): <span id="bell-std-val" class="text-white">0.0</span></span>
+                    </div>
+                </div>
+                <div class="relative w-full h-64">
+                    <canvas id="bellCurveCanvas"></canvas>
                 </div>
             </div>
 
@@ -326,11 +348,11 @@
                                 <th class="py-3.5 px-1.5 text-center w-14">Пос (10%)</th>
                                 <th class="py-3.5 px-1.5 text-center w-14">Акт (10%)</th>
                                 <th class="py-3.5 px-1.5 text-center w-16 bg-indigo-950/30 text-indigo-300">СРСП1 (10%)</th>
-                                <th class="py-3.5 px-1.5 text-center w-14">РК1 (10%)</th>
+                                <th class="py-3.5 px-1.5 text-center w-16 bg-amber-950/40 text-amber-300">РК1 (10%)</th>
                                 <th class="py-3.5 px-1.5 text-center w-14">СРСП2 (10%)</th>
                                 <th class="py-3.5 px-1.5 text-center w-14">РК2 (10%)</th>
                                 <th class="py-3.5 px-1.5 text-center w-14">Экз (40%)</th>
-                                <th class="py-3.5 px-2 text-right w-14 bg-indigo-950/20">Итог</th>
+                                <th class="py-3.5 px-2 text-right w-14 bg-indigo-950/20">Набрано</th>
                                 <th class="py-3.5 px-2 text-center w-12">Оценка</th>
                                 <th class="py-3.5 px-3 text-left">Комментарий к СРСП-1</th>
                             </tr>
@@ -369,92 +391,92 @@
     <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2"></div>
 
     <script>
-        // Обновленные массивы Группы 1 и Группы 2 с расчетом посещаемости от 15 недель семестра:
-        // 2 посещенных занятия = 13.3%, 1 посещенное занятие = 6.7%, 0 посещенных = 0%
+        // ОБНОВЛЕННЫЕ ДАННЫЕ С ОЦЕНКАМИ РК1 (mc1) ДЛЯ ОБЕИХ ГРУПП
         const initialGroup1 = [
-            { id: "g1-st-1", name: "Азизбеков Максат Арманович", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-2", name: "Акимжанов Муслимбек Бекзодұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-3", name: "Алпыспаев Мирас Жалғасұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-4", name: "Амирханов Даулет Сакенович", attendance: 6.7, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Подлог / Списано): Выбрал кейс 'Кофейня', а в текст вставил скопированный фрагмент про хлеб!" },
-            { id: "g1-st-5", name: "Ахметов Андрей Витальевич", attendance: 13.3, activities: 0, ca1: 95, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Самостоятельный авторский анализ рынка фитнес-услуг Алматы с разбором онлайн-занятий и воркаут-площадок." },
-            { id: "g1-st-6", name: "Әкімхан Рамазан Қайратұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-7", name: "Байдалы Айсер Сабырханұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-8", name: "Байдукова Арина Андреевна", attendance: 13.3, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Качественный разбор прямой и косвенной конкуренции спешелти-кофейни." },
-            { id: "g1-st-9", name: "Бекешев Дінмухамед Ермекұлы", attendance: 6.7, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Прямое копирование сгенерированного академического текста ChatGPT." },
-            { id: "g1-st-10", name: "Гуков Арман Андрейұлы", attendance: 13.3, activities: 0, ca1: 96, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "96/100 (Глубокий авторский анализ): Отличный живой авторский разбор с примерами продуктов первой необходимости (баурсаки, пирожки, лепешки)." },
-            { id: "g1-st-11", name: "Долинин Тимур Евгеньевич", attendance: 6.7, activities: 0, ca1: 97, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "97/100 (Высокий академический уровень): Глубокий самостоятельный разбор ценовой эластичности и четкое разграничение рынка спешелти-кофе и масс-маркета." },
-            { id: "g1-st-12", name: "Есіркеп Аян Бақытжанұлы", attendance: 13.3, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Качественные самостоятельные выводы по кофейням у дома и спешелти-точкам." },
-            { id: "g1-st-13", name: "Жалбаслар Дәулет Русланұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-14", name: "Жарылгасынова Жасмин Максатовна", attendance: 13.3, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Грамотное объяснение краткосрочной неэластичности бензина АИ-92." },
-            { id: "g1-st-15", name: "Казымов Руслан", attendance: 13.3, activities: 0, ca1: 60, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Крайне поверхностная отписка в полстрочки (55 символов), слабый разбор." },
-            { id: "g1-st-16", name: "Кариева Карина Армановна", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-17", name: "Коваленко Илья Викторович", attendance: 6.7, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Вставлен стандартный шаблон заготовки с формулой." },
-            { id: "g1-st-18", name: "Конысбаев Айбек Ермаханович", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-19", name: "Кошантаев Бексултан Маратович", attendance: 13.3, activities: 0, ca1: 96, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "96/100 (Глубокий математический анализ): Самостоятельный расчет процентного изменения показателей (+17.56% цена, -12.64% объемы) и детальный анализ рынка кофе." },
-            { id: "g1-st-20", name: "Масалимов Олжас Ержанович", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-21", name: "Медиханов Тимур Фархадович", attendance: 6.7, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирован готовый текст шаблонной заготовки." },
-            { id: "g1-st-22", name: "Морбекова Камилла Ескендеровна", attendance: 13.3, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Грамотный экономический анализ предельной выручки (MR = 0)." },
-            { id: "g1-st-23", name: "Мусаев Ернур Русланович", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-24", name: "Нұржанқызы Балнұр", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-25", name: "Омаров Болат Айдосович", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-26", name: "Рамазанов Арсен Дауренұлы", attendance: 13.3, activities: 0, ca1: 95, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Живой самостоятельный экономический разбор фитнес-индустрии и спортивных альтернатив." },
-            { id: "g1-st-27", name: "Рахимбекова Сагыныш Рахимбековна", attendance: 6.7, activities: 0, ca1: 60, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Поверхностное суждение в 2 предложения, некорректно указана базовая цена." },
-            { id: "g1-st-28", name: "Ровнов Владислав Александрович", attendance: 13.3, activities: 0, ca1: 95, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Качественный разбор кофейного рынка Алматы с примерами брендов (Coffee Boom, Zebra, Compass)." },
-            { id: "g1-st-29", name: "Сәтпек Нұрлыбек Асланбекұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-30", name: "Тастемір Шамиил Қайратұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-31", name: "Тәжібай Мухаммедазиз Мұхтарұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-32", name: "Терехов Вячеслав Константинович", attendance: 13.3, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Списание + Противоречие): В форме введена некорректная исходная цена." },
-            { id: "g1-st-33", name: "Титовский Андрей Сергеевич", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-34", name: "Тұрсымбай Асқар Сүлейменұлы", attendance: 6.7, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Простой, но полностью честный авторский текст без применения ИИ." },
-            { id: "g1-st-35", name: "Уразалиев Сагит Ильдарович", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-36", name: "Филипенко Александр Юрьевич", attendance: 13.3, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Типовой структурированный текст, полностью сгенерированный нейросетью." },
-            { id: "g1-st-37", name: "Хашимова Саида Ренатовна", attendance: 6.7, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Формальный списанный текст заготовки из чата." },
-            { id: "g1-st-38", name: "Хохлов Алексей Игоревич", attendance: 6.7, activities: 0, ca1: 60, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Формальный короткий ответ без детального анализа субститутов и факторов эластичности." },
-            { id: "g1-st-39", name: "Шайкенова Камила", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-40", name: "Юсупова Ильнара Дамировна", attendance: 13.3, activities: 0, ca1: 95, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Точный самостоятельный вывод формулы P_max/2 и качественный анализ субститутов (тандырный хлеб)." },
-            { id: "g1-st-41", name: "Яппаров Эмир Фанильевич", attendance: 6.7, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Книжный сгенерированный нейросетью текст." }
+            { id: "g1-st-1", name: "Азизбеков Максат Арманович", attendance: 13.3, activities: 0, ca1: 0, mc1: 29.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-2", name: "Акимжанов Муслимбек Бекзодұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 36.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-3", name: "Алпыспаев Мирас Жалғасұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 73.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-4", name: "Амирханов Даулет Сакенович", attendance: 6.7, activities: 0, ca1: 50, mc1: 65.0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Подлог / Списано): Выбрал кейс 'Кофейня', а в текст вставил скопированный фрагмент про хлеб!" },
+            { id: "g1-st-5", name: "Ахметов Андрей Витальевич", attendance: 13.3, activities: 0, ca1: 95, mc1: 82.0, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Самостоятельный авторский анализ рынка фитнес-услуг Алматы." },
+            { id: "g1-st-6", name: "Әкімхан Рамазан Қайратұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 34.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-7", name: "Байдалы Айсер Сабырханұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 32.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-8", name: "Байдукова Арина Андреевна", attendance: 13.3, activities: 0, ca1: 90, mc1: 90.0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Качественный разбор конкуренции спешелти-кофейни." },
+            { id: "g1-st-9", name: "Бекешев Дінмухамед Ермекұлы", attendance: 6.7, activities: 0, ca1: 50, mc1: 73.5, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Прямое копирование сгенерированного текста ChatGPT." },
+            { id: "g1-st-10", name: "Гуков Арман Андрейұлы", attendance: 13.3, activities: 0, ca1: 96, mc1: 75.5, ca2: 0, mc2: 0, exam: 0, comment: "96/100 (Глубокий авторский анализ): Отличный разбор с примерами продуктов первой необходимости." },
+            { id: "g1-st-11", name: "Долинин Тимур Евгеньевич", attendance: 6.7, activities: 0, ca1: 97, mc1: 95.5, ca2: 0, mc2: 0, exam: 0, comment: "97/100 (Высокий академический уровень): Глубокий самостоятельный разбор ценовой эластичности." },
+            { id: "g1-st-12", name: "Есіркеп Аян Бақытжанұлы", attendance: 13.3, activities: 0, ca1: 90, mc1: 85.0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Качественные выводы по кофейням у дома." },
+            { id: "g1-st-13", name: "Жалбаслар Дәулет Русланұлы", attendance: 0, activities: 0, ca1: 0, mc1: 40.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-14", name: "Жарылгасынова Жасмин Максатовна", attendance: 13.3, activities: 0, ca1: 90, mc1: 77.5, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Грамотное объяснение неэластичности бензина АИ-92." },
+            { id: "g1-st-15", name: "Казымов Руслан", attendance: 13.3, activities: 0, ca1: 60, mc1: 62.0, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Крайне поверхностная отписка в полстрочки." },
+            { id: "g1-st-16", name: "Кариева Карина Армановна", attendance: 13.3, activities: 0, ca1: 0, mc1: 60.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-17", name: "Ким Валентин Владиславович", attendance: 6.7, activities: 0, ca1: 0, mc1: 35.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-18", name: "Коваленко Илья Викторович", attendance: 6.7, activities: 0, ca1: 55, mc1: 76.0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Вставлен стандартный шаблон заготовки с формулой." },
+            { id: "g1-st-19", name: "Конысбаев Айбек Ермаханович", attendance: 6.7, activities: 0, ca1: 0, mc1: 67.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-20", name: "Кошантаев Бексултан Маратович", attendance: 13.3, activities: 0, ca1: 96, mc1: 92.5, ca2: 0, mc2: 0, exam: 0, comment: "96/100 (Глубокий математический анализ): Расчет процентного изменения показателей и детальный анализ." },
+            { id: "g1-st-21", name: "Масалимов Олжас Ержанович", attendance: 6.7, activities: 0, ca1: 0, mc1: 0.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-22", name: "Медиханов Тимур Фархадович", attendance: 6.7, activities: 0, ca1: 55, mc1: 72.5, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирован готовый текст шаблонной заготовки." },
+            { id: "g1-st-23", name: "Морбекова Камилла Ескендеровна", attendance: 13.3, activities: 0, ca1: 90, mc1: 76.5, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Грамотный экономический анализ предельной выручки." },
+            { id: "g1-st-24", name: "Мусаев Ернур Русланович", attendance: 13.3, activities: 0, ca1: 0, mc1: 34.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-25", name: "Нұржанқызы Балнұр", attendance: 0, activities: 0, ca1: 0, mc1: 48.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-26", name: "Омаров Болат Айдосович", attendance: 0, activities: 0, ca1: 0, mc1: 37.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-27", name: "Рамазанов Арсен Дауренұлы", attendance: 13.3, activities: 0, ca1: 95, mc1: 78.5, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Живой самостоятельный экономический разбор фитнес-индустрии." },
+            { id: "g1-st-28", name: "Рахимбекова Сагыныш Рахимбековна", attendance: 6.7, activities: 0, ca1: 60, mc1: 77.5, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Поверхностное суждение в 2 предложения." },
+            { id: "g1-st-29", name: "Ровнов Владислав Александрович", attendance: 13.3, activities: 0, ca1: 95, mc1: 87.5, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Качественный разбор кофейного рынка Алматы с примерами брендов." },
+            { id: "g1-st-30", name: "Сәтпек Нұрлыбек Асланбекұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 39.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-31", name: "Тастемір Шамиил Қайратұлы", attendance: 0, activities: 0, ca1: 0, mc1: 29.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-32", name: "Тәжібай Мухаммедазиз Мұхтарұлы", attendance: 0, activities: 0, ca1: 0, mc1: 0.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-33", name: "Терехов Вячеслав Константинович", attendance: 13.3, activities: 0, ca1: 50, mc1: 67.5, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Списание + Противоречие): В форме введена некорректная исходная цена." },
+            { id: "g1-st-34", name: "Титовский Андрей Сергеевич", attendance: 0, activities: 0, ca1: 0, mc1: 38.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-35", name: "Тұрсымбай Асқар Сүлейменұлы", attendance: 6.7, activities: 0, ca1: 90, mc1: 82.5, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Простой, честный авторский текст без применения ИИ." },
+            { id: "g1-st-36", name: "Уразалиев Сагит Ильдарович", attendance: 13.3, activities: 0, ca1: 0, mc1: 42.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-37", name: "Филипенко Александр Юрьевич", attendance: 13.3, activities: 0, ca1: 50, mc1: 87.5, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Типовой структурированный текст от нейросети." },
+            { id: "g1-st-38", name: "Хашимова Саида Ренатовна", attendance: 6.7, activities: 0, ca1: 55, mc1: 72.0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Формальный списанный текст заготовки из чата." },
+            { id: "g1-st-39", name: "Хохлов Алексей Игоревич", attendance: 6.7, activities: 0, ca1: 60, mc1: 77.0, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Формальный короткий ответ без детального анализа." },
+            { id: "g1-st-40", name: "Шайкенова Камилла Азаматовна", attendance: 0, activities: 0, ca1: 0, mc1: 37.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-41", name: "Юсупова Ильнара Дамировна", attendance: 13.3, activities: 0, ca1: 95, mc1: 83.5, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Точный вывод формулы и качественный анализ субститутов." },
+            { id: "g1-st-42", name: "Яппаров Эмир Фанильевич", attendance: 6.7, activities: 0, ca1: 50, mc1: 55.0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Книжный сгенерированный нейросетью текст." }
         ];
 
         const initialGroup2 = [
-            { id: "g2-st-1", name: "Абдрайм Еркежан Беркинбайкызы", attendance: 13.3, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирована стандартная заготовка фразировки, ходившая в студенческом чате." },
-            { id: "g2-st-2", name: "Абдулла Нұрислам Бауыржанұлы", attendance: 0, activities: 0, ca1: 98, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "98/100 (Высокий глубокий анализ): Отличный индивидуальный экономический разбор с глубокой привязкой к законам РК (СЗПТ, АЗРК, предельная маржа 15%, Продкорпорация)." },
-            { id: "g2-st-3", name: "Абраев Радмир Ниязович", attendance: 13.3, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Текст полностью сгенерирован ИИ с характерной академической канцелярией." },
-            { id: "g2-st-4", name: "АКБАРАЛИЕВ ФАХРИДИН АЛИШЕРОВИЧ", attendance: 13.3, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирован размытый шаблон заготовки из студенческого чата." },
-            { id: "g2-st-5", name: "Амангелді Айдос Даулетұлы", attendance: 13.3, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельный честный вывод про валовую выручку и альтернативы." },
-            { id: "g2-st-6", name: "Асанғалиева Әсия Арманқызы", attendance: 6.7, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельное прямое обоснование оптимальной цены вершины параболы выручки." },
-            { id: "g2-st-7", name: "Асланов Алишер Асланович", attendance: 6.7, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Поверхностная списанная шаблонная заготовка." },
-            { id: "g2-st-8", name: "Ахметов Танирберген Дауренулы", attendance: 0, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-9", name: "Әбілдаев Нұрым Тәліпханұлы", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-10", name: "Әділ Гүлсезім Әсетқызы", attendance: 13.3, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирована распространенная шаблонная заготовка." },
-            { id: "g2-st-11", name: "Биманов Алишер Бакытович", attendance: 6.7, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Подставлен сгенерированный ИИ-текст с пояснительными скобками." },
-            { id: "g2-st-12", name: "Власова Валерия Семеновна", attendance: 13.3, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Детальный авторский разбор маркетплейсов Kaspi, Temu, OZON, LC Waikiki." },
-            { id: "g2-st-13", name: "Дүйсенбай Әлімхан Дәулетұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-14", name: "Избасар Даниял Тауржанұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-15", name: "Исламов Изат", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-16", name: "Йылмаз Мухаммедали", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "85/100 (Хорошая самостоятельная работа): Авторский разбор маркетплейсов Kaspi, Wildberries и Pinduoduo." },
-            { id: "g2-st-17", name: "Кадирханов Жангир Адилетович", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-18", name: "Кенжегузин Санжар Ерланұлы", attendance: 0, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Логичное самостоятельное объяснение перетока клиентов фитнес-клубов." },
-            { id: "g2-st-19", name: "Кенжегулов Нургазы Сергазыевич", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-20", name: "Князбек Нұрбек", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-21", name: "Коробов Илья Александрович", attendance: 13.3, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-22", name: "Кочетов Руслан Юрьевич", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-23", name: "Кукушкин Юрий Кириллович", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-24", name: "Қабылбек Жантөре Батырбекұлы", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-25", name: "Ли Аделина Сергеевна", attendance: 13.3, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Живой авторский анализ локальных брендов одежды и конкуренции с маркетплейсами." },
-            { id: "g2-st-26", name: "Мажитов Султан Канатович", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-27", name: "Мазат Ерсұлтан Ердосұлы", attendance: 6.7, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельный расчет TR и единичной эластичности." },
-            { id: "g2-st-28", name: "Мамаев Станислав Алексеевич", attendance: 13.3, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирован готовый текст-шаблон из общего студенческого чата." },
-            { id: "g2-st-29", name: "Молдыбай Амина Айратқызы", attendance: 13.3, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Авторский разбор ценообразования и конкуренции с Zara и H&M." },
-            { id: "g2-st-30", name: "Мусаева Элина Князьевна", attendance: 13.3, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Искренний авторский текст от себя с детальным объяснением пика параболы." },
-            { id: "g2-st-31", name: "Мухтар Бекасыл Асылбекулы", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-32", name: "Нурканат Алиар", attendance: 13.3, activities: 0, ca1: 50, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Вставлен огромный сгенерированный фрагмент из ChatGPT (1056 символов)." },
-            { id: "g2-st-33", name: "Нұрбек Нүркен Анарбекұлы", attendance: 6.7, activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-34", name: "Нұрғали Айсана", attendance: 13.3, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Логичный разбор альтернатив АИ-92 (автогаз, такси, электромобили)." },
-            { id: "g2-st-35", name: "Сейтқасым Әкежан Серікұлы", attendance: 13.3, activities: 0, ca1: 60, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Поверхностная отписка в 1 предложение (158 символов), не указаны факторы спроса." },
-            { id: "g2-st-36", name: "Смайылова Жасмин Рысбекқызы", attendance: 13.3, activities: 0, ca1: 95, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Точные самостоятельные вычисления прироста выручки (+29% цена, TR = 7.59 млн)." },
-            { id: "g2-st-37", name: "Тильдахметов Алмат Зайнуллаұлы", attendance: 0, activities: 0, ca1: 97, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "97/100 (Высокий академический уровень): Глубокий вывод линейной функции спроса Q(P) вручную и точный расчет погрешности округления." },
-            { id: "g2-st-38", name: "Убниев Бекзат Нурсипатович", attendance: 13.3, activities: 0, ca1: 55, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Вставлен готовый шаблон из чата без индивидуального разбора." },
-            { id: "g2-st-39", name: "Шаймухамбетов Алим Асланулы", attendance: 13.3, activities: 0, ca1: 90, mc1: 0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Детальный расчет прироста выручки (+9.8%, 8.30 млн)." }
+            { id: "g2-st-1", name: "Абдрайм Еркежан Беркинбайкызы", attendance: 13.3, activities: 0, ca1: 55, mc1: 70.0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирована заготовка фразировки из чата." },
+            { id: "g2-st-2", name: "Абдулла Нұрислам Бауыржанұлы", attendance: 0, activities: 0, ca1: 98, mc1: 84.0, ca2: 0, mc2: 0, exam: 0, comment: "98/100 (Высокий глубокий анализ): Разбор с привязкой к законам РК (СЗПТ, АЗРК, маржа 15%)." },
+            { id: "g2-st-3", name: "Абраев Радмир Ниязович", attendance: 13.3, activities: 0, ca1: 50, mc1: 87.5, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Текст сгенерирован ИИ с академической канцелярией." },
+            { id: "g2-st-4", name: "АКБАРАЛИЕВ ФАХРИДИН АЛИШЕРОВИЧ", attendance: 13.3, activities: 0, ca1: 55, mc1: 71.0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирован размытый шаблон заготовки." },
+            { id: "g2-st-5", name: "Амангелді Айдос Даулетұлы", attendance: 13.3, activities: 0, ca1: 90, mc1: 90.0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельный вывод про валовую выручку." },
+            { id: "g2-st-6", name: "Асанғалиева Әсия Арманқызы", attendance: 6.7, activities: 0, ca1: 90, mc1: 82.0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Прямое обоснование оптимальной цены вершины параболы." },
+            { id: "g2-st-7", name: "Асланов Алишер Асланович", attendance: 6.7, activities: 0, ca1: 55, mc1: 63.0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Поверхностная списанная шаблонная заготовка." },
+            { id: "g2-st-8", name: "Ахметов Танирберген Дауренулы", attendance: 0, activities: 0, ca1: 0, mc1: 32.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-9", name: "Әбілдаев Нұрым Тәліпханұлы", attendance: 6.7, activities: 0, ca1: 0, mc1: 47.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-10", name: "Әділ Гүлсезім Әсетқызы", attendance: 13.3, activities: 0, ca1: 55, mc1: 80.0, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирована распространенная заготовка." },
+            { id: "g2-st-11", name: "Биманов Алишер Бакытович", attendance: 6.7, activities: 0, ca1: 50, mc1: 75.0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Подставлен сгенерированный ИИ-текст." },
+            { id: "g2-st-12", name: "Власова Валерия Семеновна", attendance: 13.3, activities: 0, ca1: 90, mc1: 91.0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Детальный авторский разбор маркетплейсов Kaspi, Temu, OZON." },
+            { id: "g2-st-13", name: "Дүйсенбай Әлімхан Дәулетұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 25.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-14", name: "Избасар Даниял Тауржанұлы", attendance: 13.3, activities: 0, ca1: 0, mc1: 41.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-15", name: "Истамов Изат", attendance: 6.7, activities: 0, ca1: 0, mc1: 0.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-16", name: "Йылмаз Мухаммедали", attendance: 0, activities: 0, ca1: 90, mc1: 85.0, ca2: 0, mc2: 0, exam: 0, comment: "85/100 (Хорошая самостоятельная работа): Авторский разбор Kaspi, Wildberries и Pinduoduo." },
+            { id: "g2-st-17", name: "Кадирханов Жангир Адилетович", attendance: 6.7, activities: 0, ca1: 0, mc1: 45.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-18", name: "Кенжегузин Санжар Ерланұлы", attendance: 0, activities: 0, ca1: 90, mc1: 86.5, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельное объяснение перетока клиентов фитнес-клубов." },
+            { id: "g2-st-19", name: "Кенжегулов Нургазы Сергазыевич", attendance: 13.3, activities: 0, ca1: 0, mc1: 37.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-20", name: "Князьбек Нұрбек Нұрланұлы", attendance: 6.7, activities: 0, ca1: 0, mc1: 40.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-21", name: "Коробов Илья Александрович", attendance: 13.3, activities: 0, ca1: 0, mc1: 42.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-22", name: "Кочетов Руслан Юрьевич", attendance: 6.7, activities: 0, ca1: 0, mc1: 42.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-23", name: "Кукушкин Юрий Кириллович", attendance: 6.7, activities: 0, ca1: 0, mc1: 42.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-24", name: "Қабылбек Жантөре Батырбекұлы", attendance: 6.7, activities: 0, ca1: 0, mc1: 40.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-25", name: "Ли Аделина Сергеевна", attendance: 13.3, activities: 0, ca1: 90, mc1: 93.5, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Анализ локальных брендов одежды и конкуренции с маркетплейсами." },
+            { id: "g2-st-26", name: "Мажитов Султан Канатович", attendance: 6.7, activities: 0, ca1: 0, mc1: 37.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-27", name: "Мазат Ерсұлтан Ердосұлы", attendance: 6.7, activities: 0, ca1: 90, mc1: 80.0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельный расчет TR и единичной эластичности." },
+            { id: "g2-st-28", name: "Мамаев Станислав Алексеевич", attendance: 13.3, activities: 0, ca1: 55, mc1: 87.5, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирован готовый текст-шаблон из чата." },
+            { id: "g2-st-29", name: "Молдыбай Амина Айратқызы", attendance: 13.3, activities: 0, ca1: 90, mc1: 86.0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Авторский разбор ценообразования и конкуренции с Zara и H&M." },
+            { id: "g2-st-30", name: "Мусаева Элина Князьевна", attendance: 13.3, activities: 0, ca1: 90, mc1: 85.0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Искренний авторский текст с детальным объяснением пика параболы." },
+            { id: "g2-st-31", name: "Мухтар Бекасыл Асылбекулы", attendance: 6.7, activities: 0, ca1: 0, mc1: 40.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-32", name: "Нурканат Алиар", attendance: 13.3, activities: 0, ca1: 50, mc1: 75.0, ca2: 0, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Вставлен сгенерированный фрагмент из ChatGPT." },
+            { id: "g2-st-33", name: "Нұрбек Нүркен Анарбекұлы", attendance: 6.7, activities: 0, ca1: 0, mc1: 38.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
+            { id: "g2-st-34", name: "Нұрғали Айсана", attendance: 13.3, activities: 0, ca1: 90, mc1: 85.0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Логичный разбор альтернатив АИ-92 (автогаз, такси)." },
+            { id: "g2-st-35", name: "Сейтқасым Әкежан Серікұлы", attendance: 13.3, activities: 0, ca1: 60, mc1: 55.0, ca2: 0, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Поверхностное суждение в 1 предложение." },
+            { id: "g2-st-36", name: "Смайылова Жасмин Рысбекқызы", attendance: 13.3, activities: 0, ca1: 95, mc1: 92.5, ca2: 0, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Точные самостоятельные вычисления прироста выручки." },
+            { id: "g2-st-37", name: "Тильдахметов Алмат Зайнуллаұлы", attendance: 0, activities: 0, ca1: 97, mc1: 91.0, ca2: 0, mc2: 0, exam: 0, comment: "97/100 (Высокий академический уровень): Глубокий вывод линейной функции спроса Q(P) вручную." },
+            { id: "g2-st-38", name: "Убниев Бекзат Нурсипатович", attendance: 13.3, activities: 0, ca1: 55, mc1: 74.5, ca2: 0, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Вставлен готовый шаблон из чата." },
+            { id: "g2-st-39", name: "Шаймухамбетов Алим Асланулы", attendance: 13.3, activities: 0, ca1: 90, mc1: 90.0, ca2: 0, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Детальный расчет прироста выручки." }
         ];
 
         let currentGroupKey = 'g1';
@@ -464,6 +486,7 @@
         let personalAttChart = null;
         let personalActChart = null;
         let personalExamChart = null;
+        let bellCurveChart = null;
         let isTeacherMode = false;
         
         const correctPassword = 'SERUS-12122026';
@@ -478,7 +501,7 @@
         };
 
         function loadDatabase() {
-            const saved = localStorage.getItem('almau_economics_se_rus_groups_v7');
+            const saved = localStorage.getItem('almau_economics_se_rus_groups_v8');
             if (saved) {
                 database = JSON.parse(saved);
             } else {
@@ -489,7 +512,7 @@
 
         function saveDatabase() {
             database[currentGroupKey] = students;
-            localStorage.setItem('almau_economics_se_rus_groups_v7', JSON.stringify(database));
+            localStorage.setItem('almau_economics_se_rus_groups_v8', JSON.stringify(database));
         }
 
         function switchGroup(groupKey) {
@@ -679,6 +702,105 @@
             circle.style.strokeDashoffset = strokeOffset;
         }
 
+        /* ПОСТРОЕНИЕ КРИВОЙ ГАУССА / BELL CURVE */
+        function renderBellCurveChart() {
+            if (bellCurveChart) bellCurveChart.destroy();
+
+            const scores = students.map(s => Number(s.mc1) || 0);
+            if (scores.length === 0) return;
+
+            const n = scores.length;
+            const mean = scores.reduce((a, b) => a + b, 0) / n;
+            const variance = scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
+            const stdDev = Math.sqrt(variance) || 1;
+
+            document.getElementById('bell-mean-val').textContent = mean.toFixed(1);
+            document.getElementById('bell-std-val').textContent = stdDev.toFixed(1);
+
+            const bins = ['0-49', '50-59', '60-69', '70-79', '80-89', '90-100'];
+            const counts = [0, 0, 0, 0, 0, 0];
+
+            scores.forEach(s => {
+                if (s < 50) counts[0]++;
+                else if (s < 60) counts[1]++;
+                else if (s < 70) counts[2]++;
+                else if (s < 80) counts[3]++;
+                else if (s < 90) counts[4]++;
+                else counts[5]++;
+            });
+
+            const bellCurvePoints = [];
+            const step = 2;
+            for (let x = 20; x <= 100; x += step) {
+                const exponent = -Math.pow(x - mean, 2) / (2 * Math.pow(stdDev, 2));
+                const y = (1 / (stdDev * Math.sqrt(2 * Math.PI))) * Math.exp(exponent);
+                bellCurvePoints.push({ x: x, y: y });
+            }
+
+            const ctx = document.getElementById('bellCurveCanvas').getContext('2d');
+            bellCurveChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: bins,
+                    datasets: [
+                        {
+                            type: 'bar',
+                            label: 'Количество студентов (Факт)',
+                            data: counts,
+                            backgroundColor: 'rgba(99, 102, 241, 0.5)',
+                            borderColor: '#6366f1',
+                            borderWidth: 1,
+                            borderRadius: 6,
+                            yAxisID: 'y'
+                        },
+                        {
+                            type: 'line',
+                            label: 'Кривая Гаусса (Теория)',
+                            data: bellCurvePoints.map(p => ({ x: p.x, y: p.y })),
+                            borderColor: '#a855f7',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            fill: true,
+                            backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                            tension: 0.4,
+                            yAxisID: 'y1'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { color: '#94a3b8', font: { size: 10 } }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'category',
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8', font: { size: 10 } }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Студенты', color: '#6366f1', font: { size: 10 } },
+                            grid: { color: '#1e293b' },
+                            ticks: { color: '#94a3b8', precision: 0 }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: false,
+                            position: 'right',
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
         function verifyTeacherPassword() {
             const pwdInput = document.getElementById('auth-password');
             if (pwdInput.value === correctPassword) {
@@ -767,7 +889,7 @@
                     <td class="py-2.5 px-1 text-center font-bold text-emerald-400 text-xs">${student.attendance}%</td>
                     <td class="py-2.5 px-1 text-center text-teal-300 text-xs">${student.activities || 0}</td>
                     <td class="py-2.5 px-1 text-center bg-indigo-950/40 font-black text-indigo-400 text-sm">${student.ca1 || 0}</td>
-                    <td class="py-2.5 px-1 text-center text-amber-300 text-xs">${student.mc1 || 0}</td>
+                    <td class="py-2.5 px-1 text-center bg-amber-950/40 font-black text-amber-400 text-sm">${student.mc1 || 0}</td>
                     <td class="py-2.5 px-1 text-center text-slate-300 text-xs">${student.ca2 || 0}</td>
                     <td class="py-2.5 px-1 text-center text-orange-300 text-xs">${student.mc2 || 0}</td>
                     <td class="py-2.5 px-1 text-center text-rose-300 text-xs">${student.exam || 0}</td>
@@ -797,37 +919,38 @@
                 return;
             }
 
-            let sum = 0;
+            let sumMc1 = 0;
             let passes = 0;
             let topStudent = null;
-            let topScore = -1;
+            let topMc1Score = -1;
 
             students.forEach(s => {
-                const final = calculateWeightedScore(s.attendance, s.activities, s.ca1, s.mc1, s.ca2, s.mc2, s.exam);
-                sum += final;
-                if (final >= 50) passes++;
+                const mc1Score = Number(s.mc1) || 0;
+                sumMc1 += mc1Score;
+                if (mc1Score >= 50) passes++;
                 
-                if (final > topScore) {
-                    topScore = final;
+                if (mc1Score > topMc1Score) {
+                    topMc1Score = mc1Score;
                     topStudent = s;
                 }
             });
 
-            const avg = sum / total;
-            document.getElementById('stat-average-grade').textContent = avg.toFixed(1);
-            document.getElementById('stat-average-letter').textContent = getLetterGrade(avg).letter;
+            const avgMc1 = sumMc1 / total;
+            document.getElementById('stat-average-grade').textContent = avgMc1.toFixed(1);
+            document.getElementById('stat-average-letter').textContent = getLetterGrade(avgMc1).letter;
 
             const passPercent = Math.round((passes / total) * 100);
             document.getElementById('stat-pass-rate').textContent = `${passPercent}%`;
 
             if (topStudent) {
-                document.getElementById('stat-best-student').textContent = `${topStudent.name} (${topScore})`;
+                document.getElementById('stat-best-student').textContent = `${topStudent.name} (${topMc1Score})`;
             }
         }
 
         function updateDashboardData() {
             renderTeacherTable();
             updateStats();
+            renderBellCurveChart();
         }
 
         function exportToCSV() {
