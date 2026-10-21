@@ -56,7 +56,7 @@
             <p id="sub-title" class="text-xs text-slate-400">Макроэкономика • Almaty Management University (AlmaU)</p>
         </div>
 
-        <!-- ИНДИКАТОРЫ ВВП И БЮДЖЕТА (ПУСТЫЕ ПО УМОЛЧАНИЮ) -->
+        <!-- ИНДИКАТОРЫ ВВП И БЮДЖЕТА -->
         <div class="flex flex-wrap items-center gap-3">
             <div class="bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-700 text-center">
                 <span id="lbl-badge-gdi" class="text-[10px] font-mono text-slate-400 uppercase block">Доходы (GDI)</span>
@@ -81,7 +81,7 @@
     <!-- ДВУХКОЛОНОЧНЫЙ МАКЕТ -->
     <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-5">
 
-        <!-- ЛЕВАЯ КОЛОНКА: ВЫБОР СТУДЕНТА И ПОЛЯ ВВОДА -->
+        <!-- ЛЕВАЯ КОЛОНКА -->
         <div class="lg:col-span-4 sidebar-dark p-4 space-y-3">
             
             <!-- СЕЛЕКТОР СТУДЕНТА -->
@@ -147,7 +147,7 @@
             </div>
         </div>
 
-        <!-- ПРАВАЯ КОЛОНКА: САНКИ + БЛОК ОТПРАВКИ -->
+        <!-- ПРАВАЯ КОЛОНКА -->
         <div class="lg:col-span-8 space-y-4">
             
             <div class="white-board p-4 flex flex-col justify-center">
@@ -175,7 +175,7 @@
 
     </main>
 
-    <!-- ПЛАВАЮЩИЙ КАЛЬКУЛЯТОР В НИЖНЕМ ПРАВОМ УГЛУ -->
+    <!-- ПЛАВАЮЩИЙ КАЛЬКУЛЯТОР -->
     <div class="fixed bottom-5 right-5 z-50 flex flex-col items-end space-y-2">
         <button onclick="toggleCalculator()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs px-4 py-2.5 rounded-full shadow-lg border border-sky-400 flex items-center gap-2 transition-all">
             <i class="fa-solid fa-calculator"></i> <span id="lbl-calc-btn">🧮 Калькулятор</span>
@@ -211,7 +211,7 @@
         </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ПРЕДУПРЕЖДЕНИЯ СИСТЕМЫ ANTI-CHEAT -->
+    <!-- ANTI-CHEAT MODAL -->
     <div id="anticheat-modal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-red-500/50 rounded-2xl p-6 max-w-md text-center space-y-4 shadow-2xl">
             <div class="text-red-500 text-4xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
@@ -231,38 +231,57 @@
         let currentLang = 'ru';
         let sankeyChart = null;
 
-        // 29 УНИКАЛЬНЫХ СБАЛАНСИРОВАННЫХ ВАРИАНТОВ ДЛЯ СТУДЕНТОВ
-        const studentsData = [
-            { name: "Hebatallah Aldada", w: 340, r: 55, i: 45, se: 75, corp: 260, taxind: 85, depr: 65, nfi: 35, sav: 12, g: 210, hidden: ["depr", "corp"] },
-            { name: "Абдихай Салтанат Жалғасқызы", w: 360, r: 65, i: 50, se: 85, corp: 290, taxind: 95, depr: 75, nfi: 45, sav: 15, g: 190, hidden: ["w", "g"] },
-            { name: "Абдрахманов Бабур Хамза улы", w: 380, r: 70, i: 55, se: 90, corp: 310, taxind: 100, depr: 80, nfi: 50, sav: 18, g: 250, hidden: ["corp", "taxind"] },
-            { name: "Адильхан Надия Берікқызы", w: 330, r: 50, i: 40, se: 70, corp: 250, taxind: 80, depr: 60, nfi: 30, sav: 10, g: 170, hidden: ["r", "i"] },
-            { name: "Бахытов Алимжан Бахыткалиулы", w: 400, r: 80, i: 60, se: 100, corp: 330, taxind: 110, depr: 85, nfi: 55, sav: 20, g: 270, hidden: ["depr", "nfi"] },
-            { name: "Берикбаланова Адина Сериковна", w: 350, r: 60, i: 50, se: 80, corp: 280, taxind: 90, depr: 70, nfi: 40, sav: 15, g: 200, hidden: ["se", "g"] },
-            { name: "Джұмағұл Әмірлан Мағауияұлы", w: 365, r: 62, i: 52, se: 82, corp: 285, taxind: 92, depr: 72, nfi: 42, sav: 15, g: 210, hidden: ["depr", "g"] },
-            { name: "Жұмажан Осман Дарменұлы", w: 370, r: 65, i: 55, se: 85, corp: 300, taxind: 95, depr: 75, nfi: 45, sav: 16, g: 230, hidden: ["corp", "sav"] },
-            { name: "Кабдрахманова Ажар Ниязовна", w: 320, r: 45, i: 35, se: 65, corp: 240, taxind: 75, depr: 55, nfi: 25, sav: 12, g: 180, hidden: ["w", "taxind"] },
-            { name: "Ким Есфирь Севастьяновна", w: 390, r: 75, i: 60, se: 95, corp: 320, taxind: 105, depr: 80, nfi: 50, sav: 17, g: 210, hidden: ["r", "se"] },
-            { name: "Кожахметова Малика Азаматовна", w: 345, r: 58, i: 48, se: 78, corp: 275, taxind: 88, depr: 68, nfi: 38, sav: 14, g: 215, hidden: ["corp", "g"] },
-            { name: "Көшкінбай Айару Арманқызы", w: 355, r: 62, i: 52, se: 82, corp: 285, taxind: 92, depr: 72, nfi: 42, sav: 15, g: 185, hidden: ["depr", "i"] },
-            { name: "Сериккалиева Еңлік Думанқызы", w: 365, r: 68, i: 54, se: 88, corp: 295, taxind: 96, depr: 76, nfi: 46, sav: 16, g: 240, hidden: ["taxind", "g"] },
-            { name: "Степанченко Савелий Дмитриевич", w: 410, r: 85, i: 65, se: 105, corp: 340, taxind: 115, depr: 90, nfi: 60, sav: 22, g: 290, hidden: ["w", "corp"] },
-            { name: "Сулейменова Айдана Нурлановна", w: 335, r: 52, i: 42, se: 72, corp: 255, taxind: 82, depr: 62, nfi: 32, sav: 11, g: 165, hidden: ["r", "nfi"] },
-            { name: "Толстова Эвелина Евгеньевна", w: 375, r: 72, i: 58, se: 92, corp: 305, taxind: 98, depr: 78, nfi: 48, sav: 17, g: 225, hidden: ["se", "depr"] },
-            { name: "Хусаинова Адия Галимовна", w: 360, r: 60, i: 50, se: 80, corp: 280, taxind: 90, depr: 70, nfi: 40, sav: 15, g: 200, hidden: ["w", "g"] },
-            { name: "Шабанов Анварбек", w: 395, r: 78, i: 62, se: 98, corp: 325, taxind: 108, depr: 82, nfi: 52, sav: 19, g: 260, hidden: ["corp", "taxind"] },
-            { name: "Югай Ксения Альбертовна", w: 350, r: 58, i: 48, se: 78, corp: 270, taxind: 88, depr: 68, nfi: 38, sav: 14, g: 195, hidden: ["i", "nfi"] },
-            { name: "Азими Шазия", w: 330, r: 48, i: 38, se: 68, corp: 245, taxind: 78, depr: 58, nfi: 28, sav: 10, g: 185, hidden: ["r", "g"] },
-            { name: "Берікбай Нұрай Нұрғалиқызы", w: 365, r: 64, i: 52, se: 84, corp: 288, taxind: 93, depr: 73, nfi: 43, sav: 15, g: 205, hidden: ["se", "corp"] },
-            { name: "Қалдыбай Алиянұр Ғалымқызы", w: 340, r: 54, i: 44, se: 74, corp: 260, taxind: 84, depr: 64, nfi: 34, sav: 13, g: 175, hidden: ["depr", "taxind"] },
-            { name: "Қошан Нұрай Нұрланқызы", w: 385, r: 74, i: 59, se: 94, corp: 315, taxind: 102, depr: 79, nfi: 49, sav: 18, g: 245, hidden: ["w", "nfi"] },
-            { name: "Марлен Бақтияр", w: 370, r: 66, i: 53, se: 86, corp: 292, taxind: 94, depr: 74, nfi: 44, sav: 16, g: 220, hidden: ["i", "corp"] },
-            { name: "Мұрат Әмір Олжасұлы", w: 405, r: 82, i: 64, se: 102, corp: 335, taxind: 112, depr: 88, nfi: 58, sav: 21, g: 280, hidden: ["r", "g"] },
-            { name: "Нурхайдаров Бексултан Айдарович", w: 360, r: 60, i: 50, se: 80, corp: 280, taxind: 90, depr: 70, nfi: 40, sav: 15, g: 200, hidden: ["se", "depr"] },
-            { name: "Төлегенқызы Айгерім", w: 348, r: 56, i: 46, se: 76, corp: 268, taxind: 86, depr: 66, nfi: 36, sav: 14, g: 190, hidden: ["w", "taxind"] },
-            { name: "Хамитбек Ажар Ғаниқызы", w: 352, r: 59, i: 49, se: 79, corp: 272, taxind: 89, depr: 69, nfi: 39, sav: 15, g: 202, hidden: ["corp", "nfi"] },
-            { name: "Бонд Джеймс (James Bond 007)", w: 700, r: 150, i: 100, se: 200, corp: 500, taxind: 150, depr: 100, nfi: 100, sav: 25, g: 300, hidden: ["nfi", "depr"] }
+        // 81 УНИКАЛЬНЫХ СБАЛАНСИРОВАННЫХ ВАРИАНТОВ ДЛЯ 2-Х ГРУПП
+        const rawNamesList = [
+            // ГРУППА 1 (1 - 42)
+            "Азизбеков Максат Арманович", "Акимжанов Муслимбек Бекзодұлы", "Алпыспаев Мирас Жалғасұлы", "Амирханов Даулет Сакенович",
+            "Ахметов Андрей Витальевич", "Әкімхан Рамазан Қайратұлы", "Байдалы Айсер Сабырханұлы", "Байдукова Арина Андреевна",
+            "Бекешев Дінмухамед Ермекұлы", "Гуков Арман Андрейұлы", "Долинин Тимур Евгеньевич", "Есіркеп Аян Бақытжанұлы",
+            "Жалбаслар Дәулет Русланұлы", "Жарылгасынова Жасмин Максатовна", "Казымов Руслан", "Кариева Карина Армановна",
+            "Ким Валентин Владиславович", "Коваленко Илья Викторович", "Конысбаев Айбек Ермаханович", "Кошантаев Бексултан Маратович",
+            "Масалимов Олжас Ержанович", "Медиханов Тимур Фархадович", "Морбекова Камилла Ескендеровна", "Мусаев Ернур Русланович",
+            "Нұржанқызы Балнұр", "Омаров Болат Айдосович", "Рамазанов Арсен Дауренұлы", "Рахимбекова Сагыныш Рахимбековна",
+            "Ровнов Владислав Александрович", "Сәтпек Нұрлыбек Асланбекұлы", "Тастемір Шамиил Қайратұлы", "Тәжібай Мухаммедазиз Мұхтарұлы",
+            "Терехов Вячеслав Константинович", "Титовский Андрей Сергеевич", "Тұрсымбай Асқар Сүлейменұлы", "Уразалиев Сагит Ильдарович",
+            "Филипенко Александр Юрьевич", "Хашимова Саида Ренатовна", "Хохлов Алексей Игоревич", "Шайкенова Камилла Азаматовна",
+            "Юсупова Ильнара Дамировна", "Яппаров Эмир Фанильевич",
+
+            // ГРУППА 2 (43 - 81)
+            "Абдрайм Еркежан Беркинбайкызы", "Абдулла Нұрислам Бауыржанұлы", "Абраев Радмир Ниязович", "Акбаралиев Фахридин Алишерович",
+            "Амангелді Айдос Даулетұлы", "Асанғалиева Әсия Арманқызы", "Асланов Алишер Асланович", "Ахметов Танирберген Дауренулы",
+            "Әбілдаев Нұрым Тәліпханұлы", "Әділ Гүлсезім Әсетқызы", "Биманов Алишер Бакытович", "Власова Валерия Семеновна",
+            "Дүйсенбай Әлімхан Дәулетұлы", "Избасар Даниял Тауржанұлы", "Истамов Изат", "Йылмаз Мухаммедали",
+            "Кадирханов Жангир Адилетович", "Кенжегузин Санжар Ерланұлы", "Кенжегулов Нургазы Сергазыевич", "Князьбек Нұрбек Нұрланұлы",
+            "Коробов Илья Александрович", "Кочетов Руслан Юрьевич", "Кукушкин Юрий Кириллович", "Қабылбек Жантөре Батырбекұлы",
+            "Ли Аделина Сергеевна", "Мажитов Султан Канатович", "Мазат Ерсұлтан Ердосұлы", "Мамаев Станислав Алексеевич",
+            "Молдыбай Амина Айратқызы", "Мусаева Элина Князьевна", "Мухтар Бекасыл Асылбекулы", "Нурканат Алиар",
+            "Нұрбек Нүркен Анарбекұлы", "Нұрғали Айсана", "Сейтқасым Әкежан Серікұлы", "Смайылова Жасмин Рысбекқызы",
+            "Тильдахметов Алмат Зайнуллаұлы", "Убниев Бекзат Нурсипатович", "Шаймухамбетов Алим Асланулы"
         ];
+
+        const hiddenCombos = [
+            ["depr", "corp"], ["w", "g"], ["corp", "taxind"], ["r", "i"], ["depr", "nfi"],
+            ["se", "g"], ["depr", "g"], ["corp", "sav"], ["w", "taxind"], ["r", "se"],
+            ["corp", "g"], ["depr", "i"], ["taxind", "g"], ["w", "corp"], ["r", "nfi"]
+        ];
+
+        // Автоматическая генерация параметров СНС с гарантией баланса
+        const studentsData = rawNamesList.map((name, index) => {
+            const seed = index + 1;
+            const w = 310 + (seed * 7) % 110;
+            const r = 45 + (seed * 3) % 45;
+            const i = 35 + (seed * 4) % 35;
+            const se = 65 + (seed * 5) % 45;
+            const corp = 230 + (seed * 8) % 110;
+            const taxind = 75 + (seed * 3) % 45;
+            const depr = 55 + (seed * 2) % 40;
+            const nfi = 25 + (seed * 4) % 35;
+            const sav = 10 + (seed % 13);
+            const g = 160 + (seed * 6) % 130;
+            const hidden = hiddenCombos[index % hiddenCombos.length];
+
+            return { name, w, r, i, se, corp, taxind, depr, nfi, sav, g, hidden };
+        });
 
         const i18n = {
             ru: {
@@ -405,7 +424,6 @@
             const unit = currentLang === 'ru' ? 'млрд ₸' : 'Billion ₸';
             const t = i18n[currentLang];
 
-            // Проверка: верхние показания выводятся только после ввода ВСЕХ полей
             if (isNaN(w) || isNaN(r) || isNaN(i) || isNaN(se) || isNaN(corp) || isNaN(taxInd) || isNaN(depr) || isNaN(nfi) || isNaN(G)) {
                 document.getElementById('val-total-income').innerText = `??? ${unit}`;
                 document.getElementById('val-total-expenditure').innerText = `??? ${unit}`;
