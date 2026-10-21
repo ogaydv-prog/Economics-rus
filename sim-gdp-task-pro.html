@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лабораторная работа: Баланс ВВП и СНС • AlmaU</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Charts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        body { background-color: #0f172a; color: #f8fafc; min-height: 100vh; padding: 20px; user-select: none; }
+        .sidebar-dark { background-color: #1e293b; border: 1px solid #334155; border-radius: 16px; }
+        .input-card { background-color: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 8px 12px; }
+        
+        input[type=number] {
+            background-color: #1e293b;
+            border: 1px solid #475569;
+            color: #38bdf8;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            border-radius: 6px;
+            padding: 4px 8px;
+            width: 90px;
+            text-align: right;
+        }
+        input[type=number]:focus { outline: none; border-color: #38bdf8; }
+
+        .white-board { background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); color: #0f172a; }
+
+        /* Калькулятор Widget */
+        .calc-btn { background-color: #334155; color: #fff; font-weight: 700; font-family: 'JetBrains Mono', monospace; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; transition: background 0.1s; }
+        .calc-btn:hover { background-color: #475569; }
+        .calc-btn-op { background-color: #0284c7; }
+        .calc-btn-op:hover { background-color: #0369a1; }
+        .calc-btn-eq { background-color: #10b981; grid-column: span 2; }
+        .calc-btn-eq:hover { background-color: #059669; }
+    </style>
+</head>
+<body class="flex flex-col items-center relative">
+
+    <!-- ВЕРХНИЙ БЛОК -->
+    <header class="w-full max-w-7xl flex flex-col md:flex-row justify-between items-center pb-4 mb-4 border-b border-slate-700 gap-4">
+        <div>
+            <h1 id="main-title" class="text-lg md:text-xl font-black uppercase tracking-tight text-slate-100 whitespace-nowrap">
+                ЛАБОРАТОРНАЯ РАБОТА: БАЛАНС ВВП И СИСТЕМА НАЦИОНАЛЬНЫХ СЧЕТОВ
+            </h1>
+            <p id="sub-title" class="text-xs text-slate-400">Макроэкономика • Almaty Management University (AlmaU)</p>
+        </div>
+
+        <!-- ИНДИКАТОРЫ ВВП И БЮДЖЕТА (ПУСТЫЕ ПО УМОЛЧАНИЮ) -->
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-700 text-center">
+                <span id="lbl-badge-gdi" class="text-[10px] font-mono text-slate-400 uppercase block">Доходы (GDI)</span>
+                <span class="text-base font-black text-sky-400" id="val-total-income">??? млрд ₸</span>
+            </div>
+            <div class="bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-700 text-center">
+                <span id="lbl-badge-gdp" class="text-[10px] font-mono text-slate-400 uppercase block">Расходы (GDP)</span>
+                <span class="text-base font-black text-emerald-400" id="val-total-expenditure">??? млрд ₸</span>
+            </div>
+            <div class="bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-700 text-center">
+                <span id="lbl-badge-budget" class="text-[10px] font-mono text-slate-400 uppercase block">Бюджет (T - G)</span>
+                <span class="text-base font-black text-amber-400" id="val-budget-status">??? млрд ₸</span>
+            </div>
+            <!-- Переключатель RU / EN -->
+            <div class="flex items-center gap-1 bg-slate-800 p-1 rounded-lg border border-slate-700">
+                <button id="btn-lang-ru" onclick="setLanguage('ru')" class="px-2.5 py-1 text-xs font-bold rounded bg-sky-500 text-white">RU</button>
+                <button id="btn-lang-en" onclick="setLanguage('en')" class="px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white">EN</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ДВУХКОЛОНОЧНЫЙ МАКЕТ -->
+    <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <!-- ЛЕВАЯ КОЛОНКА: ВЫБОР СТУДЕНТА И ПОЛЯ ВВОДА -->
+        <div class="lg:col-span-4 sidebar-dark p-4 space-y-3">
+            
+            <!-- СЕЛЕКТОР СТУДЕНТА -->
+            <div class="bg-sky-950/40 p-3 rounded-xl border border-sky-500/30">
+                <label id="lbl-select-student" class="block text-xs font-bold text-sky-300 uppercase mb-1">Выберите имя студента:</label>
+                <select id="student-select" onchange="loadStudentVariant()" class="w-full bg-slate-900 border border-sky-500/50 text-white text-xs font-semibold rounded-lg p-2 focus:outline-none focus:border-sky-400">
+                    <option value="">-- Выберите из списка --</option>
+                </select>
+            </div>
+
+            <h3 id="lbl-sidebar-title" class="text-xs font-mono font-bold text-sky-400 uppercase tracking-wider">Параметры национальной экономики (млрд ₸)</h3>
+            
+            <div class="space-y-2 text-xs">
+                <div class="input-card flex justify-between items-center">
+                    <span id="lbl-w">Заработная плата (W)</span>
+                    <input type="number" id="inp-w" placeholder="???" oninput="updateAll()">
+                </div>
+
+                <div class="input-card flex justify-between items-center">
+                    <span id="lbl-r">Рентный доход (R)</span>
+                    <input type="number" id="inp-r" placeholder="???" oninput="updateAll()">
+                </div>
+
+                <div class="input-card flex justify-between items-center">
+                    <span id="lbl-i">Процентный доход (i)</span>
+                    <input type="number" id="inp-i" placeholder="???" oninput="updateAll()">
+                </div>
+
+                <div class="input-card flex justify-between items-center">
+                    <span id="lbl-se">Доход от собственности (SE)</span>
+                    <input type="number" id="inp-se" placeholder="???" oninput="updateAll()">
+                </div>
+
+                <div class="input-card flex justify-between items-center">
+                    <span id="lbl-corp">Прибыль корпораций</span>
+                    <input type="number" id="inp-corp" placeholder="???" class="!text-emerald-400" oninput="updateAll()">
+                </div>
+
+                <div class="input-card flex justify-between items-center">
+                    <span id="lbl-taxind">Косвенные налоги (T_ind)</span>
+                    <input type="number" id="inp-taxind" placeholder="???" class="!text-red-400" oninput="updateAll()">
+                </div>
+
+                <div class="input-card flex justify-between items-center">
+                    <span id="lbl-depr">Амортизация (CCAf)</span>
+                    <input type="number" id="inp-depr" placeholder="???" class="!text-slate-300" oninput="updateAll()">
+                </div>
+
+                <div class="input-card flex justify-between items-center">
+                    <span id="lbl-nfi">ЧФД из-за рубежа (NFI)</span>
+                    <input type="number" id="inp-nfi" placeholder="???" class="!text-purple-300" oninput="updateAll()">
+                </div>
+
+                <div class="input-card flex justify-between items-center">
+                    <span id="lbl-sav">Норма сбережений (S, %)</span>
+                    <input type="number" id="inp-sav" placeholder="???" min="1" max="50" oninput="updateAll()">
+                </div>
+
+                <div class="input-card flex justify-between items-center border-red-500/40 bg-red-950/20">
+                    <span id="lbl-g" class="font-bold text-red-400">Госзакупки (G)</span>
+                    <input type="number" id="inp-g" placeholder="???" class="!text-red-400" oninput="updateAll()">
+                </div>
+            </div>
+        </div>
+
+        <!-- ПРАВАЯ КОЛОНКА: САНКИ + БЛОК ОТПРАВКИ -->
+        <div class="lg:col-span-8 space-y-4">
+            
+            <div class="white-board p-4 flex flex-col justify-center">
+                <div id="sankey_chart" class="w-full h-[520px]"></div>
+            </div>
+
+            <!-- БЛОК АНАЛИТИЧЕСКОГО ВЫВОДА СТУДЕНТА -->
+            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 space-y-3">
+                <h3 id="lbl-task-title" class="text-sm font-bold text-sky-300 uppercase">Задание для студента:</h3>
+                <p id="lbl-task-desc" class="text-xs text-slate-300 leading-relaxed">
+                    На основе фундаментального макроэкономического тождества $GDI \equiv GDP$ и законов построения СНС найдите недостающие незаполненные показатели вашего варианта. Заполните все поля, постройте макроэкономическую диаграмму Санки и приведите логическое обоснование вашего ответа (включая оценку состояния бюджета $T - G$).
+                </p>
+                
+                <textarea id="inp-conclusion" rows="3" class="w-full bg-slate-900 border border-slate-600 rounded-lg p-3 text-xs text-slate-100 focus:outline-none focus:border-sky-400" placeholder="Напишите математический ход расчёта незаполненных параметров и ваш макроэкономический вывод..."></textarea>
+                
+                <div class="flex justify-between items-center">
+                    <span id="send-status" class="text-xs font-bold"></span>
+                    <button id="btn-submit" onclick="submitToGoogleSheet()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold px-5 py-2.5 rounded-lg transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-paper-plane"></i> <span id="lbl-btn-submit">Отправить результат преподавателю</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- ПЛАВАЮЩИЙ КАЛЬКУЛЯТОР В НИЖНЕМ ПРАВОМ УГЛУ -->
+    <div class="fixed bottom-5 right-5 z-50 flex flex-col items-end space-y-2">
+        <button onclick="toggleCalculator()" class="bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs px-4 py-2.5 rounded-full shadow-lg border border-sky-400 flex items-center gap-2 transition-all">
+            <i class="fa-solid fa-calculator"></i> <span id="lbl-calc-btn">🧮 Калькулятор</span>
+        </button>
+
+        <div id="calc-widget" class="hidden bg-slate-900 border border-slate-700 rounded-2xl p-3 shadow-2xl w-64 space-y-2">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-sky-400 uppercase">Калькулятор СНС</span>
+                <button onclick="toggleCalculator()" class="text-slate-400 hover:text-white text-xs"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <input type="text" id="calc-display" readonly value="0" class="w-full bg-slate-950 border border-slate-800 text-right text-lg font-mono font-bold text-emerald-400 p-2 rounded-lg">
+            <div class="grid grid-cols-4 gap-1.5 text-xs">
+                <div class="calc-btn text-red-400" onclick="calcClear()">C</div>
+                <div class="calc-btn calc-btn-op" onclick="calcOp('/')">÷</div>
+                <div class="calc-btn calc-btn-op" onclick="calcOp('*')">×</div>
+                <div class="calc-btn calc-btn-op" onclick="calcOp('-')">-</div>
+
+                <div class="calc-btn" onclick="calcNum('7')">7</div>
+                <div class="calc-btn" onclick="calcNum('8')">8</div>
+                <div class="calc-btn" onclick="calcNum('9')">9</div>
+                <div class="calc-btn calc-btn-op" onclick="calcOp('+')">+</div>
+
+                <div class="calc-btn" onclick="calcNum('4')">4</div>
+                <div class="calc-btn" onclick="calcNum('5')">5</div>
+                <div class="calc-btn" onclick="calcNum('6')">6</div>
+                <div class="calc-btn calc-btn-eq" onclick="calcEquals()">=</div>
+
+                <div class="calc-btn" onclick="calcNum('1')">1</div>
+                <div class="calc-btn" onclick="calcNum('2')">2</div>
+                <div class="calc-btn" onclick="calcNum('3')">3</div>
+                <div class="calc-btn" onclick="calcNum('0')">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНОЕ ОКНО ПРЕДУПРЕЖДЕНИЯ СИСТЕМЫ ANTI-CHEAT -->
+    <div id="anticheat-modal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-red-500/50 rounded-2xl p-6 max-w-md text-center space-y-4 shadow-2xl">
+            <div class="text-red-500 text-4xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <h3 id="ac-modal-title" class="text-lg font-black text-white uppercase">ВНИМАНИЕ: СИСТЕМА КОНТРОЛЯ</h3>
+            <p id="ac-modal-desc" class="text-xs text-slate-300 leading-relaxed">
+                Зафиксирован уход с рабочей вкладки или попытка стороннего действия! Пожалуйста, выполняйте задание внутри системы. <b>При повторном нарушении все введённые вами данные будут аннулированы!</b>
+            </p>
+            <button onclick="closeAntiCheatModal()" class="bg-red-600 hover:bg-red-500 text-white font-bold text-xs px-6 py-2.5 rounded-lg w-full transition-all">
+                Я понял, продолжить работу
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwfY1gtcyOXQGSTtOFRpbZ99AhbDeREYTipqqtJ0_p1zBN2mU0fAZWYDA6AWhmC97mj4A/exec";
+
+        let currentLang = 'ru';
+        let sankeyChart = null;
+
+        // 29 УНИКАЛЬНЫХ СБАЛАНСИРОВАННЫХ ВАРИАНТОВ ДЛЯ СТУДЕНТОВ
+        const studentsData = [
+            { name: "Hebatallah Aldada", w: 340, r: 55, i: 45, se: 75, corp: 260, taxind: 85, depr: 65, nfi: 35, sav: 12, g: 210, hidden: ["depr", "corp"] },
+            { name: "Абдихай Салтанат Жалғасқызы", w: 360, r: 65, i: 50, se: 85, corp: 290, taxind: 95, depr: 75, nfi: 45, sav: 15, g: 190, hidden: ["w", "g"] },
+            { name: "Абдрахманов Бабур Хамза улы", w: 380, r: 70, i: 55, se: 90, corp: 310, taxind: 100, depr: 80, nfi: 50, sav: 18, g: 250, hidden: ["corp", "taxind"] },
+            { name: "Адильхан Надия Берікқызы", w: 330, r: 50, i: 40, se: 70, corp: 250, taxind: 80, depr: 60, nfi: 30, sav: 10, g: 170, hidden: ["r", "i"] },
+            { name: "Бахытов Алимжан Бахыткалиулы", w: 400, r: 80, i: 60, se: 100, corp: 330, taxind: 110, depr: 85, nfi: 55, sav: 20, g: 270, hidden: ["depr", "nfi"] },
+            { name: "Берикбаланова Адина Сериковна", w: 350, r: 60, i: 50, se: 80, corp: 280, taxind: 90, depr: 70, nfi: 40, sav: 15, g: 200, hidden: ["se", "g"] },
+            { name: "Джұмағұл Әмірлан Мағауияұлы", w: 365, r: 62, i: 52, se: 82, corp: 285, taxind: 92, depr: 72, nfi: 42, sav: 15, g: 210, hidden: ["depr", "g"] },
+            { name: "Жұмажан Осман Дарменұлы", w: 370, r: 65, i: 55, se: 85, corp: 300, taxind: 95, depr: 75, nfi: 45, sav: 16, g: 230, hidden: ["corp", "sav"] },
+            { name: "Кабдрахманова Ажар Ниязовна", w: 320, r: 45, i: 35, se: 65, corp: 240, taxind: 75, depr: 55, nfi: 25, sav: 12, g: 180, hidden: ["w", "taxind"] },
+            { name: "Ким Есфирь Севастьяновна", w: 390, r: 75, i: 60, se: 95, corp: 320, taxind: 105, depr: 80, nfi: 50, sav: 17, g: 210, hidden: ["r", "se"] },
+            { name: "Кожахметова Малика Азаматовна", w: 345, r: 58, i: 48, se: 78, corp: 275, taxind: 88, depr: 68, nfi: 38, sav: 14, g: 215, hidden: ["corp", "g"] },
+            { name: "Көшкінбай Айару Арманқызы", w: 355, r: 62, i: 52, se: 82, corp: 285, taxind: 92, depr: 72, nfi: 42, sav: 15, g: 185, hidden: ["depr", "i"] },
+            { name: "Сериккалиева Еңлік Думанқызы", w: 365, r: 68, i: 54, se: 88, corp: 295, taxind: 96, depr: 76, nfi: 46, sav: 16, g: 240, hidden: ["taxind", "g"] },
+            { name: "Степанченко Савелий Дмитриевич", w: 410, r: 85, i: 65, se: 105, corp: 340, taxind: 115, depr: 90, nfi: 60, sav: 22, g: 290, hidden: ["w", "corp"] },
+            { name: "Сулейменова Айдана Нурлановна", w: 335, r: 52, i: 42, se: 72, corp: 255, taxind: 82, depr: 62, nfi: 32, sav: 11, g: 165, hidden: ["r", "nfi"] },
+            { name: "Толстова Эвелина Евгеньевна", w: 375, r: 72, i: 58, se: 92, corp: 305, taxind: 98, depr: 78, nfi: 48, sav: 17, g: 225, hidden: ["se", "depr"] },
+            { name: "Хусаинова Адия Галимовна", w: 360, r: 60, i: 50, se: 80, corp: 280, taxind: 90, depr: 70, nfi: 40, sav: 15, g: 200, hidden: ["w", "g"] },
+            { name: "Шабанов Анварбек", w: 395, r: 78, i: 62, se: 98, corp: 325, taxind: 108, depr: 82, nfi: 52, sav: 19, g: 260, hidden: ["corp", "taxind"] },
+            { name: "Югай Ксения Альбертовна", w: 350, r: 58, i: 48, se: 78, corp: 270, taxind: 88, depr: 68, nfi: 38, sav: 14, g: 195, hidden: ["i", "nfi"] },
+            { name: "Азими Шазия", w: 330, r: 48, i: 38, se: 68, corp: 245, taxind: 78, depr: 58, nfi: 28, sav: 10, g: 185, hidden: ["r", "g"] },
+            { name: "Берікбай Нұрай Нұрғалиқызы", w: 365, r: 64, i: 52, se: 84, corp: 288, taxind: 93, depr: 73, nfi: 43, sav: 15, g: 205, hidden: ["se", "corp"] },
+            { name: "Қалдыбай Алиянұр Ғалымқызы", w: 340, r: 54, i: 44, se: 74, corp: 260, taxind: 84, depr: 64, nfi: 34, sav: 13, g: 175, hidden: ["depr", "taxind"] },
+            { name: "Қошан Нұрай Нұрланқызы", w: 385, r: 74, i: 59, se: 94, corp: 315, taxind: 102, depr: 79, nfi: 49, sav: 18, g: 245, hidden: ["w", "nfi"] },
+            { name: "Марлен Бақтияр", w: 370, r: 66, i: 53, se: 86, corp: 292, taxind: 94, depr: 74, nfi: 44, sav: 16, g: 220, hidden: ["i", "corp"] },
+            { name: "Мұрат Әмір Олжасұлы", w: 405, r: 82, i: 64, se: 102, corp: 335, taxind: 112, depr: 88, nfi: 58, sav: 21, g: 280, hidden: ["r", "g"] },
+            { name: "Нурхайдаров Бексултан Айдарович", w: 360, r: 60, i: 50, se: 80, corp: 280, taxind: 90, depr: 70, nfi: 40, sav: 15, g: 200, hidden: ["se", "depr"] },
+            { name: "Төлегенқызы Айгерім", w: 348, r: 56, i: 46, se: 76, corp: 268, taxind: 86, depr: 66, nfi: 36, sav: 14, g: 190, hidden: ["w", "taxind"] },
+            { name: "Хамитбек Ажар Ғаниқызы", w: 352, r: 59, i: 49, se: 79, corp: 272, taxind: 89, depr: 69, nfi: 39, sav: 15, g: 202, hidden: ["corp", "nfi"] },
+            { name: "Бонд Джеймс (James Bond 007)", w: 700, r: 150, i: 100, se: 200, corp: 500, taxind: 150, depr: 100, nfi: 100, sav: 25, g: 300, hidden: ["nfi", "depr"] }
+        ];
+
+        const i18n = {
+            ru: {
+                mainTitle: "ЛАБОРАТОРНАЯ РАБОТА: БАЛАНС ВВП И СИСТЕМА НАЦИОНАЛЬНЫХ СЧЕТОВ",
+                subTitle: "Макроэкономика • Almaty Management University (AlmaU)",
+                sidebarTitle: "Параметры национальной экономики (млрд ₸)",
+                selectStudent: "Выберите имя студента:",
+                badgeGdi: "Доходы (GDI)", badgeGdp: "Расходы (GDP)", badgeBudget: "Бюджет (T - G)",
+                taskTitle: "Задание для студента:",
+                taskDesc: "На основе фундаментального макроэкономического тождества GDI ≡ GDP и законов построения СНС найдите недостающие незаполненные показатели вашего варианта. Заполните все поля, постройте макроэкономическую диаграмму Санки и приведите логическое обоснование вашего ответа (включая оценку состояния бюджета T - G).",
+                btnSubmit: "Отправить результат преподавателю",
+                statusDeficit: "Дефицит: ", statusSurplus: "Профицит: +", statusBalanced: "Баланс: 0 млрд ₸",
+                w: "Заработная плата (W)", r: "Рентный доход (R)", i: "Процентный доход (i)", se: "Доход от собственности (SE)",
+                corp: "Прибыль корпораций", taxind: "Косвенные налоги (T_ind)", depr: "Амортизация (CCAf)", nfi: "ЧФД из-за рубежа (NFI)",
+                sav: "Норма сбережений (S, %)", g: "Госзакупки (G)",
+                nW: "Заработная плата (W)", nR: "Рентный доход (R)", ni: "Процентный доход (i)", nSE: "Доход от собственности (SE)",
+                nCorp: "Прибыль корпораций", nTaxInd: "Косвенные налоги (T_ind)", nDepr: "Амортизация (CCAf)", nNFI: "ЧФД из-за рубежа (NFI)",
+                nTaxPIT: "Налоги населения (ИПН)", nTaxCIT: "Налог на прибыль (КПН)", nDiv: "Дивиденды", nRetained: "Нераспределенная прибыль",
+                nSav: "Сбережения (S)", nImport: "Импорт товаров и услуг (M)", nExport: "Экспорт товаров и услуг (X)",
+                nC: "Потребление (C)", nI: "Валовые инвестиции (I)", nG: "Государственные закупки (G)", nNX: "Чистый экспорт (NX = X - M)"
+            },
+            en: {
+                mainTitle: "LAB WORK: GDP BALANCE & SYSTEM OF NATIONAL ACCOUNTS",
+                subTitle: "Macroeconomics • Almaty Management University (AlmaU)",
+                sidebarTitle: "National Economy Parameters (Billion ₸)",
+                selectStudent: "Select Student Name:",
+                badgeGdi: "Income (GDI)", badgeGdp: "Expenditure (GDP)", badgeBudget: "Budget (T - G)",
+                taskTitle: "Student Task:",
+                taskDesc: "Based on the fundamental macroeconomic identity GDI ≡ GDP and SNA balance principles, find the missing indicators for your variant. Fill in all input fields, construct the Sankey flow diagram, and provide analytical reasoning for your solution.",
+                btnSubmit: "Submit Result to Professor",
+                statusDeficit: "Deficit: ", statusSurplus: "Surplus: +", statusBalanced: "Balance: 0 Billion ₸",
+                w: "Wages & Salaries (W)", r: "Rental Income (R)", i: "Interest Income (i)", se: "Proprietor's Income (SE)",
+                corp: "Corporate Profits", taxind: "Indirect Taxes (T_ind)", depr: "Depreciation (CCAf)", nfi: "Net Factor Income (NFI)",
+                sav: "Savings Rate (S, %)", g: "Gov Purchases (G)",
+                nW: "Wages & Salaries (W)", nR: "Rental Income (R)", ni: "Interest Income (i)", nSE: "Proprietor's Income (SE)",
+                nCorp: "Corporate Profits", nTaxInd: "Indirect Taxes (T_ind)", nDepr: "Depreciation (CCAf)", nNFI: "Net Factor Income (NFI)",
+                nTaxPIT: "Personal Tax (PIT)", nTaxCIT: "Corporate Tax (CIT)", nDiv: "Dividends", nRetained: "Retained Earnings",
+                nSav: "Savings (S)", nImport: "Imports (M)", nExport: "Exports (X)",
+                nC: "Consumption (C)", nI: "Gross Investment (I)", nG: "Gov Purchases (G)", nNX: "Net Exports (NX = X - M)"
+            }
+        };
+
+        google.charts.load('current', {'packages':['sankey']});
+        google.charts.setOnLoadCallback(initChart);
+
+        function initChart() {
+            sankeyChart = new google.visualization.Sankey(document.getElementById('sankey_chart'));
+            populateStudentSelect();
+            resetFieldsToEmpty();
+        }
+
+        function populateStudentSelect() {
+            const select = document.getElementById('student-select');
+            studentsData.forEach((st, idx) => {
+                const opt = document.createElement('option');
+                opt.value = idx;
+                opt.textContent = `${idx + 1}. ${st.name}`;
+                select.appendChild(opt);
+            });
+        }
+
+        function resetFieldsToEmpty() {
+            const fields = ["w","r","i","se","corp","taxind","depr","nfi","sav","g"];
+            fields.forEach(f => {
+                const inp = document.getElementById(`inp-${f}`);
+                inp.value = "";
+                inp.placeholder = "???";
+            });
+            document.getElementById('val-total-income').innerText = "??? млрд ₸";
+            document.getElementById('val-total-expenditure').innerText = "??? млрд ₸";
+            document.getElementById('val-budget-status').innerText = "??? млрд ₸";
+        }
+
+        function loadStudentVariant() {
+            const idx = document.getElementById('student-select').value;
+            if (idx === "") {
+                resetFieldsToEmpty();
+                return;
+            }
+
+            const st = studentsData[idx];
+            const fields = ["w","r","i","se","corp","taxind","depr","nfi","sav","g"];
+
+            fields.forEach(f => {
+                const inp = document.getElementById(`inp-${f}`);
+                if (st.hidden && st.hidden.includes(f)) {
+                    inp.value = "";
+                    inp.placeholder = "🔒❓";
+                } else {
+                    inp.value = st[f];
+                }
+            });
+
+            updateAll();
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('btn-lang-ru').className = lang === 'ru' ? "px-2.5 py-1 text-xs font-bold rounded bg-sky-500 text-white" : "px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white";
+            document.getElementById('btn-lang-en').className = lang === 'en' ? "px-2.5 py-1 text-xs font-bold rounded bg-sky-500 text-white" : "px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white";
+
+            const t = i18n[lang];
+            document.getElementById('main-title').innerText = t.mainTitle;
+            document.getElementById('sub-title').innerText = t.subTitle;
+            document.getElementById('lbl-sidebar-title').innerText = t.sidebarTitle;
+            document.getElementById('lbl-select-student').innerText = t.selectStudent;
+            document.getElementById('lbl-badge-gdi').innerText = t.badgeGdi;
+            document.getElementById('lbl-badge-gdp').innerText = t.badgeGdp;
+            document.getElementById('lbl-badge-budget').innerText = t.badgeBudget;
+            document.getElementById('lbl-task-title').innerText = t.taskTitle;
+            document.getElementById('lbl-task-desc').innerText = t.taskDesc;
+            document.getElementById('lbl-btn-submit').innerText = t.btnSubmit;
+
+            document.getElementById('lbl-w').innerText = t.w;
+            document.getElementById('lbl-r').innerText = t.r;
+            document.getElementById('lbl-i').innerText = t.i;
+            document.getElementById('lbl-se').innerText = t.se;
+            document.getElementById('lbl-corp').innerText = t.corp;
+            document.getElementById('lbl-taxind').innerText = t.taxind;
+            document.getElementById('lbl-depr').innerText = t.depr;
+            document.getElementById('lbl-nfi').innerText = t.nfi;
+            document.getElementById('lbl-sav').innerText = t.sav;
+            document.getElementById('lbl-g').innerText = t.g;
+
+            updateAll();
+        }
+
+        function updateAll() {
+            const w = parseFloat(document.getElementById('inp-w').value);
+            const r = parseFloat(document.getElementById('inp-r').value);
+            const i = parseFloat(document.getElementById('inp-i').value);
+            const se = parseFloat(document.getElementById('inp-se').value);
+            const corp = parseFloat(document.getElementById('inp-corp').value);
+            const taxInd = parseFloat(document.getElementById('inp-taxind').value);
+            const depr = parseFloat(document.getElementById('inp-depr').value);
+            const nfi = parseFloat(document.getElementById('inp-nfi').value);
+            const savRate = (parseFloat(document.getElementById('inp-sav').value) || 0) / 100;
+            const G = parseFloat(document.getElementById('inp-g').value);
+
+            const unit = currentLang === 'ru' ? 'млрд ₸' : 'Billion ₸';
+            const t = i18n[currentLang];
+
+            // Проверка: верхние показания выводятся только после ввода ВСЕХ полей
+            if (isNaN(w) || isNaN(r) || isNaN(i) || isNaN(se) || isNaN(corp) || isNaN(taxInd) || isNaN(depr) || isNaN(nfi) || isNaN(G)) {
+                document.getElementById('val-total-income').innerText = `??? ${unit}`;
+                document.getElementById('val-total-expenditure').innerText = `??? ${unit}`;
+                document.getElementById('val-budget-status').innerText = `??? ${unit}`;
+                return;
+            }
+
+            const totalHHIncome = w + r + i + se;
+            const pit = Math.round(totalHHIncome * 0.10);
+            const cit = Math.round(corp * 0.20);
+            const totalTaxes = pit + cit + taxInd;
+
+            const div = Math.round(corp * 0.35);
+            const retained = corp - cit - div;
+
+            const importRate = 0.10;
+            const importHH = Math.round((totalHHIncome - pit) * importRate);
+            const importCorp = Math.round(retained * 0.10);
+            const M = importHH + importCorp;
+
+            const netHH = totalHHIncome - pit - importHH;
+            const savings = Math.round(netHH * savRate);
+            const consHH = netHH - savings;
+
+            const totalGDI = totalHHIncome + corp + taxInd + depr + nfi;
+
+            const C = consHH + div;
+            const X = M + Math.round(nfi * 0.8);
+            const NX = X - M;
+            
+            const I0 = totalGDI - C - totalTaxes - NX;
+            const totalGDP = C + I0 + G + NX;
+
+            const budgetBalance = totalTaxes - G;
+            const budgetElem = document.getElementById('val-budget-status');
+
+            if (budgetBalance < 0) {
+                budgetElem.innerText = `${t.statusDeficit}${budgetBalance} ${unit}`;
+                budgetElem.className = "text-base font-black text-red-500";
+            } else if (budgetBalance > 0) {
+                budgetElem.innerText = `${t.statusSurplus}${budgetBalance} ${unit}`;
+                budgetElem.className = "text-base font-black text-emerald-400";
+            } else {
+                budgetElem.innerText = t.statusBalanced;
+                budgetElem.className = "text-base font-black text-sky-400";
+            }
+
+            document.getElementById('val-total-income').innerText = `${totalGDI} ${unit}`;
+            document.getElementById('val-total-expenditure').innerText = `${totalGDP} ${unit}`;
+
+            if (!sankeyChart) return;
+
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'From');
+            data.addColumn('string', 'To');
+            data.addColumn('number', 'Weight');
+
+            data.addRows([
+                [ t.nW, t.nC, Math.max(1, Math.round(w * 0.90 * (1 - importRate) * (1 - savRate))) ],
+                [ t.nW, t.nSav, Math.max(1, Math.round(w * 0.90 * (1 - importRate) * savRate)) ],
+                [ t.nW, t.nTaxPIT, Math.max(1, Math.round(w * 0.10)) ],
+                [ t.nW, t.nImport, Math.max(1, Math.round(w * 0.90 * importRate)) ],
+
+                [ t.nR, t.nC, Math.max(1, Math.round(r * (1 - importRate) * (1 - savRate))) ],
+                [ t.nR, t.nSav, Math.max(1, Math.round(r * (1 - importRate) * savRate)) ],
+                [ t.nR, t.nImport, Math.max(1, Math.round(r * importRate)) ],
+
+                [ t.ni, t.nC, Math.max(1, Math.round(i * (1 - importRate) * (1 - savRate))) ],
+                [ t.ni, t.nSav, Math.max(1, Math.round(i * (1 - importRate) * savRate)) ],
+                [ t.ni, t.nImport, Math.max(1, Math.round(i * importRate)) ],
+
+                [ t.nSE, t.nC, Math.max(1, Math.round(se * 0.90 * (1 - importRate) * (1 - savRate))) ],
+                [ t.nSE, t.nSav, Math.max(1, Math.round(se * 0.90 * (1 - importRate) * savRate)) ],
+                [ t.nSE, t.nTaxPIT, Math.max(1, Math.round(se * 0.10)) ],
+                [ t.nSE, t.nImport, Math.max(1, Math.round(se * 0.90 * importRate)) ],
+
+                [ t.nCorp, t.nDiv, Math.max(1, div) ],
+                [ t.nCorp, t.nRetained, Math.max(1, retained) ],
+                [ t.nCorp, t.nTaxCIT, Math.max(1, cit) ],
+
+                [ t.nDepr, t.nI, Math.max(1, depr) ],
+                [ t.nTaxInd, t.nG, Math.max(1, taxInd) ],
+
+                [ t.nNFI, t.nExport, Math.max(1, Math.round(nfi * 0.8)) ],
+                [ t.nNFI, t.nC, Math.max(1, Math.round(nfi * 0.2)) ],
+
+                [ t.nDiv, t.nC, Math.max(1, div) ],
+                [ t.nRetained, t.nI, Math.max(1, retained - importCorp) ],
+                [ t.nRetained, t.nImport, Math.max(1, importCorp) ],
+                [ t.nSav, t.nI, Math.max(1, savings) ],
+                [ t.nTaxPIT, t.nG, Math.max(1, pit) ],
+                [ t.nTaxCIT, t.nG, Math.max(1, cit) ],
+
+                [ t.nImport, t.nNX, Math.max(1, M) ],
+                [ t.nExport, t.nNX, Math.max(1, X) ]
+            ]);
+
+            const colorsMap = [
+                '#1e3a8a', '#10b981', '#0284c7', '#ef4444', '#f97316', 
+                '#1d4ed8', '#2563eb', '#38bdf8', '#10b981', '#10b981', 
+                '#0369a1', '#ef4444', '#475569', '#0284c7', '#ef4444', 
+                '#ef4444', '#8b5cf6', '#eab308', '#f59e0b'
+            ];
+
+            const options = {
+                sankey: {
+                    node: { colors: colorsMap, label: { fontName: 'Inter', fontSize: 10, color: '#0f172a', bold: true }, nodePadding: 14, width: 14 },
+                    link: { colorMode: 'gradient' }
+                }
+            };
+
+            sankeyChart.draw(data, options);
+        }
+
+        /* ---------------- ПЛАВАЮЩИЙ КАЛЬКУЛЯТОР ---------------- */
+        let calcVal = "0";
+        function toggleCalculator() {
+            document.getElementById('calc-widget').classList.toggle('hidden');
+        }
+        function calcNum(num) {
+            if (calcVal === "0") calcVal = num; else calcVal += num;
+            document.getElementById('calc-display').value = calcVal;
+        }
+        function calcOp(op) {
+            calcVal += " " + op + " ";
+            document.getElementById('calc-display').value = calcVal;
+        }
+        function calcClear() {
+            calcVal = "0";
+            document.getElementById('calc-display').value = calcVal;
+        }
+        function calcEquals() {
+            try {
+                calcVal = String(eval(calcVal.replace(/×/g, '*').replace(/÷/g, '/')));
+                document.getElementById('calc-display').value = calcVal;
+            } catch(e) {
+                document.getElementById('calc-display').value = "Ошибка";
+                calcVal = "0";
+            }
+        }
+
+        /* ---------------- СИСТЕМА ANTI-CHEAT ---------------- */
+        let warningsCount = 0;
+
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', e => {
+            if (e.key === "F12" || (e.ctrlKey && (e.key === "c" || e.key === "u" || e.key === "I"))) {
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                warningsCount++;
+                if (warningsCount === 1) {
+                    document.getElementById('anticheat-modal').classList.remove('hidden');
+                } else if (warningsCount >= 2) {
+                    resetFieldsToEmpty();
+                    document.getElementById('student-select').value = "";
+                    document.getElementById('inp-conclusion').value = "";
+                    alert("❌ Задание аннулировано! Вы повторно покинули окно работы.");
+                }
+            }
+        });
+
+        function closeAntiCheatModal() {
+            document.getElementById('anticheat-modal').classList.add('hidden');
+        }
+
+        async function submitToGoogleSheet() {
+            const select = document.getElementById('student-select');
+            const statusElem = document.getElementById('send-status');
+
+            if (select.value === "") {
+                statusElem.innerText = "⚠️ Выберите ваше имя из списка!";
+                statusElem.className = "text-xs font-bold text-red-400";
+                return;
+            }
+
+            const conclusionText = document.getElementById('inp-conclusion').value.trim();
+
+            if (conclusionText === "") {
+                statusElem.innerText = "⚠️ Напишите ход решения и ваш вывод!";
+                statusElem.className = "text-xs font-bold text-amber-400";
+                return;
+            }
+
+            statusElem.innerText = "⏳ Отправка результата...";
+            statusElem.className = "text-xs font-bold text-sky-400";
+
+            const payload = {
+                student: studentsData[select.value].name,
+                gdi: document.getElementById('val-total-income').innerText,
+                gdp: document.getElementById('val-total-expenditure').innerText,
+                budget: document.getElementById('val-budget-status').innerText,
+                w: document.getElementById('inp-w').value,
+                r: document.getElementById('inp-r').value,
+                i: document.getElementById('inp-i').value,
+                se: document.getElementById('inp-se').value,
+                corp: document.getElementById('inp-corp').value,
+                taxind: document.getElementById('inp-taxind').value,
+                depr: document.getElementById('inp-depr').value,
+                nfi: document.getElementById('inp-nfi').value,
+                sav: document.getElementById('inp-sav').value,
+                g: document.getElementById('inp-g').value,
+                conclusion: conclusionText
+            };
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                statusElem.innerText = "✅ Результат успешно отправлен!";
+                statusElem.className = "text-xs font-bold text-emerald-400";
+            } catch (err) {
+                statusElem.innerText = "❌ Ошибка при отправке.";
+                statusElem.className = "text-xs font-bold text-red-500";
+            }
+        }
+
+        window.addEventListener('resize', () => { if (sankeyChart) updateAll(); });
+    </script>
+</body>
+</html>

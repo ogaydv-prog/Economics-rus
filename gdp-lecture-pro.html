@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Макроэкономика • Измерение ВВП | AlmaU SDTE</title>
+    <!-- Tailwind CDN & Chart.js -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at 15% 0%, #0f172a 0%, #05070c 100%); color: #f1f5f9; min-height: 100vh; font-size: 13px; }
+        .glass-panel { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(20px); border: 1px solid rgba(51, 65, 85, 0.5); box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6); }
+        .tab-btn { transition: all 0.2s ease-in-out; }
+        .tab-btn.active { box-shadow: 0 0 15px currentColor; border-color: currentColor; }
+
+        /* ИНТЕРАКТИВНЫЕ КАРТОЧКИ ИСКЛЮЧЕНИЙ */
+        .gdp-excl-card {
+            background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 14px; transition: all 0.3s ease; cursor: pointer;
+        }
+        .gdp-excl-card:hover {
+            border-color: #3b82f6; background: rgba(30, 41, 59, 0.9); box-shadow: 0 0 18px rgba(59, 130, 246, 0.3); transform: translateY(-2px);
+        }
+
+        /* РАДИО-ПЕРЕКЛЮЧАТЕЛЬ С КРАСНОЙ ПОЛОСКОЙ */
+        .radio-tuner-container { background: #0b0e17; border: 2px solid #26334d; border-radius: 8px; padding: 10px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8); }
+        input[type=range].vintage-tuner { -webkit-appearance: none; width: 100%; background: transparent; outline: none; cursor: pointer; }
+        input[type=range].vintage-tuner::-webkit-slider-runnable-track { width: 100%; height: 10px; background: linear-gradient(180deg, #10172a 0%, #1e293b 100%); border-radius: 2px; border: 1px solid #334155; }
+        input[type=range].vintage-tuner::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 26px; width: 14px;
+            background: linear-gradient(180deg, #cbd5e1 0%, #64748b 50%, #334155 100%);
+            border: 1px solid #f8fafc; border-radius: 2px; margin-top: -8px; box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            background-image: linear-gradient(to right, transparent 6px, #ef4444 6px, #ef4444 8px, transparent 8px);
+        }
+
+        /* КРАСИВЫЙ СТИЛЬ ФОРМУЛ */
+        .pretty-math-text {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #fffbeb 0%, #fde047 50%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.3));
+        }
+
+        /* АНИМАЦИИ */
+        @keyframes click-glow-pulse { 0%, 100% { filter: drop-shadow(0 0 3px rgba(197, 160, 89, 0.4)); } 50% { filter: drop-shadow(0 0 18px rgba(197, 160, 89, 0.9)); } }
+        .node-clickable { animation: click-glow-pulse 1.6s infinite ease-in-out; cursor: pointer; }
+        @keyframes red-arrow-blink { 0%, 100% { stroke: #ef4444; opacity: 0.5; } 50% { stroke: #ff4d4d; opacity: 1; stroke-width: 9; filter: drop-shadow(0 0 15px #ff0000); } }
+        .blink-red-arrow { animation: red-arrow-blink 0.8s infinite ease-in-out !important; }
+        @keyframes yellow-arrow-pulse { 0%, 100% { stroke: #d97706; opacity: 0.6; } 50% { stroke: #fbbf24; opacity: 1; filter: drop-shadow(0 0 10px #fbbf24); } }
+        .pulse-yellow-arrow { animation: yellow-arrow-pulse 1.5s infinite ease-in-out !important; }
+        .sankey-path { fill: none; opacity: 0.75; transition: all 0.3s ease; }
+        .sankey-path:hover { opacity: 1; }
+    </style>
+</head>
+<body class="p-3 md:p-4 flex flex-col justify-between min-h-screen">
+
+    <!-- ШАПКА C ЕДИНЫМ СИНЕ-МОРСКИМ ЗАГОЛОВКОМ И КРАСНЫМ УМЕНЬШЕННЫМ ПОДЗАГОЛОВКОМ -->
+    <header class="glass-panel p-3.5 rounded-xl mb-3 flex flex-col md:flex-row justify-between items-center gap-3 border-t-2 border-t-cyan-500">
+        <div class="flex items-center gap-3">
+            <div>
+                <h1 class="text-lg md:text-xl font-black tracking-tight text-cyan-400" id="txt-header-title">
+                    Макроэкономика: Измерение ВВП
+                </h1>
+                <p class="text-[10px] text-rose-400 font-bold uppercase tracking-wider mt-0.5" id="txt-header-sub">
+                    AlmaU • Школа цифровых технологий и экономики
+                </p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="setLanguage('ru')" id="btn-lang-ru" class="px-2.5 py-1 text-[11px] font-black rounded bg-blue-600 text-white transition">RU</button>
+            <button onclick="setLanguage('en')" id="btn-lang-en" class="px-2.5 py-1 text-[11px] font-black rounded text-slate-400 hover:text-white transition">EN</button>
+        </div>
+    </header>
+
+    <!-- РАЗНОЦВЕТНАЯ НАВИГАЦИЯ -->
+    <nav class="flex flex-wrap gap-1.5 mb-3">
+        <button onclick="switchTab('tab-overview', this)" class="tab-btn active px-3 py-1.5 text-xs font-bold rounded-lg border border-blue-500/50 bg-blue-950/80 text-blue-300" id="nav-overview">1. Модель кругооборота</button>
+        <button onclick="switchTab('tab-expenditure', this)" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg border border-emerald-500/50 bg-emerald-950/80 text-emerald-300" id="nav-expenditure">2. Затратный метод (C+I+G+NX)</button>
+        <button onclick="switchTab('tab-income', this)" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg border border-amber-500/50 bg-amber-950/80 text-amber-300" id="nav-income">3. Доходный метод</button>
+        <button onclick="switchTab('tab-non-gdp', this)" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg border border-purple-500/50 bg-purple-950/80 text-purple-300" id="nav-non-gdp">4. Исключения из ВВП</button>
+        <button onclick="switchTab('tab-real-nominal', this)" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg border border-cyan-500/50 bg-cyan-950/80 text-cyan-300" id="nav-real-nominal">5. Номинальный и Реальный ВВП</button>
+        <button onclick="switchTab('tab-okun', this)" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg border border-rose-500/50 bg-rose-950/80 text-rose-300" id="nav-okun">6. Потери ВВП & Закон Оукена</button>
+    </nav>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main class="flex-grow">
+
+        <!-- ВКЛАДКА 1: МОДЕЛЬ КРУГООБОРОТА -->
+        <section id="tab-overview" class="tab-content space-y-3">
+            <div class="glass-panel p-4 rounded-xl border-l-4 border-l-blue-500 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <div class="max-w-2xl">
+                    <h2 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-0.5" id="t1-title">Определение ВВП</h2>
+                    <p class="text-slate-200 text-xs md:text-sm leading-relaxed" id="t1-def">
+                        <strong>Валовой внутренний продукт (ВВП)</strong> — рыночная стоимость всех конечных товаров и услуг, произведенных внутри страны за определенный период.
+                    </p>
+                </div>
+                <div class="bg-gradient-to-r from-slate-900 to-slate-950 p-3 rounded-xl border border-amber-500/40 text-right min-w-[240px] shadow-lg">
+                    <div class="text-[10px] text-amber-400/90 uppercase tracking-widest font-bold mb-1" id="t1-stat-lbl">Основное макроэкономическое тождество</div>
+                    <div class="text-xl font-mono font-black text-amber-300 tracking-wider">Y = C + I + G + NX</div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 items-stretch w-full">
+                
+                <!-- НОВЫЙ БЛОК: 4 МЕТОДА РАСЧЁТА ВВП ВМЕСТО ПАНЕЛИ ЛЕКТОРА -->
+                <div class="lg:col-span-3 glass-panel p-3.5 rounded-xl flex flex-col justify-between space-y-2 text-xs border-t-2 border-t-teal-400">
+                    <div>
+                        <div class="border-b border-slate-700 pb-2 mb-3">
+                            <h3 class="text-xs font-bold text-teal-300 uppercase tracking-wider text-center" id="methods-block-title">4 Способа расчёта ВВП</h3>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-2.5">
+                            <!-- 1. Затратный метод -->
+                            <div class="p-2.5 bg-slate-900/90 rounded-xl border border-teal-500/30 flex items-center gap-3 hover:border-teal-400 transition">
+                                <div class="w-10 h-10 rounded-full bg-teal-950 flex items-center justify-center border border-teal-400 text-teal-300 flex-shrink-0 text-base shadow-inner">
+                                    👛
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-100 text-[11px]" id="m1-name">Затратный метод</div>
+                                    <div class="text-[9px] text-slate-400" id="m1-sub">По потоку расходов (C+I+G+NX)</div>
+                                </div>
+                            </div>
+
+                            <!-- 2. Доходный метод -->
+                            <div class="p-2.5 bg-slate-900/90 rounded-xl border border-teal-500/30 flex items-center gap-3 hover:border-teal-400 transition">
+                                <div class="w-10 h-10 rounded-full bg-teal-950 flex items-center justify-center border border-teal-400 text-teal-300 flex-shrink-0 text-base shadow-inner">
+                                    🤲
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-100 text-[11px]" id="m2-name">Доходный метод</div>
+                                    <div class="text-[9px] text-slate-400" id="m2-sub">По первичным доходам факторов</div>
+                                </div>
+                            </div>
+
+                            <!-- 3. По добавленной стоимости -->
+                            <div class="p-2.5 bg-slate-900/90 rounded-xl border border-teal-500/30 flex items-center gap-3 hover:border-teal-400 transition">
+                                <div class="w-10 h-10 rounded-full bg-teal-950 flex items-center justify-center border border-teal-400 text-teal-300 flex-shrink-0 text-base shadow-inner">
+                                    🔄
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-100 text-[11px]" id="m3-name">По добавленной стоимости</div>
+                                    <div class="text-[9px] text-slate-400" id="m3-sub">Производственный метод (сумма ВДС)</div>
+                                </div>
+                            </div>
+
+                            <!-- 4. По конечной продукции -->
+                            <div class="p-2.5 bg-slate-900/90 rounded-xl border border-teal-500/30 flex items-center gap-3 hover:border-teal-400 transition">
+                                <div class="w-10 h-10 rounded-full bg-teal-950 flex items-center justify-center border border-teal-400 text-teal-300 flex-shrink-0 text-base shadow-inner">
+                                    🏷️
+                                </div>
+                                <div>
+                                    <div class="font-bold text-slate-100 text-[11px]" id="m4-name">По конечной продукции</div>
+                                    <div class="text-[9px] text-slate-400" id="m4-sub">Без повторного счёта сырья</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-2 bg-slate-900/60 border-l-2 border-teal-400 rounded-r text-[10px] text-slate-400 leading-relaxed space-y-0.5 mt-2">
+                        <span class="font-bold text-teal-300 block" id="sim-eq-title">МАКРОЭКОНОМИЧЕСКОЕ РАВНОВЕСИЕ:</span>
+                        <div id="sim-eq-desc">Все 4 метода дают одинаковый конечный результат ВВП.</div>
+                    </div>
+                </div>
+
+                <!-- ИНТЕРАКТИВНАЯ СХЕМА КРУГООБОРОТА -->
+                <div class="lg:col-span-9 bg-[#0b0d19] p-2 rounded-xl border border-slate-800 flex flex-col justify-between relative text-slate-200 overflow-hidden">
+                    <div class="relative w-full aspect-[4/3] rounded overflow-hidden">
+                        <svg viewBox="0 0 820 620" class="w-full h-full select-none" id="circ-svg">
+                            <defs>
+                                <marker id="arrow-red-head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#ef4444" /></marker>
+                                <marker id="arrow-yellow-head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#fbbf24" /></marker>
+                                <marker id="arrow-green-head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#10b981" /></marker>
+                                <marker id="arrow-blue-head" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#06b6d4" /></marker>
+                                <radialGradient id="gold-coin-grad" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#fffbeb" /><stop offset="40%" stop-color="#fbbf24" /><stop offset="100%" stop-color="#b45309" /></radialGradient>
+                                <radialGradient id="globe-water-grad" cx="40%" cy="40%" r="60%"><stop offset="0%" stop-color="#3b82f6" /><stop offset="70%" stop-color="#1d4ed8" /><stop offset="100%" stop-color="#1e3a8a" /></radialGradient>
+                                <mask id="import-mask"><rect width="820" height="620" fill="black" /><path id="import-mask-path" d="M 788,303 L 788,85 L 470,85" fill="none" stroke="white" stroke-width="10" /></mask>
+                                <mask id="export-mask"><rect width="820" height="620" fill="black" /><path id="export-mask-path" d="M 788,303 L 788,515 L 470,515" fill="none" stroke="white" stroke-width="10" /></mask>
+                            </defs>
+
+                            <path id="path-spending" d="M 430,128 A 175,175 0 0,1 573,275" fill="none" stroke="#ef4444" stroke-width="7.5" marker-end="url(#arrow-red-head)" />
+                            <path id="path-revenue" d="M 573,325 A 175,175 0 0,1 430,472" fill="none" stroke="#ef4444" stroke-width="7.5" marker-end="url(#arrow-red-head)" />
+                            <path id="path-costs" d="M 370,472 A 175,175 0 0,1 227,325" fill="none" stroke="#ef4444" stroke-width="7.5" marker-end="url(#arrow-red-head)" />
+                            <path id="path-income" d="M 227,275 A 175,175 0 0,1 370,128" fill="none" stroke="#ef4444" stroke-width="7.5" marker-end="url(#arrow-red-head)" />
+
+                            <path id="path-goods" d="M 624,275 A 225,225 0 0,0 430,77" fill="none" stroke="#fbbf24" stroke-width="5" marker-end="url(#arrow-yellow-head)" />
+                            <path id="path-goods-sold" d="M 370,523 A 225,225 0 0,0 624,325" fill="none" stroke="#fbbf24" stroke-width="5" marker-end="url(#arrow-yellow-head)" />
+                            <path id="path-factors-out" d="M 370,77 A 225,225 0 0,0 176,275" fill="none" stroke="#fbbf24" stroke-width="5" marker-end="url(#arrow-yellow-head)" />
+                            <path id="path-factors-in" d="M 176,325 A 225,225 0 0,0 430,523" fill="none" stroke="#fbbf24" stroke-width="5" marker-end="url(#arrow-yellow-head)" />
+
+                            <path id="label-spending" d="M 430,102 A 200,200 0 0,1 598,270" fill="none" />
+                            <text font-size="14" font-weight="900" fill="#f87171" dy="4"><textPath href="#label-spending" startOffset="15%" id="lbl-svg-spending">Потребительские расходы</textPath></text>
+
+                            <path id="label-revenue" d="M 430,498 A 200,200 0 0,0 598,330" fill="none" />
+                            <text font-size="14" font-weight="900" fill="#f87171" dy="4"><textPath href="#label-revenue" startOffset="18%" id="lbl-svg-revenue">Доходы фирм (выручка)</textPath></text>
+
+                            <path id="label-costs" d="M 202,330 A 200,200 0 0,0 370,498" fill="none" />
+                            <text font-size="14" font-weight="900" fill="#f87171" dy="4"><textPath href="#label-costs" startOffset="10%" id="lbl-svg-costs">Зарплата, рента, проценты</textPath></text>
+
+                            <path id="label-income" d="M 202,270 A 200,200 0 0,1 370,102" fill="none" />
+                            <text font-size="14" font-weight="900" fill="#f87171" dy="4"><textPath href="#label-income" startOffset="12%" id="lbl-svg-income">Доходы домашних хозяйств</textPath></text>
+
+                            <text x="545" y="45" fill="#fbbf24" font-size="12" font-weight="extrabold" id="lbl-svg-gbought">Потребление благ</text>
+                            <text x="545" y="565" fill="#fbbf24" font-size="12" font-weight="extrabold" id="lbl-svg-gsold">Готовая продукция</text>
+                            <text x="125" y="45" fill="#fbbf24" font-size="12" font-weight="extrabold" id="lbl-svg-fout">Факторы производства</text>
+                            <text x="125" y="565" fill="#fbbf24" font-size="12" font-weight="extrabold" id="lbl-svg-fin">Использование факторов</text>
+
+                            <g transform="translate(325, 250)" id="node-government" onclick="clickGovernment()" class="node-clickable">
+                                <rect width="150" height="100" rx="14" fill="#1e293b" stroke="#0284c7" stroke-width="2.5" />
+                                <path d="M 35,80 L 115,80 M 35,32 L 115,32" stroke="#38bdf8" stroke-width="3" />
+                                <rect x="42" y="32" width="10" height="48" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+                                <rect x="62" y="32" width="10" height="48" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+                                <rect x="82" y="32" width="10" height="48" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+                                <rect x="102" y="32" width="10" height="48" fill="#0f172a" stroke="#38bdf8" stroke-width="1.5" />
+                                <path d="M 25,32 L 75,8 L 125,32 Z" fill="#1e293b" stroke="#38bdf8" stroke-width="2.5" />
+                                <text x="75" y="93" fill="#f8fafc" font-size="12" font-weight="extrabold" text-anchor="middle" id="node-lbl-gov">Государство</text>
+                            </g>
+
+                            <g id="tax-h-gov" opacity="0">
+                                <path d="M 400,150 L 400,230" fill="none" stroke="#ef4444" stroke-width="4" marker-end="url(#arrow-red-head)" />
+                                <text x="415" y="195" fill="#ef4444" font-size="13" font-weight="900" id="lbl-tax1">Налоги</text>
+                            </g>
+                            <g id="tax-f-gov" opacity="0">
+                                <path d="M 400,450 L 400,370" fill="none" stroke="#ef4444" stroke-width="4" marker-end="url(#arrow-red-head)" />
+                                <text x="415" y="415" fill="#ef4444" font-size="13" font-weight="900" id="lbl-tax2">Налоги</text>
+                            </g>
+                            <g id="regulation-left" opacity="0">
+                                <line x1="325" y1="300" x2="215" y2="300" stroke="#10b981" stroke-width="3.5" marker-end="url(#arrow-green-head)" />
+                                <text x="270" y="290" fill="#10b981" font-size="11" font-weight="900" text-anchor="middle" id="lbl-reg1">Регулирование</text>
+                            </g>
+                            <g id="regulation-right" opacity="0">
+                                <line x1="475" y1="300" x2="585" y2="300" stroke="#10b981" stroke-width="3.5" marker-end="url(#arrow-green-head)" />
+                                <text x="530" y="290" fill="#10b981" font-size="11" font-weight="900" text-anchor="middle" id="lbl-reg2">Регулирование</text>
+                            </g>
+
+                            <g transform="translate(330, 40)" id="node-households" class="node-clickable" onclick="clickHouse()">
+                                <rect width="140" height="100" rx="14" fill="#1e293b" stroke="#d97706" stroke-width="2.5" />
+                                <text x="70" y="24" fill="#f8fafc" font-size="12" font-weight="extrabold" text-anchor="middle" id="node-lbl-house">Домохозяйства</text>
+                                <path d="M 30,62 L 70,32 L 110,62 Z" fill="#d97706" />
+                                <rect x="45" y="62" width="50" height="30" fill="#0f172a" stroke="#d97706" stroke-width="1.5" />
+                                <rect x="58" y="68" width="24" height="16" fill="#fef08a" rx="2" />
+                            </g>
+
+                            <g transform="translate(330, 470)" id="node-firms" class="node-clickable" onclick="clickFirm()">
+                                <rect width="140" height="100" rx="14" fill="#1e293b" stroke="#c5a059" stroke-width="2.5" />
+                                <text x="70" y="24" fill="#f8fafc" font-size="12" font-weight="extrabold" text-anchor="middle" id="node-lbl-firms">Фирмы</text>
+                                <rect x="35" y="62" width="70" height="30" fill="#0f172a" stroke="#c5a059" stroke-width="1.5" />
+                                <path d="M 35,62 L 50,42 L 50,62 L 65,42 L 65,62 L 80,42 L 80,62 L 105,42 L 105,62 Z" fill="#c5a059" />
+                            </g>
+
+                            <g transform="translate(50, 275)" id="node-resource-market">
+                                <rect width="150" height="50" rx="10" fill="#1e293b" stroke="#10b981" stroke-width="2.5" />
+                                <text x="75" y="30" fill="#a7f3d0" font-size="14" font-weight="900" text-anchor="middle" id="node-lbl-mkt-res">Рынок ресурсов</text>
+                            </g>
+                            <g transform="translate(590, 275)" id="node-product-market">
+                                <rect width="150" height="50" rx="10" fill="#1e293b" stroke="#3b82f6" stroke-width="2.5" />
+                                <text x="75" y="30" fill="#93c5fd" font-size="13" font-weight="900" text-anchor="middle" id="node-lbl-mkt-prod">Рынок товаров и услуг</text>
+                            </g>
+
+                            <g id="trade-channels" opacity="0">
+                                <path id="path-import" d="M 788,303 L 788,85 L 470,85" fill="none" stroke="#06b6d4" stroke-width="3" stroke-dasharray="4,4" mask="url(#import-mask)" marker-end="url(#arrow-blue-head)" />
+                                <path id="path-export" d="M 788,303 L 788,515 L 470,515" fill="none" stroke="#f43f5e" stroke-width="3" stroke-dasharray="4,4" mask="url(#export-mask)" marker-end="url(#arrow-red-head)" />
+                                <path id="label-import-text" d="M 470,85 L 788,85" fill="none" />
+                                <path id="label-export-text" d="M 470,515 L 788,515" fill="none" />
+                                <text font-size="13" font-weight="black" fill="#22d3ee" dy="-6"><textPath href="#label-import-text" startOffset="50%" text-anchor="middle" id="lbl-trade-imp">Импорт</textPath></text>
+                                <text font-size="13" font-weight="black" fill="#f43f5e" dy="16"><textPath href="#label-export-text" startOffset="50%" text-anchor="middle" id="lbl-trade-exp">Экспорт</textPath></text>
+                            </g>
+
+                            <g transform="translate(760, 275)" id="node-globe" onclick="clickGlobe()" class="node-clickable">
+                                <circle cx="28" cy="28" r="26" fill="url(#globe-water-grad)" stroke="#38bdf8" stroke-width="2" />
+                                <path d="M 10,22 Q 18,12 30,16 Q 38,20 44,12 Q 46,24 50,34 Q 36,41 32,31 Z" fill="#10b981" opacity="0.95" />
+                                <text x="28" y="70" fill="#38bdf8" font-size="11" font-weight="black" text-anchor="middle" id="node-lbl-globe">Мир</text>
+                            </g>
+
+                            <g id="coins-container"></g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 2: ЗАТРАТНЫЙ МЕТОД -->
+        <section id="tab-expenditure" class="tab-content hidden space-y-3">
+            <div class="glass-panel p-4 rounded-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-700 pb-2.5 mb-3">
+                    <h2 class="text-sm font-bold text-slate-200" id="t2-title">Затратный метод ВВП (Expenditure Approach)</h2>
+                    <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700 text-xs">
+                        <button onclick="setExpenditureCountry('us')" id="btn-exp-us" class="px-2.5 py-1 font-bold rounded bg-blue-600 text-white transition">🇺🇸 США (BEA 2025)</button>
+                        <button onclick="setExpenditureCountry('kz')" id="btn-exp-kz" class="px-2.5 py-1 font-bold rounded text-slate-400 hover:text-white transition">🇰🇿 Казахстан (БНС РК 2025)</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                    <div class="md:col-span-5 space-y-2 text-xs" id="expenditure-details"></div>
+                    <div class="md:col-span-7 h-72 glass-panel p-3 rounded-xl flex items-center justify-center">
+                        <canvas id="chartExpenditure"></canvas>
+                    </div>
+                </div>
+                <div class="mt-3 p-2.5 bg-slate-900/80 rounded-lg border border-slate-700/80 text-[11px] text-slate-400 flex justify-between items-center" id="exp-source-note"></div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 3: ДОХОДНЫЙ МЕТОД -->
+        <section id="tab-income" class="tab-content hidden space-y-3">
+            <div class="glass-panel p-4 rounded-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-700 pb-2.5 mb-3">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-200" id="t3-title">Доходный метод расчёта ВВП</h2>
+                        <p class="text-[11px] text-slate-400" id="t3-sub">Распределение первичных доходов факторам производства</p>
+                    </div>
+                    <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700 text-xs">
+                        <button onclick="setIncomeCountry('us')" id="btn-inc-us" class="px-2.5 py-1 font-bold rounded bg-blue-600 text-white transition">🇺🇸 США (BEA 2025)</button>
+                        <button onclick="setIncomeCountry('kz')" id="btn-inc-kz" class="px-2.5 py-1 font-bold rounded text-slate-400 hover:text-white transition">🇰🇿 Казахстан (БНС РК 2025)</button>
+                    </div>
+                </div>
+
+                <div class="bg-[#0b0d19] p-3 rounded-xl border border-slate-800 relative mb-3">
+                    <svg viewBox="0 0 750 250" class="w-full h-auto select-none" id="sankey-income-svg"></svg>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch">
+                    <div class="md:col-span-5 space-y-2 text-xs flex flex-col justify-center" id="income-details"></div>
+                    <div class="md:col-span-7 h-80 md:h-96 glass-panel p-4 rounded-xl flex items-center justify-center">
+                        <canvas id="chartIncome"></canvas>
+                    </div>
+                </div>
+
+                <div class="mt-3 p-3 bg-slate-900/80 rounded-xl border border-blue-500/30 text-xs text-slate-300 leading-relaxed" id="income-theory-block"></div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 4: ИСКЛЮЧЕНИЯ ИЗ ВВП -->
+        <section id="tab-non-gdp" class="tab-content hidden space-y-3">
+            <div class="glass-panel p-4 rounded-xl">
+                <h2 class="text-sm font-bold text-slate-200 mb-2" id="t4-title">Сделки, НЕ включаемые в ВВП (Boundary of Production)</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-3" id="non-gdp-cards"></div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 5: НОМИНАЛЬНЫЙ И РЕАЛЬНЫЙ ВВП -->
+        <section id="tab-real-nominal" class="tab-content hidden space-y-3">
+            <div class="glass-panel p-4 rounded-xl">
+                <h2 class="text-sm font-bold text-slate-200 text-center uppercase tracking-widest mb-3 border-b border-slate-700 pb-2" id="t5-title">Номинальный и Реальный ВВП</h2>
+
+                <div class="my-4 p-4 bg-gradient-to-r from-slate-950 via-slate-900 to-slate-950 rounded-xl border border-amber-500/40 text-center shadow-2xl space-y-1">
+                    <div class="text-[10px] text-amber-400 font-bold uppercase tracking-widest" id="t5-eq-lbl">Уравнение количественной теории денег (Уравнение Фишера)</div>
+                    <div class="text-3xl font-mono font-black tracking-widest my-2 flex justify-center items-center gap-3">
+                        <span class="text-emerald-400 drop-shadow-[0_0_10px_rgba(16,185,129,0.5)]">MV</span>
+                        <span class="text-slate-500 font-sans">=</span>
+                        <span class="text-rose-500 drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]">PY</span>
+                    </div>
+                    <div class="text-[11px] text-slate-400 font-medium" id="t5-eq-sub">
+                        <span class="text-emerald-400 font-bold">M</span> — Денежная масса | <span class="text-emerald-400 font-bold">V</span> — Скорость обращения | <span class="text-rose-400 font-bold">P</span> — <strong>Уровень цен</strong> | <span class="text-rose-400 font-bold">Y</span> — Реальный ВВП
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-900/90 p-4 rounded-xl border border-slate-700 mb-4">
+                    <div>
+                        <label class="text-xs text-slate-300 flex justify-between font-bold mb-1">
+                            <span id="lbl-apple-y-title">Урожай яблок (Выпуск Y):</span> 
+                            <span id="lbl-apple-y" class="text-amber-400 font-mono font-black">100 мешков</span>
+                        </label>
+                        <input type="range" id="slider-apple-y" min="100" max="150" value="100" class="vintage-tuner" oninput="calcApples()">
+                    </div>
+                    <div>
+                        <label class="text-xs text-slate-300 flex justify-between font-bold mb-1">
+                            <span id="lbl-apple-p-title">Текущая цена P (Уровень цен):</span> 
+                            <span id="lbl-apple-p" class="text-rose-400 font-mono font-black">6000 ₸</span>
+                        </label>
+                        <input type="range" id="slider-apple-p" min="5000" max="10000" step="500" value="6000" class="vintage-tuner" oninput="calcApples()">
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-br from-[#022c22] via-[#064e3b] to-[#022c22] border-2 border-emerald-500/50 rounded-2xl p-5 space-y-5 text-slate-100 shadow-[0_0_30px_rgba(16,185,129,0.15)]">
+                    
+                    <!-- РЯД 1: НОМИНАЛЬНЫЙ ВВП -->
+                    <div class="flex flex-col lg:flex-row items-center justify-between gap-5 border-b border-emerald-500/30 pb-5">
+                        <div class="flex items-center gap-4 min-w-[260px]">
+                            <div class="w-14 h-14 relative flex-shrink-0 drop-shadow-[0_0_12px_rgba(239,68,68,0.5)]">
+                                <svg viewBox="0 0 100 100" class="w-full h-full">
+                                    <path d="M 50,25 C 55,10 70,10 80,20 C 95,35 90,70 75,85 C 65,95 55,90 50,85 C 45,90 35,95 25,85 C 10,70 5,35 20,20 C 30,10 45,10 50,25 Z" fill="url(#red-apple-grad)"/>
+                                    <path d="M 50,25 Q 52,10 60,8" fill="none" stroke="#78350f" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M 58,12 Q 70,8 66,18 Z" fill="#22c55e"/>
+                                    <ellipse cx="35" cy="35" rx="6" ry="12" fill="#ffffff" opacity="0.3" transform="rotate(-30 35 35)"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-black text-rose-400 tracking-tight" id="card-nom-title">Номинальный ВВП</h3>
+                                <div class="text-xl font-mono font-black text-rose-300">P · Y</div>
+                            </div>
+                        </div>
+
+                        <div class="text-center lg:text-right space-y-1">
+                            <div id="nom-formula-display" class="text-2xl md:text-3xl font-extrabold pretty-math-text tracking-wide">
+                                100 × 6 000 ₸ = 600 000 ₸
+                            </div>
+                            <div id="nom-ratio-display" class="text-xs font-bold text-rose-300 font-mono">
+                                = 1,2 × 500 000
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- РЯД 2: РЕАЛЬНЫЙ ВВП -->
+                    <div class="flex flex-col lg:flex-row items-center justify-between gap-5">
+                        <div class="flex items-center gap-4 min-w-[260px]">
+                            <div class="w-14 h-14 relative flex-shrink-0 drop-shadow-[0_0_12px_rgba(16,185,129,0.5)]">
+                                <svg viewBox="0 0 100 100" class="w-full h-full">
+                                    <path d="M 50,25 C 55,10 70,10 80,20 C 95,35 90,70 75,85 C 65,95 55,90 50,85 C 45,90 35,95 25,85 C 10,70 5,35 20,20 C 30,10 45,10 50,25 Z" fill="url(#green-apple-grad)"/>
+                                    <path d="M 50,25 Q 52,10 60,8" fill="none" stroke="#78350f" stroke-width="4" stroke-linecap="round"/>
+                                    <path d="M 58,12 Q 70,8 66,18 Z" fill="#4ade80"/>
+                                    <ellipse cx="35" cy="35" rx="6" ry="12" fill="#ffffff" opacity="0.3" transform="rotate(-30 35 35)"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-black text-emerald-400 tracking-tight" id="card-real-title">Реальный ВВП</h3>
+                                <div class="text-xl font-mono font-black text-emerald-300">P base · Y</div>
+                            </div>
+                        </div>
+
+                        <div class="text-center lg:text-right space-y-1">
+                            <div id="real-formula-display" class="text-2xl md:text-3xl font-extrabold pretty-math-text tracking-wide">
+                                100 × 5 000 ₸ = 500 000 ₸
+                            </div>
+                            <div id="real-ratio-display" class="text-xs font-bold text-emerald-300 font-mono">
+                                = 1 × 500 000
+                            </div>
+                        </div>
+                    </div>
+
+                    <svg width="0" height="0" class="absolute">
+                        <defs>
+                            <radialGradient id="red-apple-grad" cx="35%" cy="35%" r="65%">
+                                <stop offset="0%" stop-color="#f87171"/>
+                                <stop offset="60%" stop-color="#dc2626"/>
+                                <stop offset="100%" stop-color="#7f1d1d"/>
+                            </radialGradient>
+                            <radialGradient id="green-apple-grad" cx="35%" cy="35%" r="65%">
+                                <stop offset="0%" stop-color="#4ade80"/>
+                                <stop offset="60%" stop-color="#16a34a"/>
+                                <stop offset="100%" stop-color="#14532d"/>
+                            </radialGradient>
+                        </defs>
+                    </svg>
+                </div>
+
+                <div class="mt-4 p-3 bg-slate-900/90 rounded-xl border border-slate-700 flex flex-col md:flex-row justify-between items-center gap-3">
+                    <div>
+                        <h4 class="text-xs font-bold text-blue-400 uppercase tracking-wider" id="t5-fisher-rate-title">Эффект Фишера (Процентные ставки)</h4>
+                        <p class="text-[11px] text-slate-400 mt-0.5" id="t5-fisher-rate-sub">Взаимосвязь реальной ставки (r), номинальной ставки (n) и инфляции (i)</p>
+                    </div>
+                    <div class="text-lg font-mono font-bold text-amber-400 bg-slate-950 px-5 py-1.5 rounded-lg border border-amber-500/30 shadow-inner">r = n - i</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 6: ЗАКОН ОУКЕНА -->
+        <section id="tab-okun" class="tab-content hidden space-y-3">
+            <div class="glass-panel p-4 rounded-xl">
+                <h2 class="text-sm font-bold text-slate-200 mb-1" id="t6-title">Потенциальный ВВП, Потери ВВП и Закон Оукена</h2>
+                <p class="text-[11px] text-slate-400 mb-3" id="t6-sub">При превышении циклической безработицей естественного уровня на 1%, потери ВВП составляют 2.0%–2.5%.</p>
+
+                <div class="radio-tuner-container my-2 max-w-2xl mx-auto">
+                    <div class="flex justify-between items-center mb-1 text-xs">
+                        <span class="text-slate-300 font-bold uppercase tracking-wider" id="lbl-unemp-title">Шкала циклической безработицы (u - u*):</span>
+                        <span id="val-unemp" class="text-rose-400 font-mono font-bold text-sm">2.0%</span>
+                    </div>
+                    <input type="range" id="slider-unemp" min="0" max="5" step="0.5" value="2.0" class="vintage-tuner" oninput="calcOkunSankey()">
+                    <div class="flex justify-between text-[10px] text-slate-500 font-mono mt-1">
+                        <span id="lbl-u-min">0% (Полная занятость)</span>
+                        <span>2.5%</span>
+                        <span id="lbl-u-max">5.0% (Рецессионный шок)</span>
+                    </div>
+                </div>
+
+                <div class="bg-[#0b0d19] p-4 rounded-xl border border-slate-800 relative max-w-2xl mx-auto space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span id="txt-gap-val" class="text-sm font-mono font-bold text-rose-400 bg-rose-950/80 px-5 py-1.5 rounded-lg border border-rose-500/50 mx-auto shadow-lg tracking-wide">Потери ВВП: -5.0%</span>
+                    </div>
+                    <svg viewBox="0 0 600 170" class="w-full h-auto select-none" id="sankey-okun-svg"></svg>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ПОДВАЛ -->
+    <footer class="mt-3 text-center text-[10px] text-slate-500 font-bold uppercase tracking-widest pt-2 border-t border-slate-800/80" id="txt-footer">
+        AlmaU • SDTE 2026 • Экономика • Макроэкономика
+    </footer>
+
+    <!-- СКРИПТЫ И ДВИЖОК -->
+    <script>
+        const expData = {
+            us: {
+                total: "$30.861 трлн",
+                items: [
+                    { name: "C — Потребительские расходы", val: "$20.870 трлн", pct: "67.6%" },
+                    { name: "I — Валовые инвестиции", val: "$5.557 трлн", pct: "18.0%" },
+                    { name: "G — Государственные закупки", val: "$5.355 трлн", pct: "17.3%" },
+                    { name: "NX — Чистый экспорт", val: "-$0.921 трлн", pct: "-3.0%" }
+                ],
+                chart: [67.6, 18.0, 17.3, -3.0],
+                note: "Источник: Бюро экономического анализа США (U.S. BEA, Summary NIPA 2025/2026)."
+            },
+            kz: {
+                total: "155.236 трлн ₸ ($310.47 млрд)",
+                items: [
+                    { name: "C — Потребление домохозяйств", val: "88.547 трлн ₸ ($177.09 млрд)", pct: "57.0%" },
+                    { name: "I — Валовое накопление капитала", val: "45.017 трлн ₸ ($90.03 млрд)", pct: "29.0%" },
+                    { name: "G — Государственные закупки", val: "16.498 трлн ₸ ($33.00 млрд)", pct: "10.6%" },
+                    { name: "NX — Чистый экспорт", val: "5.174 трлн ₸ ($10.35 млрд)", pct: "3.4%" }
+                ],
+                chart: [57.0, 29.0, 10.6, 3.4],
+                note: "Источник: БНС РК (2025)."
+            }
+        };
+
+        const expDataEn = {
+            us: {
+                total: "$30.861 Trillion",
+                items: [
+                    { name: "C — Consumer Spending", val: "$20.870 T", pct: "67.6%" },
+                    { name: "I — Gross Private Investment", val: "$5.557 T", pct: "18.0%" },
+                    { name: "G — Government Purchases", val: "$5.355 T", pct: "17.3%" },
+                    { name: "NX — Net Exports", val: "-$0.921 T", pct: "-3.0%" }
+                ],
+                chart: [67.6, 18.0, 17.3, -3.0],
+                note: "Source: U.S. Bureau of Economic Analysis (BEA Summary NIPA 2025/2026)."
+            },
+            kz: {
+                total: "155.236 Trillion ₸ ($310.47 B)",
+                items: [
+                    { name: "C — Household Consumption", val: "88.547 T ₸ ($177.09 B)", pct: "57.0%" },
+                    { name: "I — Gross Capital Formation", val: "45.017 T ₸ ($90.03 B)", pct: "29.0%" },
+                    { name: "G — Government Expenditures", val: "16.498 T ₸ ($33.00 B)", pct: "10.6%" },
+                    { name: "NX — Net Exports", val: "5.174 T ₸ ($10.35 B)", pct: "3.4%" }
+                ],
+                chart: [57.0, 29.0, 10.6, 3.4],
+                note: "Source: Bureau of National Statistics Kazakhstan (2025)."
+            }
+        };
+
+        const incData = {
+            us: {
+                items: [
+                    { name: "1. Оплата труда наемных работников", val: "$15.719 трлн", pct: "50.9%" },
+                    { name: "2. Прибыль корпораций", val: "$4.025 трлн", pct: "13.0%" },
+                    { name: "3. Доход от собственности", val: "$2.157 трлн", pct: "7.0%" },
+                    { name: "4. Рентные доходы", val: "$1.000 трлн", pct: "3.2%" },
+                    { name: "5. Проценты и доходы от депозитов", val: "$3.500 трлн", pct: "11.3%" },
+                    { name: "6. Амортизация капитала (CCAdj)", val: "$5.056 трлн", pct: "16.4%" },
+                    { name: "7. Косвенные налоги на производство", val: "$2.111 трлн", pct: "6.8%" }
+                ],
+                chart: [50.9, 13.0, 7.0, 3.2, 11.3, 16.4, 6.8]
+            },
+            kz: {
+                items: [
+                    { name: "1. Валовая прибыль и операционный излишек", val: "98.910 трлн ₸ ($197.82 млрд)", pct: "62.0%" },
+                    { name: "2. Оплата труда работников", val: "49.384 трлн ₸ ($98.77 млрд)", pct: "30.9%" },
+                    { name: "3. Чистые налоги на производство и импорт", val: "11.314 трлн ₸ ($22.63 млрд)", pct: "7.1%" }
+                ],
+                chart: [62.0, 30.9, 7.1]
+            }
+        };
+
+        const incDataEn = {
+            us: {
+                items: [
+                    { name: "1. Compensation of Employees", val: "$15.719 T", pct: "50.9%" },
+                    { name: "2. Corporate Profits", val: "$4.025 T", pct: "13.0%" },
+                    { name: "3. Proprietors' Income", val: "$2.157 T", pct: "7.0%" },
+                    { name: "4. Rental Income", val: "$1.000 T", pct: "3.2%" },
+                    { name: "5. Net Interest & Deposit Income", val: "$3.500 T", pct: "11.3%" },
+                    { name: "6. Capital Consumption (Depreciation)", val: "$5.056 T", pct: "16.4%" },
+                    { name: "7. Taxes on Production and Imports", val: "$2.111 T", pct: "6.8%" }
+                ],
+                chart: [50.9, 13.0, 7.0, 3.2, 11.3, 16.4, 6.8]
+            },
+            kz: {
+                items: [
+                    { name: "1. Gross Operating Surplus & Profits", val: "98.910 T ₸ ($197.82 B)", pct: "62.0%" },
+                    { name: "2. Compensation of Employees", val: "49.384 T ₸ ($98.77 B)", pct: "30.9%" },
+                    { name: "3. Net Taxes on Production & Imports", val: "11.314 T ₸ ($22.63 B)", pct: "7.1%" }
+                ],
+                chart: [62.0, 30.9, 7.1]
+            }
+        };
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            btn.classList.add('active');
+        }
+
+        let expChartObj = null;
+        function setExpenditureCountry(country) {
+            const btnUs = document.getElementById('btn-exp-us');
+            const btnKz = document.getElementById('btn-exp-kz');
+            const details = document.getElementById('expenditure-details');
+            const note = document.getElementById('exp-source-note');
+            
+            const sourceDataset = (currentLang === 'ru') ? expData : expDataEn;
+            const data = sourceDataset[country];
+
+            if(country === 'us') {
+                btnUs.className = "px-2.5 py-1 font-bold rounded bg-blue-600 text-white transition";
+                btnKz.className = "px-2.5 py-1 font-bold rounded text-slate-400 hover:text-white transition";
+            } else {
+                btnKz.className = "px-2.5 py-1 font-bold rounded bg-blue-600 text-white transition";
+                btnUs.className = "px-2.5 py-1 font-bold rounded text-slate-400 hover:text-white transition";
+            }
+
+            btnUs.innerText = currentLang === 'ru' ? "🇺🇸 США (BEA 2025)" : "🇺🇸 USA (BEA 2025)";
+            btnKz.innerText = currentLang === 'ru' ? "🇰🇿 Казахстан (БНС РК 2025)" : "🇰🇿 Kazakhstan (BNS 2025)";
+
+            const totalLabel = currentLang === 'ru' ? 'Итого ВВП' : 'Total GDP';
+            let html = `<div class="p-2.5 bg-slate-900/90 rounded-lg border border-slate-700 font-bold text-amber-400 flex justify-between"><span>${totalLabel} (${country.toUpperCase()}):</span> <span>${data.total}</span></div>`;
+            data.items.forEach(item => {
+                html += `<div class="p-2 bg-slate-900/60 rounded-lg border border-slate-800 flex justify-between"><span class="text-slate-300 font-medium">${item.name}</span><div class="text-right"><span class="text-white font-bold">${item.val}</span> <span class="text-blue-400 font-mono text-[10px]">(${item.pct})</span></div></div>`;
+            });
+            details.innerHTML = html;
+            note.innerText = data.note;
+
+            if(expChartObj) {
+                expChartObj.data.labels = currentLang === 'ru' 
+                    ? ['C — Потребление', 'I — Инвестиции', 'G — Госзакупки', 'NX — Чистый экспорт']
+                    : ['C — Consumption', 'I — Investment', 'G — Govt Purchases', 'NX — Net Exports'];
+                expChartObj.data.datasets[0].data = data.chart;
+                expChartObj.update();
+            }
+        }
+
+        let incChartObj = null;
+        function setIncomeCountry(country) {
+            const btnUs = document.getElementById('btn-inc-us');
+            const btnKz = document.getElementById('btn-inc-kz');
+            const details = document.getElementById('income-details');
+            
+            const sourceDataset = (currentLang === 'ru') ? incData : incDataEn;
+            const data = sourceDataset[country];
+
+            if(country === 'us') {
+                btnUs.className = "px-2.5 py-1 font-bold rounded bg-blue-600 text-white transition";
+                btnKz.className = "px-2.5 py-1 font-bold rounded text-slate-400 hover:text-white transition";
+            } else {
+                btnKz.className = "px-2.5 py-1 font-bold rounded bg-blue-600 text-white transition";
+                btnUs.className = "px-2.5 py-1 font-bold rounded text-slate-400 hover:text-white transition";
+            }
+
+            btnUs.innerText = currentLang === 'ru' ? "🇺🇸 США (BEA 2025)" : "🇺🇸 USA (BEA 2025)";
+            btnKz.innerText = currentLang === 'ru' ? "🇰🇿 Казахстан (БНС РК 2025)" : "🇰🇿 Kazakhstan (BNS 2025)";
+
+            let html = "";
+            data.items.forEach(item => {
+                html += `<div class="p-2 bg-slate-900/60 rounded-lg border border-slate-800 flex justify-between"><span class="text-slate-300 font-medium text-[11px]">${item.name}</span><div class="text-right"><span class="text-white font-bold text-[11px]">${item.val}</span> <span class="text-emerald-400 font-mono text-[10px]">(${item.pct})</span></div></div>`;
+            });
+            details.innerHTML = html;
+
+            if (incChartObj) {
+                if (country === 'us') {
+                    incChartObj.data.labels = currentLang === 'ru' 
+                        ? ['Оплата труда', 'Прибыль', 'Доход от собств.', 'Рента', 'Депозиты/Проценты', 'Амортизация', 'Налоги']
+                        : ['Wages', 'Profits', "Proprietors' Inc.", 'Rent', 'Interest/Deposits', 'Depreciation', 'Taxes'];
+                    incChartObj.data.datasets[0].data = [50.9, 13.0, 7.0, 3.2, 11.3, 16.4, 6.8];
+                    incChartObj.data.datasets[0].backgroundColor = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#64748b', '#ef4444'];
+                } else {
+                    incChartObj.data.labels = currentLang === 'ru' 
+                        ? ['Валовая прибыль', 'Оплата труда', 'Чистые налоги']
+                        : ['Gross Profit', 'Labor Income', 'Net Taxes'];
+                    incChartObj.data.datasets[0].data = [62.0, 30.9, 7.1];
+                    incChartObj.data.datasets[0].backgroundColor = ['#10b981', '#3b82f6', '#ef4444'];
+                }
+                incChartObj.update();
+            }
+
+            renderIncomeSankey(country);
+        }
+
+        function renderIncomeSankey(country) {
+            const svg = document.getElementById('sankey-income-svg');
+            if(country === 'us') {
+                svg.innerHTML = `
+                    <rect x="20" y="20" width="120" height="210" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2.5"/>
+                    <text x="80" y="115" fill="#ffffff" font-size="12" font-weight="900" text-anchor="middle">${currentLang==='ru'?'ВВП США':'US GDP'}</text>
+                    <text x="80" y="135" fill="#60a5fa" font-size="11" font-weight="bold" text-anchor="middle">$30.861 трлн</text>
+
+                    <path d="M 140 35 L 480 20" stroke="#3b82f6" stroke-width="20" class="sankey-path"/>
+                    <path d="M 140 65 L 480 52" stroke="#10b981" stroke-width="12" class="sankey-path"/>
+                    <path d="M 140 90 L 480 84" stroke="#f59e0b" stroke-width="8" class="sankey-path"/>
+                    <path d="M 140 110 L 480 112" stroke="#8b5cf6" stroke-width="5" class="sankey-path"/>
+                    <path d="M 140 130 L 480 140" stroke="#06b6d4" stroke-width="11" class="sankey-path"/>
+                    <path d="M 140 160 L 480 172" stroke="#64748b" stroke-width="14" class="sankey-path"/>
+                    <path d="M 140 190 L 480 204" stroke="#ef4444" stroke-width="8" class="sankey-path"/>
+
+                    <rect x="480" y="8" width="250" height="24" rx="4" fill="#0f172a" stroke="#3b82f6"/>
+                    <text x="490" y="24" fill="#93c5fd" font-size="10" font-weight="bold">${currentLang==='ru'?'Оплата труда (50.9%)':'Compensation of Employees (50.9%)'}</text>
+                    <rect x="480" y="40" width="250" height="24" rx="4" fill="#0f172a" stroke="#10b981"/>
+                    <text x="490" y="56" fill="#a7f3d0" font-size="10" font-weight="bold">${currentLang==='ru'?'Прибыль корпораций (13.0%)':'Corporate Profits (13.0%)'}</text>
+                    <rect x="480" y="72" width="250" height="24" rx="4" fill="#0f172a" stroke="#f59e0b"/>
+                    <text x="490" y="88" fill="#fde68a" font-size="10" font-weight="bold">${currentLang==='ru'?'Доход от собственности (7.0%)':'Proprietors Income (7.0%)'}</text>
+                    <rect x="480" y="100" width="250" height="24" rx="4" fill="#0f172a" stroke="#8b5cf6"/>
+                    <text x="490" y="116" fill="#ddd6fe" font-size="10" font-weight="bold">${currentLang==='ru'?'Рентные доходы (3.2%)':'Rental Income (3.2%)'}</text>
+                    <rect x="480" y="128" width="250" height="24" rx="4" fill="#0f172a" stroke="#06b6d4"/>
+                    <text x="490" y="144" fill="#a5f3fc" font-size="10" font-weight="bold">${currentLang==='ru'?'Депозиты & Проценты ($3.5T / 11.3%)':'Interest & Deposit Income (11.3%)'}</text>
+                    <rect x="480" y="160" width="250" height="24" rx="4" fill="#0f172a" stroke="#64748b"/>
+                    <text x="490" y="176" fill="#cbd5e1" font-size="10" font-weight="bold">${currentLang==='ru'?'Амортизация капитала (16.4%)':'Depreciation (16.4%)'}</text>
+                    <rect x="480" y="192" width="250" height="24" rx="4" fill="#0f172a" stroke="#ef4444"/>
+                    <text x="490" y="208" fill="#fca5a5" font-size="10" font-weight="bold">${currentLang==='ru'?'Косвенные налоги (6.8%)':'Taxes on Production (6.8%)'}</text>
+                `;
+            } else {
+                svg.innerHTML = `
+                    <rect x="20" y="25" width="120" height="190" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2.5"/>
+                    <text x="80" y="115" fill="#ffffff" font-size="12" font-weight="900" text-anchor="middle">${currentLang==='ru'?'ВВП РК':'Kazakhstan GDP'}</text>
+                    <text x="80" y="135" fill="#60a5fa" font-size="11" font-weight="bold" text-anchor="middle">155.2 трлн ₸</text>
+
+                    <path d="M 140 60 L 480 45" stroke="#10b981" stroke-width="45" class="sankey-path"/>
+                    <path d="M 140 130 L 480 120" stroke="#3b82f6" stroke-width="28" class="sankey-path"/>
+                    <path d="M 140 185 L 480 180" stroke="#ef4444" stroke-width="12" class="sankey-path"/>
+
+                    <rect x="480" y="20" width="250" height="50" rx="6" fill="#0f172a" stroke="#10b981"/>
+                    <text x="490" y="49" fill="#a7f3d0" font-size="11" font-weight="bold">${currentLang==='ru'?'Валовая прибыль & Излишек (62.0%)':'Gross Operating Surplus (62.0%)'}</text>
+                    <rect x="480" y="95" width="250" height="48" rx="6" fill="#0f172a" stroke="#3b82f6"/>
+                    <text x="490" y="123" fill="#93c5fd" font-size="11" font-weight="bold">${currentLang==='ru'?'Оплата труда работников (30.9%)':'Compensation of Employees (30.9%)'}</text>
+                    <rect x="480" y="160" width="250" height="40" rx="6" fill="#0f172a" stroke="#ef4444"/>
+                    <text x="490" y="184" fill="#fca5a5" font-size="11" font-weight="bold">${currentLang==='ru'?'Чистые налоги на производство (7.1%)':'Net Taxes on Production (7.1%)'}</text>
+                `;
+            }
+        }
+
+        /* РАСЧЕТ И ОТОБРАЖЕНИЕ ЯБЛОК */
+        function calcApples() {
+            const y = parseInt(document.getElementById('slider-apple-y').value);
+            const p = parseInt(document.getElementById('slider-apple-p').value);
+            const pBase = 5000;
+
+            document.getElementById('lbl-apple-y').innerText = y + (currentLang === 'ru' ? ' мешков' : ' bags');
+            document.getElementById('lbl-apple-p').innerText = p.toLocaleString('ru-RU') + ' ₸';
+
+            const nomVal = y * p;
+            const realVal = y * pBase;
+            const ratio = (p / pBase).toFixed(1).replace('.', ',');
+
+            document.getElementById('nom-formula-display').innerText = `${y} × ${p.toLocaleString('ru-RU')} ₸ = ${nomVal.toLocaleString('ru-RU')} ₸`;
+            document.getElementById('nom-ratio-display').innerText = `= ${ratio} × 500 000`;
+
+            document.getElementById('real-formula-display').innerText = `${y} × ${pBase.toLocaleString('ru-RU')} ₸ = ${realVal.toLocaleString('ru-RU')} ₸`;
+            document.getElementById('real-ratio-display').innerText = `= 1 × 500 000`;
+        }
+
+        /* РАСЧЕТ И ЧИСТЫЙ ГРАФИК ЗАКОНА ОУКЕНА */
+        function calcOkunSankey() {
+            const u = parseFloat(document.getElementById('slider-unemp').value);
+            document.getElementById('val-unemp').innerText = u.toFixed(1) + '%';
+            
+            const gap = u * -2.5; 
+            document.getElementById('txt-gap-val').innerText = currentLang === 'ru' 
+                ? `Потери ВВП: ${gap.toFixed(1)}%` 
+                : `GDP Output Loss: ${gap.toFixed(1)}%`;
+
+            const svg = document.getElementById('sankey-okun-svg');
+            const actualY = 100 + gap; 
+            
+            const baseH = 100;
+            const actualH = Math.max(30, baseH * (actualY / 100));
+            const topOffset = (baseH - actualH);
+
+            svg.innerHTML = `
+                <!-- Блок 1: Потенциальный ВВП (100%) -->
+                <rect x="40" y="35" width="150" height="${baseH}" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2.5"/>
+                <text x="115" y="80" fill="#ffffff" font-size="11" font-weight="900" text-anchor="middle">${currentLang==='ru'?'Потенциальный (Y*)':'Potential GDP (Y*)'}</text>
+                <text x="115" y="102" fill="#60a5fa" font-size="16" font-weight="black" text-anchor="middle">100.0%</text>
+
+                <!-- Соединительный чистый прямой поток -->
+                <polygon points="190,${35 + topOffset} 410,${35 + topOffset} 410,135 190,135" fill="#10b981" opacity="0.6"/>
+
+                <!-- Блок 2: Фактический ВВП (Y) -->
+                <rect x="410" y="${35 + topOffset}" width="150" height="${actualH}" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2.5"/>
+                <text x="485" y="${35 + topOffset + actualH/2 - 5}" fill="#ffffff" font-size="11" font-weight="900" text-anchor="middle">${currentLang==='ru'?'Фактический (Y)':'Actual GDP (Y)'}</text>
+                <text x="485" y="${35 + topOffset + actualH/2 + 15}" fill="#34d399" font-size="15" font-weight="black" text-anchor="middle">${actualY.toFixed(1)}%</text>
+            `;
+        }
+
+        let currentLang = 'ru';
+        const dict = {
+            ru: {
+                title: "Макроэкономика: Измерение ВВП", sub: "AlmaU • Школа цифровых технологий и экономики",
+                nav1: "1. Модель кругооборота", nav2: "2. Затратный метод (C+I+G+NX)", nav3: "3. Доходный метод", nav4: "4. Исключения из ВВП", nav5: "5. Номинальный и Реальный ВВП", nav6: "6. Потери ВВП & Закон Оукена",
+                t1Title: "Определение ВВП", t1Def: "<strong>Валовой внутренний продукт (ВВП)</strong> — рыночная стоимость всех конечных товаров и услуг, произведенных внутри страны за определенный период.", t1Stat: "Основное макроэкономическое тождество",
+                methodsTitle: "4 Способа расчёта ВВП",
+                m1Name: "Затратный метод", m1Sub: "По потоку расходов (C+I+G+NX)",
+                m2Name: "Доходный метод", m2Sub: "По первичным доходам факторов",
+                m3Name: "По добавленной стоимости", m3Sub: "Производственный метод (сумма ВДС)",
+                m4Name: "По конечной продукции", m4Sub: "Без повторного счёта сырья",
+                simEqTitle: "МАКРОЭКОНОМИЧЕСКОЕ РАВНОВЕСИЕ:", simEqDesc: "Все 4 метода дают одинаковый конечный результат ВВП.",
+                nodeGov: "Государство", nodeHouse: "Домохозяйства", nodeFirms: "Фирмы", nodeRes: "Рынок ресурсов", nodeProd: "Рынок товаров и услуг", nodeGlobe: "Мир",
+                spending: "Потребительские расходы", revenue: "Доходы фирм (выручка)", costs: "Зарплата, рента, проценты", income: "Доходы домашних хозяйств",
+                gbought: "Потребление благ", gsold: "Готовая продукция", fout: "Факторы производства", fin: "Использование факторов",
+                import: "Импорт", export: "Экспорт", tax: "Налоги", reg: "Регулирование",
+                t2Title: "Затратный метод ВВП (Expenditure Approach)",
+                t3Title: "Доходный метод расчёта ВВП", t3Sub: "Распределение первичных доходов факторам производства",
+                t3Theory: "<strong>💡 Сущность доходного метода (Income Approach):</strong> ВВП суммирует все доходы, полученные владельцами факторов производства в процессе создания национального продукта.",
+                t4Title: "Сделки, НЕ включаемые в ВВП (Boundary of Production)",
+                cardNonGdp: `
+                    <div class="gdp-excl-card space-y-2">
+                        <div class="font-bold text-base text-rose-400">1. Государственные трансферты</div>
+                        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">Пенсии, пособия по безработице, социальные выплаты. Исключаются, так как не сопровождаются созданием нового текущего продукта.</p>
+                    </div>
+                    <div class="gdp-excl-card space-y-2">
+                        <div class="font-bold text-base text-emerald-400">2. Частные трансферты</div>
+                        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">Подарки, денежные переводы родным, помощь студентам от родителей. Являются лишь перераспределением готовых доходов.</p>
+                    </div>
+                    <div class="gdp-excl-card space-y-2">
+                        <div class="font-bold text-base text-cyan-400">3. Ценные бумаги & Криптоактивы</div>
+                        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">Покупка акций, облигаций или криптовалюты. Меняется только владелец финансового права, реальный выпуск товаров не происходит.</p>
+                    </div>
+                    <div class="gdp-excl-card space-y-2">
+                        <div class="font-bold text-base text-amber-400">4. Продажа подержанных товаров (Secondhand)</div>
+                        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">Перепродажа б/у автомобилей или вторичной недвижимости. Их стоимость уже была учтена в ВВП в год первоначального выпуска.</p>
+                    </div>
+                    <div class="gdp-excl-card space-y-2">
+                        <div class="font-bold text-base text-slate-400">5. Теневой сектор и домашний труд</div>
+                        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">Самообслуживание, уход за домом, а также неформальные наличные расчеты без чеков исключаются из-за отсутствия рыночной фиксации.</p>
+                    </div>
+                `,
+                t5Title: "Номинальный и Реальный ВВП",
+                t5EqLbl: "Уравнение количественной теории денег (Уравнение Фишера)",
+                t5EqSub: "<span class='text-emerald-400 font-bold'>M</span> — Денежная масса | <span class='text-emerald-400 font-bold'>V</span> — Скорость обращения | <span class='text-rose-400 font-bold'>P</span> — <strong>Уровень цен</strong> | <span class='text-rose-400 font-bold'>Y</span> — Реальный ВВП",
+                appleYTitle: "Урожай яблок (Выпуск Y):", applePTitle: "Текущая цена P (Уровень цен):", appleBase: "Базовая цена P_base = 5000 ₸ / мешок",
+                cardNomTitle: "Номинальный ВВП", cardNomSub: "В текущих ценах года",
+                cardRealTitle: "Реальный ВВП", cardRealSub: "В постоянных базовых ценах",
+                t5FisherTitle: "Эффект Фишера (Процентные ставки)", t5FisherSub: "Взаимосвязь реальной ставки (r), номинальной ставки (n) и инфляции (i)",
+                t6Title: "Потенциальный ВВП, Потери ВВП и Закон Оукена", t6Sub: "При превышении циклической безработицей естественного уровня на 1%, потери ВВП составляют 2.0%–2.5%.",
+                lblUnempTitle: "Шкала циклической безработицы (u - u*):", lblUMin: "0% (Полная занятость)", lblUMax: "5.0% (Рецессионный шок)",
+                footer: "AlmaU • SDTE 2026 • Экономика • Макроэкономика"
+            },
+            en: {
+                title: "Macroeconomics: Measuring GDP", sub: "AlmaU • School of Digital Technologies & Economics",
+                nav1: "1. Circular Flow Model", nav2: "2. Expenditure Approach (C+I+G+NX)", nav3: "3. Income Approach", nav4: "4. Excluded from GDP", nav5: "5. Nominal and Real GDP", nav6: "6. GDP Loss & Okun Law",
+                t1Title: "Definition of GDP", t1Def: "<strong>Gross Domestic Product (GDP)</strong> is the market value of all final goods and services produced within a country in a given period.", t1Stat: "Fundamental Macroeconomic Identity",
+                methodsTitle: "4 Methods of Calculating GDP",
+                m1Name: "Expenditure Method", m1Sub: "By spending flow (C+I+G+NX)",
+                m2Name: "Income Method", m2Sub: "By primary factor payments",
+                m3Name: "Value Added Method", m3Sub: "Production method (sum of GVA)",
+                m4Name: "Final Output Method", m4Sub: "Excludes intermediate goods",
+                simEqTitle: "MACROECONOMIC EQUILIBRIUM:", simEqDesc: "All 4 approaches yield identical total GDP.",
+                nodeGov: "Government", nodeHouse: "Households", nodeFirms: "Firms", nodeRes: "Factor Market", nodeProd: "Goods Market", nodeGlobe: "World",
+                spending: "Consumer Spending", revenue: "Firm Revenue", costs: "Wages, Rent, Interest", income: "Household Income",
+                gbought: "Goods Purchased", gsold: "Finished Output", fout: "Factor Inputs", fin: "Factor Usage",
+                import: "Imports", export: "Exports", tax: "Taxes", reg: "Regulation",
+                t2Title: "Expenditure Approach to GDP",
+                t3Title: "Income Approach to GDP", t3Sub: "Factor distribution of primary national income",
+                t3Theory: "<strong>💡 Income Approach Theory:</strong> GDP aggregates all factor payments earned by owners of resources during production.",
+                t4Title: "Transactions EXCLUDED from GDP (Boundary of Production)",
+                cardNonGdp: `
+                    <div class="gdp-excl-card space-y-2">
+                        <div class="font-bold text-base text-rose-400">1. Public Transfer Payments</div>
+                        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">Pensions, unemployment benefits, social welfare. Excluded as they do not reflect current production.</p>
+                    </div>
+                    <div class="gdp-excl-card space-y-2">
+                        <div class="font-bold text-base text-emerald-400">2. Private Transfers</div>
+                        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">Gifts, family allowances, student support from parents. Pure redistribution of income.</p>
+                    </div>
+                    <div class="gdp-excl-card space-y-2">
+                        <div class="font-bold text-base text-cyan-400">3. Financial Assets & Crypto</div>
+                        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">Stocks, bonds, or cryptocurrency purchases. Reallocates ownership without producing goods.</p>
+                    </div>
+                    <div class="gdp-excl-card space-y-2">
+                        <div class="font-bold text-base text-amber-400">4. Secondhand Sales</div>
+                        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">Resale of used cars or existing homes. Included in GDP during initial production year.</p>
+                    </div>
+                    <div class="gdp-excl-card space-y-2">
+                        <div class="font-bold text-base text-slate-400">5. Shadow Economy & Household Work</div>
+                        <p class="text-slate-300 text-xs md:text-sm leading-relaxed">Non-market household production and informal cash transactions without receipts.</p>
+                    </div>
+                `,
+                t5Title: "Nominal and Real GDP",
+                t5EqLbl: "Quantity Theory of Money (Fisher Equation)",
+                t5EqSub: "<span class='text-emerald-400 font-bold'>M</span> — Money Supply | <span class='text-emerald-400 font-bold'>V</span> — Velocity | <span class='text-rose-400 font-bold'>P</span> — <strong>Price Level</strong> | <span class='text-rose-400 font-bold'>Y</span> — Real GDP",
+                appleYTitle: "Apple Harvest Y (Output):", applePTitle: "Current Price P (Price Level):", appleBase: "Base Price P_base = 5000 ₸ / bag",
+                cardNomTitle: "Nominal GDP", cardNomSub: "At current prices",
+                cardRealTitle: "Real GDP", cardRealSub: "At constant base prices",
+                t5FisherTitle: "Fisher Effect (Interest Rates)", t5FisherSub: "Relationship between real rate (r), nominal rate (n), and inflation (i)",
+                t6Title: "Potential GDP, GDP Loss & Okun Law", t6Sub: "For every 1% cyclical unemployment exceeds structural rate, GDP loses 2.0%–2.5%.",
+                lblUnempTitle: "Cyclical Unemployment Scale (u - u*):", lblUMin: "0% (Full Employment)", lblUMax: "5.0% (Recessionary Shock)",
+                footer: "AlmaU • SDTE 2026 • Economics • Macroeconomics"
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const d = dict[lang];
+
+            document.getElementById('txt-header-title').innerText = d.title;
+            document.getElementById('txt-header-sub').innerText = d.sub;
+            
+            document.getElementById('nav-overview').innerText = d.nav1;
+            document.getElementById('nav-expenditure').innerText = d.nav2;
+            document.getElementById('nav-income').innerText = d.nav3;
+            document.getElementById('nav-non-gdp').innerText = d.nav4;
+            document.getElementById('nav-real-nominal').innerText = d.nav5;
+            document.getElementById('nav-okun').innerText = d.nav6;
+
+            document.getElementById('t1-title').innerText = d.t1Title;
+            document.getElementById('t1-def').innerHTML = d.t1Def;
+            document.getElementById('t1-stat-lbl').innerText = d.t1Stat;
+            
+            document.getElementById('methods-block-title').innerText = d.methodsTitle;
+            document.getElementById('m1-name').innerText = d.m1Name;
+            document.getElementById('m1-sub').innerText = d.m1Sub;
+            document.getElementById('m2-name').innerText = d.m2Name;
+            document.getElementById('m2-sub').innerText = d.m2Sub;
+            document.getElementById('m3-name').innerText = d.m3Name;
+            document.getElementById('m3-sub').innerText = d.m3Sub;
+            document.getElementById('m4-name').innerText = d.m4Name;
+            document.getElementById('m4-sub').innerText = d.m4Sub;
+
+            document.getElementById('sim-eq-title').innerText = d.simEqTitle;
+            document.getElementById('sim-eq-desc').innerText = d.simEqDesc;
+
+            document.getElementById('t2-title').innerText = d.t2Title;
+            document.getElementById('t3-title').innerText = d.t3Title;
+            document.getElementById('t3-sub').innerText = d.t3Sub;
+            document.getElementById('income-theory-block').innerHTML = d.t3Theory;
+
+            document.getElementById('t4-title').innerText = d.t4Title;
+            document.getElementById('non-gdp-cards').innerHTML = d.cardNonGdp;
+
+            document.getElementById('t5-title').innerText = d.t5Title;
+            document.getElementById('t5-eq-lbl').innerText = d.t5EqLbl;
+            document.getElementById('t5-eq-sub').innerHTML = d.t5EqSub;
+            document.getElementById('lbl-apple-y-title').innerText = d.appleYTitle;
+            document.getElementById('lbl-apple-p-title').innerText = d.applePTitle;
+            document.getElementById('card-nom-title').innerText = d.cardNomTitle;
+            document.getElementById('card-real-title').innerText = d.cardRealTitle;
+            document.getElementById('t5-fisher-rate-title').innerText = d.t5FisherTitle;
+            document.getElementById('t5-fisher-rate-sub').innerText = d.t5FisherSub;
+
+            document.getElementById('t6-title').innerText = d.t6Title;
+            document.getElementById('t6-sub').innerText = d.t6Sub;
+            document.getElementById('lbl-unemp-title').innerText = d.lblUnempTitle;
+            document.getElementById('lbl-u-min').innerText = d.lblUMin;
+            document.getElementById('lbl-u-max').innerText = d.lblUMax;
+
+            document.getElementById('txt-footer').innerText = d.footer;
+
+            document.getElementById('node-lbl-gov').textContent = d.nodeGov;
+            document.getElementById('node-lbl-house').textContent = d.nodeHouse;
+            document.getElementById('node-lbl-firms').textContent = d.nodeFirms;
+            document.getElementById('node-lbl-mkt-res').textContent = d.nodeRes;
+            document.getElementById('node-lbl-mkt-prod').textContent = d.nodeProd;
+            document.getElementById('node-lbl-globe').textContent = d.nodeGlobe;
+
+            document.getElementById('lbl-svg-spending').textContent = d.spending;
+            document.getElementById('lbl-svg-revenue').textContent = d.revenue;
+            document.getElementById('lbl-svg-costs').textContent = d.costs;
+            document.getElementById('lbl-svg-income').textContent = d.income;
+            document.getElementById('lbl-svg-gbought').textContent = d.gbought;
+            document.getElementById('lbl-svg-gsold').textContent = d.gsold;
+            document.getElementById('lbl-svg-fout').textContent = d.fout;
+            document.getElementById('lbl-svg-fin').textContent = d.fin;
+            document.getElementById('lbl-trade-imp').textContent = d.import;
+            document.getElementById('lbl-trade-exp').textContent = d.export;
+            document.getElementById('lbl-tax1').textContent = d.tax;
+            document.getElementById('lbl-tax2').textContent = d.tax;
+            document.getElementById('lbl-reg1').textContent = d.reg;
+            document.getElementById('lbl-reg2').textContent = d.reg;
+
+            if(lang === 'ru') {
+                document.getElementById('btn-lang-ru').className = "px-2.5 py-1 text-[11px] font-black rounded bg-blue-600 text-white transition";
+                document.getElementById('btn-lang-en').className = "px-2.5 py-1 text-[11px] font-black rounded text-slate-400 hover:text-white transition";
+            } else {
+                document.getElementById('btn-lang-en').className = "px-2.5 py-1 text-[11px] font-black rounded bg-blue-600 text-white transition";
+                document.getElementById('btn-lang-ru').className = "px-2.5 py-1 text-[11px] font-black rounded text-slate-400 hover:text-white transition";
+            }
+
+            const activeExpBtn = document.getElementById('btn-exp-us').classList.contains('bg-blue-600') ? 'us' : 'kz';
+            setExpenditureCountry(activeExpBtn);
+
+            const activeIncBtn = document.getElementById('btn-inc-us').classList.contains('bg-blue-600') ? 'us' : 'kz';
+            setIncomeCountry(activeIncBtn);
+
+            calcOkunSankey();
+            calcApples();
+        }
+
+        // ДВИЖОК СИМУЛЯТОРА КРУГООБОРОТА
+        const pathSpending = document.getElementById('path-spending');
+        const pathRevenue = document.getElementById('path-revenue');
+        const pathCosts = document.getElementById('path-costs');
+        const pathIncome = document.getElementById('path-income');
+        const pathGoods = document.getElementById('path-goods');
+        const pathImport = document.getElementById('path-import');
+        const pathExport = document.getElementById('path-export');
+        const importMaskPath = document.getElementById('import-mask-path');
+        const exportMaskPath = document.getElementById('export-mask-path');
+        const taxH = document.getElementById('tax-h-gov');
+        const taxF = document.getElementById('tax-f-gov');
+        const regL = document.getElementById('regulation-left');
+        const regR = document.getElementById('regulation-right');
+        const tradeChannels = document.getElementById('trade-channels');
+        const coinsContainer = document.getElementById('coins-container');
+
+        let simState = 0;
+        let animatedCoins = [];
+        let rAF_Timer = null;
+
+        function getPointOnPath(path, percent) {
+            const length = path.getTotalLength();
+            return path.getPointAtLength(length * percent);
+        }
+
+        function createCoin() {
+            const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
+            const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+            circle.setAttribute("r", "11");
+            circle.setAttribute("fill", "url(#gold-coin-grad)");
+            circle.setAttribute("stroke", "#d97706");
+            circle.setAttribute("stroke-width", "1.5");
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute("dy", "4");
+            text.setAttribute("fill", "#451a03");
+            text.setAttribute("font-size", "12");
+            text.setAttribute("font-weight", "900");
+            text.textContent = "₸";
+            g.appendChild(circle);
+            g.appendChild(text);
+            coinsContainer.appendChild(g);
+            return g;
+        }
+
+        function clearCoins() { coinsContainer.innerHTML = ""; animatedCoins = []; }
+        function clearBlinkingArrows() {
+            pathSpending.classList.remove('blink-red-arrow');
+            pathRevenue.classList.remove('blink-red-arrow');
+            pathCosts.classList.remove('blink-red-arrow');
+            pathIncome.classList.remove('blink-red-arrow');
+            pathGoods.classList.remove('pulse-yellow-arrow');
+        }
+
+        function startIdle() {
+            cancelAnimationFrame(rAF_Timer);
+            clearCoins();
+            clearBlinkingArrows();
+            simState = 0;
+        }
+
+        function clickHouse() {
+            if (simState !== 0) return;
+            cancelAnimationFrame(rAF_Timer); clearCoins(); clearBlinkingArrows(); simState = 1;
+            pathSpending.classList.add('blink-red-arrow');
+
+            for (let i = 0; i < 5; i++) {
+                animatedCoins.push({ el: createCoin(), path: pathSpending, progress: -i * 0.08, speed: 0.015 });
+            }
+            animateSpending();
+        }
+
+        function animateSpending() {
+            if (simState !== 1) return;
+            let allArrived = true;
+            animatedCoins.forEach(coin => {
+                if (coin.progress < 1.0) { coin.progress += coin.speed; allArrived = false; }
+                if (coin.progress >= 0.0) {
+                    const pt = getPointOnPath(coin.path, Math.min(1.0, coin.progress));
+                    coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                    coin.el.style.display = "block";
+                } else { coin.el.style.display = "none"; }
+            });
+            if (allArrived) triggerRevenueSplit(); else rAF_Timer = requestAnimationFrame(animateSpending);
+        }
+
+        function triggerRevenueSplit() {
+            clearBlinkingArrows();
+            const staticCoin = animatedCoins[0];
+            const ptStatic = getPointOnPath(pathSpending, 1.0);
+            staticCoin.el.setAttribute("transform", `translate(${ptStatic.x}, ${ptStatic.y})`);
+            pathGoods.classList.add('pulse-yellow-arrow');
+
+            const movingCoins = animatedCoins.slice(1);
+            movingCoins.forEach((coin, idx) => { coin.path = pathRevenue; coin.progress = -idx * 0.08; coin.speed = 0.015; });
+            pathRevenue.classList.add('blink-red-arrow');
+
+            animateRevenueSplit(movingCoins);
+        }
+
+        function animateRevenueSplit(coins) {
+            if (simState !== 1) return;
+            let allArrived = true;
+            coins.forEach(coin => {
+                if (coin.progress < 1.0) { coin.progress += coin.speed; allArrived = false; }
+                if (coin.progress >= 0.0) {
+                    const pt = getPointOnPath(coin.path, Math.min(1.0, coin.progress));
+                    coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                    coin.el.style.display = "block";
+                } else { coin.el.style.display = "none"; }
+            });
+            if (!allArrived) rAF_Timer = requestAnimationFrame(() => animateRevenueSplit(coins));
+        }
+
+        function clickFirm() {
+            if (simState !== 1) return;
+            cancelAnimationFrame(rAF_Timer); clearBlinkingArrows(); simState = 2;
+            pathCosts.classList.add('blink-red-arrow');
+
+            animatedCoins = [];
+            for (let i = 0; i < 3; i++) {
+                animatedCoins.push({ el: createCoin(), path: pathCosts, progress: -i * 0.1, speed: 0.015 });
+            }
+            animateToResourceMarket();
+        }
+
+        function animateToResourceMarket() {
+            if (simState !== 2) return;
+            let allArrived = true;
+            animatedCoins.forEach(coin => {
+                if (coin.progress < 1.0) { coin.progress += coin.speed; allArrived = false; }
+                if (coin.progress >= 0.0) {
+                    const pt = getPointOnPath(coin.path, Math.min(1.0, coin.progress));
+                    coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                    coin.el.style.display = "block";
+                } else { coin.el.style.display = "none"; }
+            });
+            if (allArrived) triggerIncomeToHouse(); else rAF_Timer = requestAnimationFrame(animateToResourceMarket);
+        }
+
+        function triggerIncomeToHouse() {
+            clearBlinkingArrows();
+            const pt1 = getPointOnPath(pathCosts, 1.0);
+            animatedCoins[0].el.setAttribute("transform", `translate(${pt1.x - 10}, ${pt1.y})`);
+            animatedCoins[1].el.setAttribute("transform", `translate(${pt1.x + 10}, ${pt1.y})`);
+
+            const movingCoin = animatedCoins[2];
+            movingCoin.path = pathIncome; movingCoin.progress = 0.0; movingCoin.speed = 0.015;
+            pathIncome.classList.add('blink-red-arrow');
+            animateLastCoin(movingCoin);
+        }
+
+        function animateLastCoin(coin) {
+            if (simState !== 2) return;
+            if (coin.progress < 1.0) {
+                coin.progress += coin.speed;
+                const pt = getPointOnPath(coin.path, coin.progress);
+                coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                rAF_Timer = requestAnimationFrame(() => animateLastCoin(coin));
+            } else { setTimeout(startIdle, 1800); }
+        }
+
+        function clickGovernment() {
+            cancelAnimationFrame(rAF_Timer); clearCoins(); clearBlinkingArrows(); simState = 3;
+            taxH.setAttribute('opacity', '1'); taxF.setAttribute('opacity', '1'); regL.setAttribute('opacity', '1'); regR.setAttribute('opacity', '1');
+            setTimeout(() => { taxH.setAttribute('opacity', '0'); taxF.setAttribute('opacity', '0'); regL.setAttribute('opacity', '0'); regR.setAttribute('opacity', '0'); startIdle(); }, 3500);
+        }
+
+        function clickGlobe() {
+            cancelAnimationFrame(rAF_Timer); clearCoins(); clearBlinkingArrows(); simState = 4;
+            tradeChannels.setAttribute('opacity', '1');
+
+            const impLen = pathImport.getTotalLength();
+            importMaskPath.style.strokeDasharray = impLen;
+            importMaskPath.style.strokeDashoffset = impLen;
+            animateImportLine();
+        }
+
+        function animateImportLine() {
+            let offset = parseFloat(importMaskPath.style.strokeDashoffset);
+            if (offset > 0) {
+                offset -= 12;
+                if (offset < 0) offset = 0;
+                importMaskPath.style.strokeDashoffset = offset;
+                rAF_Timer = requestAnimationFrame(animateImportLine);
+            } else {
+                const impCoin = { el: createCoin(), path: pathImport, progress: 1.0, speed: 0.008 };
+                animateImportCoin(impCoin);
+            }
+        }
+
+        function animateImportCoin(coin) {
+            if (simState !== 4) return;
+            if (coin.progress > 0.0) {
+                coin.progress -= coin.speed;
+                const pt = getPointOnPath(coin.path, coin.progress);
+                coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                rAF_Timer = requestAnimationFrame(() => animateImportCoin(coin));
+            } else {
+                coin.el.style.display = 'none';
+                const expLen = pathExport.getTotalLength();
+                exportMaskPath.style.strokeDasharray = expLen;
+                exportMaskPath.style.strokeDashoffset = expLen;
+                animateExportLine();
+            }
+        }
+
+        function animateExportLine() {
+            let offset = parseFloat(exportMaskPath.style.strokeDashoffset);
+            if (offset > 0) {
+                offset -= 12;
+                if (offset < 0) offset = 0;
+                exportMaskPath.style.strokeDashoffset = offset;
+                rAF_Timer = requestAnimationFrame(animateExportLine);
+            } else {
+                const expCoin = { el: createCoin(), path: pathExport, progress: 0.0, speed: 0.008 };
+                animateExportCoin(expCoin);
+            }
+        }
+
+        function animateExportCoin(coin) {
+            if (simState !== 4) return;
+            if (coin.progress < 1.0) {
+                coin.progress += coin.speed;
+                const pt = getPointOnPath(coin.path, coin.progress);
+                coin.el.setAttribute("transform", `translate(${pt.x}, ${pt.y})`);
+                rAF_Timer = requestAnimationFrame(() => animateExportCoin(coin));
+            } else {
+                coin.el.style.display = 'none';
+                setTimeout(() => { tradeChannels.setAttribute('opacity', '0'); startIdle(); }, 2500);
+            }
+        }
+
+        function resetSimulation() { startIdle(); }
+
+        window.onload = function() {
+            expChartObj = new Chart(document.getElementById('chartExpenditure'), {
+                type: 'doughnut',
+                data: {
+                    labels: ['C — Потребление', 'I — Инвестиции', 'G — Госзакупки', 'NX — Чистый экспорт'],
+                    datasets: [{
+                        data: [67.6, 18.0, 17.3, -3.0],
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444']
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            incChartObj = new Chart(document.getElementById('chartIncome'), {
+                type: 'bar',
+                data: {
+                    labels: ['Оплата труда', 'Прибыль', 'Доход от собств.', 'Рента', 'Депозиты/Проценты', 'Амортизация', 'Налоги'],
+                    datasets: [{
+                        label: '% от ВВП',
+                        data: [50.9, 13.0, 7.0, 3.2, 11.3, 16.4, 6.8],
+                        backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4', '#64748b', '#ef4444']
+                    }]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { color: '#94a3b8' },
+                            grid: { color: 'rgba(51, 65, 85, 0.4)' }
+                        },
+                        x: {
+                            ticks: { color: '#f1f5f9', font: { size: 10, weight: 'bold' } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+
+            setLanguage('ru');
+        };
+    </script>
+</body>
+</html>

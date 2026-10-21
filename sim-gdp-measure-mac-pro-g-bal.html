@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ВВП: потоки доходов и расходов в экономике • AlmaU</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Charts -->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .sidebar-dark {
+            background-color: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 16px;
+        }
+
+        .slider-card {
+            background-color: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 8px 12px;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            margin: 6px 0;
+        }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            cursor: pointer;
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            height: 24px;
+            width: 16px;
+            border-radius: 4px;
+            border: 1px solid #1e293b;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: -8px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+            transition: transform 0.1s ease;
+        }
+        input[type=range]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+        }
+
+        .thumb-blue-1::-webkit-slider-thumb { background: linear-gradient(to right, #64748b 30%, #1e3a8a 30%, #1e3a8a 70%, #64748b 70%); }
+        .thumb-blue-2::-webkit-slider-thumb { background: linear-gradient(to right, #64748b 30%, #1d4ed8 30%, #1d4ed8 70%, #64748b 70%); }
+        .thumb-blue-3::-webkit-slider-thumb { background: linear-gradient(to right, #64748b 30%, #2563eb 30%, #2563eb 70%, #64748b 70%); }
+        .thumb-blue-4::-webkit-slider-thumb { background: linear-gradient(to right, #64748b 30%, #38bdf8 30%, #38bdf8 70%, #64748b 70%); }
+
+        .thumb-green::-webkit-slider-thumb { background: linear-gradient(to right, #64748b 30%, #10b981 30%, #10b981 70%, #64748b 70%); }
+        .thumb-red::-webkit-slider-thumb { background: linear-gradient(to right, #64748b 30%, #ef4444 30%, #ef4444 70%, #64748b 70%); }
+        .thumb-darkgray::-webkit-slider-thumb { background: linear-gradient(to right, #64748b 30%, #475569 30%, #475569 70%, #64748b 70%); }
+        .thumb-violet::-webkit-slider-thumb { background: linear-gradient(to right, #64748b 30%, #8b5cf6 30%, #8b5cf6 70%, #64748b 70%); }
+
+        .white-board {
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            color: #0f172a;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center">
+
+    <!-- ВЕРХНИЙ БЛОК -->
+    <header class="w-full max-w-7xl flex flex-col md:flex-row justify-between items-center pb-4 mb-4 border-b border-slate-700 gap-4">
+        <div>
+            <!-- Привязан динамический ID для перевода заголовков -->
+            <h1 id="main-title" class="text-lg md:text-xl font-black uppercase tracking-tight text-slate-100 whitespace-nowrap">
+                ВВП: потоки доходов и расходов в экономике
+            </h1>
+            <p id="sub-title" class="text-xs text-slate-400">Макроэкономика • Симулятор кругооборота национальных счетов</p>
+        </div>
+
+        <!-- ИНДИКАТОРЫ ВВП И БЮДЖЕТА -->
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-700 text-center">
+                <span id="lbl-badge-gdi" class="text-[10px] font-mono text-slate-400 uppercase block">Доходы (GDI)</span>
+                <span class="text-base font-black text-sky-400" id="val-total-income">1020 млрд ₸</span>
+            </div>
+            <div class="bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-700 text-center">
+                <span id="lbl-badge-gdp" class="text-[10px] font-mono text-slate-400 uppercase block">Расходы (GDP)</span>
+                <span class="text-base font-black text-emerald-400" id="val-total-expenditure">1020 млрд ₸</span>
+            </div>
+            <div class="bg-slate-800 px-3.5 py-2 rounded-xl border border-slate-700 text-center">
+                <span id="lbl-badge-budget" class="text-[10px] font-mono text-slate-400 uppercase block">Бюджет (T - G)</span>
+                <span class="text-base font-black" id="val-budget-status">0 млрд ₸</span>
+            </div>
+            <!-- Переключатель RU / EN -->
+            <div class="flex items-center gap-1 bg-slate-800 p-1 rounded-lg border border-slate-700">
+                <button id="btn-lang-ru" onclick="setLanguage('ru')" class="px-2.5 py-1 text-xs font-bold rounded bg-sky-500 text-white">RU</button>
+                <button id="btn-lang-en" onclick="setLanguage('en')" class="px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white">EN</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- ДВУХКОЛОНОЧНЫЙ МАКЕТ -->
+    <main class="w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-5">
+
+        <!-- ЛЕВАЯ КОЛОНКА: СЛАЙДЕРЫ УПРАВЛЕНИЯ -->
+        <div class="lg:col-span-4 sidebar-dark p-4 space-y-2.5">
+            <h3 id="lbl-sidebar-title" class="text-xs font-mono font-bold text-sky-400 uppercase tracking-wider mb-1">Факторы доходов и расходов (млрд ₸)</h3>
+            
+            <!-- 1. Заработная плата -->
+            <div class="slider-card">
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span id="lbl-w">Заработная плата (W)</span>
+                    <span class="font-mono text-blue-400 font-bold" id="val-w">350</span>
+                </div>
+                <input type="range" id="slide-w" min="50" max="800" value="350" class="thumb-blue-1" oninput="updateAll()">
+            </div>
+
+            <!-- 2. Рентный доход -->
+            <div class="slider-card">
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span id="lbl-r">Рентный доход (R)</span>
+                    <span class="font-mono text-blue-400 font-bold" id="val-r">60</span>
+                </div>
+                <input type="range" id="slide-r" min="10" max="300" value="60" class="thumb-blue-2" oninput="updateAll()">
+            </div>
+
+            <!-- 3. Процентный доход -->
+            <div class="slider-card">
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span id="lbl-i">Процентный доход (i)</span>
+                    <span class="font-mono text-blue-400 font-bold" id="val-i">50</span>
+                </div>
+                <input type="range" id="slide-i" min="10" max="300" value="50" class="thumb-blue-3" oninput="updateAll()">
+            </div>
+
+            <!-- 4. Доход от собственности -->
+            <div class="slider-card">
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span id="lbl-se">Доход от собственности (SE)</span>
+                    <span class="font-mono text-sky-400 font-bold" id="val-se">80</span>
+                </div>
+                <input type="range" id="slide-se" min="10" max="400" value="80" class="thumb-blue-4" oninput="updateAll()">
+            </div>
+
+            <!-- 5. Прибыль корпораций -->
+            <div class="slider-card">
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span id="lbl-corp">Прибыль корпораций (Profits)</span>
+                    <span class="font-mono text-emerald-400 font-bold" id="val-corp">280</span>
+                </div>
+                <input type="range" id="slide-corp" min="50" max="700" value="280" class="thumb-green" oninput="updateAll()">
+            </div>
+
+            <!-- 6. Косвенные налоги -->
+            <div class="slider-card border-red-500/20">
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span id="lbl-taxind" class="text-red-300">Косвенные налоги (T_ind)</span>
+                    <span class="font-mono text-red-400 font-bold" id="val-taxind">90</span>
+                </div>
+                <input type="range" id="slide-taxind" min="10" max="300" value="90" class="thumb-red" oninput="updateAll()">
+            </div>
+
+            <!-- 7. Амортизация -->
+            <div class="slider-card">
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span id="lbl-depr">Амортизация капитала (CCAf)</span>
+                    <span class="font-mono text-slate-400 font-bold" id="val-depr">70</span>
+                </div>
+                <input type="range" id="slide-depr" min="10" max="250" value="70" class="thumb-darkgray" oninput="updateAll()">
+            </div>
+
+            <!-- 8. Чистые факторные доходы из-за рубежа (NFI) -->
+            <div class="slider-card">
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span id="lbl-nfi">Чистые факторные доходы из-за рубежа (NFI)</span>
+                    <span class="font-mono text-purple-300 font-bold" id="val-nfi">40</span>
+                </div>
+                <input type="range" id="slide-nfi" min="0" max="200" value="40" class="thumb-violet" oninput="updateAll()">
+            </div>
+
+            <!-- 9. Норма сбережений -->
+            <div class="slider-card">
+                <div class="flex justify-between text-xs text-slate-300">
+                    <span id="lbl-sav">Норма сбережений (S)</span>
+                    <span class="font-mono text-sky-400 font-bold" id="val-sav">15%</span>
+                </div>
+                <input type="range" id="slide-sav" min="5" max="35" value="15" class="thumb-blue-4" oninput="updateAll()">
+            </div>
+
+            <!-- 10. ПОЛЗУНОК ГОСУДАРСТВЕННЫХ ЗАКУПОК -->
+            <div class="slider-card border-red-500/40 bg-red-950/20">
+                <div class="flex justify-between text-xs text-slate-200">
+                    <span id="lbl-g" class="font-bold text-red-400">Госзакупки (G)</span>
+                    <span class="font-mono text-red-400 font-bold" id="val-g">200</span>
+                </div>
+                <input type="range" id="slide-g" min="50" max="600" value="200" class="thumb-red" oninput="updateAll()">
+                <div class="text-[10px] text-slate-400 mt-1 flex justify-between">
+                    <span id="lbl-tax-collected-text">Собрано налогов (T_total): <strong id="val-tax-total" class="text-red-400">200</strong></span>
+                    <button id="btn-balance" onclick="syncGovPurchasesWithTaxes()" class="text-sky-400 hover:underline">Сбалансировать</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ПРАВАЯ КОЛОНКА: СВЕТЛОЕ БЕЛОЕ ПОЛЕ С САНКИ-ДИАГРАММОЙ -->
+        <div class="lg:col-span-8 white-board p-5 flex flex-col justify-center">
+            <div id="sankey_chart" class="w-full h-[580px]"></div>
+        </div>
+
+    </main>
+
+    <script>
+        let currentLang = 'ru';
+        let sankeyChart = null;
+
+        const i18n = {
+            ru: {
+                mainTitle: "ВВП: ПОТОКИ ДОХОДОВ И РАСХОДОВ В ЭКОНОМИКЕ",
+                subTitle: "Макроэкономика • Симулятор кругооборота национальных счетов",
+                sidebarTitle: "Факторы доходов и расходов (млрд ₸)",
+                badgeGdi: "Доходы (GDI)",
+                badgeGdp: "Расходы (GDP)",
+                badgeBudget: "Бюджет (T - G)",
+                taxCollectedText: "Собрано налогов (T_total): ",
+                btnBalance: "Сбалансировать",
+                
+                statusDeficit: "Дефицит: ",
+                statusSurplus: "Профицит: +",
+                statusBalanced: "Баланс: 0 млрд ₸",
+
+                w: "Заработная плата (W)",
+                r: "Рентный доход (R)",
+                i: "Процентный доход (i)",
+                se: "Доход от собственности (SE)",
+                corp: "Прибыль корпораций (Profits)",
+                taxind: "Косвенные налоги (T_ind)",
+                depr: "Амортизация капитала (CCAf)",
+                nfi: "Чистые факторные доходы из-за рубежа (NFI)",
+                sav: "Норма сбережений (S)",
+                g: "Госзакупки (G)",
+
+                nW: "Заработная плата (W)",
+                nR: "Рентный доход (R)",
+                ni: "Процентный доход (i)",
+                nSE: "Доход от собственности (SE)",
+                nCorp: "Прибыль корпораций",
+                nTaxInd: "Косвенные налоги (T_ind)",
+                nDepr: "Амортизация (CCAf)",
+                nNFI: "ЧФД из-за рубежа (NFI)",
+
+                nTaxPIT: "Налоги населения (ИПН)",
+                nTaxCIT: "Налог на прибыль (КПН)",
+                nDiv: "Дивиденды",
+                nRetained: "Нераспределенная прибыль",
+                nSav: "Сбережения (S)",
+                nImport: "Импорт товаров и услуг (M)",
+                nExport: "Экспорт товаров и услуг (X)",
+
+                nC: "Потребление (C)",
+                nI: "Валовые инвестиции (I)",
+                nG: "Государственные закупки (G)",
+                nNX: "Чистый экспорт (NX = X - M)"
+            },
+            en: {
+                mainTitle: "GDP: INCOME AND EXPENDITURE FLOWS IN THE ECONOMY",
+                subTitle: "Macroeconomics • National Accounts Circular Flow Simulator",
+                sidebarTitle: "Income & Expenditure Drivers (Billion ₸)",
+                badgeGdi: "Income (GDI)",
+                badgeGdp: "Expenditure (GDP)",
+                badgeBudget: "Budget (T - G)",
+                taxCollectedText: "Total Taxes (T_total): ",
+                btnBalance: "Balance Budget",
+
+                statusDeficit: "Deficit: ",
+                statusSurplus: "Surplus: +",
+                statusBalanced: "Balance: 0 Billion ₸",
+
+                w: "Wages & Salaries (W)",
+                r: "Rental Income (R)",
+                i: "Interest Income (i)",
+                se: "Proprietor's Income (SE)",
+                corp: "Corporate Profits",
+                taxind: "Indirect Taxes (T_ind)",
+                depr: "Depreciation (CCAf)",
+                nfi: "Net Factor Income (NFI)",
+                sav: "Savings Rate (S)",
+                g: "Government Purchases (G)",
+
+                nW: "Wages & Salaries (W)",
+                nR: "Rental Income (R)",
+                ni: "Interest Income (i)",
+                nSE: "Proprietor's Income (SE)",
+                nCorp: "Corporate Profits",
+                nTaxInd: "Indirect Taxes (T_ind)",
+                nDepr: "Depreciation (CCAf)",
+                nNFI: "Net Factor Income (NFI)",
+
+                nTaxPIT: "Personal Tax (PIT)",
+                nTaxCIT: "Corporate Tax (CIT)",
+                nDiv: "Dividends",
+                nRetained: "Retained Earnings",
+                nSav: "Savings (S)",
+                nImport: "Imports (M)",
+                nExport: "Exports (X)",
+
+                nC: "Consumption (C)",
+                nI: "Gross Investment (I)",
+                nG: "Government Purchases (G)",
+                nNX: "Net Exports (NX = X - M)"
+            }
+        };
+
+        google.charts.load('current', {'packages':['sankey']});
+        google.charts.setOnLoadCallback(initChart);
+
+        function initChart() {
+            sankeyChart = new google.visualization.Sankey(document.getElementById('sankey_chart'));
+            syncGovPurchasesWithTaxes();
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('btn-lang-ru').className = lang === 'ru' 
+                ? "px-2.5 py-1 text-xs font-bold rounded bg-sky-500 text-white"
+                : "px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white";
+            
+            document.getElementById('btn-lang-en').className = lang === 'en' 
+                ? "px-2.5 py-1 text-xs font-bold rounded bg-sky-500 text-white"
+                : "px-2.5 py-1 text-xs font-bold rounded text-slate-400 hover:text-white";
+
+            const t = i18n[lang];
+            
+            // Динамический перевод главных заголовков в верхней панели
+            document.getElementById('main-title').innerText = t.mainTitle;
+            document.getElementById('sub-title').innerText = t.subTitle;
+            document.getElementById('lbl-sidebar-title').innerText = t.sidebarTitle;
+            document.getElementById('lbl-badge-gdi').innerText = t.badgeGdi;
+            document.getElementById('lbl-badge-gdp').innerText = t.badgeGdp;
+            document.getElementById('lbl-badge-budget').innerText = t.badgeBudget;
+
+            // Перевод подписей ползунков
+            document.getElementById('lbl-w').innerText = t.w;
+            document.getElementById('lbl-r').innerText = t.r;
+            document.getElementById('lbl-i').innerText = t.i;
+            document.getElementById('lbl-se').innerText = t.se;
+            document.getElementById('lbl-corp').innerText = t.corp;
+            document.getElementById('lbl-taxind').innerText = t.taxind;
+            document.getElementById('lbl-depr').innerText = t.depr;
+            document.getElementById('lbl-nfi').innerText = t.nfi;
+            document.getElementById('lbl-sav').innerText = t.sav;
+            document.getElementById('lbl-g').innerText = t.g;
+
+            document.getElementById('btn-balance').innerText = t.btnBalance;
+
+            updateAll();
+        }
+
+        function syncGovPurchasesWithTaxes() {
+            const w = parseInt(document.getElementById('slide-w').value);
+            const r = parseInt(document.getElementById('slide-r').value);
+            const i = parseInt(document.getElementById('slide-i').value);
+            const se = parseInt(document.getElementById('slide-se').value);
+            const corp = parseInt(document.getElementById('slide-corp').value);
+            const taxInd = parseInt(document.getElementById('slide-taxind').value);
+
+            const pit = Math.round((w + r + i + se) * 0.10);
+            const cit = Math.round(corp * 0.20);
+            const totalTaxes = pit + cit + taxInd;
+
+            document.getElementById('slide-g').value = totalTaxes;
+            updateAll();
+        }
+
+        function updateAll() {
+            const w = parseInt(document.getElementById('slide-w').value);
+            const r = parseInt(document.getElementById('slide-r').value);
+            const i = parseInt(document.getElementById('slide-i').value);
+            const se = parseInt(document.getElementById('slide-se').value);
+
+            const corp = parseInt(document.getElementById('slide-corp').value);
+            const taxInd = parseInt(document.getElementById('slide-taxind').value);
+            const depr = parseInt(document.getElementById('slide-depr').value);
+            const nfi = parseInt(document.getElementById('slide-nfi').value);
+            const savRate = parseInt(document.getElementById('slide-sav').value) / 100;
+            let G = parseInt(document.getElementById('slide-g').value);
+
+            const t = i18n[currentLang];
+
+            document.getElementById('val-w').innerText = w;
+            document.getElementById('val-r').innerText = r;
+            document.getElementById('val-i').innerText = i;
+            document.getElementById('val-se').innerText = se;
+            document.getElementById('val-corp').innerText = corp;
+            document.getElementById('val-taxind').innerText = taxInd;
+            document.getElementById('val-depr').innerText = depr;
+            document.getElementById('val-nfi').innerText = nfi;
+            document.getElementById('val-sav').innerText = Math.round(savRate * 100) + "%";
+            document.getElementById('val-g').innerText = G;
+
+            // 1. Налоги
+            const totalHHIncome = w + r + i + se;
+            const pit = Math.round(totalHHIncome * 0.10);
+            const cit = Math.round(corp * 0.20);
+            const totalTaxes = pit + cit + taxInd;
+            
+            document.getElementById('lbl-tax-collected-text').innerHTML = `${t.taxCollectedText}<strong id="val-tax-total" class="text-red-400">${totalTaxes}</strong>`;
+
+            // 2. Корпорации
+            const div = Math.round(corp * 0.35);
+            const retained = corp - cit - div;
+
+            // 3. Импорт
+            const importRate = 0.10;
+            const importHH = Math.round((totalHHIncome - pit) * importRate);
+            const importCorp = Math.round(retained * 0.10);
+            const M = importHH + importCorp;
+
+            const netHH = totalHHIncome - pit - importHH;
+            const savings = Math.round(netHH * savRate);
+            const consHH = netHH - savings;
+
+            // 4. Доходы (GDI)
+            const totalGDI = totalHHIncome + corp + taxInd + depr + nfi;
+
+            // 5. Расходы (GDP)
+            const C = consHH + div;
+            const X = M + Math.round(nfi * 0.8);
+            const NX = X - M;
+            
+            const I0 = totalGDI - C - totalTaxes - NX;
+            const totalGDP = C + I0 + G + NX;
+
+            // 6. Бюджет
+            const budgetBalance = totalTaxes - G;
+            const budgetElem = document.getElementById('val-budget-status');
+
+            if (budgetBalance < 0) {
+                budgetElem.innerText = `${t.statusDeficit}${budgetBalance} ${currentLang === 'ru' ? 'млрд ₸' : 'Billion ₸'}`;
+                budgetElem.className = "text-base font-black text-red-500";
+            } else if (budgetBalance > 0) {
+                budgetElem.innerText = `${t.statusSurplus}${budgetBalance} ${currentLang === 'ru' ? 'млрд ₸' : 'Billion ₸'}`;
+                budgetElem.className = "text-base font-black text-emerald-400";
+            } else {
+                budgetElem.innerText = t.statusBalanced;
+                budgetElem.className = "text-base font-black text-sky-400";
+            }
+
+            const unit = currentLang === 'ru' ? 'млрд ₸' : 'Billion ₸';
+            document.getElementById('val-total-income').innerText = `${totalGDI} ${unit}`;
+            document.getElementById('val-total-expenditure').innerText = `${totalGDP} ${unit}`;
+
+            if (!sankeyChart) return;
+
+            const data = new google.visualization.DataTable();
+            data.addColumn('string', 'From');
+            data.addColumn('string', 'To');
+            data.addColumn('number', 'Weight');
+
+            data.addRows([
+                [ t.nW, t.nC, Math.max(1, Math.round(w * 0.90 * (1 - importRate) * (1 - savRate))) ],
+                [ t.nW, t.nSav, Math.max(1, Math.round(w * 0.90 * (1 - importRate) * savRate)) ],
+                [ t.nW, t.nTaxPIT, Math.max(1, Math.round(w * 0.10)) ],
+                [ t.nW, t.nImport, Math.max(1, Math.round(w * 0.90 * importRate)) ],
+
+                [ t.nR, t.nC, Math.max(1, Math.round(r * (1 - importRate) * (1 - savRate))) ],
+                [ t.nR, t.nSav, Math.max(1, Math.round(r * (1 - importRate) * savRate)) ],
+                [ t.nR, t.nImport, Math.max(1, Math.round(r * importRate)) ],
+
+                [ t.ni, t.nC, Math.max(1, Math.round(i * (1 - importRate) * (1 - savRate))) ],
+                [ t.ni, t.nSav, Math.max(1, Math.round(i * (1 - importRate) * savRate)) ],
+                [ t.ni, t.nImport, Math.max(1, Math.round(i * importRate)) ],
+
+                [ t.nSE, t.nC, Math.max(1, Math.round(se * 0.90 * (1 - importRate) * (1 - savRate))) ],
+                [ t.nSE, t.nSav, Math.max(1, Math.round(se * 0.90 * (1 - importRate) * savRate)) ],
+                [ t.nSE, t.nTaxPIT, Math.max(1, Math.round(se * 0.10)) ],
+                [ t.nSE, t.nImport, Math.max(1, Math.round(se * 0.90 * importRate)) ],
+
+                [ t.nCorp, t.nDiv, Math.max(1, div) ],
+                [ t.nCorp, t.nRetained, Math.max(1, retained) ],
+                [ t.nCorp, t.nTaxCIT, Math.max(1, cit) ],
+
+                [ t.nDepr, t.nI, Math.max(1, depr) ],
+                [ t.nTaxInd, t.nG, Math.max(1, taxInd) ],
+
+                [ t.nNFI, t.nExport, Math.max(1, Math.round(nfi * 0.8)) ],
+                [ t.nNFI, t.nC, Math.max(1, Math.round(nfi * 0.2)) ],
+
+                [ t.nDiv, t.nC, Math.max(1, div) ],
+                [ t.nRetained, t.nI, Math.max(1, retained - importCorp) ],
+                [ t.nRetained, t.nImport, Math.max(1, importCorp) ],
+                [ t.nSav, t.nI, Math.max(1, savings) ],
+                [ t.nTaxPIT, t.nG, Math.max(1, pit) ],
+                [ t.nTaxCIT, t.nG, Math.max(1, cit) ],
+
+                [ t.nImport, t.nNX, Math.max(1, M) ],
+                [ t.nExport, t.nNX, Math.max(1, X) ]
+            ]);
+
+            const colorsMap = [
+                '#1e3a8a', '#10b981', '#0284c7', '#ef4444', '#f97316', 
+                '#1d4ed8', '#2563eb', '#38bdf8', '#10b981', '#10b981', 
+                '#0369a1', '#ef4444', '#475569', '#0284c7', '#ef4444', 
+                '#ef4444', '#8b5cf6', '#eab308', '#f59e0b'
+            ];
+
+            const options = {
+                sankey: {
+                    node: {
+                        colors: colorsMap,
+                        label: {
+                            fontName: 'Inter',
+                            fontSize: 10,
+                            color: '#0f172a',
+                            bold: true
+                        },
+                        nodePadding: 14,
+                        width: 14
+                    },
+                    link: {
+                        colorMode: 'gradient'
+                    }
+                }
+            };
+
+            sankeyChart.draw(data, options);
+        }
+
+        window.addEventListener('resize', () => {
+            if (sankeyChart) updateAll();
+        });
+    </script>
+</body>
+</html>
