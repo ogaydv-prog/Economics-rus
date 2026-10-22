@@ -23,31 +23,40 @@
             position: relative;
         }
 
+        /* Единая шапка навигации */
+        .top-nav {
+            width: 100%;
+            max-width: 1450px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px; /* Опускает логотип и кнопку ровно на уровень названия Тема 8 */
+            margin-bottom: -15px; /* Сближает с заголовком */
+            z-index: 10;
+        }
+
         .top-left-logo {
-            position: absolute;
-            top: 25px;
-            left: 30px;
             width: 55px;
             height: 55px;
             object-fit: contain;
         }
 
         .back-button {
-            position: absolute;
-            top: 35px;
-            right: 30px;
             text-decoration: none;
             background-color: #001e50;
             color: white;
-            padding: 8px 16px;
+            padding: 9px 18px;
             border-radius: 8px;
             font-weight: 600;
             font-size: 14px;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
         }
 
         .back-button:hover {
             background-color: #003380;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 30, 80, 0.25);
         }
 
         header {
@@ -90,7 +99,7 @@
             text-decoration: none;
             background: #ffffff;
             border: 2px solid #001e50;
-            border-radius: 6px 6px 12px 12px; /* Прямые углы сверху, чтобы не срезать заголовок */
+            border-radius: 6px 6px 12px 12px;
             overflow: hidden;
             box-shadow: 0 4px 14px rgba(0, 30, 80, 0.08);
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -223,18 +232,18 @@
                 padding: 10px 15px;
             }
 
+            .top-nav {
+                flex-direction: flex-row;
+                margin-top: 0;
+                margin-bottom: 10px;
+            }
+
             .top-left-logo {
-                position: static;
-                margin: 0 auto 10px auto;
-                display: block;
                 width: 48px;
                 height: 48px;
             }
 
             .back-button {
-                position: static;
-                display: inline-block;
-                margin: 0 auto 15px auto;
                 padding: 6px 12px;
                 font-size: 12px;
             }
@@ -262,11 +271,11 @@
 </head>
 <body>
 
-    <!-- Логотип AlmaU -->
-    <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo">
-    
-    <!-- Кнопка возврата -->
-    <a href="topics.html" class="back-button">← К темам курса</a>
+    <!-- Навигация: Логотип и кнопка возврата на одном уровне -->
+    <div class="top-nav">
+        <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+        <a href="topics.html" class="back-button">← К темам курса</a>
+    </div>
 
     <header>
         <h1>Тема 8: Принципы макроэкономики и измерение ВВП</h1>
