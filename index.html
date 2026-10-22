@@ -23,23 +23,23 @@
             position: relative;
         }
 
-        /* Контейнер шапки для идеального позиционирования логотипа */
-        .header-container {
-            width: 100%;
-            max-width: 1150px;
-            position: relative;
-            text-align: center;
-            margin-top: 10px;
-            margin-bottom: 30px;
-        }
-
+        /* Логотип в левом верхнем углу окна браузера */
         .top-left-logo {
             position: absolute;
-            top: 5px;
-            left: 0;
+            top: 20px;
+            left: 25px;
             width: 55px;
             height: 55px;
             object-fit: contain;
+            z-index: 100;
+        }
+
+        .header-container {
+            width: 100%;
+            max-width: 1150px;
+            text-align: center;
+            margin-top: 5px;
+            margin-bottom: 30px;
         }
 
         h1 {
@@ -128,6 +128,16 @@
         }
 
         /* АДАПТАЦИЯ ДЛЯ СМАРТФОНОВ И ПЛАНШЕТОВ */
+        @media (max-width: 900px) {
+            .top-left-logo {
+                position: static;
+                display: block;
+                margin: 0 auto 12px auto;
+                width: 50px;
+                height: 50px;
+            }
+        }
+
         @media (max-width: 768px) {
             body { 
                 padding: 12px 10px; 
@@ -136,14 +146,6 @@
             .header-container { 
                 margin-top: 0; 
                 margin-bottom: 20px; 
-            }
-
-            .top-left-logo {
-                position: static;
-                display: block;
-                margin: 0 auto 12px auto;
-                width: 50px;
-                height: 50px;
             }
 
             h1 { 
@@ -158,7 +160,6 @@
                 padding: 0 5px;
             }
 
-            /* Четкая сетка из 2 колонок на мобильных устройствах */
             .grid-container { 
                 display: grid;
                 grid-template-columns: repeat(2, 1fr);
@@ -170,7 +171,7 @@
             .card { 
                 width: 100%; 
                 height: auto; 
-                aspect-ratio: 190 / 250; /* Сохранение пропорций */
+                aspect-ratio: 190 / 250;
                 border-radius: 12px; 
             }
 
@@ -190,10 +191,10 @@
 </head>
 <body>
 
-    <header class="header-container">
-        <!-- Логотип AlmaU по центру на мобильных и слева на ПК -->
-        <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo">
+    <!-- Логотип AlmaU в левом углу для ПК, по центру для мобильных -->
+    <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo">
 
+    <header class="header-container">
         <h1>ЭКОНОМИКА</h1>
         <p class="subtitle">
             Интерактивный учебный хаб | SE, IS, DS, PM 2026 <br>
