@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPI & Inflation Simulator • 5 Steps of Laspeyres | AlmaU SDTE</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #030712;
+            color: #f3f4f6;
+            min-height: 100vh;
+        }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Bloomberg Neon Glassmorphism */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(55, 65, 81, 0.6);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 15px rgba(59, 130, 246, 0.08);
+        }
+
+        .tab-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Разноцветные активные вкладки */
+        .tab-btn-s1.active {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            border-color: #60a5fa;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.4);
+        }
+        .tab-btn-s2.active {
+            background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+            border-color: #fbbf24;
+            box-shadow: 0 0 20px rgba(217, 119, 6, 0.4);
+        }
+        .tab-btn-s3.active {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            border-color: #34d399;
+            box-shadow: 0 0 20px rgba(5, 150, 105, 0.4);
+        }
+        .tab-btn-s4.active {
+            background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+            border-color: #22d3ee;
+            box-shadow: 0 0 20px rgba(8, 145, 178, 0.4);
+        }
+        .tab-btn-s5.active {
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            border-color: #a78bfa;
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #1f2937; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+    </style>
+</head>
+<body class="p-3 md:p-6 flex flex-col justify-between min-h-screen">
+
+    <!-- HEADER / SHAPKA -->
+    <header class="glass-panel p-4 rounded-2xl mb-4 border-t-2 border-t-blue-500 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        <div class="flex items-center space-x-3">
+            <div class="p-3 bg-blue-950/80 rounded-xl border border-blue-500/40 text-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                <i class="fa-solid fa-chart-line text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-lg md:text-2xl font-black text-blue-500 tracking-tight flex items-center gap-2 drop-shadow-[0_0_10px_rgba(59,130,246,0.4)]" id="txt-header-title">
+                    Интерактивный Симулятор Расчёта CPI и Инфляции (в Тенге ₸)
+                    <span class="text-xs font-mono font-normal px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">Laspeyres Index</span>
+                </h1>
+                <p class="text-xs text-slate-400 mt-0.5" id="txt-header-sub">
+                    Практический 5-шаговый тренажёр измерения стоимости жизни • Стандарт IMF / ILO CPI Manual (2020)
+                </p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto justify-between lg:justify-end">
+            
+            <!-- Контроллер курса USD / KZT -->
+            <div class="flex items-center space-x-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800 text-xs">
+                <span class="text-amber-400 font-bold flex items-center gap-1">
+                    <i class="fa-solid fa-dollar-sign"></i> <span id="lbl-rate-title">Курс USD/KZT:</span>
+                </span>
+                <div class="flex items-center space-x-1">
+                    <button onclick="changeExchangeRate(-5)" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded flex items-center justify-center border border-slate-700">▼</button>
+                    <input type="number" id="input-fx-rate" value="450" onchange="setExchangeRate(this.value)" class="w-16 bg-slate-950 border border-slate-700 rounded text-center text-amber-300 font-mono font-bold focus:outline-none">
+                    <button onclick="changeExchangeRate(5)" class="w-6 h-6 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded flex items-center justify-center border border-slate-700">▲</button>
+                    <span class="text-slate-400 font-mono font-bold">₸</span>
+                </div>
+            </div>
+
+            <!-- ДИНАМИЧЕСКАЯ ЯЗЫКОВАЯ ССЫЛКА НА PDF МАНУАЛ МВФ -->
+            <a id="link-cpi-manual" href="https://www.imf.org/-/media/files/data/cpi/cpi-manual-concepts-and-methods-russian.pdf" target="_blank" class="px-3 py-1.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-500/50 text-blue-200 text-xs rounded-xl transition flex items-center space-x-2 shadow-lg">
+                <i class="fa-solid fa-file-pdf text-red-400 text-sm"></i>
+                <span id="txt-manual-link" class="font-semibold">Руководство МВФ по ИПЦ (PDF)</span>
+            </a>
+
+            <!-- Двуязычный переключатель -->
+            <div class="flex items-center space-x-1 bg-slate-900 p-1 rounded-xl border border-slate-800">
+                <button onclick="setLanguage('ru')" id="btn-lang-ru" class="px-3 py-1 text-xs font-extrabold rounded-lg bg-blue-600 text-white transition">RU</button>
+                <button onclick="setLanguage('en')" id="btn-lang-en" class="px-3 py-1 text-xs font-extrabold rounded-lg text-slate-400 hover:text-white transition">EN</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 5 РАЗНОЦВЕТНЫХ ШАГОВ (НАВИГАЦИЯ) -->
+    <nav class="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4 text-xs font-bold">
+        <button onclick="switchTab('tab-step1', this)" class="tab-btn tab-btn-s1 active p-3 rounded-xl border border-slate-700 glass-panel text-left space-y-1">
+            <div class="text-[10px] text-blue-400 uppercase tracking-widest font-mono" id="nav-step1-num">Шаг 1</div>
+            <div class="text-slate-200" id="nav-step1-title">1. Зафиксировать корзину (Q₀)</div>
+        </button>
+
+        <button onclick="switchTab('tab-step2', this)" class="tab-btn tab-btn-s2 p-3 rounded-xl border border-slate-700 glass-panel text-left space-y-1">
+            <div class="text-[10px] text-amber-400 uppercase tracking-widest font-mono" id="nav-step2-num">Шаг 2</div>
+            <div class="text-slate-200" id="nav-step2-title">2. Определить цены (P₀, Pₜ)</div>
+        </button>
+
+        <button onclick="switchTab('tab-step3', this)" class="tab-btn tab-btn-s3 p-3 rounded-xl border border-slate-700 glass-panel text-left space-y-1">
+            <div class="text-[10px] text-emerald-400 uppercase tracking-widest font-mono" id="nav-step3-num">Шаг 3</div>
+            <div class="text-slate-200" id="nav-step3-title">3. Стоимость корзины (ΣP·Q)</div>
+        </button>
+
+        <button onclick="switchTab('tab-step4', this)" class="tab-btn tab-btn-s4 p-3 rounded-xl border border-slate-700 glass-panel text-left space-y-1">
+            <div class="text-[10px] text-cyan-400 uppercase tracking-widest font-mono" id="nav-step4-num">Шаг 4</div>
+            <div class="text-slate-200" id="nav-step4-title">4. Измерить CPI (Индекс)</div>
+        </button>
+
+        <button onclick="switchTab('tab-step5', this)" class="tab-btn tab-btn-s5 col-span-2 md:col-span-1 p-3 rounded-xl border border-slate-700 glass-panel text-left space-y-1">
+            <div class="text-[10px] text-purple-400 uppercase tracking-widest font-mono" id="nav-step5-num">Шаг 5</div>
+            <div class="text-slate-200" id="nav-step5-title">5. Измерить инфляцию (π)</div>
+        </button>
+    </nav>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-grow space-y-4">
+
+        <!-- ================= ШАГ 1: ФИКСАЦИЯ КОРЗИНЫ ================= -->
+        <section id="tab-step1" class="tab-content active space-y-4">
+            <div class="glass-panel p-4 md:p-6 rounded-2xl space-y-4">
+                
+                <!-- Верхняя плашка выбора горизонта и добавления товара -->
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white flex items-center gap-2" id="s1-header-title">
+                            <i class="fa-solid fa-basket-shopping text-blue-400"></i>
+                            Шаг 1: Формирование и фиксация потребительской корзины (Q₀)
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5" id="s1-header-sub">
+                            Согласно методологии Ласпейреса, объемы потребления фиксируются в базовом периоде. Вы можете менять объемы прямо в таблице.
+                        </p>
+                    </div>
+
+                    <!-- Выбор временного горизонта -->
+                    <div class="flex items-center space-x-2 bg-slate-900 p-1.5 rounded-xl border border-slate-800 text-xs">
+                        <span class="text-slate-400 font-bold px-2" id="lbl-period-select">Период:</span>
+                        <button onclick="setConsumptionPeriod(3)" id="btn-p-3" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition">3 мес</button>
+                        <button onclick="setConsumptionPeriod(6)" id="btn-p-6" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition">6 мес</button>
+                        <button onclick="setConsumptionPeriod(12)" id="btn-p-12" class="px-2.5 py-1 rounded-lg bg-blue-600 text-white font-bold transition">1 год</button>
+                    </div>
+                </div>
+
+                <!-- БЛОК ЛАСПЕЙРЕСА С ФОТОГРАФИЕЙ -->
+                <div class="p-4 bg-slate-950 rounded-xl border border-amber-500/40 flex flex-col md:flex-row items-center gap-4 text-xs">
+                    <img src="Laspeyres.png" alt="Etienne Laspeyres" class="w-20 h-24 object-cover rounded-xl border-2 border-amber-400 flex-shrink-0 shadow-lg">
+                    <div class="space-y-1 text-slate-300">
+                        <span class="font-bold text-amber-300 text-sm block" id="laspeyres-card-title">Этьен Ласпейрес (Etienne Laspeyres, 1834–1913)</span>
+                        <p class="leading-relaxed" id="laspeyres-card-desc">
+                            Немецкий экономист, предложивший в 1871 году формулу индекса цен с <strong>фиксированной корзиной базового периода (Q₀)</strong>.
+                            Основное ограничение индекса Ласпейреса — <em>Substitution Bias (ошибка замещения)</em>: он слегка завышает рост стоимости жизни, так как не учитывает оперативный переход покупателей на подешевевшие товары-заменители.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Форма добавления нового товара -->
+                <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-2">
+                    <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2" id="add-item-title">
+                        <i class="fa-solid fa-plus-circle"></i> Добавить свой товар или услугу в корзину
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 text-xs">
+                        <input type="text" id="add-name" placeholder="Название (например, Кофе)" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                        <select id="add-cat" class="sm:col-span-3 bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                            <option value="Food">🥩 Продовольственные товары (Food)</option>
+                            <option value="Housing">🏠 Жильё и коммуналка (Housing)</option>
+                            <option value="Transport">🚗 Транспорт (Transport)</option>
+                            <option value="Apparel">👕 Одежда и обувь (Apparel)</option>
+                            <option value="Medical">🏥 Здравоохранение (Medical)</option>
+                            <option value="Education">🎓 Образование и связь (Education)</option>
+                            <option value="Recreation">🎟️ Отдых и культура (Recreation)</option>
+                            <option value="Other">📦 Прочие товары и услуги (Other)</option>
+                        </select>
+                        <input type="text" id="add-unit" placeholder="Ед.изм (л, кг, мес)" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                        <input type="number" id="add-qty" placeholder="Кол-во (Q₀)" class="sm:col-span-2 bg-slate-950 border border-slate-700 rounded-lg p-2 text-slate-100 focus:outline-none focus:border-blue-500">
+                        <button onclick="addNewCustomItem()" class="sm:col-span-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg p-2 transition text-xs" id="btn-add-item">
+                            + Добавить
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Таблица товаров корзины -->
+                <div class="max-h-96 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="sticky top-0 bg-slate-900 text-blue-400 font-bold border-b border-slate-800">
+                            <tr>
+                                <th class="p-3 w-8">#</th>
+                                <th class="p-3" id="th-item-name">Наименование товара / услуги</th>
+                                <th class="p-3" id="th-item-cat">Категория COICOP</th>
+                                <th class="p-3 text-center" id="th-item-unit">Единица измерения</th>
+                                <th class="p-3 text-right" id="th-item-qty">Управляемый объем (Q₀)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60" id="table-basket-body">
+                            <!-- Заполняется динамически JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ШАГ 2: ФИКСАЦИЯ ЦЕН ================= -->
+        <section id="tab-step2" class="tab-content space-y-4">
+            <div class="glass-panel p-4 md:p-6 rounded-2xl space-y-4">
+                <div class="border-b border-slate-800 pb-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white flex items-center gap-2" id="s2-header-title">
+                            <i class="fa-solid fa-tags text-amber-400"></i>
+                            Шаг 2: Сбор и регистрация цен в Тенге ₸ (P₀ — 2020 г., Pₜ — 2026 г.)
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5" id="s2-header-sub">
+                            Вы можете управлять как базовыми (P₀), так и текущими ценами (Pₜ). В скобках указан эквивалент в долларах США ($).
+                        </p>
+                    </div>
+
+                    <div class="text-xs text-slate-400 font-mono bg-slate-900 p-2 rounded-lg border border-slate-800">
+                        <span id="txt-base-year-lbl">Базовый год: <strong>2020 (P₀)</strong></span> | 
+                        <span id="txt-curr-year-lbl">Текущий год: <strong>2026 (Pₜ)</strong></span>
+                    </div>
+                </div>
+
+                <div class="max-h-96 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="sticky top-0 bg-slate-900 text-amber-400 font-bold border-b border-slate-800">
+                            <tr>
+                                <th class="p-3" id="th-p-name">Товар / Услуга</th>
+                                <th class="p-3 text-center" id="th-p-unit">Ед. изм.</th>
+                                <th class="p-3 text-right" id="th-p-qty">Объем (Q₀)</th>
+                                <th class="p-3 text-right text-blue-400" id="th-p-p0">Базовая цена (P₀, ₸)</th>
+                                <th class="p-3 text-right text-emerald-400" id="th-p-pt">Текущая цена (Pₜ, ₸)</th>
+                                <th class="p-3 text-right" id="th-p-change">Рост цены (%)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 font-mono" id="table-prices-body">
+                            <!-- Заполняется динамически JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ШАГ 3: СТОИМОСТЬ КОРЗИНЫ И СЕКТОРА ================= -->
+        <section id="tab-step3" class="tab-content space-y-4">
+            <div class="glass-panel p-4 md:p-6 rounded-2xl space-y-4">
+                <div class="border-b border-slate-800 pb-3">
+                    <h2 class="text-base font-extrabold text-white flex items-center gap-2" id="s3-header-title">
+                        <i class="fa-solid fa-calculator text-emerald-400"></i>
+                        Шаг 3: Расчёт стоимости корзины в Тенге ₸ и распределение по 8 секторам
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5" id="s3-header-sub">
+                        Вычисление суммы расходов: Σ(P₀ · Q₀) в базовых ценах и Σ(Pₜ · Q₀) в текущих ценах.
+                    </p>
+                </div>
+
+                <!-- Карточки итоговых сумм -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-4 bg-slate-950 rounded-xl border border-blue-500/40 text-center space-y-1">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider" id="lbl-cost-base">Стоимость корзины в базовых ценах Σ(P₀ · Q₀):</span>
+                        <div id="disp-cost-p0" class="text-2xl font-mono font-black text-blue-400">0 ₸ ($0)</div>
+                    </div>
+                    <div class="p-4 bg-slate-950 rounded-xl border border-emerald-500/40 text-center space-y-1">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider" id="lbl-cost-curr">Стоимость корзины в текущих ценах Σ(Pₜ · Q₀):</span>
+                        <div id="disp-cost-pt" class="text-2xl font-mono font-black text-emerald-400">0 ₸ ($0)</div>
+                    </div>
+                </div>
+
+                <!-- Диаграмма секторов расходов -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+                    <div class="lg:col-span-5 space-y-2 text-xs" id="sectors-breakdown-list">
+                        <!-- Список секторов -->
+                    </div>
+                    <div class="lg:col-span-7 h-80 glass-panel p-3 rounded-xl flex items-center justify-center relative">
+                        <canvas id="chartSectorsDoughnut"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ШАГ 4: РАСЧЁТ CPI ================= -->
+        <section id="tab-step4" class="tab-content space-y-4">
+            <div class="glass-panel p-4 md:p-6 rounded-2xl space-y-4">
+                <div class="border-b border-slate-800 pb-3">
+                    <h2 class="text-base font-extrabold text-white flex items-center gap-2" id="s4-header-title">
+                        <i class="fa-solid fa-scale-balanced text-cyan-400"></i>
+                        Шаг 4: Измерение Индекса Потребительских Цен (CPI - Laspeyres Formula)
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5" id="s4-header-sub">
+                        CPI нормирует стоимость текущей корзины относительно базовой стоимости, где базовый индекс = 100.0.
+                    </p>
+                </div>
+
+                <!-- Калькулятор Ласпейреса -->
+                <div class="p-6 bg-slate-950 rounded-2xl border border-cyan-500/40 text-center space-y-4">
+                    <div class="text-xs text-cyan-400 font-bold uppercase tracking-widest" id="s4-formula-lbl">Формула Индекса Ласпейреса:</div>
+                    <div class="text-sm md:text-base font-mono font-bold text-slate-200">
+                        CPIₜ = [ Σ(Pₜ · Q₀) / Σ(P₀ · Q₀) ] × 100
+                    </div>
+
+                    <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 max-w-xl mx-auto font-mono text-xs text-slate-300 space-y-1">
+                        <div>CPI₂₀₂₆ = [ <span id="math-cost-pt" class="text-emerald-400 font-bold">0 ₸</span> / <span id="math-cost-p0" class="text-blue-400 font-bold">0 ₸</span> ] × 100</div>
+                    </div>
+
+                    <button onclick="calculateCPI()" class="px-6 py-2.5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-extrabold rounded-xl transition shadow-lg text-sm" id="btn-calc-cpi">
+                        <i class="fa-solid fa-calculator mr-2"></i>Рассчитать CPI
+                    </button>
+
+                    <div class="pt-2">
+                        <span class="text-xs text-slate-400 block uppercase tracking-wider" id="lbl-res-cpi">Рассчитанный индекс CPI (2026):</span>
+                        <div id="res-cpi-value" class="text-4xl font-mono font-black text-cyan-300 mt-1">100.00</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ШАГ 5: РАСЧЁТ ИНФЛЯЦИИ ================= -->
+        <section id="tab-step5" class="tab-content space-y-4">
+            <div class="glass-panel p-4 md:p-6 rounded-2xl space-y-4">
+                <div class="border-b border-slate-800 pb-3">
+                    <h2 class="text-base font-extrabold text-white flex items-center gap-2" id="s5-header-title">
+                        <i class="fa-solid fa-fire text-purple-400"></i>
+                        Шаг 5: Измерение годового темпа инфляции (π) и Исторический Тренд
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5" id="s5-header-sub">
+                        Инфляция показывает процентный прирост уровня CPI текущего периода относительно предшествующего.
+                    </p>
+                </div>
+
+                <!-- Главное значение инфляции -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="p-4 bg-slate-950 rounded-xl border border-purple-500/40 text-center space-y-1">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider" id="lbl-inf-formula">Формула Инфляции:</span>
+                        <div class="text-xs font-mono text-purple-300">π_t = [(CPI_t - CPI_t-1) / CPI_t-1] × 100%</div>
+                    </div>
+
+                    <div class="p-4 bg-slate-950 rounded-xl border border-purple-500/40 text-center space-y-1 md:col-span-2">
+                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider" id="lbl-inf-result">Темп инфляции к базовому периоду (%):</span>
+                        <div id="res-inflation-rate" class="text-3xl font-mono font-black text-purple-400">+0.00%</div>
+                    </div>
+                </div>
+
+                <!-- График исторического тренда CPI (2020–2026) -->
+                <div class="space-y-2">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider" id="chart-trend-title">Динамика CPI и Инфляции (2020–2026)</h3>
+                    <div class="h-64 glass-panel p-3 rounded-xl flex items-center justify-center">
+                        <canvas id="chartTrendLine"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-4 text-center text-[10px] text-slate-500 font-bold uppercase tracking-widest pt-3 border-t border-slate-800">
+        AlmaU • SDTE • Principles of Economics / Macroeconomics | IMF & ILO Standard CPI Model (2020)
+    </footer>
+
+    <!-- ENGINE & SCRIPTS -->
+    <script>
+        // БАЗОВЫЕ ТОВАРЫ С УТОЧНЕННЫМИ ЦВЕТНЫМИ ИКОНКАМИ
+        const initialProducts = [
+            // Food
+            { id: 1, nameRu: "Молоко 2.5%", nameEn: "Milk 2.5%", icon: "fa-bottle-droplet", iconColor: "text-sky-300", cat: "Food", unitRu: "литр", unitEn: "liter", q0: 120, p0Kzt: 540, ptKzt: 675 },
+            { id: 2, nameRu: "Хлеб пшеничный", nameEn: "Wheat Bread", icon: "fa-bread-slice", iconColor: "text-amber-300", cat: "Food", unitRu: "буханка", unitEn: "loaf", q0: 180, p0Kzt: 360, ptKzt: 495 },
+            { id: 3, nameRu: "Говядина (мякоть)", nameEn: "Beef Meat", icon: "fa-drumstick-bite", iconColor: "text-rose-400", cat: "Food", unitRu: "кг", unitEn: "kg", q0: 45, p0Kzt: 3375, ptKzt: 4410 },
+            { id: 4, nameRu: "Куриное филе", nameEn: "Chicken Fillet", icon: "fa-drumstick-bite", iconColor: "text-orange-300", cat: "Food", unitRu: "кг", unitEn: "kg", q0: 60, p0Kzt: 1890, ptKzt: 2520 },
+            { id: 5, nameRu: "Яйца куриные", nameEn: "Eggs", icon: "fa-egg", iconColor: "text-yellow-200", cat: "Food", unitRu: "десяток", unitEn: "10-pack", q0: 30, p0Kzt: 675, ptKzt: 945 },
+            { id: 6, nameRu: "Картофель", nameEn: "Potatoes", icon: "fa-bowl-rice", iconColor: "text-amber-700", cat: "Food", unitRu: "кг", unitEn: "kg", q0: 100, p0Kzt: 225, ptKzt: 335 },
+            { id: 7, nameRu: "Яблоки", nameEn: "Apples", icon: "fa-apple-whole", iconColor: "text-red-400", cat: "Food", unitRu: "кг", unitEn: "kg", q0: 50, p0Kzt: 810, ptKzt: 1035 },
+            { id: 8, nameRu: "Сахар-песок", nameEn: "Sugar", icon: "fa-cubes", iconColor: "text-slate-100", cat: "Food", unitRu: "кг", unitEn: "kg", q0: 25, p0Kzt: 450, ptKzt: 630 },
+            { id: 9, nameRu: "Подсолнечное масло", nameEn: "Sunflower Oil", icon: "fa-bottle-droplet", iconColor: "text-amber-400", cat: "Food", unitRu: "литр", unitEn: "liter", q0: 20, p0Kzt: 900, ptKzt: 1260 },
+            { id: 10, nameRu: "Питьевая вода 5л", nameEn: "Bottled Water 5L", icon: "fa-box-tissue", iconColor: "text-cyan-300", cat: "Food", unitRu: "бутыль", unitEn: "bottle", q0: 40, p0Kzt: 495, ptKzt: 720 },
+
+            // Housing
+            { id: 11, nameRu: "Аренда 1-комн. квартиры", nameEn: "1-Bed Rent", icon: "fa-house-user", iconColor: "text-orange-400", cat: "Housing", unitRu: "месяц", unitEn: "month", q0: 12, p0Kzt: 157500, ptKzt: 216000 },
+            { id: 12, nameRu: "Электроэнергия", nameEn: "Electricity", icon: "fa-bolt", iconColor: "text-yellow-400", cat: "Housing", unitRu: "кВт·ч", unitEn: "kWh", q0: 2400, p0Kzt: 36, ptKzt: 54 },
+            { id: 13, nameRu: "Отопление и горячая вода", nameEn: "Heating & Hot Water", icon: "fa-faucet-drip", iconColor: "text-red-500", cat: "Housing", unitRu: "месяц", unitEn: "month", q0: 6, p0Kzt: 20250, ptKzt: 27900 },
+            { id: 14, nameRu: "Холодная вода и канализация", nameEn: "Cold Water", icon: "fa-faucet", iconColor: "text-blue-400", cat: "Housing", unitRu: "куб.м", unitEn: "cu.m", q0: 80, p0Kzt: 270, ptKzt: 405 },
+
+            // Transport
+            { id: 15, nameRu: "Бензин АИ-95", nameEn: "Gasoline AI-95", icon: "fa-gas-pump", iconColor: "text-amber-500", cat: "Transport", unitRu: "литр", unitEn: "liter", q0: 600, p0Kzt: 248, ptKzt: 350 },
+            { id: 16, nameRu: "Проезд в обществ. транспорте", nameEn: "Public Bus Fare", icon: "fa-bus-simple", iconColor: "text-emerald-400", cat: "Transport", unitRu: "поездка", unitEn: "ride", q0: 400, p0Kzt: 112, ptKzt: 158 },
+            { id: 17, nameRu: "Такси (городские поездки)", nameEn: "Taxi Rides", icon: "fa-taxi", iconColor: "text-yellow-300", cat: "Transport", unitRu: "поездка", unitEn: "ride", q0: 50, p0Kzt: 1800, ptKzt: 2925 },
+
+            // Apparel
+            { id: 18, nameRu: "Джинсы мужские/женские", nameEn: "Jeans", icon: "fa-shirt", iconColor: "text-blue-400", cat: "Apparel", unitRu: "штука", unitEn: "piece", q0: 2, p0Kzt: 20250, ptKzt: 27000 },
+            { id: 19, nameRu: "Кроссовки спортивные", nameEn: "Sneakers", icon: "fa-shoe-prints", iconColor: "text-teal-300", cat: "Apparel", unitRu: "пара", unitEn: "pair", q0: 2, p0Kzt: 31500, ptKzt: 42750 },
+            { id: 20, nameRu: "Куртка зимняя", nameEn: "Winter Coat", icon: "fa-vest", iconColor: "text-indigo-300", cat: "Apparel", unitRu: "штука", unitEn: "piece", q0: 1, p0Kzt: 54000, ptKzt: 72000 },
+
+            // Medical
+            { id: 21, nameRu: "Приём врача-терапевта", nameEn: "Doctor Visit", icon: "fa-user-doctor", iconColor: "text-rose-500", cat: "Medical", unitRu: "визит", unitEn: "visit", q0: 4, p0Kzt: 11250, ptKzt: 15750 },
+            { id: 22, nameRu: "Жаропонижающие / ОРВИ", nameEn: "Cold Medicine", icon: "fa-pills", iconColor: "text-emerald-400", cat: "Medical", unitRu: "упаковка", unitEn: "pack", q0: 10, p0Kzt: 1575, ptKzt: 2340 },
+
+            // Education & Comm
+            { id: 23, nameRu: "Домашний интернет (Wi-Fi)", nameEn: "Home Internet", icon: "fa-wifi", iconColor: "text-cyan-400", cat: "Education", unitRu: "месяц", unitEn: "month", q0: 12, p0Kzt: 6750, ptKzt: 9000 },
+            { id: 24, nameRu: "Мобильная связь и тариф", nameEn: "Mobile Tariff", icon: "fa-mobile-screen-button", iconColor: "text-purple-400", cat: "Education", unitRu: "месяц", unitEn: "month", q0: 12, p0Kzt: 4500, ptKzt: 6300 },
+
+            // Recreation
+            { id: 25, nameRu: "Билет в кинотеатр", nameEn: "Cinema Ticket", icon: "fa-film", iconColor: "text-fuchsia-400", cat: "Recreation", unitRu: "билет", unitEn: "ticket", q0: 12, p0Kzt: 2250, ptKzt: 3375 },
+            { id: 26, nameRu: "Абонемент в фитнес-зал", nameEn: "Gym Membership", icon: "fa-dumbbell", iconColor: "text-emerald-400", cat: "Recreation", unitRu: "месяц", unitEn: "month", q0: 12, p0Kzt: 13500, ptKzt: 18900 },
+
+            // Other
+            { id: 27, nameRu: "Стрижка в салоне", nameEn: "Haircut Service", icon: "fa-scissors", iconColor: "text-pink-400", cat: "Other", unitRu: "услуга", unitEn: "service", q0: 10, p0Kzt: 5400, ptKzt: 8100 },
+            { id: 28, nameRu: "Стиральный порошок", nameEn: "Laundry Powder", icon: "fa-soap", iconColor: "text-sky-200", cat: "Other", unitRu: "кг", unitEn: "kg", q0: 12, p0Kzt: 1350, ptKzt: 2025 }
+        ];
+
+        let productsState = JSON.parse(JSON.stringify(initialProducts));
+        let selectedPeriodMonths = 12; 
+        let fxRateKztPerUsd = 450; 
+        let currentLang = 'ru';
+
+        // ДИКШОНАРИ ЯЗЫКОВ
+        const dict = {
+            ru: {
+                headerTitle: "Интерактивный Симулятор Расчёта CPI и Инфляции (в Тенге ₸)",
+                headerSub: "Практический 5-шаговый тренажёр измерения стоимости жизни • Стандарт IMF / ILO CPI Manual (2020)",
+                rateTitle: "Курс USD/KZT:",
+                manualLink: "Руководство МВФ по ИПЦ (PDF)",
+                manualUrl: "https://www.imf.org/-/media/files/data/cpi/cpi-manual-concepts-and-methods-russian.pdf",
+                navStep1Num: "Шаг 1", navStep1Title: "1. Зафиксировать корзину (Q₀)",
+                navStep2Num: "Шаг 2", navStep2Title: "2. Определить цены (P₀, Pₜ)",
+                navStep3Num: "Шаг 3", navStep3Title: "3. Стоимость корзины (ΣP·Q)",
+                navStep4Num: "Шаг 4", navStep4Title: "4. Измерить CPI (Индекс)",
+                navStep5Num: "Шаг 5", navStep5Title: "5. Измерить инфляцию (π)",
+                s1HeaderTitle: "Шаг 1: Формирование и фиксация потребительской корзины (Q₀)",
+                s1HeaderSub: "Согласно методологии Ласпейреса, объемы потребления фиксируются в базовом периоде. Вы можете менять объемы прямо в таблице.",
+                lblPeriodSelect: "Период:",
+                addItemTitle: "Добавить свой товар или услугу в корзину",
+                btnAddItem: "+ Добавить",
+                thItemName: "Наименование товара / услуги",
+                thItemCat: "Категория COICOP",
+                thItemUnit: "Единица измерения",
+                thItemQty: "Управляемый объем (Q₀)",
+                s2HeaderTitle: "Шаг 2: Сбор и регистрация цен в Тенге ₸ (P₀ — 2020 г., Pₜ — 2026 г.)",
+                s2HeaderSub: "Вы можете управлять как базовыми (P₀), так и текущими ценами (Pₜ). В скобках указан эквивалент в долларах США ($).",
+                txtBaseYearLbl: "Базовый год: <strong>2020 (P₀)</strong>",
+                txtCurrYearLbl: "Текущий год: <strong>2026 (Pₜ)</strong>",
+                thPName: "Товар / Услуга", thPUnit: "Ед. изм.", thPQty: "Объем (Q₀)", thPP0: "Базовая цена (P₀, ₸)", thPPt: "Текущая цена (Pₜ, ₸)", thPChange: "Рост цены (%)",
+                s3HeaderTitle: "Шаг 3: Расчёт стоимости корзины в Тенге ₸ и распределение по 8 секторам",
+                s3HeaderSub: "Вычисление суммы расходов: Σ(P₀ · Q₀) в базовых ценах и Σ(Pₜ · Q₀) в текущих ценах.",
+                lblCostBase: "Стоимость корзины в базовых ценах Σ(P₀ · Q₀):",
+                lblCostCurr: "Стоимость корзины в текущих ценах Σ(Pₜ · Q₀):",
+                s4HeaderTitle: "Шаг 4: Измерение Индекса Потребительских Цен (CPI - Laspeyres Formula)",
+                s4HeaderSub: "CPI нормирует стоимость текущей корзины относительно базовой стоимости, где базовый индекс = 100.0.",
+                s4FormulaLbl: "Формула Индекса Ласпейреса:",
+                btnCalcCpi: "Рассчитать CPI",
+                lblResCpi: "Рассчитанный индекс CPI (2026):",
+                s5HeaderTitle: "Шаг 5: Измерение годового темпа инфляции (π) и Исторический Тренд",
+                s5HeaderSub: "Инфляция показывает процентный прирост уровня CPI текущего периода относительно предшествующего.",
+                lblInfFormula: "Формула Инфляции:",
+                lblInfResult: "Темп инфляции к базовому периоду (%):",
+                chartTrendTitle: "Динамика CPI и Инфляции (2020–2026)",
+                laspeyresCardTitle: "Этьен Ласпейрес (Etienne Laspeyres, 1834–1913)",
+                laspeyresCardDesc: "Немецкий экономист, предложивший в 1871 году формулу индекса цен с фиксированной корзиной базового периода (Q₀). Основное ограничение индекса Ласпейреса — Substitution Bias (ошибка замещения): он слегка завышает рост стоимости жизни, так как не учитывает оперативный переход покупателей на подешевевшие товары-заменители."
+            },
+            en: {
+                headerTitle: "Interactive CPI & Inflation Calculation Simulator (in KZT ₸)",
+                headerSub: "Hands-on 5-Step Cost of Living Measurement Simulator • IMF / ILO CPI Manual Standard (2020)",
+                rateTitle: "USD/KZT Rate:",
+                manualLink: "IMF CPI Manual (PDF)",
+                manualUrl: "https://www.imf.org/-/media/files/data/cpi/cpi-manual-concepts-and-methods.pdf",
+                navStep1Num: "Step 1", navStep1Title: "1. Fix Basket (Q₀)",
+                navStep2Num: "Step 2", navStep2Title: "2. Collect Prices (P₀, Pₜ)",
+                navStep3Num: "Step 3", navStep3Title: "3. Basket Cost (ΣP·Q)",
+                navStep4Num: "Step 4", navStep4Title: "4. Compute CPI Index",
+                navStep5Num: "Step 5", navStep5Title: "5. Compute Inflation (π)",
+                s1HeaderTitle: "Step 1: Basket Formation & Fixation (Q₀)",
+                s1HeaderSub: "Under the Laspeyres methodology, consumption quantities are set in the base period. You can adjust quantities directly in the table.",
+                lblPeriodSelect: "Period:",
+                addItemTitle: "Add Custom Item or Service to Basket",
+                btnAddItem: "+ Add Item",
+                thItemName: "Item / Service Name",
+                thItemCat: "COICOP Category",
+                thItemUnit: "Unit of Measure",
+                thItemQty: "Editable Quantity (Q₀)",
+                s2HeaderTitle: "Step 2: Price Registration in KZT ₸ (P₀ — 2020, Pₜ — 2026)",
+                s2HeaderSub: "You can manage both base (P₀) and current (Pₜ) prices. USD ($) equivalents are shown in parentheses.",
+                txtBaseYearLbl: "Base Year: <strong>2020 (P₀)</strong>",
+                txtCurrYearLbl: "Current Year: <strong>2026 (Pₜ)</strong>",
+                thPName: "Item / Service", thPUnit: "Unit", thPQty: "Qty (Q₀)", thPP0: "Base Price (P₀, ₸)", thPPt: "Current Price (Pₜ, ₸)", thPChange: "Price Change (%)",
+                s3HeaderTitle: "Step 3: Basket Cost Calculation in KZT ₸ & COICOP 8-Sector Breakdown",
+                s3HeaderSub: "Calculating total spend: Σ(P₀ · Q₀) at base prices and Σ(Pₜ · Q₀) at current prices.",
+                lblCostBase: "Base Basket Cost Σ(P₀ · Q₀):",
+                lblCostCurr: "Current Basket Cost Σ(Pₜ · Q₀):",
+                s4HeaderTitle: "Step 4: Measuring Consumer Price Index (CPI - Laspeyres Formula)",
+                s4HeaderSub: "CPI normalizes the current basket cost relative to the base period cost, where base index = 100.0.",
+                s4FormulaLbl: "Laspeyres Price Index Formula:",
+                btnCalcCpi: "Compute CPI",
+                lblResCpi: "Calculated CPI Index (2026):",
+                s5HeaderTitle: "Step 5: Measuring Annual Inflation Rate (π) & Historical Trend",
+                s5HeaderSub: "Inflation represents the percentage increase in the CPI level compared to the prior period.",
+                lblInfFormula: "Inflation Formula:",
+                lblInfResult: "Inflation Rate vs Base Period (%):",
+                chartTrendTitle: "CPI & Inflation Dynamics (2020–2026)",
+                laspeyresCardTitle: "Etienne Laspeyres (1834–1913)",
+                laspeyresCardDesc: "German economist who formulated the price index with fixed base-period quantities (Q₀) in 1871. The main limitation of the Laspeyres index is Substitution Bias: it overstates true inflation because it ignores consumer substitution toward cheaper alternatives."
+            }
+        };
+
+        const categoryNames = {
+            Food: { ru: "🥩 Продовольственные товары", en: "🥩 Food & Beverages", color: "#f43f5e" },
+            Housing: { ru: "🏠 Жильё и коммунальные услуги", en: "🏠 Housing & Utilities", color: "#f59e0b" },
+            Transport: { ru: "🚗 Транспорт и топливо", en: "🚗 Transport & Fuel", color: "#3b82f6" },
+            Apparel: { ru: "👕 Одежда и обувь", en: "👕 Apparel & Footwear", color: "#a855f7" },
+            Medical: { ru: "🏥 Здравоохранение", en: "🏥 Medical Care", color: "#10b981" },
+            Education: { ru: "🎓 Образование и связь", en: "🎓 Education & Telecom", color: "#06b6d4" },
+            Recreation: { ru: "🎟️ Отдых и культура", en: "🎟️ Recreation & Culture", color: "#ec4899" },
+            Other: { ru: "📦 Прочие товары и услуги", en: "📦 Other Goods & Services", color: "#64748b" }
+        };
+
+        let chartSectorsObj = null;
+        let chartTrendObj = null;
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+
+            if (tabId === 'tab-step3') renderSectorsChart();
+            if (tabId === 'tab-step5') renderTrendChart();
+        }
+
+        function changeExchangeRate(delta) {
+            fxRateKztPerUsd = Math.max(100, fxRateKztPerUsd + delta);
+            document.getElementById('input-fx-rate').value = fxRateKztPerUsd;
+            renderPricesTable();
+            recalculateAll();
+            if (document.getElementById('tab-step3').classList.contains('active')) renderSectorsChart();
+        }
+
+        function setExchangeRate(val) {
+            const parsed = parseFloat(val);
+            if (!isNaN(parsed) && parsed > 0) {
+                fxRateKztPerUsd = parsed;
+                renderPricesTable();
+                recalculateAll();
+                if (document.getElementById('tab-step3').classList.contains('active')) renderSectorsChart();
+            }
+        }
+
+        function setConsumptionPeriod(months) {
+            selectedPeriodMonths = months;
+            
+            document.getElementById('btn-p-3').className = months === 3 ? "px-2.5 py-1 rounded-lg bg-blue-600 text-white font-bold transition" : "px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition";
+            document.getElementById('btn-p-6').className = months === 6 ? "px-2.5 py-1 rounded-lg bg-blue-600 text-white font-bold transition" : "px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition";
+            document.getElementById('btn-p-12').className = months === 12 ? "px-2.5 py-1 rounded-lg bg-blue-600 text-white font-bold transition" : "px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition";
+
+            renderBasketTable();
+            renderPricesTable();
+            recalculateAll();
+        }
+
+        function addNewCustomItem() {
+            const name = document.getElementById('add-name').value.trim();
+            const cat = document.getElementById('add-cat').value;
+            const unit = document.getElementById('add-unit').value.trim();
+            const qty = parseFloat(document.getElementById('add-qty').value);
+
+            if (!name || !unit || isNaN(qty) || qty <= 0) {
+                alert(currentLang === 'ru' ? "Заполните все поля корректно!" : "Please fill all fields correctly!");
+                return;
+            }
+
+            const newItem = {
+                id: Date.now(),
+                nameRu: name, nameEn: name,
+                icon: "fa-cart-flatbed",
+                iconColor: "text-amber-400",
+                cat: cat,
+                unitRu: unit, unitEn: unit,
+                q0: qty, p0Kzt: 4500, ptKzt: 5400
+            };
+
+            productsState.push(newItem);
+            document.getElementById('add-name').value = '';
+            document.getElementById('add-unit').value = '';
+            document.getElementById('add-qty').value = '';
+
+            renderBasketTable();
+            renderPricesTable();
+            recalculateAll();
+        }
+
+        function updateItemQuantity(id, newQty) {
+            const item = productsState.find(p => p.id === id);
+            if (item) {
+                const parsed = parseFloat(newQty);
+                const factor = selectedPeriodMonths / 12;
+                item.q0 = !isNaN(parsed) && parsed >= 0 ? (parsed / factor) : 0;
+                renderPricesTable();
+                recalculateAll();
+            }
+        }
+
+        function updatePriceP0(id, newPriceKzt) {
+            const item = productsState.find(p => p.id === id);
+            if (item) {
+                item.p0Kzt = parseFloat(newPriceKzt) || 0;
+                renderPricesTable();
+                recalculateAll();
+            }
+        }
+
+        function updatePricePt(id, newPriceKzt) {
+            const item = productsState.find(p => p.id === id);
+            if (item) {
+                item.ptKzt = parseFloat(newPriceKzt) || 0;
+                renderPricesTable();
+                recalculateAll();
+            }
+        }
+
+        function renderBasketTable() {
+            const tbody = document.getElementById('table-basket-body');
+            let html = '';
+            const factor = selectedPeriodMonths / 12;
+
+            productsState.forEach((item, idx) => {
+                const name = currentLang === 'ru' ? item.nameRu : item.nameEn;
+                const unit = currentLang === 'ru' ? item.unitRu : item.unitEn;
+                const catName = categoryNames[item.cat][currentLang];
+                const adjustedQ0 = (item.q0 * factor).toFixed(1);
+
+                html += `<tr class="hover:bg-slate-900/60 transition">
+                    <td class="p-3 font-mono text-slate-500">${idx + 1}</td>
+                    <td class="p-3 font-bold text-slate-200 flex items-center gap-2.5">
+                        <i class="fa-solid ${item.icon} ${item.iconColor} w-5 text-center text-sm drop-shadow"></i>
+                        ${name}
+                    </td>
+                    <td class="p-3 text-slate-400">${catName}</td>
+                    <td class="p-3 text-center text-slate-400">${unit}</td>
+                    <td class="p-3 text-right">
+                        <input type="number" step="0.5" min="0" value="${adjustedQ0}" onchange="updateItemQuantity(${item.id}, this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded p-1 text-right text-blue-400 font-mono font-bold focus:outline-none focus:border-blue-500">
+                    </td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function renderPricesTable() {
+            const tbody = document.getElementById('table-prices-body');
+            let html = '';
+            const factor = selectedPeriodMonths / 12;
+
+            productsState.forEach(item => {
+                const name = currentLang === 'ru' ? item.nameRu : item.nameEn;
+                const unit = currentLang === 'ru' ? item.unitRu : item.unitEn;
+                const adjustedQ0 = (item.q0 * factor);
+                
+                const pctChange = item.p0Kzt > 0 ? (((item.ptKzt - item.p0Kzt) / item.p0Kzt) * 100).toFixed(1) : "0.0";
+                const changeColor = item.ptKzt >= item.p0Kzt ? 'text-rose-400' : 'text-emerald-400';
+
+                const p0Usd = (item.p0Kzt / fxRateKztPerUsd).toFixed(2);
+                const ptUsd = (item.ptKzt / fxRateKztPerUsd).toFixed(2);
+
+                html += `<tr class="hover:bg-slate-900/60 transition">
+                    <td class="p-3 font-bold text-slate-200 flex items-center gap-2.5">
+                        <i class="fa-solid ${item.icon} ${item.iconColor} w-5 text-center text-sm drop-shadow"></i>
+                        ${name}
+                    </td>
+                    <td class="p-3 text-center text-slate-400">${unit}</td>
+                    <td class="p-3 text-right text-slate-400 font-mono">${adjustedQ0.toFixed(1)}</td>
+                    
+                    <!-- Редактируемая базовая цена P0 -->
+                    <td class="p-3 text-right">
+                        <div class="flex items-center justify-end space-x-1">
+                            <input type="number" step="10" value="${Math.round(item.p0Kzt)}" onchange="updatePriceP0(${item.id}, this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded p-1 text-right text-blue-400 font-bold focus:outline-none focus:border-blue-500">
+                            <span class="text-slate-400 text-xs">₸</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono block">($${p0Usd})</span>
+                    </td>
+
+                    <!-- Редактируемая текущая цена Pt -->
+                    <td class="p-3 text-right">
+                        <div class="flex items-center justify-end space-x-1">
+                            <input type="number" step="10" value="${Math.round(item.ptKzt)}" onchange="updatePricePt(${item.id}, this.value)" class="w-24 bg-slate-900 border border-slate-700 rounded p-1 text-right text-emerald-400 font-bold focus:outline-none focus:border-emerald-500">
+                            <span class="text-slate-400 text-xs">₸</span>
+                        </div>
+                        <span class="text-[10px] text-slate-500 font-mono block">($${ptUsd})</span>
+                    </td>
+
+                    <td class="p-3 text-right font-bold ${changeColor}">${pctChange > 0 ? '+' : ''}${pctChange}%</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function recalculateAll() {
+            const factor = selectedPeriodMonths / 12;
+            let totalCostP0 = 0;
+            let totalCostPt = 0;
+
+            productsState.forEach(item => {
+                const q = item.q0 * factor;
+                totalCostP0 += (item.p0Kzt || 0) * q;
+                totalCostPt += (item.ptKzt || 0) * q;
+            });
+
+            const totalP0Usd = (totalCostP0 / fxRateKztPerUsd).toFixed(2);
+            const totalPtUsd = (totalCostPt / fxRateKztPerUsd).toFixed(2);
+
+            document.getElementById('disp-cost-p0').innerText = Math.round(totalCostP0).toLocaleString('ru-RU') + ' ₸ ($' + totalP0Usd + ')';
+            document.getElementById('disp-cost-pt').innerText = Math.round(totalCostPt).toLocaleString('ru-RU') + ' ₸ ($' + totalPtUsd + ')';
+
+            document.getElementById('math-cost-p0').innerText = Math.round(totalCostP0).toLocaleString('ru-RU') + ' ₸';
+            document.getElementById('math-cost-pt').innerText = Math.round(totalCostPt).toLocaleString('ru-RU') + ' ₸';
+
+            const cpi = totalCostP0 > 0 ? (totalCostPt / totalCostP0) * 100 : 100;
+            const inflation = cpi - 100;
+
+            document.getElementById('res-cpi-value').innerText = cpi.toFixed(2);
+            document.getElementById('res-inflation-rate').innerText = (inflation >= 0 ? '+' : '') + inflation.toFixed(2) + '%';
+        }
+
+        function calculateCPI() {
+            recalculateAll();
+            alert(currentLang === 'ru' ? "Расчет CPI успешно обновлён!" : "CPI calculation updated successfully!");
+        }
+
+        function renderSectorsChart() {
+            const factor = selectedPeriodMonths / 12;
+            const sectorTotals = {};
+
+            Object.keys(categoryNames).forEach(cat => sectorTotals[cat] = 0);
+
+            productsState.forEach(item => {
+                const spend = (item.ptKzt || 0) * (item.q0 * factor);
+                sectorTotals[item.cat] = (sectorTotals[item.cat] || 0) + spend;
+            });
+
+            // Список рядом
+            const listContainer = document.getElementById('sectors-breakdown-list');
+            let html = '';
+            let totalSpend = Object.values(sectorTotals).reduce((a, b) => a + b, 0);
+
+            Object.keys(categoryNames).forEach(cat => {
+                const spend = sectorTotals[cat];
+                const pct = totalSpend > 0 ? ((spend / totalSpend) * 100).toFixed(1) : 0;
+                const info = categoryNames[cat];
+
+                html += `<div class="p-2 bg-slate-950 rounded-lg border border-slate-800 flex justify-between items-center">
+                    <span class="text-slate-300 font-bold">${info[currentLang]}</span>
+                    <span class="font-mono font-bold" style="color: ${info.color}">${Math.round(spend).toLocaleString('ru-RU')} ₸ (${pct}%)</span>
+                </div>`;
+            });
+            listContainer.innerHTML = html;
+
+            // Doughnut Chart
+            if (chartSectorsObj) chartSectorsObj.destroy();
+            chartSectorsObj = new Chart(document.getElementById('chartSectorsDoughnut'), {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(categoryNames).map(cat => categoryNames[cat][currentLang]),
+                    datasets: [{
+                        data: Object.keys(categoryNames).map(cat => sectorTotals[cat]),
+                        backgroundColor: Object.keys(categoryNames).map(cat => categoryNames[cat].color),
+                        borderWidth: 2,
+                        borderColor: '#030712'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { color: '#f3f4f6', font: { size: 10, weight: 'bold' } } }
+                    }
+                }
+            });
+        }
+
+        function renderTrendChart() {
+            const factor = selectedPeriodMonths / 12;
+            let totalCostP0 = 0;
+            let totalCostPt = 0;
+            productsState.forEach(item => {
+                const q = item.q0 * factor;
+                totalCostP0 += (item.p0Kzt || 0) * q;
+                totalCostPt += (item.ptKzt || 0) * q;
+            });
+            const currentCpi = totalCostP0 > 0 ? (totalCostPt / totalCostP0) * 100 : 100;
+
+            if (chartTrendObj) chartTrendObj.destroy();
+            chartTrendObj = new Chart(document.getElementById('chartTrendLine'), {
+                type: 'line',
+                data: {
+                    labels: ['2020', '2021', '2022', '2023', '2024', '2025', '2026'],
+                    datasets: [
+                        {
+                            label: 'CPI Index (2020=100)',
+                            data: [100.0, 108.4, 120.3, 129.8, 137.5, 143.2, currentCpi.toFixed(1)],
+                            borderColor: '#3b82f6',
+                            backgroundColor: '#3b82f6',
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Inflation Rate (%)',
+                            data: [0.0, 8.4, 11.0, 7.9, 5.9, 4.1, (currentCpi - 100).toFixed(1)],
+                            borderColor: '#a78bfa',
+                            backgroundColor: '#a78bfa',
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: '#f3f4f6' }, grid: { color: 'rgba(55, 65, 81, 0.4)' } },
+                        y: { ticks: { color: '#f3f4f6' }, grid: { color: 'rgba(55, 65, 81, 0.4)' } }
+                    }
+                }
+            });
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const d = dict[lang];
+
+            document.getElementById('txt-header-title').childNodes[0].nodeValue = d.headerTitle + ' ';
+            document.getElementById('txt-header-sub').innerText = d.headerSub;
+            document.getElementById('lbl-rate-title').innerText = d.rateTitle;
+            
+            // Динамическое обновление текста и URL ссылки на мануал МВФ
+            document.getElementById('txt-manual-link').innerText = d.manualLink;
+            document.getElementById('link-cpi-manual').href = d.manualUrl;
+
+            document.getElementById('nav-step1-num').innerText = d.navStep1Num;
+            document.getElementById('nav-step1-title').innerText = d.navStep1Title;
+            document.getElementById('nav-step2-num').innerText = d.navStep2Num;
+            document.getElementById('nav-step2-title').innerText = d.navStep2Title;
+            document.getElementById('nav-step3-num').innerText = d.navStep3Num;
+            document.getElementById('nav-step3-title').innerText = d.navStep3Title;
+            document.getElementById('nav-step4-num').innerText = d.navStep4Num;
+            document.getElementById('nav-step4-title').innerText = d.navStep4Title;
+            document.getElementById('nav-step5-num').innerText = d.navStep5Num;
+            document.getElementById('nav-step5-title').innerText = d.navStep5Title;
+
+            document.getElementById('s1-header-title').childNodes[2].nodeValue = ' ' + d.s1HeaderTitle;
+            document.getElementById('s1-header-sub').innerText = d.s1HeaderSub;
+            document.getElementById('lbl-period-select').innerText = d.lblPeriodSelect;
+            document.getElementById('add-item-title').childNodes[1].nodeValue = ' ' + d.addItemTitle;
+            document.getElementById('btn-add-item').innerText = d.btnAddItem;
+
+            document.getElementById('laspeyres-card-title').innerText = d.laspeyresCardTitle;
+            document.getElementById('laspeyres-card-desc').innerHTML = d.laspeyresCardDesc;
+
+            document.getElementById('th-item-name').innerText = d.thItemName;
+            document.getElementById('th-item-cat').innerText = d.thItemCat;
+            document.getElementById('th-item-unit').innerText = d.thItemUnit;
+            document.getElementById('th-item-qty').innerText = d.thItemQty;
+
+            document.getElementById('s2-header-title').childNodes[2].nodeValue = ' ' + d.s2HeaderTitle;
+            document.getElementById('s2-header-sub').innerText = d.s2HeaderSub;
+            document.getElementById('txt-base-year-lbl').innerHTML = d.txtBaseYearLbl;
+            document.getElementById('txt-curr-year-lbl').innerHTML = d.txtCurrYearLbl;
+
+            document.getElementById('th-p-name').innerText = d.thPName;
+            document.getElementById('th-p-unit').innerText = d.thPUnit;
+            document.getElementById('th-p-qty').innerText = d.thPQty;
+            document.getElementById('th-p-p0').innerText = d.thPP0;
+            document.getElementById('th-p-pt').innerText = d.thPPt;
+            document.getElementById('th-p-change').innerText = d.thPChange;
+
+            document.getElementById('s3-header-title').childNodes[2].nodeValue = ' ' + d.s3HeaderTitle;
+            document.getElementById('s3-header-sub').innerText = d.s3HeaderSub;
+            document.getElementById('lbl-cost-base').innerText = d.lblCostBase;
+            document.getElementById('lbl-cost-curr').innerText = d.lblCostCurr;
+
+            document.getElementById('s4-header-title').childNodes[2].nodeValue = ' ' + d.s4HeaderTitle;
+            document.getElementById('s4-header-sub').innerText = d.s4HeaderSub;
+            document.getElementById('s4-formula-lbl').innerText = d.s4FormulaLbl;
+            document.getElementById('btn-calc-cpi').innerText = d.btnCalcCpi;
+            document.getElementById('lbl-res-cpi').innerText = d.lblResCpi;
+
+            document.getElementById('s5-header-title').childNodes[2].nodeValue = ' ' + d.s5HeaderTitle;
+            document.getElementById('s5-header-sub').innerText = d.s5HeaderSub;
+            document.getElementById('lbl-inf-formula').innerText = d.lblInfFormula;
+            document.getElementById('lbl-inf-result').innerText = d.lblInfResult;
+            document.getElementById('chart-trend-title').innerText = d.chartTrendTitle;
+
+            if (lang === 'ru') {
+                document.getElementById('btn-lang-ru').className = "px-3 py-1 text-xs font-extrabold rounded-lg bg-blue-600 text-white transition";
+                document.getElementById('btn-lang-en').className = "px-3 py-1 text-xs font-extrabold rounded-lg text-slate-400 hover:text-white transition";
+            } else {
+                document.getElementById('btn-lang-en').className = "px-3 py-1 text-xs font-extrabold rounded-lg bg-blue-600 text-white transition";
+                document.getElementById('btn-lang-ru').className = "px-3 py-1 text-xs font-extrabold rounded-lg text-slate-400 hover:text-white transition";
+            }
+
+            renderBasketTable();
+            renderPricesTable();
+            recalculateAll();
+        }
+
+        window.onload = function() {
+            setLanguage('ru');
+        };
+    </script>
+</body>
+</html>

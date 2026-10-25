@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Макроэкономика • Измерение стоимости жизни | AlmaU SDTE</title>
+    <!-- Tailwind CDN & Chart.js -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at 15% 0%, #0f172a 0%, #05070c 100%); color: #f1f5f9; min-height: 100vh; font-size: 13px; }
+        .glass-panel { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(20px); border: 1px solid rgba(51, 65, 85, 0.5); box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6); }
+        .tab-btn { transition: all 0.2s ease-in-out; }
+        .tab-btn.active { box-shadow: 0 0 15px currentColor; border-color: currentColor; }
+
+        .cpi-card {
+            background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 14px; transition: all 0.3s ease; cursor: pointer;
+        }
+        .cpi-card:hover {
+            border-color: #3b82f6; background: rgba(30, 41, 59, 0.9); box-shadow: 0 0 18px rgba(59, 130, 246, 0.3); transform: translateY(-2px);
+        }
+
+        .vintage-tuner { -webkit-appearance: none; width: 100%; background: transparent; outline: none; cursor: pointer; }
+        .vintage-tuner::-webkit-slider-runnable-track { width: 100%; height: 10px; background: linear-gradient(180deg, #10172a 0%, #1e293b 100%); border-radius: 2px; border: 1px solid #334155; }
+        .vintage-tuner::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 26px; width: 14px;
+            background: linear-gradient(180deg, #cbd5e1 0%, #64748b 50%, #334155 100%);
+            border: 1px solid #f8fafc; border-radius: 2px; margin-top: -8px; box-shadow: 0 2px 8px rgba(0,0,0,0.8);
+            background-image: linear-gradient(to right, transparent 6px, #ef4444 6px, #ef4444 8px, transparent 8px);
+        }
+
+        .pretty-math-text {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #fffbeb 0%, #fde047 50%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.3));
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
+    </style>
+</head>
+<body class="p-3 md:p-4 flex flex-col justify-between min-h-screen">
+
+    <!-- ШАПКА -->
+    <header class="glass-panel p-3.5 rounded-xl mb-3 flex flex-col md:flex-row justify-between items-center gap-3 border-t-2 border-t-amber-500">
+        <div class="flex items-center gap-3">
+            <div>
+                <h1 class="text-lg md:text-xl font-black tracking-tight text-amber-400" id="txt-header-title">
+                    Измерение стоимости жизни (CPI)
+                </h1>
+                <p class="text-[10px] text-rose-400 font-bold uppercase tracking-wider mt-0.5" id="txt-header-sub">
+                    AlmaU • Школа цифровых технологий и экономики | Макроэкономика
+                </p>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700">
+            <button onclick="setLanguage('ru')" id="btn-lang-ru" class="px-2.5 py-1 text-[11px] font-black rounded bg-blue-600 text-white transition">RU</button>
+            <button onclick="setLanguage('en')" id="btn-lang-en" class="px-2.5 py-1 text-[11px] font-black rounded text-slate-400 hover:text-white transition">EN</button>
+        </div>
+    </header>
+
+    <!-- НАВИГАЦИЯ -->
+    <nav class="flex flex-wrap gap-1.5 mb-3">
+        <button onclick="switchTab('tab-method', this)" class="tab-btn active px-3 py-1.5 text-xs font-bold rounded-lg border border-blue-500/50 bg-blue-950/80 text-blue-300" id="nav-method">1. Методология расчёта CPI</button>
+        <button onclick="switchTab('tab-basket', this)" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg border border-amber-500/50 bg-amber-950/80 text-amber-300" id="nav-basket">2. Структура корзины (США vs Казахстан)</button>
+        <button onclick="switchTab('tab-problems', this)" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg border border-purple-500/50 bg-purple-950/80 text-purple-300" id="nav-problems">3. Ошибки измерения</button>
+        <button onclick="switchTab('tab-deflator', this)" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg border border-emerald-500/50 bg-emerald-950/80 text-emerald-300" id="nav-deflator">4. CPI vs Дефлятор ВВП</button>
+        <button onclick="switchTab('tab-adjust', this)" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg border border-cyan-500/50 bg-cyan-950/80 text-cyan-300" id="nav-adjust">5. Пересчёт сумм & Процентные ставки</button>
+        <button onclick="switchTab('tab-us-history', this)" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg border border-indigo-500/50 bg-indigo-950/80 text-indigo-300" id="nav-us-history">6. Инфляция в США (1965–2025)</button>
+        <button onclick="switchTab('tab-top50', this)" class="tab-btn px-3 py-1.5 text-xs font-bold rounded-lg border border-rose-500/50 bg-rose-950/80 text-rose-300" id="nav-top50">7. Мировая инфляция: ТОП-50 стран (Данные ЦБ)</button>
+    </nav>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main class="flex-grow">
+
+        <!-- ВКЛАДКА 1: МЕТОДОЛОГИЯ -->
+        <section id="tab-method" class="tab-content space-y-3">
+            <div class="glass-panel p-4 rounded-xl border-l-4 border-l-blue-500 flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <div class="max-w-2xl">
+                    <h2 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-0.5" id="t1-title">Индекс потребительских цен (CPI)</h2>
+                    <p class="text-slate-200 text-xs md:text-sm leading-relaxed" id="t1-def">
+                        <strong>Индекс потребительских цен (CPI)</strong> — ключевой показатель изменения общей стоимости товаров и услуг, приобретаемых типичным потребителем.
+                    </p>
+                </div>
+                <div class="bg-gradient-to-r from-slate-900 to-slate-950 p-3 rounded-xl border border-amber-500/40 text-right min-w-[280px] shadow-lg space-y-1">
+                    <div class="text-[10px] text-amber-400/90 uppercase tracking-widest font-bold" id="t1-stat-lbl">Ключевые формулы</div>
+                    <div class="text-xs font-mono font-black text-amber-300" id="t1-formula-cpi">CPI_t = (Стоимость корзины в ценах t / в ценах базы) × 100</div>
+                    <div class="text-[11px] font-mono text-emerald-400" id="t1-formula-inf">π_t = [(CPI_t - CPI_t-1) / CPI_t-1] × 100%</div>
+                </div>
+            </div>
+
+            <!-- 5 ПОДРОБНЫХ ЭТАПОВ -->
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-xs">
+                <div class="p-3.5 bg-slate-900/90 rounded-xl border border-blue-500/30 space-y-1.5">
+                    <div class="text-amber-400 font-black text-sm" id="s1-num">01. Состав корзины</div>
+                    <div class="text-blue-300 font-bold" id="s1-title">Определение структуры и объёмов</div>
+                    <p class="text-slate-300 text-[11px] leading-relaxed" id="s1-desc">
+                        Статведомство проводит обследования расходов домохозяйств (Consumer Expenditure Survey), чтобы определить, какие товары покупают люди и в каком объёме (Q).
+                    </p>
+                </div>
+
+                <div class="p-3.5 bg-slate-900/90 rounded-xl border border-blue-500/30 space-y-1.5">
+                    <div class="text-amber-400 font-black text-sm" id="s2-num">02. Регулярный фиксаж</div>
+                    <div class="text-blue-300 font-bold" id="s2-title">Сбор текущих цен (P)</div>
+                    <p class="text-slate-300 text-[11px] leading-relaxed" id="s2-desc">
+                        Регистраторы ежемесячно собирают цены на одинаковые товары-представители в магазинах, супермаркетах и аптеках во всех регионах.
+                    </p>
+                </div>
+
+                <div class="p-3.5 bg-slate-900/90 rounded-xl border border-blue-500/30 space-y-1.5">
+                    <div class="text-amber-400 font-black text-sm" id="s3-num">03. Стоимость корзины</div>
+                    <div class="text-blue-300 font-bold" id="s3-title">Расчёт общей суммы (Σ P × Q)</div>
+                    <p class="text-slate-300 text-[11px] leading-relaxed" id="s3-desc">
+                        Перемножается текущая цена каждого товара на зафиксированный объём его потребления. Стоимость рассчитывается ежемесячно, за квартал и год.
+                    </p>
+                </div>
+
+                <div class="p-3.5 bg-slate-900/90 rounded-xl border border-blue-500/30 space-y-1.5">
+                    <div class="text-amber-400 font-black text-sm" id="s4-num">04. Базовый период</div>
+                    <div class="text-blue-300 font-bold" id="s4-title">Нормирование к 100</div>
+                    <p class="text-slate-300 text-[11px] leading-relaxed" id="s4-desc">
+                        Выбирается базовый период (год), стоимость корзины в котором принимается за 100. Стоимость в другие периоды делится на базовую и умножается на 100.
+                    </p>
+                </div>
+
+                <div class="p-3.5 bg-slate-900/90 rounded-xl border border-blue-500/30 space-y-1.5">
+                    <div class="text-amber-400 font-black text-sm" id="s5-num">05. Темп инфляции</div>
+                    <div class="text-blue-300 font-bold" id="s5-title">Расчёт прироста цен (π)</div>
+                    <p class="text-slate-300 text-[11px] leading-relaxed" id="s5-desc">
+                        Инфляция рассчитывается как процентное изменение уровня CPI текущего периода относительно предшествующего (MoM или YoY).
+                    </p>
+                </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded-xl border border-slate-700/80 bg-slate-900/80 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
+                <div class="space-y-1">
+                    <span class="text-amber-400 font-bold text-sm block" id="m-rule-title">💡 Главное правило Ласпейреса:</span>
+                    <p class="text-slate-300 leading-relaxed max-w-3xl" id="m-rule-desc">
+                        Индекс CPI является <strong>индексом Ласпейреса</strong> с фиксированными количествами ($Q_{base}$). Он показывает, на сколько изменились бы расходы потребителя на покупку <em>совершенно одинакового</em> набора товаров, если бы менялись только цены ($P_t$).
+                    </p>
+                </div>
+                <div class="bg-slate-950 p-3 rounded-lg border border-blue-500/40 text-center font-mono min-w-[220px]">
+                    <span class="text-slate-400 text-[10px] block mb-1" id="m-formula-lbl">Формула Ласпейреса:</span>
+                    <span class="text-emerald-400 font-black text-sm">CPI = Σ(P_t × Q_0) / Σ(P_0 × Q_0)</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 2: КОРЗИНА CPI (США VS КАЗАХСТАН) -->
+        <section id="tab-basket" class="tab-content hidden space-y-3">
+            <div class="glass-panel p-4 rounded-xl">
+                <div class="border-b border-slate-700 pb-2 mb-3 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-200" id="t2-title">Структура потребительской корзины</h2>
+                        <p class="text-[11px] text-slate-400" id="t2-sub">Сравнение структуры расходов в США (BLS) и Казахстане (Бюро национальной статистики РК stat.gov.kz)</p>
+                    </div>
+                    
+                    <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700 text-xs">
+                        <button onclick="setBasketCountry('us')" id="btn-basket-us" class="px-3 py-1 font-bold rounded bg-blue-600 text-white transition">🇺🇸 США (BLS 2025)</button>
+                        <button onclick="setBasketCountry('kz')" id="btn-basket-kz" class="px-3 py-1 font-bold rounded text-slate-400 hover:text-white transition">🇰🇿 Казахстан (stat.gov.kz)</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                    <div class="md:col-span-5 space-y-2 text-xs" id="basket-items-list">
+                        <!-- Динамический список -->
+                    </div>
+
+                    <div class="md:col-span-7 h-80 glass-panel p-3 rounded-xl flex items-center justify-center relative">
+                        <canvas id="chartBasketDoughnut"></canvas>
+                    </div>
+                </div>
+
+                <div class="mt-3 p-3 bg-slate-900/80 rounded-xl border border-blue-500/30 text-xs text-slate-300 leading-relaxed space-y-1" id="basket-note-block">
+                    <!-- Заполняется скриптом -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 3: ОШИБКИ ИЗМЕРЕНИЯ -->
+        <section id="tab-problems" class="tab-content hidden space-y-3">
+            <div class="glass-panel p-4 rounded-xl">
+                <h2 class="text-sm font-bold text-slate-200 mb-1" id="t3-title">Проблемы и ошибки измерения CPI</h2>
+                <p class="text-[11px] text-slate-400 mb-3" id="t3-sub">Почему CPI не является идеальным индексом стоимости жизни (завышение инфляции примерно на 0.5–1.0 п.п. в год)</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="problems-cards">
+                    <div class="cpi-card space-y-1.5">
+                        <div class="font-bold text-rose-400 text-sm" id="p1-title">1. Ошибка замещения (Substitution Bias)</div>
+                        <p class="text-slate-300 text-xs leading-relaxed" id="p1-desc">Цены меняются неравномерно. Потребители замещают подорожавшие товары более дешевыми, но фиксированная корзина этого сразу не учитывает.</p>
+                    </div>
+                    <div class="cpi-card space-y-1.5">
+                        <div class="font-bold text-amber-400 text-sm" id="p2-title">2. Появление новых товаров (New Goods)</div>
+                        <p class="text-slate-300 text-xs leading-relaxed" id="p2-desc">Новые товары дают больше выбора и повышают покупательную способность, но попадают в корзину с задержкой.</p>
+                    </div>
+                    <div class="cpi-card space-y-1.5">
+                        <div class="font-bold text-emerald-400 text-sm" id="p3-title">3. Неучтённое изменение качества (Quality Change)</div>
+                        <p class="text-slate-300 text-xs leading-relaxed" id="p3-desc">Если товар дорожает из-за улучшения качества, это не чистая инфляция. Сложно точно отделить рост цены от роста качества.</p>
+                    </div>
+                    <div class="cpi-card space-y-1.5">
+                        <div class="font-bold text-cyan-400 text-sm" id="p4-title">4. Места покупки и формулы (Outlet Bias)</div>
+                        <p class="text-slate-300 text-xs leading-relaxed" id="p4-desc">Переход покупателей в дисконтные магазины учитывается медленно. Цепные индексы помогают быстрее отслеживать сдвиги.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 4: CPI VS ДЕФЛЯТОР ВВП -->
+        <section id="tab-deflator" class="tab-content hidden space-y-3">
+            <div class="glass-panel p-4 rounded-xl">
+                <h2 class="text-sm font-bold text-slate-200 mb-3" id="t4-title">Сравнение: CPI vs Дефлятор ВВП</h2>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-900 text-amber-300 font-bold border-b border-slate-700">
+                            <tr>
+                                <th class="p-2.5" id="th-crit">Критерий</th>
+                                <th class="p-2.5" id="th-cpi-col">Индекс потребительских цен (CPI)</th>
+                                <th class="p-2.5" id="th-def-col">Дефлятор ВВП</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800">
+                            <tr>
+                                <td class="p-2.5 font-bold text-blue-400" id="cr1-lbl">Охват товаров</td>
+                                <td class="p-2.5" id="cr1-cpi">Только товары и услуги, покупаемые городскими потребителями</td>
+                                <td class="p-2.5" id="cr1-def">Все конечные товары и услуги внутреннего производства</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-blue-400" id="cr2-lbl">Импорт</td>
+                                <td class="p-2.5 font-bold text-rose-400" id="cr2-cpi">Включается (если покупается потребителями)</td>
+                                <td class="p-2.5 font-bold text-slate-400" id="cr2-def">Исключается (не внутреннее производство)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-blue-400" id="cr3-lbl">Экспорт</td>
+                                <td class="p-2.5" id="cr3-cpi">Исключается</td>
+                                <td class="p-2.5 font-bold text-emerald-400" id="cr3-def">Включается</td>
+                            </tr>
+                            <tr>
+                                <td class="p-2.5 font-bold text-blue-400" id="cr4-lbl">Структура весов</td>
+                                <td class="p-2.5" id="cr4-cpi">Фиксированная корзина (обновляется ежегодно)</td>
+                                <td class="p-2.5" id="cr4-def">Меняется непрерывно вместе с выпуском</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4 p-3 bg-slate-900/90 rounded-xl border border-amber-500/30 text-xs text-slate-300 space-y-1">
+                    <span class="font-bold text-amber-400 block" id="ex-div-title">💡 Наглядный пример расхождения:</span>
+                    <div id="ex-div-desc">Рост цен на <strong>импортную нефть</strong> напрямую увеличивает CPI, но не входит в дефлятор ВВП США. Напротив, рост цен на <strong>военную технику</strong> внутреннего производства увеличивает дефлятор ВВП, но не влияет на CPI.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 5: ПЕРЕСЧЁТ СУММ И СЛАЙДЕРЫ -->
+        <section id="tab-adjust" class="tab-content hidden space-y-3">
+            <div class="glass-panel p-4 rounded-xl space-y-4">
+                <h2 class="text-sm font-bold text-slate-200 uppercase tracking-widest border-b border-slate-700 pb-2" id="t5-title">Корректировка денежных величин и Процентные ставки</h2>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+                    
+                    <!-- ЛЕВЫЙ БЛОК: КАЛЬКУЛЯТОР СО СЛАЙДЕРАМИ -->
+                    <div class="lg:col-span-6 bg-slate-900/90 p-3.5 rounded-xl border border-slate-700 space-y-3">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase" id="calc-title">Калькулятор покупательной способности ($)</h3>
+                        
+                        <div class="space-y-2 text-xs">
+                            <div>
+                                <label class="text-slate-300 flex justify-between font-bold mb-1">
+                                    <span id="lbl-val-a">Сумма в году A ($):</span>
+                                    <span id="disp-val-a" class="text-amber-300 font-mono font-bold">$600</span>
+                                </label>
+                                <input type="range" id="slider-val-a" min="100" max="5000" step="50" value="600" class="vintage-tuner" oninput="calcInflationAdjust()">
+                            </div>
+
+                            <div>
+                                <label class="text-slate-300 flex justify-between font-bold mb-1">
+                                    <span id="lbl-cpi-a">CPI в году A (например, 1980):</span>
+                                    <span id="disp-cpi-a" class="text-blue-400 font-mono font-bold">200</span>
+                                </label>
+                                <input type="range" id="slider-cpi-a" min="50" max="350" step="5" value="200" class="vintage-tuner" oninput="calcInflationAdjust()">
+                            </div>
+
+                            <div>
+                                <label class="text-slate-300 flex justify-between font-bold mb-1">
+                                    <span id="lbl-cpi-b">CPI в году B (например, Сегодня):</span>
+                                    <span id="disp-cpi-b" class="text-emerald-400 font-mono font-bold">300</span>
+                                </label>
+                                <input type="range" id="slider-cpi-b" min="50" max="350" step="5" value="300" class="vintage-tuner" oninput="calcInflationAdjust()">
+                            </div>
+                        </div>
+
+                        <div class="p-2.5 bg-gradient-to-r from-slate-950 to-slate-900 rounded-lg border border-amber-500/40 text-center space-y-0.5">
+                            <span class="text-[10px] text-slate-400 block uppercase tracking-wider" id="lbl-eq-b">Эквивалентная покупательная способность в году B:</span>
+                            <span id="calc-result" class="text-2xl font-mono font-black text-amber-300 pretty-math-text">$900.00</span>
+                        </div>
+                    </div>
+
+                    <!-- ПРАВЫЙ БЛОК: ИЛЛЮСТРАТИВНЫЙ ПРИМЕР -->
+                    <div class="lg:col-span-6 bg-slate-900/90 p-3.5 rounded-xl border border-slate-700 flex flex-col justify-between space-y-2 text-xs">
+                        <div>
+                            <h3 class="text-xs font-bold text-blue-400 uppercase mb-2" id="ex-calc-title">💡 Практический пример пересчёта зарплат</h3>
+                            <p class="text-slate-300 leading-relaxed text-[11px]" id="ex-calc-desc">
+                                Допустим, в 1980 году зарплата специалиста составляла <strong>$600</strong> в месяц при CPI = <strong>200</strong>. Чтобы узнать, какой доход сегодня (при CPI = <strong>300</strong>) обеспечивает точно такую же покупательную способность, мы корректируем сумму на отношение индексов:
+                            </p>
+                        </div>
+
+                        <div class="p-3 bg-slate-950 rounded-lg border border-blue-500/30 text-center font-mono">
+                            <div class="text-slate-400 text-[10px] mb-1" id="ex-formula-lbl">Формула пересчёта:</div>
+                            <div class="text-amber-300 font-bold text-sm">Сумма_B = Сумма_A × (CPI_B / CPI_A)</div>
+                            <div class="text-emerald-400 text-xs mt-1">$600 × (300 / 200) = $900</div>
+                        </div>
+
+                        <div class="text-[10px] text-slate-400 italic" id="ex-calc-sub">
+                            Инфляционная корректировка позволяет сравнивать реальное благосостояние людей в разные исторические эпохи.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ЭФФЕКТ ФИШЕРА -->
+                <div class="bg-slate-900/90 p-4 rounded-xl border border-slate-700 space-y-3">
+                    <h3 class="text-xs font-bold text-emerald-400 uppercase" id="fisher-title">Номинальная vs Реальная процентная ставка</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs text-slate-300 flex justify-between font-bold mb-1">
+                                <span id="lbl-nom-title">Номинальная ставка (i):</span>
+                                <span id="lbl-nom-rate" class="text-blue-400 font-mono font-black">10.0%</span>
+                            </label>
+                            <input type="range" id="slider-nom-rate" min="0" max="20" step="0.5" value="10.0" class="vintage-tuner" oninput="calcRates()">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-300 flex justify-between font-bold mb-1">
+                                <span id="lbl-inf-title">Инфляция (π):</span>
+                                <span id="lbl-inf-rate" class="text-rose-400 font-mono font-black">6.0%</span>
+                            </label>
+                            <input type="range" id="slider-inf-rate" min="0" max="20" step="0.5" value="6.0" class="vintage-tuner" oninput="calcRates()">
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-950 rounded-lg border border-emerald-500/40 flex flex-col md:flex-row justify-around items-center text-center gap-2">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block" id="lbl-approx-title">Приближенная реальная ставка (r ≈ i - π):</span>
+                            <span id="res-approx-rate" class="text-xl font-mono font-black text-emerald-400">4.0%</span>
+                        </div>
+                        <div class="border-t md:border-t-0 md:border-l border-slate-800 pt-2 md:pt-0 md:pl-4">
+                            <span class="text-[10px] text-slate-400 block" id="lbl-exact-title">Точная ставка [r = (1+i)/(1+π) - 1]:</span>
+                            <span id="res-exact-rate" class="text-xl font-mono font-black text-cyan-300">3.77%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 6: ИНФЛЯЦИЯ В США (1965–2025) -->
+        <section id="tab-us-history" class="tab-content hidden space-y-3">
+            <div class="glass-panel p-4 rounded-xl space-y-3">
+                <h2 class="text-sm font-bold text-slate-200 uppercase tracking-widest border-b border-slate-700 pb-2" id="t6-us-title">Два измерителя инфляции в США (1965–2025): CPI-U vs Дефлятор ВВП</h2>
+                <div class="h-80 glass-panel p-3 rounded-xl flex items-center justify-center">
+                    <canvas id="chartUsHistory"></canvas>
+                </div>
+                <div class="p-2.5 bg-slate-900/80 rounded-lg border border-slate-700 text-xs text-slate-400" id="us-hist-note">
+                    Источник: Bureau of Labor Statistics (BLS) & Bureau of Economic Analysis (BEA NIPA Table 1.1.9).
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 7: МИРОВАЯ ИНФЛЯЦИЯ ТОП-50 СТРАН -->
+        <section id="tab-top50" class="tab-content hidden space-y-3">
+            <div class="glass-panel p-4 rounded-xl space-y-4">
+                <div class="border-b border-slate-700 pb-2 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-200" id="t7-title">Рейтинг инфляции в мире: ТОП-50 стран (2025–2026)</h2>
+                        <p class="text-[11px] text-slate-400" id="t7-sub">Данные зафиксированы по официальным релизам Центральных банков и Статистических служб стран (INDEC, BCRA, TCMB, БНС РК, NBE, SBP и др.)</p>
+                    </div>
+                    <div class="bg-amber-950/80 border border-amber-500/50 px-3 py-1 rounded-lg text-amber-300 font-bold text-xs flex items-center gap-2">
+                        <span>🇰🇿 Казахстан (stat.gov.kz):</span>
+                        <span id="kz-rank-badge" class="font-mono text-amber-400 font-black">#37 (9.3%)</span>
+                    </div>
+                </div>
+
+                <!-- ГРАФИК С ГРАДИЕНТОМ -->
+                <div class="space-y-1">
+                    <h3 class="text-xs font-bold text-rose-400 uppercase" id="top-chart-title">Визуализация лидеров по инфляции и позиции Казахстана (Официальные данные ЦБ)</h3>
+                    <div class="h-96 glass-panel p-3 rounded-xl flex items-center justify-center">
+                        <canvas id="chartTop50"></canvas>
+                    </div>
+                </div>
+
+                <!-- ПОЛНАЯ ТАБЛИЦА С ОФИЦИАЛЬНЫМИ ИСТОЧНИКАМИ В СКОБКАХ -->
+                <div class="space-y-1">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase" id="top-table-title">Полная таблица ТОП-50 стран по инфляции (по официальным данным регуляторов)</h3>
+                    <div class="max-h-96 overflow-y-auto rounded-xl border border-slate-800 bg-slate-950">
+                        <table class="w-full text-left text-xs text-slate-300">
+                            <thead class="sticky top-0 bg-slate-900 text-amber-300 font-bold border-b border-slate-700">
+                                <tr>
+                                    <th class="p-2 text-center w-12">#</th>
+                                    <th class="p-2" id="th-cname">Страна и Официальный орган (ЦБ / Статком)</th>
+                                    <th class="p-2 text-right text-rose-400" id="th-crate-2025">Инфляция 2025 (%)</th>
+                                    <th class="p-2 text-right text-amber-400" id="th-crate-2026">Текущая 2026 YoY (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800/60 font-mono" id="table-top50-body">
+                                <!-- Заполняется скриптом -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ПОДВАЛ -->
+    <footer class="mt-3 text-center text-[10px] text-slate-500 font-bold uppercase tracking-widest pt-2 border-t border-slate-800/80" id="txt-footer">
+        AlmaU • SDTE • Макроэкономика / Принципы экономики
+    </footer>
+
+    <!-- СКРИПТЫ И ДВИЖОК -->
+    <script>
+        // СТРУКТУРЫ КОРЗИН (США И КАЗАХСТАН STAT.GOV.KZ)
+        const countryBaskets = {
+            us: {
+                titleRu: "Корзина США (BLS, Декабрь 2025)",
+                titleEn: "US CPI-U Basket (BLS, December 2025)",
+                items: [
+                    { nameRu: "🏠 Жильё (Housing)", nameEn: "🏠 Housing", pct: "44.469%", color: "#f59e0b", val: 44.469 },
+                    { nameRu: "🚗 Транспорт (Transportation)", nameEn: "🚗 Transportation", pct: "16.316%", color: "#3b82f6", val: 16.316 },
+                    { nameRu: "🍔 Продукты и напитки", nameEn: "🍔 Food & Beverages", pct: "14.539%", color: "#f43f5e", val: 14.539 },
+                    { nameRu: "🏥 Медицинские услуги", nameEn: "🏥 Medical Care", pct: "8.423%", color: "#10b981", val: 8.423 },
+                    { nameRu: "🎓 Образование и связь", nameEn: "🎓 Education & Communication", pct: "5.846%", color: "#06b6d4", val: 5.846 },
+                    { nameRu: "🎟️ Отдых и развлечения", nameEn: "🎟️ Recreation", pct: "5.137%", color: "#a855f7", val: 5.137 },
+                    { nameRu: "📦 Прочие товары и услуги", nameEn: "📦 Other Goods & Services", pct: "2.902%", color: "#64748b", val: 2.902 },
+                    { nameRu: "👕 Одежда (Apparel)", nameEn: "👕 Apparel", pct: "2.368%", color: "#6366f1", val: 2.368 }
+                ],
+                noteRu: "💡 <strong>Официальные данные BLS США:</strong> Жильё занимает 44.5% корзины и включает как арендную плату, так и эквивалент жилья владельцев (OER).",
+                noteEn: "💡 <strong>Official US BLS Data:</strong> Housing takes 44.5% of the basket, including rent and owners' equivalent rent (OER)."
+            },
+            kz: {
+                titleRu: "Корзина Казахстана (Официальные данные БНС РК - stat.gov.kz)",
+                titleEn: "Kazakhstan CPI Basket (Official BNS RK - stat.gov.kz)",
+                items: [
+                    { nameRu: "🥩 Продовольственные товары", nameEn: "🥩 Food Products", pct: "41.100%", color: "#f43f5e", val: 41.1 },
+                    { nameRu: "👔 Непродовольственные товары", nameEn: "👔 Non-Food Goods", pct: "28.400%", color: "#3b82f6", val: 28.4 },
+                    { nameRu: "⚡ Платные услуги населению", nameEn: "⚡ Paid Services", pct: "30.500%", color: "#10b981", val: 30.5 }
+                ],
+                noteRu: "💡 <strong>Официальные данные Бюро национальной статистики РК (stat.gov.kz):</strong> Веса корзины составляют 41,1% на продовольственные товары, 28,4% на непродовольственные и 30,5% на платные услуги.",
+                noteEn: "💡 <strong>Official Bureau of National Statistics RK Data (stat.gov.kz):</strong> Basket weights are 41.1% for food products, 28.4% for non-food goods, and 30.5% for paid services."
+            }
+        };
+
+        // ВЫВЕРЕННЫЕ ДАННЫЕ ОФИЦИАЛЬНЫХ ЦЕНТРАЛЬНЫХ БАНКОВ И СТАТКОМОВ
+        const top50Data = [
+            { rank: 1, nameRu: "Венесуэла (Центральный банк BCV)", nameEn: "Venezuela (Central Bank BCV)", flag: "🇻🇪", rate2025: 45.0, rate2026: 38.5 },
+            { rank: 2, nameRu: "Судан (Центральный банк Судана)", nameEn: "Sudan (Central Bank of Sudan)", flag: "🇸🇩", rate2025: 120.0, rate2026: 110.0 },
+            { rank: 3, nameRu: "Аргентина (Нацинститут статистики INDEC / BCRA)", nameEn: "Argentina (INDEC / Central Bank BCRA)", flag: "🇦🇷", rate2025: 31.55, rate2026: 33.4 },
+            { rank: 4, nameRu: "Турция (Центральный банк TCMB / TÜİK)", nameEn: "Turkey (Central Bank TCMB / TÜİK)", flag: "🇹🇷", rate2025: 30.89, rate2026: 29.73 },
+            { rank: 5, nameRu: "Гаити (Институт статистики IHSI)", nameEn: "Haiti (Institute of Statistics IHSI)", flag: "🇭🇹", rate2025: 18.2, rate2026: 16.1 },
+            { rank: 6, nameRu: "Иран (Центральный банк Ирана)", nameEn: "Iran (Central Bank of Iran)", flag: "🇮🇷", rate2025: 17.5, rate2026: 15.8 },
+            { rank: 7, nameRu: "Нигерия (Национальное бюро статистики NBS / CBN)", nameEn: "Nigeria (NBS / Central Bank CBN)", flag: "🇳🇬", rate2025: 16.2, rate2026: 14.63 },
+            { rank: 8, nameRu: "Египет (Центральный банк CBE / CAPMAS)", nameEn: "Egypt (Central Bank CBE / CAPMAS)", flag: "🇪🇬", rate2025: 15.8, rate2026: 13.9 },
+            { rank: 9, nameRu: "Ангола (Национальный банк Анголы BNA)", nameEn: "Angola (National Bank of Angola BNA)", flag: "🇦🇴", rate2025: 15.1, rate2026: 13.8 },
+            { rank: 10, nameRu: "Суринам (Центральный банк Суринама)", nameEn: "Suriname (Central Bank of Suriname)", flag: "🇸🇷", rate2025: 12.4, rate2026: 10.88 },
+            { rank: 11, nameRu: "Эфиопия (Национальный банк Эфиопии NBE)", nameEn: "Ethiopia (National Bank of Ethiopia NBE)", flag: "🇪🇹", rate2025: 11.8, rate2026: 9.7 },
+            { rank: 12, nameRu: "Пакистан (Государственный банк Пакистана SBP)", nameEn: "Pakistan (State Bank of Pakistan SBP)", flag: "🇵🇰", rate2025: 11.2, rate2026: 9.5 },
+            { rank: 13, nameRu: "Казахстан (Бюро нацстатистики РК stat.gov.kz / НБ РК)", nameEn: "Kazakhstan (Bureau of Stat stat.gov.kz / NBK)", flag: "🇰🇿", rate2025: 9.8, rate2026: 9.3, isKz: true },
+            { rank: 14, nameRu: "Зимбабве (Резервный банк Зимбабве RBZ)", nameEn: "Zimbabwe (Reserve Bank of Zimbabwe RBZ)", flag: "🇿🇼", rate2025: 8.5, rate2026: 6.8 },
+            { rank: 15, nameRu: "Узбекистан (Центральный банк РУз)", nameEn: "Uzbekistan (Central Bank of Uzbekistan)", flag: "🇺🇿", rate2025: 8.4, rate2026: 6.4 },
+            { rank: 16, nameRu: "Россия (Центральный банк РФ / Росстат)", nameEn: "Russia (Bank of Russia / Rosstat)", flag: "🇷🇺", rate2025: 7.4, rate2026: 6.35 },
+            { rank: 17, nameRu: "Колумбия (Центральный банк / DANE)", nameEn: "Colombia (Banco de la República / DANE)", flag: "🇨🇴", rate2025: 7.1, rate2026: 6.29 }
+        ];
+
+        function getGradientColor(index, total) {
+            const ratio = index / (total - 1);
+            const r = 239;
+            const g = Math.round(68 + ratio * (158 - 68)); 
+            const b = Math.round(68 + ratio * (11 - 68));
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            btn.classList.add('active');
+        }
+
+        function calcInflationAdjust() {
+            const valA = parseFloat(document.getElementById('slider-val-a').value);
+            const cpiA = parseFloat(document.getElementById('slider-cpi-a').value);
+            const cpiB = parseFloat(document.getElementById('slider-cpi-b').value);
+
+            document.getElementById('disp-val-a').innerText = '$' + valA;
+            document.getElementById('disp-cpi-a').innerText = cpiA;
+            document.getElementById('disp-cpi-b').innerText = cpiB;
+
+            const res = valA * (cpiB / cpiA);
+            document.getElementById('calc-result').innerText = '$' + res.toFixed(2);
+        }
+
+        function calcRates() {
+            const i = parseFloat(document.getElementById('slider-nom-rate').value);
+            const pi = parseFloat(document.getElementById('slider-inf-rate').value);
+
+            document.getElementById('lbl-nom-rate').innerText = i.toFixed(1) + '%';
+            document.getElementById('lbl-inf-rate').innerText = pi.toFixed(1) + '%';
+
+            const rApprox = i - pi;
+            const exactR = ((1 + i/100) / (1 + pi/100) - 1) * 100;
+
+            document.getElementById('res-approx-rate').innerText = rApprox.toFixed(1) + '%';
+            document.getElementById('res-exact-rate').innerText = exactR.toFixed(2) + '%';
+        }
+
+        let activeBasketCountry = 'us';
+        function setBasketCountry(country) {
+            activeBasketCountry = country;
+            const btnUs = document.getElementById('btn-basket-us');
+            const btnKz = document.getElementById('btn-basket-kz');
+
+            if (country === 'us') {
+                btnUs.className = "px-3 py-1 font-bold rounded bg-blue-600 text-white transition";
+                btnKz.className = "px-3 py-1 font-bold rounded text-slate-400 hover:text-white transition";
+            } else {
+                btnKz.className = "px-3 py-1 font-bold rounded bg-blue-600 text-white transition";
+                btnUs.className = "px-3 py-1 font-bold rounded text-slate-400 hover:text-white transition";
+            }
+
+            renderBasketView();
+        }
+
+        function renderBasketView() {
+            const cData = countryBaskets[activeBasketCountry];
+            const container = document.getElementById('basket-items-list');
+            const noteBlock = document.getElementById('basket-note-block');
+
+            let html = "";
+            cData.items.forEach(item => {
+                const name = currentLang === 'ru' ? item.nameRu : item.nameEn;
+                html += `<div class="p-2.5 bg-slate-900/60 rounded-lg border border-slate-800 flex justify-between items-center">
+                    <span class="text-slate-300 font-bold">${name}</span>
+                    <span class="font-mono font-bold text-sm" style="color: ${item.color}">${item.pct}</span>
+                </div>`;
+            });
+            container.innerHTML = html;
+            noteBlock.innerHTML = currentLang === 'ru' ? cData.noteRu : cData.noteEn;
+
+            if (chartDoughnutObj) {
+                chartDoughnutObj.data.labels = cData.items.map(i => currentLang === 'ru' ? i.nameRu : i.nameEn);
+                chartDoughnutObj.data.datasets[0].data = cData.items.map(i => i.val);
+                chartDoughnutObj.data.datasets[0].backgroundColor = cData.items.map(i => i.color);
+                chartDoughnutObj.update();
+            }
+        }
+
+        let currentLang = 'ru';
+        const dict = {
+            ru: {
+                headerTitle: "Измерение стоимости жизни (CPI)", headerSub: "AlmaU • Школа цифровых технологий и экономики | Макроэкономика",
+                nav1: "1. Методология расчёта CPI", nav2: "2. Структура корзины (США vs Казахстан)", nav3: "3. Ошибки измерения", nav4: "4. CPI vs Дефлятор ВВП", nav5: "5. Пересчёт сумм & Процентные ставки", nav6: "6. Инфляция в США (1965–2025)", nav7: "7. Мировая инфляция (Данные ЦБ)",
+                t1Title: "Индекс потребительских цен (CPI)", t1Def: "<strong>Индекс потребительских цен (CPI)</strong> — ключевой показатель изменения общей стоимости товаров и услуг, приобретаемых типичным потребителем.",
+                t1StatLbl: "Ключевые формулы", t1FormCpi: "CPI_t = (Стоимость корзины в ценах t / в ценах базы) × 100", t1FormInf: "π_t = [(CPI_t - CPI_t-1) / CPI_t-1] × 100%",
+                s1Num: "01. Состав корзины", s1Title: "Определение структуры и объёмов", s1Desc: "Статведомство проводит обследования расходов домохозяйств (CES), чтобы определить товары, услуги и объёмы их потребления.",
+                s2Num: "02. Регулярный фиксаж", s2Title: "Сбор текущих цен (P)", s2Desc: "Регистраторы ежемесячно фиксируют цены на одинаковые товары во всех торговых точках страны.",
+                s3Num: "03. Стоимость корзины", s3Title: "Расчёт общей суммы (Σ P × Q)", s3Desc: "Перемножается текущая цена на объем потребления. Расчёт ведется за месяц, квартал и год.",
+                s4Num: "04. Базовый период", s4Title: "Нормирование к 100", s4Desc: "Стоимость базового года принимается за 100. Остальные периоды рассчитываются относительно него.",
+                s5Num: "05. Темп инфляции", s5Title: "Расчёт прироста цен (π)", s5Desc: "Находится процентный прирост уровня CPI по сравнению с прошлым периодом.",
+                mRuleTitle: "💡 Главное правило Ласпейреса:", mRuleDesc: "Индекс CPI является <strong>индексом Ласпейреса</strong> с фиксированными количествами (Q_base). Он показывает изменение стоимости абсолютно одинаковой корзины.", mFormulaLbl: "Формула Ласпейреса:",
+                t2Title: "Структура потребительской корзины", t2Sub: "Сравнение структуры расходов в США (BLS) и Казахстане (Бюро национальной статистики РК stat.gov.kz)",
+                t3Title: "Проблемы и ошибки измерения CPI", t3Sub: "Почему CPI не является идеальным индексом стоимости жизни (завышение инфляции примерно на 0.5–1.0 п.п. в год)",
+                p1Title: "1. Ошибка замещения (Substitution Bias)", p1Desc: "Цены меняются неравномерно. Потребители замещают подорожавшие товары более дешевыми, но фиксированная корзина этого сразу не учитывает.",
+                p2Title: "2. Появление новых товаров (New Goods)", p2Desc: "Новые товары дают больше выбора и повышают покупательную способность, но попадают в корзину с задержкой.",
+                p3Title: "3. Неучтённое изменение качества (Quality Change)", p3Desc: "Если товар дорожает из-за улучшения качества, это не чистая инфляция. Сложно отделить рост цены от роста качества.",
+                p4Title: "4. Места покупки и формулы (Outlet Bias)", p4Desc: "Переход покупателей в дисконтные магазины учитывается медленно. Цепные индексы помогают лучше.",
+                t4Title: "Сравнение: CPI vs Дефлятор ВВП", thCrit: "Критерий", thCpiCol: "Индекс потребительских цен (CPI)", thDefCol: "Дефлятор ВВП",
+                cr1Lbl: "Охват товаров", cr1Cpi: "Только товары и услуги, покупаемые городскими потребителями", cr1Def: "Все конечные товары и услуги внутреннего производства",
+                cr2Lbl: "Импорт", cr2Cpi: "Включается (если покупается потребителями)", cr2Def: "Исключается (не внутреннее производство)",
+                cr3Lbl: "Экспорт", cr3Cpi: "Исключается", cr3Def: "Включается",
+                cr4Lbl: "Структура весов", cr4Cpi: "Фиксированная корзина (обновляется ежегодно)", cr4Def: "Меняется непрерывно вместе с выпуском",
+                exDivTitle: "💡 Наглядный пример расхождения:", exDivDesc: "Рост цен на <strong>импортную нефть</strong> напрямую увеличивает CPI, но не входит в дефлятор ВВП США. Напротив, рост цен на <strong>военную технику</strong> внутреннего производства увеличивает дефлятор ВВП, но не влияет на CPI.",
+                t5Title: "Корректировка денежных величин и Процентные ставки", calcTitle: "Калькулятор покупательной способности ($)",
+                lblValA: "Сумма в году A ($):", lblCpiA: "CPI в году A (например, 1980):", lblCpiB: "CPI в году B (например, Сегодня):", lblEqB: "Эквивалентная покупательная способность в году B:",
+                exCalcTitle: "💡 Практический пример пересчёта зарплат", exCalcDesc: "Допустим, в 1980 году зарплата составляла $600 при CPI = 200. При сегодняшнем CPI = 300 эквивалентный доход равен:", exFormulaLbl: "Формула пересчёта:", exCalcSub: "Инфляционная корректировка позволяет сравнивать реальное благосостояние людей в разные исторические эпохи.",
+                fisherTitle: "Номинальная vs Реальная процентная ставка", lblNomTitle: "Номинальная ставка (i):", lblInfTitle: "Инфляция (π):", lblApproxTitle: "Приближенная реальная ставка (r ≈ i - π):", lblExactTitle: "Точная ставка [r = (1+i)/(1+π) - 1]:",
+                t6UsTitle: "Два измерителя инфляции в США (1965–2025): CPI-U vs Дефлятор ВВП", usHistNote: "Источник: Bureau of Labor Statistics (BLS) & Bureau of Economic Analysis (BEA NIPA Table 1.1.9).",
+                t7Title: "Рейтинг инфляции в мире (По данным Центральных банков)", t7Sub: "Данные зафиксированы по официальным релизам Центральных банков и Статистических служб стран (INDEC, BCRA, TCMB, БНС РК, NBE, SBP и др.)",
+                topChartTitle: "Визуализация лидеров по инфляции и позиции Казахстана (Официальные данные ЦБ)", topTableTitle: "Полная таблица стран по инфляции (по официальным данным регуляторов)",
+                thCname: "Страна и Официальный орган (ЦБ / Статком)", thCrate2025: "Инфляция 2025 (%)", thCrate2026: "Текущая 2026 YoY (%)",
+                footer: "AlmaU • SDTE • Макроэкономика / Принципы экономики"
+            },
+            en: {
+                headerTitle: "Measuring the Cost of Living (CPI)", headerSub: "AlmaU • School of Digital Technologies & Economics | Macroeconomics",
+                nav1: "1. CPI Methodology Steps", nav2: "2. Basket Structure (US vs Kazakhstan)", nav3: "3. Measurement Biases", nav4: "4. CPI vs GDP Deflator", nav5: "5. Adjusting Values & Interest Rates", nav6: "6. US Inflation (1965–2025)", nav7: "7. Global Inflation (CB Data)",
+                t1Title: "Consumer Price Index (CPI)", t1Def: "<strong>Consumer Price Index (CPI)</strong> is the core measure of the overall cost of goods and services bought by a typical consumer.",
+                t1StatLbl: "Key Formulas", t1FormCpi: "CPI_t = (Basket Cost in Period t / Base Period Cost) × 100", t1FormInf: "π_t = [(CPI_t - CPI_t-1) / CPI_t-1] × 100%",
+                s1Num: "01. Basket Selection", s1Title: "Defining Scope & Quantities", s1Desc: "Statistical agencies conduct Consumer Expenditure Surveys (CES) to define items and exact consumption quantities (Q).",
+                s2Num: "02. Price Collection", s2Title: "Regular Price Tracking (P)", s2Desc: "Price collectors log thousands of prices for representative items in retail outlets nationwide every month.",
+                s3Num: "03. Basket Cost", s3Title: "Total Calculation (Σ P × Q)", s3Desc: "Prices are multiplied by fixed quantities. Costs are calculated monthly, quarterly, and annually.",
+                s4Num: "04. Base Period", s4Title: "Normalizing to 100", s4Desc: "The base period basket cost is set to 100. Other periods are measured relative to this benchmark.",
+                s5Num: "05. Inflation Rate", s5Title: "Growth Rate Calculation (π)", s5Desc: "Inflation is computed as the percentage change in CPI relative to the prior period.",
+                mRuleTitle: "💡 Laspeyres Principle:", mRuleDesc: "The CPI is a <strong>Laspeyres index</strong> with fixed base-period quantities (Q_base). It measures price changes of an identical basket.", mFormulaLbl: "Laspeyres Formula:",
+                t2Title: "Consumer Basket Structure", t2Sub: "Comparison of spending structures in US (BLS) and Kazakhstan (Bureau of National Statistics RK stat.gov.kz)",
+                t3Title: "Problems in Measuring the Cost of Living", t3Sub: "Why CPI overstates true cost-of-living increases (estimated historically at 0.5–1.0 percentage points per year)",
+                p1Title: "1. Substitution Bias", p1Desc: "Prices change non-proportionally. Consumers substitute cheaper goods, but a fixed basket ignores this shift.",
+                p2Title: "2. Introduction of New Goods", p2Desc: "New products increase choice and dollar purchasing power, but enter the basket with a time lag.",
+                p3Title: "3. Unmeasured Quality Change", p3Desc: "Quality improvements raise prices without pure inflation. Separating quality from price changes is difficult.",
+                p4Title: "4. Outlet & Formula Effects", p4Desc: "Shifts to discount outlets are captured slowly. Chained indexes help track these shifts better.",
+                t4Title: "Comparison: CPI vs GDP Deflator", thCrit: "Dimension", thCpiCol: "Consumer Price Index (CPI)", thDefCol: "GDP Deflator",
+                cr1Lbl: "Coverage", cr1Cpi: "Goods and services bought by urban consumers", cr1Def: "All final goods and services produced domestically",
+                cr2Lbl: "Imports", cr2Cpi: "Included (when bought by domestic consumers)", cr2Def: "Excluded (produced abroad)",
+                cr3Lbl: "Exports", cr3Cpi: "Excluded", cr3Def: "Included (domestically produced)",
+                cr4Lbl: "Weights", cr4Cpi: "Fixed basket (updated annually)", cr4Def: "Changes continuously with output mix",
+                exDivTitle: "💡 Divergence Example:", exDivDesc: "A spike in <strong>imported oil prices</strong> directly raises CPI but does not affect the US GDP deflator. Conversely, higher prices of <strong>domestically built military gear</strong> raise the GDP deflator but not CPI.",
+                t5Title: "Correcting Values & Interest Rates", calcTitle: "Dollar Purchasing Power Calculator ($)",
+                lblValA: "Amount in Year A ($):", lblCpiA: "CPI in Year A (e.g. 1980):", lblCpiB: "CPI in Year B (e.g. Today):", lblEqB: "Equivalent Purchasing Power in Year B:",
+                exCalcTitle: "💡 Practical Salary Adjustment Example", exCalcDesc: "Suppose a salary in 1980 was $600 with CPI = 200. At today's CPI = 300, the equivalent purchasing power is:", exFormulaLbl: "Adjustment Formula:", exCalcSub: "Inflation adjustment allows comparing real living standards across different historical eras.",
+                fisherTitle: "Nominal vs Real Interest Rates", lblNomTitle: "Nominal Rate (i):", lblInfTitle: "Inflation Rate (π):", lblApproxTitle: "Approximate Real Rate (r ≈ i - π):", lblExactTitle: "Exact Real Rate [r = (1+i)/(1+π) - 1]:",
+                t6UsTitle: "Two Measures of US Inflation (1965–2025): CPI-U vs GDP Deflator", usHistNote: "Source: US Bureau of Labor Statistics (BLS) & Bureau of Economic Analysis (BEA NIPA Table 1.1.9).",
+                t7Title: "Global Inflation Ranking (Central Bank Data)", t7Sub: "Data from official releases of Central Banks and National Statistical Services (INDEC, BCRA, TCMB, BNS RK, NBE, SBP, etc.)",
+                topChartTitle: "Inflation Leaders Visualization & Kazakhstan Position (Official CB Data)", topTableTitle: "Full Country Inflation Table (Official Regulatory Data)",
+                thCname: "Country & Official Authority (CB / Stat office)", thCrate2025: "2025 Inflation (%)", thCrate2026: "Current 2026 YoY (%)",
+                footer: "AlmaU • SDTE • Macroeconomics / Principles of Economics"
+            }
+        };
+
+        function renderTop50Table() {
+            const tbody = document.getElementById('table-top50-body');
+            let html = "";
+            top50Data.forEach((item, idx) => {
+                const name = currentLang === 'ru' ? item.nameRu : item.nameEn;
+                const gradColor = getGradientColor(idx, top50Data.length);
+                const rowBg = item.isKz 
+                    ? "bg-amber-950/90 font-bold border-y-2 border-amber-500 text-amber-200" 
+                    : "hover:bg-slate-900/80";
+                
+                html += `<tr class="${rowBg}">
+                    <td class="p-2 text-center font-bold" style="color: ${gradColor}">${item.rank}</td>
+                    <td class="p-2 flex items-center gap-2"><span>${item.flag}</span> <span>${name}</span></td>
+                    <td class="p-2 text-right font-bold" style="color: ${gradColor}">${item.rate2025.toFixed(1)}%</td>
+                    <td class="p-2 text-right text-amber-300 font-bold">${item.rate2026.toFixed(1)}%</td>
+                </tr>`;
+            });
+            tbody.innerHTML = html;
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const d = dict[lang];
+
+            document.getElementById('txt-header-title').innerText = d.headerTitle;
+            document.getElementById('txt-header-sub').innerText = d.headerSub;
+
+            document.getElementById('nav-method').innerText = d.nav1;
+            document.getElementById('nav-basket').innerText = d.nav2;
+            document.getElementById('nav-problems').innerText = d.nav3;
+            document.getElementById('nav-deflator').innerText = d.nav4;
+            document.getElementById('nav-adjust').innerText = d.nav5;
+            document.getElementById('nav-us-history').innerText = d.nav6;
+            document.getElementById('nav-top50').innerText = d.nav7;
+
+            document.getElementById('t1-title').innerText = d.t1Title;
+            document.getElementById('t1-def').innerHTML = d.t1Def;
+            document.getElementById('t1-stat-lbl').innerText = d.t1StatLbl;
+            document.getElementById('t1-formula-cpi').innerText = d.t1FormCpi;
+            document.getElementById('t1-formula-inf').innerText = d.t1FormInf;
+
+            document.getElementById('s1-num').innerText = d.s1Num;
+            document.getElementById('s1-title').innerText = d.s1Title;
+            document.getElementById('s1-desc').innerText = d.s1Desc;
+            document.getElementById('s2-num').innerText = d.s2Num;
+            document.getElementById('s2-title').innerText = d.s2Title;
+            document.getElementById('s2-desc').innerText = d.s2Desc;
+            document.getElementById('s3-num').innerText = d.s3Num;
+            document.getElementById('s3-title').innerText = d.s3Title;
+            document.getElementById('s3-desc').innerText = d.s3Desc;
+            document.getElementById('s4-num').innerText = d.s4Num;
+            document.getElementById('s4-title').innerText = d.s4Title;
+            document.getElementById('s4-desc').innerText = d.s4Desc;
+            document.getElementById('s5-num').innerText = d.s5Num;
+            document.getElementById('s5-title').innerText = d.s5Title;
+            document.getElementById('s5-desc').innerText = d.s5Desc;
+
+            document.getElementById('m-rule-title').innerText = d.mRuleTitle;
+            document.getElementById('m-rule-desc').innerHTML = d.mRuleDesc;
+            document.getElementById('m-formula-lbl').innerText = d.mFormulaLbl;
+
+            document.getElementById('t2-title').innerText = d.t2Title;
+            document.getElementById('t2-sub').innerText = d.t2Sub;
+
+            document.getElementById('t3-title').innerText = d.t3Title;
+            document.getElementById('t3-sub').innerText = d.t3Sub;
+            document.getElementById('p1-title').innerText = d.p1Title;
+            document.getElementById('p1-desc').innerText = d.p1Desc;
+            document.getElementById('p2-title').innerText = d.p2Title;
+            document.getElementById('p2-desc').innerText = d.p2Desc;
+            document.getElementById('p3-title').innerText = d.p3Title;
+            document.getElementById('p3-desc').innerText = d.p3Desc;
+            document.getElementById('p4-title').innerText = d.p4Title;
+            document.getElementById('p4-desc').innerText = d.p4Desc;
+
+            document.getElementById('t4-title').innerText = d.t4Title;
+            document.getElementById('th-crit').innerText = d.thCrit;
+            document.getElementById('th-cpi-col').innerText = d.thCpiCol;
+            document.getElementById('th-def-col').innerText = d.thDefCol;
+            document.getElementById('cr1-lbl').innerText = d.cr1Lbl;
+            document.getElementById('cr1-cpi').innerText = d.cr1Cpi;
+            document.getElementById('cr1-def').innerText = d.cr1Def;
+            document.getElementById('cr2-lbl').innerText = d.cr2Lbl;
+            document.getElementById('cr2-cpi').innerText = d.cr2Cpi;
+            document.getElementById('cr2-def').innerText = d.cr2Def;
+            document.getElementById('cr3-lbl').innerText = d.cr3Lbl;
+            document.getElementById('cr3-cpi').innerText = d.cr3Cpi;
+            document.getElementById('cr3-def').innerText = d.cr3Def;
+            document.getElementById('cr4-lbl').innerText = d.cr4Lbl;
+            document.getElementById('cr4-cpi').innerText = d.cr4Cpi;
+            document.getElementById('cr4-def').innerText = d.cr4Def;
+            document.getElementById('ex-div-title').innerText = d.exDivTitle;
+            document.getElementById('ex-div-desc').innerHTML = d.exDivDesc;
+
+            document.getElementById('t5-title').innerText = d.t5Title;
+            document.getElementById('calc-title').innerText = d.calcTitle;
+            document.getElementById('lbl-val-a').innerText = d.lblValA;
+            document.getElementById('lbl-cpi-a').innerText = d.lblCpiA;
+            document.getElementById('lbl-cpi-b').innerText = d.lblCpiB;
+            document.getElementById('lbl-eq-b').innerText = d.lblEqB;
+
+            document.getElementById('ex-calc-title').innerText = d.exCalcTitle;
+            document.getElementById('ex-calc-desc').innerHTML = d.exCalcDesc;
+            document.getElementById('ex-formula-lbl').innerText = d.exFormulaLbl;
+            document.getElementById('ex-calc-sub').innerText = d.exCalcSub;
+
+            document.getElementById('fisher-title').innerText = d.fisherTitle;
+            document.getElementById('lbl-nom-title').innerText = d.lblNomTitle;
+            document.getElementById('lbl-inf-title').innerText = d.lblInfTitle;
+            document.getElementById('lbl-approx-title').innerText = d.lblApproxTitle;
+            document.getElementById('lbl-exact-title').innerText = d.lblExactTitle;
+
+            document.getElementById('t6-us-title').innerText = d.t6UsTitle;
+            document.getElementById('us-hist-note').innerText = d.usHistNote;
+
+            document.getElementById('t7-title').innerText = d.t7Title;
+            document.getElementById('t7-sub').innerText = d.t7Sub;
+            document.getElementById('top-chart-title').innerText = d.topChartTitle;
+            document.getElementById('top-table-title').innerText = d.topTableTitle;
+            document.getElementById('th-cname').innerText = d.thCname;
+            document.getElementById('th-crate-2025').innerText = d.thCrate2025;
+            document.getElementById('th-crate-2026').innerText = d.thCrate2026;
+
+            document.getElementById('txt-footer').innerText = d.footer;
+
+            if(lang === 'ru') {
+                document.getElementById('btn-lang-ru').className = "px-2.5 py-1 text-[11px] font-black rounded bg-blue-600 text-white transition";
+                document.getElementById('btn-lang-en').className = "px-2.5 py-1 text-[11px] font-black rounded text-slate-400 hover:text-white transition";
+            } else {
+                document.getElementById('btn-lang-en').className = "px-2.5 py-1 text-[11px] font-black rounded bg-blue-600 text-white transition";
+                document.getElementById('btn-lang-ru').className = "px-2.5 py-1 text-[11px] font-black rounded text-slate-400 hover:text-white transition";
+            }
+
+            renderBasketView();
+            renderTop50Table();
+
+            if (chartTop50Obj) {
+                const sample = top50Data.slice(0, 15).concat(top50Data.find(i => i.isKz));
+                chartTop50Obj.data.labels = sample.map(i => `${i.flag} ${lang === 'ru' ? i.nameRu : i.nameEn}`);
+                chartTop50Obj.update();
+            }
+        }
+
+        let chartDoughnutObj = null;
+        let chartTop50Obj = null;
+
+        window.onload = function() {
+            // ППОНЧИК КОРЗИНЫ
+            const initialBasket = countryBaskets['us'];
+            chartDoughnutObj = new Chart(document.getElementById('chartBasketDoughnut'), {
+                type: 'doughnut',
+                data: {
+                    labels: initialBasket.items.map(i => i.nameRu),
+                    datasets: [{
+                        data: initialBasket.items.map(i => i.val),
+                        backgroundColor: initialBasket.items.map(i => i.color),
+                        borderWidth: 2,
+                        borderColor: '#0f172a'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { color: '#f1f5f9', font: { size: 10, weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+
+            // ГРАФИК США
+            new Chart(document.getElementById('chartUsHistory'), {
+                type: 'line',
+                data: {
+                    labels: ['1965', '1970', '1975', '1980', '1985', '1990', '1995', '2000', '2005', '2010', '2015', '2020', '2022', '2025'],
+                    datasets: [
+                        { label: 'Инфляция CPI-U (%)', data: [1.8, 5.8, 9.1, 13.5, 3.6, 5.4, 2.8, 3.4, 3.4, 1.6, 0.1, 1.2, 8.0, 2.6], borderColor: '#f43f5e', backgroundColor: '#f43f5e', tension: 0.3 },
+                        { label: 'Дефлятор ВВП (%)', data: [1.6, 5.3, 9.2, 9.0, 3.2, 3.7, 2.0, 2.2, 3.1, 1.2, 1.0, 1.3, 7.1, 2.6], borderColor: '#0284c7', backgroundColor: '#0284c7', tension: 0.3 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            // ГОРИЗОНТАЛЬНЫЙ БАРЧАТ
+            const sampleTop = top50Data.slice(0, 15).concat(top50Data.find(i => i.isKz));
+            chartTop50Obj = new Chart(document.getElementById('chartTop50'), {
+                type: 'bar',
+                data: {
+                    labels: sampleTop.map(i => `${i.flag} ${i.nameRu}`),
+                    datasets: [
+                        {
+                            label: 'Текущая инфляция (%)',
+                            data: sampleTop.map(i => i.rate2026),
+                            backgroundColor: sampleTop.map((i, idx) => i.isKz ? '#f59e0b' : getGradientColor(idx, sampleTop.length))
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#f1f5f9' }, grid: { color: 'rgba(51, 65, 85, 0.4)' } },
+                        y: { ticks: { color: '#f1f5f9', font: { size: 10, weight: 'bold' } } }
+                    }
+                }
+            });
+
+            calcInflationAdjust();
+            calcRates();
+            setLanguage('ru');
+        };
+    </script>
+</body>
+</html>

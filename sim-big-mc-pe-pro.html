@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alternative Inflation & Cost of Living Indices | AlmaU Executive Dashboard</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #030712; color: #f3f4f6; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(55, 65, 81, 0.6);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Кнопки навигации - Карточки из репозитория */
+        .tab-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(15, 23, 42, 0.6);
+            border: 1.5px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            border-color: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.5);
+        }
+
+        .tab-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+
+        /* Индивидуальная подсветка рамок при клике/активации */
+        .tab-btn-mac.active {
+            border-color: #10b981 !important;
+            box-shadow: 0 0 22px rgba(16, 185, 129, 0.6), inset 0 0 10px rgba(16, 185, 129, 0.2) !important;
+        }
+
+        .tab-btn-iphone.active {
+            border-color: #e2e8f0 !important;
+            box-shadow: 0 0 22px rgba(226, 232, 240, 0.5), inset 0 0 10px rgba(226, 232, 240, 0.2) !important;
+        }
+
+        .tab-btn-starbucks.active {
+            border-color: #059669 !important;
+            box-shadow: 0 0 22px rgba(5, 150, 105, 0.6), inset 0 0 10px rgba(5, 150, 105, 0.2) !important;
+        }
+
+        .tab-btn-banana.active {
+            border-color: #eab308 !important;
+            box-shadow: 0 0 22px rgba(234, 179, 8, 0.6), inset 0 0 10px rgba(234, 179, 8, 0.2) !important;
+        }
+
+        .tab-btn-cinema.active {
+            border-color: #a855f7 !important;
+            box-shadow: 0 0 22px rgba(168, 85, 247, 0.6), inset 0 0 10px rgba(168, 85, 247, 0.2) !important;
+        }
+
+        .tab-btn-dishes.active {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 22px rgba(59, 130, 246, 0.6), inset 0 0 10px rgba(59, 130, 246, 0.2) !important;
+        }
+
+        .tab-btn-method.active {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 22px rgba(239, 68, 68, 0.6), inset 0 0 10px rgba(239, 68, 68, 0.2) !important;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="p-4 md:p-6 min-h-screen flex flex-col justify-between">
+
+    <!-- HEADER -->
+    <header class="glass-panel p-4 rounded-2xl mb-5 border-t-2 border-t-purple-500 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="flex items-center space-x-4">
+            <!-- Логотип AlmaU -->
+            <div class="px-3 py-1.5 bg-white rounded-xl border border-slate-200/80 shadow-md flex items-center justify-center overflow-hidden min-h-[52px]">
+                <img src="almau-logo.png" alt="AlmaU Logo" class="h-10 w-auto object-contain">
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-black text-purple-400 tracking-tight" id="txt-header-title">
+                    Альтернативные Индексы Инфляции и Покупательной Способности
+                </h1>
+                <p class="text-xs font-semibold text-amber-300 mt-0.5" id="txt-header-sub">
+                    Учебный дашборд для анализа ППС, стоимости услуг и трудовой доступности • AlmaU School of Economics & Digital Technologies
+                </p>
+            </div>
+        </div>
+
+        <!-- Переключатель языков RU / EN -->
+        <div class="flex items-center space-x-1 bg-slate-900 p-1 rounded-xl border border-slate-800 self-end md:self-auto">
+            <button onclick="setLanguage('ru')" id="btn-lang-ru" class="px-3 py-1 text-xs font-extrabold rounded-lg bg-purple-600 text-white transition">RU</button>
+            <button onclick="setLanguage('en')" id="btn-lang-en" class="px-3 py-1 text-xs font-extrabold rounded-lg text-slate-400 hover:text-white transition">EN</button>
+        </div>
+    </header>
+
+    <!-- NAVIGATION TABS (7 Вкладок с картинками из репозитория) -->
+    <nav class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 mb-5">
+        <!-- Big Mac -->
+        <button onclick="switchTab('tab-bigmac', this)" class="tab-btn tab-btn-mac active h-28 flex items-center justify-center" title="Big Mac Index">
+            <img src="pic-dash-mc.png" alt="McDonald's">
+        </button>
+
+        <!-- iPhone -->
+        <button onclick="switchTab('tab-iphone', this)" class="tab-btn tab-btn-iphone h-28 flex items-center justify-center" title="iPhone Index">
+            <img src="pic-dash-apl.png" alt="iPhone Index">
+        </button>
+
+        <!-- Starbucks -->
+        <button onclick="switchTab('tab-starbucks', this)" class="tab-btn tab-btn-starbucks h-28 flex items-center justify-center" title="Starbucks Latte Index">
+            <img src="pic-dash-strb.png" alt="Starbucks">
+        </button>
+
+        <!-- Banana Index -->
+        <button onclick="switchTab('tab-banana', this)" class="tab-btn tab-btn-banana h-28 flex items-center justify-center" title="Banana Index">
+            <img src="pic-dash-ban.png" alt="Banana Index">
+        </button>
+
+        <!-- Hollywood -->
+        <button onclick="switchTab('tab-cinema', this)" class="tab-btn tab-btn-cinema h-28 flex items-center justify-center" title="Hollywood Index">
+            <img src="pic-dash-hol.png" alt="Hollywood Index">
+        </button>
+
+        <!-- Региональные индексы -->
+        <button onclick="switchTab('tab-dishes', this)" class="tab-btn tab-btn-dishes h-28 flex items-center justify-center" title="Региональные индексы">
+            <img src="pic-dash-reg.png" alt="Региональные индексы">
+        </button>
+
+        <!-- Методология -->
+        <button onclick="switchTab('tab-methodology', this)" class="tab-btn tab-btn-method h-28 flex items-center justify-center" title="Методология">
+            <img src="pic-dash-metod.png" alt="Методология">
+        </button>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow space-y-5">
+
+        <!-- 1. BIG MAC INDEX -->
+        <section id="tab-bigmac" class="tab-content active space-y-5">
+            <div class="glass-panel p-5 rounded-2xl space-y-5 border-t-2 border-t-red-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <span id="bm-title">Индекс Биг-Мака (The Economist)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5" id="bm-sub">Сравнение цен бургера в местной валюте с ценой в США ($6.22). Показывает классический паритет покупательной способности (ППС).</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+                    <div class="lg:col-span-7 h-80 glass-panel p-3 rounded-xl">
+                        <canvas id="chartBigMac"></canvas>
+                    </div>
+                    <div class="lg:col-span-5 space-y-3">
+                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 space-y-2 text-xs">
+                            <h3 class="font-bold text-amber-400 uppercase tracking-wider" id="bm-exp-title">Макроэкономическая интерпретация:</h3>
+                            <ul class="space-y-1.5 text-slate-300 list-disc list-inside leading-relaxed" id="bm-exp-list">
+                                <li><strong>Переоценённые валюты:</strong> Швейцария (+45.4%), Уругвай (+43.7%), Норвегия (+29.4%). В этих странах высокая стоимость неторгуемых услуг (аренда, труд, НДС).</li>
+                                <li><strong>Недооценённые валюты:</strong> Индонезия (-61.7%), Индия (-60.5%), Тайвань (-61.1%). Отклонение объясняется эффектом Балассы-Самуэльсона (низкой зарплатой в сфере услуг).</li>
+                            </ul>
+                        </div>
+                        <div class="p-3 bg-red-950/40 border border-red-800/60 rounded-xl text-[11px] text-red-200" id="bm-note">
+                            <i class="fa-solid fa-circle-info mr-1 text-red-400"></i>
+                            <strong>Ограничение:</strong> Индекс Биг-Мака показывает направление ППС валют, но не является показателем внутренней инфляции.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. IPHONE INDEX -->
+        <section id="tab-iphone" class="tab-content space-y-5">
+            <div class="glass-panel p-5 rounded-2xl space-y-5 border-t-2 border-t-sky-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <span id="ip-title">iPhone 16 Pro 128GB Index (Deutsche Bank)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5" id="ip-sub">Сравнение розничной цены высокотехнологичного товара в USD и трудовой доступности в рабочих днях.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+                    <div class="lg:col-span-7 h-80 glass-panel p-3 rounded-xl">
+                        <canvas id="chartIphone"></canvas>
+                    </div>
+                    <div class="lg:col-span-5 space-y-3">
+                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 space-y-2 text-xs">
+                            <h3 class="font-bold text-sky-400 uppercase tracking-wider" id="ip-exp-title">Географическая дискриминация и доступность:</h3>
+                            <p class="text-slate-300 leading-relaxed" id="ip-exp-p1">
+                                Разрыв в ценах между <strong>Турцией ($2,182)</strong> и <strong>США ($1,079)</strong> составляет 2.05 раза из-за пошлин, НДС и налога на IMEI.
+                            </p>
+                            <hr class="border-slate-800">
+                            <p class="text-slate-300 leading-relaxed" id="ip-exp-p2">
+                                <strong>Трудовая доступность:</strong> В США или Швейцарии на iPhone нужно работать 5–7 дней, тогда как в развивающихся экономиках — от 40 до 90+ рабочих дней.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. STARBUCKS LATTE INDEX -->
+        <section id="tab-starbucks" class="tab-content space-y-5">
+            <div class="glass-panel p-5 rounded-2xl space-y-5 border-t-2 border-t-emerald-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <span id="sb-title">Starbucks Tall Latte Index (GCPDex)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5" id="sb-sub">Индикатор стоимости городских сервисных услуг, коммерческой аренды и труда в мегаполисах.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+                    <div class="lg:col-span-7 h-80 glass-panel p-3 rounded-xl">
+                        <canvas id="chartStarbucks"></canvas>
+                    </div>
+                    <div class="lg:col-span-5 space-y-3 text-xs">
+                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                            <h3 class="font-bold text-emerald-400 uppercase tracking-wider" id="sb-exp-title">Минуты труда на 1 чашку кофе:</h3>
+                            <p class="text-slate-300 leading-relaxed" id="sb-exp-p1">
+                                Абсолютная цена варьируется от <strong>$2.12 (Бразилия)</strong> до <strong>$6.70 (Швейцария)</strong>.
+                            </p>
+                            <p class="text-slate-300 leading-relaxed" id="sb-exp-p2">
+                                Однако трудовая доступность перекраивает карту:
+                            </p>
+                            <ul class="list-disc list-inside text-slate-300 space-y-1 pt-1" id="sb-exp-list">
+                                <li><strong>США:</strong> ~46 минут минимального труда.</li>
+                                <li><strong>Индия:</strong> ~6.7 часов труда на ту же чашку.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. BANANA INDEX -->
+        <section id="tab-banana" class="tab-content space-y-5">
+            <div class="glass-panel p-5 rounded-2xl space-y-5 border-t-2 border-t-yellow-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <span id="bn-title">Индекс Банана: Цена 1 кг в USD (Numbeo 2026)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5" id="bn-sub">Индикатор мировой торговли скоропортящимися фруктами, логистических цепей и наценок супермаркетов.</p>
+                    </div>
+                    <span class="text-xs font-mono bg-yellow-950/60 text-yellow-300 border border-yellow-800 px-3 py-1 rounded-lg" id="bn-badge">Казахстан = $2.05 / кг</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
+                    <div class="lg:col-span-7 h-80 glass-panel p-3 rounded-xl">
+                        <canvas id="chartBanana"></canvas>
+                    </div>
+                    <div class="lg:col-span-5 space-y-3 text-xs">
+                        <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                            <h3 class="font-bold text-yellow-400 uppercase tracking-wider" id="bn-exp-title">Почему банан — идеальный товар-«маяк»?</h3>
+                            <p class="text-slate-300 leading-relaxed" id="bn-exp-p1">
+                                В отличие от Биг-Мака, банан однороден по всему миру. Разница цен (от $0.65 в Пакистане до $3.50 в Израиле) отражает плечо логистики, пошлины и порчу при транспортировке.
+                            </p>
+                            <hr class="border-slate-800">
+                            <p class="text-slate-300 leading-relaxed" id="bn-exp-p2">
+                                <strong>Экологический Banana Index:</strong> Не путать с ценовым! В The Economist банановый индекс измеряет выбросы CO₂ продуктов в «банановых эквивалентах».
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. HOLLYWOOD INDEX -->
+        <section id="tab-cinema" class="tab-content space-y-5">
+            <div class="glass-panel p-5 rounded-2xl space-y-5 border-t-2 border-t-purple-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <span id="hw-title">Hollywood Index: Цены на билеты & Кассовые сборы</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5" id="hw-sub">Стоимость городского досуга в кинотеатрах и разбор мировых рекордов кассовых сборов.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <div class="glass-panel p-4 rounded-xl h-80 space-y-2">
+                        <h3 class="text-xs font-bold text-purple-300 uppercase tracking-wider" id="hw-chart-title">1. Цена билета на международный фильм (USD)</h3>
+                        <div class="h-64">
+                            <canvas id="chartCinemaTickets"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-xl space-y-3 text-xs">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex justify-between items-center">
+                            <span id="hw-tbl-title">2. Самые кассовые фильмы в истории</span>
+                            <span class="text-[10px] text-slate-400 font-mono">Box Office Mojo</span>
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-800 text-slate-400 font-mono text-[11px]">
+                                        <th class="py-2" id="th-movie">Фильм (Год)</th>
+                                        <th class="py-2 text-right" id="th-nom">Номинал ($ млрд)</th>
+                                        <th class="py-2 text-right text-emerald-400" id="th-real">С поправкой на инфляцию</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60 font-mono" id="tb-movies-body">
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <p class="text-[11px] text-slate-400 bg-slate-900 p-2 rounded border border-slate-800 leading-relaxed" id="hw-note">
+                            <strong>Вывод:</strong> Номинальный Box Office отражает финансовый масштаб, а реальный (с поправкой на инфляцию) — истинный охват аудитории.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. REGIONAL INDICES -->
+        <section id="tab-dishes" class="tab-content space-y-5">
+            <div class="glass-panel p-5 rounded-2xl space-y-5 border-t-2 border-t-rose-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                            <span id="reg-title">Региональные индексы (Плов, Тхали, Бешбармак)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5" id="reg-sub">Сравнение официальных потребительских наборов и разовых медиа-индексов национальной кухни.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                    <div class="glass-panel p-4 rounded-xl h-80 space-y-2">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider" id="reg-plov-title">Индекс Плова по регионам Узбекистана (Сумов)</h3>
+                        <div class="h-64">
+                            <canvas id="chartPlov"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="glass-panel p-4 rounded-xl h-80 space-y-2">
+                        <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider" id="reg-thali-title">CRISIL Roti Rice Rate — Индия (Рупий)</h3>
+                        <div class="h-64">
+                            <canvas id="chartThali"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 text-xs space-y-2">
+                    <h3 class="font-bold text-rose-400 uppercase tracking-wider" id="reg-exp-title">Качество и регулярность данных:</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-slate-300">
+                        <div class="p-3 bg-slate-950 rounded-lg border border-slate-800" id="reg-card-1">
+                            <strong class="text-amber-300 block mb-1">Узбекистан (Плов):</strong> Официальный регулярный ряд Нацкомстата. Фиксирует средние цены на рис, мясо, морковь, лук и масло по регионам.
+                        </div>
+                        <div class="p-3 bg-slate-950 rounded-lg border border-slate-800" id="reg-card-2">
+                            <strong class="text-emerald-300 block mb-1">Индия (CRISIL Thali):</strong> Ежемесячный отчёт по 4 макрорегионам. Показывает продовольственные шоки (например, лук +89% г/г).
+                        </div>
+                        <div class="p-3 bg-slate-950 rounded-lg border border-slate-800" id="reg-card-3">
+                            <strong class="text-rose-300 block mb-1">Казахстан (Бешбармак):</strong> Разовый журналистский расчет ($41.74 в КЗ vs $78.37 во Франции). Иллюстративен, но не подходит для ППС.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. METHODOLOGY -->
+        <section id="tab-methodology" class="tab-content space-y-5">
+            <div class="glass-panel p-5 rounded-2xl space-y-5 border-t-2 border-t-cyan-500">
+                <div class="border-b border-slate-800 pb-3">
+                    <h2 class="text-base font-extrabold text-white flex items-center gap-2">
+                        <span id="mth-title">Методологический свод и Практикум</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5" id="mth-sub">Сравнительный анализ надёжности альтернативных бытовых индикаторов.</p>
+                </div>
+
+                <div class="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-900 text-cyan-400 font-bold border-b border-slate-800">
+                            <tr>
+                                <th class="p-3" id="th-idx">Индекс</th>
+                                <th class="p-3" id="th-type">Тип измерения</th>
+                                <th class="p-3" id="th-rel">Надёжность</th>
+                                <th class="p-3" id="th-use">Лучшее применение</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 font-mono" id="tb-methodology-body">
+                            <!-- Dynamic -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="p-4 bg-slate-900 rounded-xl border border-slate-800 space-y-2">
+                    <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider" id="mth-rules-title">5 правил построения собственного индекса:</h3>
+                    <ol class="list-decimal list-inside text-xs text-slate-300 space-y-1 leading-relaxed" id="mth-rules-list">
+                        <li>Зафиксировать точный рецепт, вес и качество товара.</li>
+                        <li>Собирать медианную цену по нескольким точкам продажи.</li>
+                        <li>Разделять локальную цену и валютный курс.</li>
+                        <li>Публиковать две панели: цену в USD и доступность в часах труда.</li>
+                        <li>Сопоставлять полученный результат с официальным ИПЦ.</li>
+                    </ol>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="mt-4 text-center text-[10px] text-slate-600 font-medium tracking-wide border-t border-slate-900 pt-2" id="txt-footer">
+        AlmaU SDTE • Educational Interactive Simulator • Economics & Digital Technologies
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        let currentLang = 'ru';
+
+        const dict = {
+            ru: {
+                headerTitle: "Альтернативные Индексы Инфляции и Покупательной Способности",
+                headerSub: "Учебный дашборд для анализа ППС, стоимости услуг и трудовой доступности • AlmaU School of Economics & Digital Technologies",
+                
+                bmTitle: "Индекс Биг-Мака (The Economist)",
+                bmSub: "Сравнение цен бургера в местной валюте с ценой в США ($6.22). Показывает классический паритет покупательной способности (ППС).",
+                bmExpTitle: "Макроэкономическая интерпретация:",
+                bmExpList: "<li><strong>Переоценённые валюты:</strong> Швейцария (+45.4%), Уругвай (+43.7%), Норвегия (+29.4%). В этих странах высокая стоимость неторгуемых услуг (аренда, труд, НДС).</li><li><strong>Недооценённые валюты:</strong> Индонезия (-61.7%), Индия (-60.5%), Тайвань (-61.1%). Отклонение объясняется эффектом Балассы-Самуэльсона (низкой зарплатой в сфере услуг).</li>",
+                bmNote: "<i class='fa-solid fa-circle-info mr-1 text-red-400'></i><strong>Ограничение:</strong> Индекс Биг-Мака показывает направление ППС валют, но не является показателем внутренней инфляции.",
+                bmChartLabel: "Цена Big Mac (USD, Июль 2026)",
+
+                ipTitle: "iPhone 16 Pro 128GB Index (Deutsche Bank)",
+                ipSub: "Сравнение розничной цены высокотехнологичного товара в USD и трудовой доступности в рабочих днях.",
+                ipExpTitle: "Географическая дискриминация и доступность:",
+                ipExpP1: "Разрыв в ценах между <strong>Турцией ($2,182)</strong> и <strong>США ($1,079)</strong> составляет 2.05 раза из-за пошлин, НДС и налога на IMEI.",
+                ipExpP2: "<strong>Трудовая доступность:</strong> В США или Швейцарии на iPhone нужно работать 5–7 дней, тогда как в развивающихся экономиках — от 40 до 90+ рабочих дней.",
+                ipChartLabel: "Цена iPhone 16 Pro 128GB (USD, 2025)",
+
+                sbTitle: "Starbucks Tall Latte Index (GCPDex)",
+                sbSub: "Индикатор стоимости городских сервисных услуг, коммерческой аренды и труда в мегаполисах.",
+                sbExpTitle: "Минуты труда на 1 чашку кофе:",
+                sbExpP1: "Абсолютная цена варьируется от <strong>$2.12 (Бразилия)</strong> до <strong>$6.70 (Швейцария)</strong>.",
+                sbExpP2: "Однако трудовая доступность перекраивает карту:",
+                sbExpList: "<li><strong>США:</strong> ~46 минут минимального труда.</li><li><strong>Индия:</strong> ~6.7 часов труда на ту же чашку.</li>",
+                sbChartLabel: "Starbucks Tall Latte (USD, Апрель 2026)",
+
+                bnTitle: "Индекс Банана: Цена 1 кг в USD (Numbeo 2026)",
+                bnSub: "Индикатор мировой торговли скоропортящимися фруктами, логистических цепей и наценок супермаркетов.",
+                bnBadge: "Казахстан = $2.05 / кг",
+                bnExpTitle: "Почему банан — идеальный товар-«маяк»?",
+                bnExpP1: "В отличие от Биг-Мака, банан однороден по всему миру. Разница цен (от $0.65 в Пакистане до $3.50 в Израиле) отражает плечо логистики, пошлины и порчу при транспортировке.",
+                bnExpP2: "<strong>Экологический Banana Index:</strong> Не путать с ценовым! В The Economist банановый индекс измеряет выбросы CO₂ продуктов в «банановых эквивалентах».",
+                bnChartLabel: "Цена за 1 кг бананов (USD, 2026)",
+
+                hwTitle: "Hollywood Index: Цены на билеты & Кассовые сборы",
+                hwSub: "Стоимость городского досуга в кинотеатрах и разбор мировых рекордов кассовых сборов.",
+                hwChartTitle: "1. Цена билета на международный фильм (USD)",
+                hwTblTitle: "2. Самые кассовые фильмы в истории",
+                thMovie: "Фильм (Год)", thNom: "Номинал ($ млрд)", thReal: "С поправкой на инфляцию",
+                hwNote: "<strong>Вывод:</strong> Номинальный Box Office отражает финансовый масштаб, а реальный (с поправкой на инфляцию) — истинный охват аудитории.",
+                hwChartLabel: "Билет в кино (USD, 2025)",
+
+                regTitle: "Региональные индексы (Плов, Тхали, Бешбармак)",
+                regSub: "Сравнение официальных потребительских наборов и разовых медиа-индексов национальной кухни.",
+                regPlovTitle: "Индекс Плова по регионам Узбекистана (Сумов)",
+                regThaliTitle: "CRISIL Roti Rice Rate — Индия (Рупий)",
+                regExpTitle: "Качество и регулярность данных:",
+                regCard1: "<strong class='text-amber-300 block mb-1'>Узбекистан (Плов):</strong> Официальный регулярный ряд Нацкомстата. Фиксирует средние цены на рис, мясо, морковь, лук и масло по регионам.",
+                regCard2: "<strong class='text-emerald-300 block mb-1'>Индия (CRISIL Thali):</strong> Ежемесячный отчёт по 4 макрорегионам. Показывает продовольственные шоки (например, лук +89% г/г).",
+                regCard3: "<strong class='text-rose-300 block mb-1'>Казахстан (Бешбармак):</strong> Разовый журналистский расчет ($41.74 в КЗ vs $78.37 во Франции). Иллюстративен, но не подходит для ППС.",
+                plovChartLabel: "Набор для плова (Сумов, Май 2026)",
+                thaliVegLabel: "Вегетарианская (₹)", thaliNonVegLabel: "Невегетарианская (₹)",
+
+                mthTitle: "Методологический свод и Практикум",
+                mthSub: "Сравнительный анализ надёжности альтернативных бытовых индикаторов.",
+                thIdx: "Индекс", thType: "Тип измерения", thRel: "Надёжность", thUse: "Лучшее применение",
+                mthRulesTitle: "5 правил построения собственного индекса:",
+                mthRulesList: "<li>Зафиксировать точный рецепт, вес и качество товара.</li><li>Собирать медианную цену по нескольким точкам продажи.</li><li>Разделять локальную цену и валютный курс.</li><li>Публиковать две панели: цену в USD и доступность в часах труда.</li><li>Сопоставлять полученный результат с официальным ИПЦ.</li>",
+
+                moviesData: [
+                    { title: "Унесённые ветром (1939)", nom: "$0.40 B", real: "$4.20 B (#1)", isRealTop: true },
+                    { title: "Аватар (2009)", nom: "$2.92 B (#1)", real: "$3.82 B", isNomTop: true },
+                    { title: "Мстители: Финал (2019)", nom: "$2.80 B", real: "$3.16 B" },
+                    { title: "Титаник (1997)", nom: "$2.26 B", real: "$3.48 B" }
+                ],
+                methodologyRows: [
+                    { name: "Big Mac Index", type: "Валютная ППС", rel: "Высокая", use: "Наглядная валютная иллюстрация", color: "text-emerald-400" },
+                    { name: "CRISIL Thali", type: "Инфляция еды", rel: "Высокая", use: "Продовольственная нагрузка семей", color: "text-emerald-400" },
+                    { name: "Banana Index", type: "Цена товара / Логистика", rel: "Средняя", use: "Анализ импортных ценовых цепочек", color: "text-amber-400" },
+                    { name: "Индекс Плова", type: "Региональные цены", rel: "Средне-высокая", use: "Динамика блюда с фиксированной рецептурой", color: "text-emerald-400" },
+                    { name: "iPhone Index", type: "Доступность / Налоги", rel: "Средняя", use: "Оценка импортных пошлин и часов труда", color: "text-amber-400" },
+                    { name: "Starbucks Latte", type: "Городской сервис", rel: "Средняя", use: "Стоимость аренды и труда в мегаполисах", color: "text-amber-400" }
+                ],
+                footer: "AlmaU SDTE • Educational Interactive Simulator • Economics & Digital Technologies"
+            },
+            en: {
+                headerTitle: "Alternative Inflation & Purchasing Power Indices",
+                headerSub: "Educational Dashboard for PPP, Service Costs & Labor Affordability Analysis • AlmaU SDTE",
+                
+                bmTitle: "Big Mac Index (The Economist)",
+                bmSub: "Comparing local burger prices with the US benchmark ($6.22). Demonstrates classic Purchasing Power Parity (PPP).",
+                bmExpTitle: "Macroeconomic Interpretation:",
+                bmExpList: "<li><strong>Overvalued Currencies:</strong> Switzerland (+45.4%), Uruguay (+43.7%), Norway (+29.4%). Driven by high costs of non-tradable services (rent, labor, VAT).</li><li><strong>Undervalued Currencies:</strong> Indonesia (-61.7%), India (-60.5%), Taiwan (-61.1%). Explained by Balassa-Samuelson effect (lower service wages).</li>",
+                bmNote: "<i class='fa-solid fa-circle-info mr-1 text-red-400'></i><strong>Limitation:</strong> Big Mac Index shows PPP direction but is not an indicator of domestic consumer inflation.",
+                bmChartLabel: "Big Mac Price (USD, July 2026)",
+
+                ipTitle: "iPhone 16 Pro 128GB Index (Deutsche Bank)",
+                ipSub: "Comparing retail prices of a tech benchmark in USD vs labor affordability in working days.",
+                ipExpTitle: "Geographic Price Discrimination & Affordability:",
+                ipExpP1: "Price gap between <strong>Turkey ($2,182)</strong> and <strong>USA ($1,079)</strong> reaches 2.05x due to import tariffs, VAT, and IMEI registration taxes.",
+                ipExpP2: "<strong>Labor Affordability:</strong> Working 5–7 days is required in US or Switzerland vs 40 to 90+ days in developing economies.",
+                ipChartLabel: "iPhone 16 Pro 128GB Price (USD, 2025)",
+
+                sbTitle: "Starbucks Tall Latte Index (GCPDex)",
+                sbSub: "Indicator of urban service costs, commercial rent, and local wages across global cities.",
+                sbExpTitle: "Labor Minutes per Cup of Coffee:",
+                sbExpP1: "Absolute prices range from <strong>$2.12 (Brazil)</strong> to <strong>$6.70 (Switzerland)</strong>.",
+                sbExpP2: "However, labor affordability flips the ranking:",
+                sbExpList: "<li><strong>USA:</strong> ~46 minutes of minimum wage labor.</li><li><strong>India:</strong> ~6.7 hours of labor for the same cup.</li>",
+                sbChartLabel: "Starbucks Tall Latte Price (USD, April 2026)",
+
+                bnTitle: "Banana Index: 1 kg Price in USD (Numbeo 2026)",
+                bnSub: "Indicator of global perishable fruit trade, logistics chains, and supermarket markups.",
+                bnBadge: "Kazakhstan = $2.05 / kg",
+                bnExpTitle: "Why is the Banana an Ideal 'Beacon' Good?",
+                bnExpP1: "Unlike Big Mac, a banana is homogeneous globally. Price gaps ($0.65 in Pakistan to $3.50 in Israel) reflect logistics distance, tariffs, and spoilage.",
+                bnExpP2: "<strong>Environmental Banana Index:</strong> Do not confuse with price! In The Economist, it measures carbon emissions in 'banana equivalents'.",
+                bnChartLabel: "Price per 1 kg of Bananas (USD, 2026)",
+
+                hwTitle: "Hollywood Index: Cinema Tickets & Box Office Records",
+                hwSub: "Urban leisure prices in movie theaters and historical box office analysis.",
+                hwChartTitle: "1. Cinema Ticket Price for International Release (USD)",
+                hwTblTitle: "2. Highest-Grossing Movies of All Time",
+                thMovie: "Movie (Year)", thNom: "Nominal ($ Bn)", thReal: "Adjusted for Inflation",
+                hwNote: "<strong>Takeaway:</strong> Nominal Box Office shows monetary scale, while real box office (inflation-adjusted) reflects true audience reach.",
+                hwChartLabel: "Cinema Ticket Price (USD, 2025)",
+
+                regTitle: "Regional Indices (Plov, Thali, Beshbarmak)",
+                regSub: "Comparing official basket tracking with media-based national dish indices.",
+                regPlovTitle: "Plov Index by Regions of Uzbekistan (Sum)",
+                regThaliTitle: "CRISIL Roti Rice Rate — India (Rupees)",
+                regExpTitle: "Data Quality & Regularity:",
+                regCard1: "<strong class='text-amber-300 block mb-1'>Uzbekistan (Plov):</strong> Official regular tracking by National Statistics Committee using standard ingredient weights.",
+                regCard2: "<strong class='text-emerald-300 block mb-1'>India (CRISIL Thali):</strong> Monthly report covering 4 macro-regions, detecting food price shocks (e.g. onion +89% YoY).",
+                regCard3: "<strong class='text-rose-300 block mb-1'>Kazakhstan (Beshbarmak):</strong> One-off media calculation ($41.74 in KZ vs $78.37 in France). Illustrative, not suited for strict PPP.",
+                plovChartLabel: "Plov Set Price (Sum, May 2026)",
+                thaliVegLabel: "Vegetarian (₹)", thaliNonVegLabel: "Non-Vegetarian (₹)",
+
+                mthTitle: "Methodological Summary & Workshop",
+                mthSub: "Comparative reliability assessment of alternative living cost indicators.",
+                thIdx: "Index", thType: "Measurement Type", thRel: "Reliability", thUse: "Best Application",
+                mthRulesTitle: "5 Rules for Building Your Own Index:",
+                mthRulesList: "<li>Fix exact recipe, weight, and product quality.</li><li>Collect median prices across multiple retail points.</li><li>Separate local price dynamics from exchange rate fluctuations.</li><li>Publish two panels: USD price and labor affordability.</li><li>Benchmark results against official Consumer Price Index (CPI).</li>",
+
+                moviesData: [
+                    { title: "Gone with the Wind (1939)", nom: "$0.40 B", real: "$4.20 B (#1)", isRealTop: true },
+                    { title: "Avatar (2009)", nom: "$2.92 B (#1)", real: "$3.82 B", isNomTop: true },
+                    { title: "Avengers: Endgame (2019)", nom: "$2.80 B", real: "$3.16 B" },
+                    { title: "Titanic (1997)", nom: "$2.26 B", real: "$3.48 B" }
+                ],
+                methodologyRows: [
+                    { name: "Big Mac Index", type: "Currency PPP", rel: "High", use: "Visual currency valuation illustration", color: "text-emerald-400" },
+                    { name: "CRISIL Thali", type: "Food Inflation", rel: "High", use: "Domestic food expense tracking", color: "text-emerald-400" },
+                    { name: "Banana Index", type: "Product Price / Logistics", rel: "Medium", use: "Import price chain analysis", color: "text-amber-400" },
+                    { name: "Plov Index", type: "Regional Prices", rel: "Medium-High", use: "Fixed dish recipe price dynamics", color: "text-emerald-400" },
+                    { name: "iPhone Index", type: "Affordability / Taxes", rel: "Medium", use: "Import tariffs and working hours evaluation", color: "text-amber-400" },
+                    { name: "Starbucks Latte", type: "Urban Services", rel: "Medium", use: "Commercial rent and service labor cost", color: "text-amber-400" }
+                ],
+                footer: "AlmaU SDTE • Educational Interactive Simulator • Economics & Digital Technologies"
+            }
+        };
+
+        let chartBigMacObj = null, chartIphoneObj = null, chartStarbucksObj = null, chartBananaObj = null, chartCinemaTicketsObj = null, chartPlovObj = null, chartThaliObj = null;
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function renderDynamicTables(lang) {
+            const d = dict[lang];
+
+            const moviesTbody = document.getElementById('tb-movies-body');
+            let moviesHtml = '';
+            d.moviesData.forEach(m => {
+                const nomClass = m.isNomTop ? 'text-amber-400 font-bold' : 'text-slate-300';
+                const realClass = m.isRealTop ? 'text-emerald-400 font-bold' : 'text-slate-300';
+                moviesHtml += `<tr>
+                    <td class="py-2.5 font-bold text-slate-200">${m.title}</td>
+                    <td class="py-2.5 text-right ${nomClass}">${m.nom}</td>
+                    <td class="py-2.5 text-right ${realClass}">${m.real}</td>
+                </tr>`;
+            });
+            moviesTbody.innerHTML = moviesHtml;
+
+            const mthTbody = document.getElementById('tb-methodology-body');
+            let mthHtml = '';
+            d.methodologyRows.forEach(r => {
+                mthHtml += `<tr>
+                    <td class="p-3 font-bold text-white">${r.name}</td>
+                    <td class="p-3 text-slate-400">${r.type}</td>
+                    <td class="p-3 ${r.color}">${r.rel}</td>
+                    <td class="p-3 text-slate-300">${r.use}</td>
+                </tr>`;
+            });
+            mthTbody.innerHTML = mthHtml;
+        }
+
+        function renderAllCharts(lang) {
+            const d = dict[lang];
+
+            if (chartBigMacObj) chartBigMacObj.destroy();
+            chartBigMacObj = new Chart(document.getElementById('chartBigMac'), {
+                type: 'bar',
+                data: {
+                    labels: lang === 'ru' 
+                        ? ['Швейцария', 'Уругвай', 'Норвегия', 'Колумбия', 'США (Base)', 'Украина', 'Индия', 'Индонезия']
+                        : ['Switzerland', 'Uruguay', 'Norway', 'Colombia', 'USA (Base)', 'Ukraine', 'India', 'Indonesia'],
+                    datasets: [{
+                        label: d.bmChartLabel,
+                        data: [9.04, 8.94, 8.05, 8.00, 6.22, 3.34, 2.45, 2.38],
+                        backgroundColor: ['#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#06b6d4', '#3b82f6', '#8b5cf6'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { ticks: { color: '#9ca3af' } }, y: { ticks: { color: '#f3f4f6' } } }
+                }
+            });
+
+            if (chartIphoneObj) chartIphoneObj.destroy();
+            chartIphoneObj = new Chart(document.getElementById('chartIphone'), {
+                type: 'bar',
+                data: {
+                    labels: lang === 'ru'
+                        ? ['Турция', 'Бразилия', 'Египет', 'Швеция', 'Индия', 'США', 'Южная Корея']
+                        : ['Turkey', 'Brazil', 'Egypt', 'Sweden', 'India', 'USA', 'South Korea'],
+                    datasets: [{
+                        label: d.ipChartLabel,
+                        data: [2182, 1835, 1525, 1448, 1401, 1079, 1063],
+                        backgroundColor: '#38bdf8',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { ticks: { color: '#9ca3af' } }, y: { ticks: { color: '#f3f4f6' } } }
+                }
+            });
+
+            if (chartStarbucksObj) chartStarbucksObj.destroy();
+            chartStarbucksObj = new Chart(document.getElementById('chartStarbucks'), {
+                type: 'bar',
+                data: {
+                    labels: lang === 'ru'
+                        ? ['Швейцария', 'США', 'Великобритания', 'ОАЭ', 'Корея', 'Япония', 'Индия', 'Бразилия']
+                        : ['Switzerland', 'USA', 'UK', 'UAE', 'Korea', 'Japan', 'India', 'Brazil'],
+                    datasets: [{
+                        label: d.sbChartLabel,
+                        data: [6.70, 5.45, 5.34, 4.29, 3.85, 3.33, 3.04, 2.12],
+                        backgroundColor: ['#10b981', '#059669', '#047857', '#0d9488', '#0284c7', '#2563eb', '#7c3aed', '#db2777'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { ticks: { color: '#9ca3af' } }, y: { ticks: { color: '#f3f4f6' } } }
+                }
+            });
+
+            if (chartBananaObj) chartBananaObj.destroy();
+            chartBananaObj = new Chart(document.getElementById('chartBanana'), {
+                type: 'bar',
+                data: {
+                    labels: lang === 'ru'
+                        ? ['Израиль', 'Дания', 'Сингапур', 'Южная Корея', 'Казахстан', 'США', 'Эквадор', 'Индия', 'Пакистан']
+                        : ['Israel', 'Denmark', 'Singapore', 'South Korea', 'Kazakhstan', 'USA', 'Ecuador', 'India', 'Pakistan'],
+                    datasets: [{
+                        label: d.bnChartLabel,
+                        data: [3.50, 3.23, 3.15, 3.00, 2.05, 1.67, 1.08, 0.66, 0.65],
+                        backgroundColor: ['#eab308', '#facc15', '#fde047', '#fef08a', '#eab308', '#84cc16', '#22c55e', '#10b981', '#059669'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { ticks: { color: '#9ca3af' } }, y: { ticks: { color: '#f3f4f6' } } }
+                }
+            });
+
+            if (chartCinemaTicketsObj) chartCinemaTicketsObj.destroy();
+            chartCinemaTicketsObj = new Chart(document.getElementById('chartCinemaTickets'), {
+                type: 'bar',
+                data: {
+                    labels: lang === 'ru'
+                        ? ['Цюрих', 'Лондон', 'Нью-Йорк', 'Токио', 'Сеул', 'Мумбаи', 'Джакарта']
+                        : ['Zurich', 'London', 'New York', 'Tokyo', 'Seoul', 'Mumbai', 'Jakarta'],
+                    datasets: [{
+                        label: d.hwChartLabel,
+                        data: [24.6, 20.4, 20.0, 13.2, 11.1, 4.7, 3.1],
+                        backgroundColor: '#a855f7',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { ticks: { color: '#9ca3af' } }, y: { ticks: { color: '#f3f4f6' } } }
+                }
+            });
+
+            if (chartPlovObj) chartPlovObj.destroy();
+            chartPlovObj = new Chart(document.getElementById('chartPlov'), {
+                type: 'bar',
+                data: {
+                    labels: lang === 'ru'
+                        ? ['Ташкент', 'Фергана', 'Самарканд', 'Ташкентская обл.', 'Каракалпакстан']
+                        : ['Tashkent', 'Fergana', 'Samarkand', 'Tashkent Region', 'Karakalpakstan'],
+                    datasets: [{
+                        label: d.plovChartLabel,
+                        data: [125125, 122884, 119999, 119694, 103557],
+                        backgroundColor: ['#f59e0b', '#fbbf24', '#d97706', '#b45309', '#78350f'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { ticks: { color: '#9ca3af' } }, y: { ticks: { color: '#f3f4f6' } } }
+                }
+            });
+
+            if (chartThaliObj) chartThaliObj.destroy();
+            chartThaliObj = new Chart(document.getElementById('chartThali'), {
+                type: 'bar',
+                data: {
+                    labels: lang === 'ru' ? ['Сентябрь 2025', 'Сентябрь 2026'] : ['September 2025', 'September 2026'],
+                    datasets: [
+                        { label: d.thaliVegLabel, data: [28.1, 30.8], backgroundColor: '#10b981' },
+                        { label: d.thaliNonVegLabel, data: [56.0, 59.5], backgroundColor: '#f59e0b' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#f3f4f6' } } },
+                    scales: { x: { ticks: { color: '#9ca3af' } }, y: { ticks: { color: '#f3f4f6' } } }
+                }
+            });
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const d = dict[lang];
+
+            document.getElementById('txt-header-title').innerText = d.headerTitle;
+            document.getElementById('txt-header-sub').innerText = d.headerSub;
+
+            document.getElementById('bm-title').innerText = d.bmTitle;
+            document.getElementById('bm-sub').innerText = d.bmSub;
+            document.getElementById('bm-exp-title').innerText = d.bmExpTitle;
+            document.getElementById('bm-exp-list').innerHTML = d.bmExpList;
+            document.getElementById('bm-note').innerHTML = d.bmNote;
+
+            document.getElementById('ip-title').innerText = d.ipTitle;
+            document.getElementById('ip-sub').innerText = d.ipSub;
+            document.getElementById('ip-exp-title').innerText = d.ipExpTitle;
+            document.getElementById('ip-exp-p1').innerHTML = d.ipExpP1;
+            document.getElementById('ip-exp-p2').innerHTML = d.ipExpP2;
+
+            document.getElementById('sb-title').innerText = d.sbTitle;
+            document.getElementById('sb-sub').innerText = d.sbSub;
+            document.getElementById('sb-exp-title').innerText = d.sbExpTitle;
+            document.getElementById('sb-exp-p1').innerHTML = d.sbExpP1;
+            document.getElementById('sb-exp-p2').innerHTML = d.sbExpP2;
+            document.getElementById('sb-exp-list').innerHTML = d.sbExpList;
+
+            document.getElementById('bn-title').innerText = d.bnTitle;
+            document.getElementById('bn-sub').innerText = d.bnSub;
+            document.getElementById('bn-badge').innerText = d.bnBadge;
+            document.getElementById('bn-exp-title').innerText = d.bnExpTitle;
+            document.getElementById('bn-exp-p1').innerHTML = d.bnExpP1;
+            document.getElementById('bn-exp-p2').innerHTML = d.bnExpP2;
+
+            document.getElementById('hw-title').innerText = d.hwTitle;
+            document.getElementById('hw-sub').innerText = d.hwSub;
+            document.getElementById('hw-chart-title').innerText = d.hwChartTitle;
+            document.getElementById('hw-tbl-title').innerText = d.hwTblTitle;
+            document.getElementById('th-movie').innerText = d.thMovie;
+            document.getElementById('th-nom').innerText = d.thNom;
+            document.getElementById('th-real').innerText = d.thReal;
+            document.getElementById('hw-note').innerHTML = d.hwNote;
+
+            document.getElementById('reg-title').innerText = d.regTitle;
+            document.getElementById('reg-sub').innerText = d.regSub;
+            document.getElementById('reg-plov-title').innerText = d.regPlovTitle;
+            document.getElementById('reg-thali-title').innerText = d.regThaliTitle;
+            document.getElementById('reg-exp-title').innerText = d.regExpTitle;
+            document.getElementById('reg-card-1').innerHTML = d.regCard1;
+            document.getElementById('reg-card-2').innerHTML = d.regCard2;
+            document.getElementById('reg-card-3').innerHTML = d.regCard3;
+
+            document.getElementById('mth-title').innerText = d.mthTitle;
+            document.getElementById('mth-sub').innerText = d.mthSub;
+            document.getElementById('th-idx').innerText = d.thIdx;
+            document.getElementById('th-type').innerText = d.thType;
+            document.getElementById('th-rel').innerText = d.thRel;
+            document.getElementById('th-use').innerText = d.thUse;
+            document.getElementById('mth-rules-title').innerText = d.mthRulesTitle;
+            document.getElementById('mth-rules-list').innerHTML = d.mthRulesList;
+            document.getElementById('txt-footer').innerText = d.footer;
+
+            if (lang === 'ru') {
+                document.getElementById('btn-lang-ru').className = "px-3 py-1 text-xs font-extrabold rounded-lg bg-purple-600 text-white transition";
+                document.getElementById('btn-lang-en').className = "px-3 py-1 text-xs font-extrabold rounded-lg text-slate-400 hover:text-white transition";
+            } else {
+                document.getElementById('btn-lang-en').className = "px-3 py-1 text-xs font-extrabold rounded-lg bg-purple-600 text-white transition";
+                document.getElementById('btn-lang-ru').className = "px-3 py-1 text-xs font-extrabold rounded-lg text-slate-400 hover:text-white transition";
+            }
+
+            renderDynamicTables(lang);
+            renderAllCharts(lang);
+        }
+
+        window.onload = function() {
+            setLanguage('ru');
+        };
+    </script>
+</body>
+</html>
