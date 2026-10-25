@@ -24,64 +24,69 @@
             box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
         }
 
-        /* Кнопки навигации - Карточки из репозитория */
+        /* КВАДРАТНЫЕ КНОПКИ С ТОЧНЫМ ОБЖИМОМ */
         .tab-btn {
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(15, 23, 42, 0.6);
-            border: 1.5px solid rgba(255, 255, 255, 0.12);
-            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
             overflow: hidden;
             cursor: pointer;
-            padding: 4px;
+            padding: 0;
+            aspect-ratio: 1 / 1; /* Строгий квадрат */
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .tab-btn:hover {
-            transform: translateY(-3px) scale(1.02);
-            border-color: rgba(255, 255, 255, 0.3);
-            box-shadow: 0 8px 20px -4px rgba(0, 0, 0, 0.5);
+            transform: translateY(-4px) scale(1.03);
+            border-color: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 25px -4px rgba(0, 0, 0, 0.6);
         }
 
         .tab-btn img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            border-radius: 12px;
+            object-fit: fill; /* Заполнение всей рамки без щелей */
+            display: block;
         }
 
-        /* Индивидуальная подсветка рамок при клике/активации */
+        /* Подсветка неоновых рамок строго по контуру */
         .tab-btn-mac.active {
             border-color: #10b981 !important;
-            box-shadow: 0 0 22px rgba(16, 185, 129, 0.6), inset 0 0 10px rgba(16, 185, 129, 0.2) !important;
+            box-shadow: 0 0 25px rgba(16, 185, 129, 0.7), inset 0 0 12px rgba(16, 185, 129, 0.3) !important;
         }
 
         .tab-btn-iphone.active {
             border-color: #e2e8f0 !important;
-            box-shadow: 0 0 22px rgba(226, 232, 240, 0.5), inset 0 0 10px rgba(226, 232, 240, 0.2) !important;
+            box-shadow: 0 0 25px rgba(226, 232, 240, 0.6), inset 0 0 12px rgba(226, 232, 240, 0.3) !important;
         }
 
         .tab-btn-starbucks.active {
             border-color: #059669 !important;
-            box-shadow: 0 0 22px rgba(5, 150, 105, 0.6), inset 0 0 10px rgba(5, 150, 105, 0.2) !important;
+            box-shadow: 0 0 25px rgba(5, 150, 105, 0.7), inset 0 0 12px rgba(5, 150, 105, 0.3) !important;
         }
 
         .tab-btn-banana.active {
             border-color: #eab308 !important;
-            box-shadow: 0 0 22px rgba(234, 179, 8, 0.6), inset 0 0 10px rgba(234, 179, 8, 0.2) !important;
+            box-shadow: 0 0 25px rgba(234, 179, 8, 0.7), inset 0 0 12px rgba(234, 179, 8, 0.3) !important;
         }
 
         .tab-btn-cinema.active {
             border-color: #a855f7 !important;
-            box-shadow: 0 0 22px rgba(168, 85, 247, 0.6), inset 0 0 10px rgba(168, 85, 247, 0.2) !important;
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.7), inset 0 0 12px rgba(168, 85, 247, 0.3) !important;
         }
 
         .tab-btn-dishes.active {
             border-color: #3b82f6 !important;
-            box-shadow: 0 0 22px rgba(59, 130, 246, 0.6), inset 0 0 10px rgba(59, 130, 246, 0.2) !important;
+            box-shadow: 0 0 25px rgba(59, 130, 246, 0.7), inset 0 0 12px rgba(59, 130, 246, 0.3) !important;
         }
 
         .tab-btn-method.active {
             border-color: #ef4444 !important;
-            box-shadow: 0 0 22px rgba(239, 68, 68, 0.6), inset 0 0 10px rgba(239, 68, 68, 0.2) !important;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.7), inset 0 0 12px rgba(239, 68, 68, 0.3) !important;
         }
 
         .tab-content { display: none; }
@@ -94,9 +99,8 @@
     <!-- HEADER -->
     <header class="glass-panel p-4 rounded-2xl mb-5 border-t-2 border-t-purple-500 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div class="flex items-center space-x-4">
-            <!-- Логотип AlmaU -->
-            <div class="px-3 py-1.5 bg-white rounded-xl border border-slate-200/80 shadow-md flex items-center justify-center overflow-hidden min-h-[52px]">
-                <img src="almau-logo.png" alt="AlmaU Logo" class="h-10 w-auto object-contain">
+            <div class="px-3 py-1.5 bg-white rounded-xl border border-slate-200/80 shadow-md flex items-center justify-center min-w-[140px] h-[52px]">
+                <img src="https://ogaydv-prog.github.io/principles-economics/almau.jpg" alt="AlmaU Logo" class="max-h-9 w-auto object-contain" onerror="this.src='./almau.jpg'">
             </div>
             <div>
                 <h1 class="text-xl md:text-2xl font-black text-purple-400 tracking-tight" id="txt-header-title">
@@ -108,48 +112,47 @@
             </div>
         </div>
 
-        <!-- Переключатель языков RU / EN -->
         <div class="flex items-center space-x-1 bg-slate-900 p-1 rounded-xl border border-slate-800 self-end md:self-auto">
             <button onclick="setLanguage('ru')" id="btn-lang-ru" class="px-3 py-1 text-xs font-extrabold rounded-lg bg-purple-600 text-white transition">RU</button>
             <button onclick="setLanguage('en')" id="btn-lang-en" class="px-3 py-1 text-xs font-extrabold rounded-lg text-slate-400 hover:text-white transition">EN</button>
         </div>
     </header>
 
-    <!-- NAVIGATION TABS (7 Вкладок с картинками из репозитория) -->
-    <nav class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 mb-5">
+    <!-- NAVIGATION TABS (7 Квадратных рамок) -->
+    <nav class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-4 mb-6">
         <!-- Big Mac -->
-        <button onclick="switchTab('tab-bigmac', this)" class="tab-btn tab-btn-mac active h-28 flex items-center justify-center" title="Big Mac Index">
-            <img src="pic-dash-mc.png" alt="McDonald's">
+        <button onclick="switchTab('tab-bigmac', this)" class="tab-btn tab-btn-mac active" title="Big Mac Index">
+            <img src="pic-dash-mc.png" alt="McDonald's" onerror="this.src='./pic-dash-mc.png'">
         </button>
 
         <!-- iPhone -->
-        <button onclick="switchTab('tab-iphone', this)" class="tab-btn tab-btn-iphone h-28 flex items-center justify-center" title="iPhone Index">
-            <img src="pic-dash-apl.png" alt="iPhone Index">
+        <button onclick="switchTab('tab-iphone', this)" class="tab-btn tab-btn-iphone" title="iPhone Index">
+            <img src="pic-dash-apl.png" alt="iPhone Index" onerror="this.src='./pic-dash-apl.png'">
         </button>
 
         <!-- Starbucks -->
-        <button onclick="switchTab('tab-starbucks', this)" class="tab-btn tab-btn-starbucks h-28 flex items-center justify-center" title="Starbucks Latte Index">
-            <img src="pic-dash-strb.png" alt="Starbucks">
+        <button onclick="switchTab('tab-starbucks', this)" class="tab-btn tab-btn-starbucks" title="Starbucks Latte Index">
+            <img src="pic-dash-strb.png" alt="Starbucks" onerror="this.src='./pic-dash-strb.png'">
         </button>
 
         <!-- Banana Index -->
-        <button onclick="switchTab('tab-banana', this)" class="tab-btn tab-btn-banana h-28 flex items-center justify-center" title="Banana Index">
-            <img src="pic-dash-ban.png" alt="Banana Index">
+        <button onclick="switchTab('tab-banana', this)" class="tab-btn tab-btn-banana" title="Banana Index">
+            <img src="pic-dash-ban.png" alt="Banana Index" onerror="this.src='./pic-dash-ban.png'">
         </button>
 
         <!-- Hollywood -->
-        <button onclick="switchTab('tab-cinema', this)" class="tab-btn tab-btn-cinema h-28 flex items-center justify-center" title="Hollywood Index">
-            <img src="pic-dash-hol.png" alt="Hollywood Index">
+        <button onclick="switchTab('tab-cinema', this)" class="tab-btn tab-btn-cinema" title="Hollywood Index">
+            <img src="pic-dash-hol.png" alt="Hollywood Index" onerror="this.src='./pic-dash-hol.png'">
         </button>
 
         <!-- Региональные индексы -->
-        <button onclick="switchTab('tab-dishes', this)" class="tab-btn tab-btn-dishes h-28 flex items-center justify-center" title="Региональные индексы">
-            <img src="pic-dash-reg.png" alt="Региональные индексы">
+        <button onclick="switchTab('tab-dishes', this)" class="tab-btn tab-btn-dishes" title="Региональные индексы">
+            <img src="pic-dash-reg.png" alt="Региональные индексы" onerror="this.src='./pic-dash-reg.png'">
         </button>
 
         <!-- Методология -->
-        <button onclick="switchTab('tab-methodology', this)" class="tab-btn tab-btn-method h-28 flex items-center justify-center" title="Методология">
-            <img src="pic-dash-metod.png" alt="Методология">
+        <button onclick="switchTab('tab-methodology', this)" class="tab-btn tab-btn-method" title="Методология">
+            <img src="pic-dash-metod.png" alt="Методология" onerror="this.src='./pic-dash-metod.png'">
         </button>
     </nav>
 
