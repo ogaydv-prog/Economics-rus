@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тема 9 | Экономика (SE, DS, IS, PM)</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #333333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 15px 20px;
+            position: relative;
+        }
+
+        /* Навигационная панель */
+        .top-nav {
+            width: 100%;
+            max-width: 1450px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 25px;
+            margin-bottom: -10px;
+            z-index: 10;
+        }
+
+        .top-left-logo {
+            width: 55px;
+            height: 55px;
+            object-fit: contain;
+        }
+
+        .back-button {
+            text-decoration: none;
+            background-color: #001e50;
+            color: white;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
+        }
+
+        .back-button:hover {
+            background-color: #003380;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 30, 80, 0.25);
+        }
+
+        header {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 30px;
+            font-weight: 700;
+            color: #001e50;
+            margin-bottom: 8px;
+            margin-top: 10px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #555555;
+            max-width: 720px;
+            line-height: 1.5;
+            margin: 0 auto;
+        }
+
+        /* Контейнер карточек — ровно по центру высоты */
+        .grid-container {
+            display: flex;
+            flex-wrap: nowrap;
+            gap: 18px;
+            max-width: 1450px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            margin: auto 0;
+            padding: 20px 0 40px 0;
+        }
+
+        /* Размеры карточки строго под пропорции исходников (185x300px) */
+        .card {
+            display: block;
+            text-decoration: none;
+            background: #ffffff;
+            border: 2px solid #001e50;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(0, 30, 80, 0.08);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            width: 185px; 
+            height: 300px; 
+            flex-shrink: 0;
+            cursor: pointer;
+            position: relative;
+        }
+
+        /* Картинка заполняет карточку без зазоров */
+        .card img {
+            width: 100% !important;
+            height: 100% !important;
+            display: block !important;
+            object-fit: fill !important;
+            border: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* Подсветка в тёплом янтарно-оранжевом стиле картин Вермеера */
+        .card:hover, .card:active {
+            transform: translateY(-10px) scale(1.04);
+            border: 3px solid #f59e0b;
+            box-shadow: 0 14px 30px rgba(245, 158, 11, 0.35), inset 0 0 12px rgba(245, 158, 11, 0.15);
+        }
+
+        footer {
+            margin-top: auto;
+            font-size: 14px;
+            color: #718096;
+            padding-top: 30px;
+            padding-bottom: 20px;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 1250px) {
+            .grid-container {
+                flex-wrap: wrap;
+                gap: 16px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px 15px;
+            }
+
+            .top-nav {
+                margin-top: 5px;
+                margin-bottom: 15px;
+            }
+
+            .top-left-logo {
+                width: 48px;
+                height: 48px;
+            }
+
+            .back-button {
+                padding: 7px 13px;
+                font-size: 12px;
+            }
+
+            header {
+                margin-top: 5px;
+                margin-bottom: 15px;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            .subtitle {
+                font-size: 13px;
+            }
+
+            .grid-container {
+                margin: 10px 0;
+                padding-bottom: 20px;
+            }
+
+            .card {
+                width: 155px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Навигация: Логотип и кнопка возврата -->
+    <div class="top-nav">
+        <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/almau.jpg'">
+        <a href="topics.html" class="back-button">← К темам курса</a>
+    </div>
+
+    <header>
+        <h1>Тема 9: Измерение стоимости жизни</h1>
+        <p class="subtitle">
+            Выберите учебный ресурс ниже: конспект лекции, презентация, интерактивные симуляторы инфляции, лабораторная работа или видеолекция.
+        </p>
+    </header>
+
+    <!-- Основная сетка ресурсов -->
+    <main class="grid-container">
+        <!-- 1. Конспект лекции -->
+        <a href="cpi-lecture9-pro-pe.html" class="card" title="Конспект лекции">
+            <img src="pic-lecture9-ru.png" alt="Конспект лекции" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-lecture9-ru.png'">
+        </a>
+
+        <!-- 2. Презентация Canva -->
+        <a href="https://canva.link/sqo0h6oo8x0mp9c" target="_blank" rel="noopener noreferrer" class="card" title="Презентация">
+            <img src="pic-preza9-rus.png" alt="Презентация" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-preza9-rus.png'">
+        </a>
+
+        <!-- 3. Симулятор ИПЦ / CPI -->
+        <a href="sim-cpi-pe.html" class="card" title="Симулятор ИПЦ">
+            <img src="pic-cpi-rus.png" alt="Симулятор ИПЦ" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-cpi-rus.png'">
+        </a>
+
+        <!-- 4. Симулятор Альтернативных Индексов (Биг-Мак и др.) -->
+        <a href="sim-big-mc-pe-pro.html" class="card" title="Альтернативные индексы инфляции">
+            <img src="pic-big-mc-ru.png" alt="Альтернативные индексы инфляции" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-big-mc-ru.png'">
+        </a>
+
+        <!-- 5. Лабораторная работа -->
+        <a href="#" class="card" title="Лабораторная работа (Скоро)">
+            <img src="pic-cpi-task-rus.png" alt="Лабораторная работа" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-cpi-task-rus.png'">
+        </a>
+
+        <!-- 6. Видеолекция (Прямой переход без переворота) -->
+        <a href="https://www.youtube.com/watch?v=jWAineywlO8&list=PLGssI1JnCp5uK8oP_5_DFfOO0-f1gwXw9&index=51" target="_blank" rel="noopener noreferrer" class="card" title="Видеолекция">
+            <img src="pic-video9-ru.png" alt="Видеолекция" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-video9-ru.png'">
+        </a>
+    </main>
+
+    <footer>
+        <p>Разработано для студентов IT-направлений (SE, DS, IS, PM) AlmaU 2026 | Курс: Экономика</p>
+        <p>© Almaty Management University | Школа цифровых технологий и экономики</p>
+    </footer>
+
+</body>
+</html>
