@@ -1,0 +1,2675 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Денежный рынок | Principles of Economics | AlmaU SDTE 2026</title>
+    <style>
+        :root {
+            --navy: #001e50;
+            --navy-light: #003380;
+            --teal: #187a87;
+            --teal-light: #e6f4f6;
+            --gold: #d99b26;
+            --gold-bright: #fbbf24;
+            --red: #dc2626;
+            --red-light: #fee2e2;
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 25px -5px rgba(0, 30, 80, 0.08), 0 4px 10px -2px rgba(0, 30, 80, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--navy) 0%, #002d72 100%);
+            color: white;
+            padding: 18px 32px;
+            box-shadow: 0 4px 20px rgba(0, 30, 80, 0.18);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-badge {
+            width: 52px;
+            height: 52px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .logo-badge img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .logo-fallback {
+            font-weight: 800;
+            color: var(--navy);
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .title-block h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            line-height: 1.2;
+        }
+
+        .title-block p {
+            font-size: 13px;
+            color: #cbd5e1;
+            margin-top: 3px;
+        }
+
+        .controls-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .lang-switch {
+            display: flex;
+            background: rgba(255, 255, 255, 0.14);
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .lang-btn {
+            border: none;
+            background: transparent;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 7px;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .lang-btn.active {
+            background: var(--gold-bright);
+            color: var(--navy);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+        }
+
+        /* Navigation Tabs */
+        .nav-wrapper {
+            background: white;
+            border-bottom: 1px solid var(--border);
+            padding: 0 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+
+        .nav-tabs {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 10px 0;
+            scrollbar-width: thin;
+        }
+
+        .tab-btn {
+            border: 1px solid transparent;
+            background: #f8fafc;
+            color: var(--muted);
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .tab-btn:hover {
+            background: #eef2f6;
+            color: var(--navy);
+        }
+
+        .tab-btn.active {
+            background: var(--navy);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 30, 80, 0.2);
+        }
+
+        .tab-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            background: rgba(255,255,255,0.2);
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .tab-btn:not(.active) .tab-num {
+            background: #e2e8f0;
+            color: var(--navy);
+        }
+
+        /* Main Container */
+        main {
+            max-width: 1400px;
+            width: 100%;
+            margin: 26px auto;
+            padding: 0 20px;
+            flex: 1;
+        }
+
+        .tab-panel {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards & Layout */
+        .section-header {
+            margin-bottom: 22px;
+        }
+
+        .section-header h2 {
+            font-size: 24px;
+            color: var(--navy);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .section-header p {
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 22px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 22px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Distinction badges */
+        .distinction-box {
+            background: #f8fafc;
+            border-left: 4px solid var(--teal);
+            padding: 14px 16px;
+            border-radius: 8px;
+        }
+
+        .distinction-box h4 {
+            color: var(--navy);
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .distinction-box p {
+            font-size: 13.5px;
+            color: #475569;
+        }
+
+        /* 3D Flip Cards for Functions of Money */
+        .flip-card {
+            background-color: transparent;
+            height: 290px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            border-radius: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            padding: 26px 22px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .flip-card-front {
+            background: white;
+            border: 2px solid var(--border);
+        }
+
+        .flip-card:hover .flip-card-front {
+            border-color: var(--gold);
+        }
+
+        .circle-icon {
+            width: 118px;
+            height: 118px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 15px;
+            line-height: 1.25;
+            padding: 12px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+        }
+
+        .bg-teal { background: #187a87; }
+        .bg-navy { background: #14364a; }
+        .bg-gold { background: #d99b26; }
+
+        .flip-hint {
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--teal);
+            font-weight: 600;
+            background: var(--teal-light);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .flip-card-back {
+            background: linear-gradient(145deg, var(--navy) 0%, #0b3954 100%);
+            color: white;
+            transform: rotateY(180deg);
+            text-align: left;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .flip-card-back h3 {
+            color: var(--gold-bright);
+            font-size: 17px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            padding-bottom: 8px;
+            width: 100%;
+        }
+
+        .flip-card-back p {
+            font-size: 13.8px;
+            line-height: 1.55;
+            color: #f1f5f9;
+        }
+
+        .flip-formula {
+            background: rgba(255,255,255,0.1);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-family: 'Cambria Math', Georgia, serif;
+            font-size: 14px;
+            color: var(--gold-bright);
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Evolution Timeline */
+        .evo-flow {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            gap: 12px;
+            margin: 18px 0;
+            flex-wrap: wrap;
+        }
+
+        .evo-step {
+            flex: 1;
+            min-width: 180px;
+            background: #f8fafc;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 14px;
+            padding: 16px;
+            position: relative;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .evo-step:hover {
+            transform: translateY(-4px);
+            border-color: var(--teal);
+            background: white;
+        }
+
+        .evo-step.highlight-cbdc {
+            background: linear-gradient(180deg, #fffbeb 0%, #ffffff 100%);
+            border-color: var(--gold);
+        }
+
+        .evo-badge {
+            display: inline-block;
+            background: var(--navy);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .evo-step.highlight-cbdc .evo-badge {
+            background: var(--gold);
+            color: var(--navy);
+        }
+
+        .evo-step h4 {
+            font-size: 15px;
+            color: var(--navy);
+            margin-bottom: 6px;
+        }
+
+        .evo-step p {
+            font-size: 13px;
+            color: #475569;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13.5px;
+        }
+
+        th {
+            background: var(--navy);
+            color: white;
+            text-align: left;
+            padding: 11px 14px;
+            font-weight: 600;
+        }
+
+        th:first-child { border-top-left-radius: 8px; }
+        th:last-child { border-top-right-radius: 8px; }
+
+        td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: top;
+        }
+
+        tr:nth-child(even) td {
+            background: #f8fafc;
+        }
+
+        .agg-pill {
+            display: inline-block;
+            padding: 2px 9px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12px;
+            background: var(--teal-light);
+            color: var(--teal);
+        }
+
+        .callout-amber {
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-left: 5px solid var(--gold);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-top: 10px;
+        }
+
+        .callout-amber h4 {
+            color: #92400e;
+            font-size: 15.5px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .callout-amber p {
+            font-size: 13.8px;
+            color: #78350f;
+        }
+
+        /* Interactive Sliders */
+        .slider-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 16px;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--navy);
+        }
+
+        .slider-val {
+            background: var(--red);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .slider-val.teal-val {
+            background: var(--teal);
+        }
+
+        /* Red Slider Styling */
+        input[type="range"].red-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #fecaca;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type="range"].red-slider::-webkit-slider-runnable-track {
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #ef4444, #b91c1c);
+        }
+
+        input[type="range"].red-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #dc2626;
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(220, 38, 38, 0.5);
+            cursor: pointer;
+            margin-top: -7px;
+            transition: transform 0.15s;
+        }
+
+        input[type="range"].red-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        /* Teal Slider Styling */
+        input[type="range"].teal-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            background: #bae6fd;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type="range"].teal-slider::-webkit-slider-runnable-track {
+            height: 8px;
+            border-radius: 5px;
+            background: linear-gradient(90deg, #187a87, #001e50);
+        }
+
+        input[type="range"].teal-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--navy);
+            border: 3px solid white;
+            box-shadow: 0 2px 6px rgba(0, 30, 80, 0.4);
+            cursor: pointer;
+            margin-top: -6px;
+        }
+
+        /* Sub-tabs inside panels */
+        .sub-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .sub-tab-btn {
+            padding: 9px 18px;
+            border-radius: 9px;
+            border: 1.5px solid var(--border);
+            background: white;
+            font-weight: 700;
+            font-size: 13.5px;
+            color: var(--muted);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .sub-tab-btn.active {
+            border-color: var(--navy);
+            background: var(--navy);
+            color: white;
+        }
+
+        .sub-panel {
+            display: none;
+        }
+
+        .sub-panel.active {
+            display: block;
+        }
+
+        /* Status pill for equilibrium */
+        .eq-status {
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .eq-status.target-hit {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .eq-status.off-target {
+            background: #f1f5f9;
+            color: var(--navy);
+            border: 1px solid #cbd5e1;
+        }
+
+        /* Formula Cards */
+        .formula-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .formula-item {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .formula-item .f-label {
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--teal);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            margin-bottom: 8px;
+        }
+
+        .formula-item .f-math {
+            font-family: 'Cambria Math', 'Times New Roman', serif;
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--navy);
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px dashed #cbd5e1;
+            margin-bottom: 8px;
+        }
+
+        .formula-item .f-desc {
+            font-size: 12.5px;
+            color: var(--muted);
+        }
+
+        /* SVG Containers */
+        .svg-wrap {
+            width: 100%;
+            overflow-x: auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Footer */
+        footer {
+            background: white;
+            border-top: 1px solid var(--border);
+            padding: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 40px;
+        }
+
+        footer strong {
+            color: var(--navy);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <div class="brand-block">
+            <div class="logo-badge">
+                <img src="https://ogaydv-prog.github.io/principles-economics/almau.jpg" alt="AlmaU" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <span class="logo-fallback" style="display:none;">AlmaU</span>
+            </div>
+            <div class="title-block">
+                <h1 data-i18n="mainTitle">Денежный рынок: Спрос на деньги и предложение денег</h1>
+                <p data-i18n="subTitle">Курс «Принципы экономики» | Almaty Management University (AlmaU) • Школа цифровых технологий и экономики (SDTE), 2026</p>
+            </div>
+        </div>
+        <div class="controls-block">
+            <div class="lang-switch">
+                <button class="lang-btn active" id="btn-ru" onclick="setLang('ru')">RU</button>
+                <button class="lang-btn" id="btn-en" onclick="setLang('en')">EN</button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div class="nav-wrapper">
+    <nav class="nav-tabs" id="navTabs">
+        <button class="tab-btn active" onclick="openTab('tab1', this)"><span class="tab-num">1</span><span data-i18n="t1">Как работает денежный рынок</span></button>
+        <button class="tab-btn" onclick="openTab('tab2', this)"><span class="tab-num">2</span><span data-i18n="t2">Функции денег</span></button>
+        <button class="tab-btn" onclick="openTab('tab3', this)"><span class="tab-num">3</span><span data-i18n="t3">Эволюция денег и платежей</span></button>
+        <button class="tab-btn" onclick="openTab('tab4', this)"><span class="tab-num">4</span><span data-i18n="t4">Измерение денежной массы</span></button>
+        <button class="tab-btn" onclick="openTab('tab5', this)"><span class="tab-num">5</span><span data-i18n="t5">Агрегаты: США и Казахстан</span></button>
+        <button class="tab-btn" onclick="openTab('tab6', this)"><span class="tab-num">6</span><span data-i18n="t6">Предложение денег и равновесие</span></button>
+        <button class="tab-btn" onclick="openTab('tab7', this)"><span class="tab-num">7</span><span data-i18n="t7">Теории спроса и скорость</span></button>
+        <button class="tab-btn" onclick="openTab('tab8', this)"><span class="tab-num">8</span><span data-i18n="t8">Итоги и ключевые формулы</span></button>
+    </nav>
+</div>
+
+<main>
+    <!-- ==================== TAB 1: HOW MONEY MARKET WORKS ==================== -->
+    <section id="tab1" class="tab-panel active">
+        <div class="section-header">
+            <h2 data-i18n="s1Title">Как работает денежный рынок и чем он отличается от рынка товаров и услуг</h2>
+            <p data-i18n="s1Desc">Деньги — наиболее ликвидный актив. На денежном рынке ценой выступает номинальная процентная ставка (i), а на рынке товаров и услуг — общий уровень цен (P).</p>
+        </div>
+
+        <div class="grid-2">
+            <!-- Graph 1: Goods and Services Market (AD-SRAS) -->
+            <div class="card">
+                <div class="card-title">
+                    <span data-i18n="g1Title">1. Рынок товаров и услуг (краткосрочный период)</span>
+                    <span class="agg-pill">AD — SRAS</span>
+                </div>
+                <div class="svg-wrap">
+                    <svg viewBox="0 0 460 310" width="460" height="310">
+                        <!-- Grid -->
+                        <line x1="65" y1="30" x2="65" y2="260" stroke="#334155" stroke-width="2"/>
+                        <line x1="65" y1="260" x2="430" y2="260" stroke="#334155" stroke-width="2"/>
+                        <!-- Dashed guides -->
+                        <line x1="65" y1="145" x2="245" y2="145" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+                        <line x1="245" y1="145" x2="245" y2="260" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+                        <!-- SRAS upward sloping -->
+                        <path d="M 105 235 Q 230 165 385 50" fill="none" stroke="#187a87" stroke-width="3.5" stroke-linecap="round"/>
+                        <text x="360" y="42" fill="#187a87" font-weight="700" font-size="14">SRAS</text>
+                        <!-- AD downward sloping -->
+                        <line x1="105" y1="55" x2="395" y2="235" stroke="#001e50" stroke-width="3.5" stroke-linecap="round"/>
+                        <text x="380" y="220" fill="#001e50" font-weight="700" font-size="14">AD</text>
+                        <!-- Equilibrium -->
+                        <circle cx="245" cy="145" r="6" fill="#d99b26" stroke="#001e50" stroke-width="2"/>
+                        <text x="255" y="138" fill="#001e50" font-weight="700" font-size="13">E (Y*, P*)</text>
+                        <!-- Labels -->
+                        <text x="48" y="149" fill="#334155" font-weight="700" font-size="13">P*</text>
+                        <text x="238" y="278" fill="#334155" font-weight="700" font-size="13">Y*</text>
+                        <text x="18" y="150" fill="#001e50" font-weight="700" font-size="13" transform="rotate(-90 18,150)" text-anchor="middle" data-i18n="axisP">Уровень цен (P)</text>
+                        <text x="245" y="300" fill="#001e50" font-weight="700" font-size="13" text-anchor="middle" data-i18n="axisY">Реальный выпуск (Y)</text>
+                    </svg>
+                </div>
+                <p style="font-size:13.5px; color:#475569; margin-top:8px;" data-i18n="g1Note">
+                    Кривая краткосрочного совокупного предложения <strong>SRAS имеет положительный наклон</strong> из-за жёсткости цен и зарплат: рост уровня цен <em>P</em> стимулирует фирмы расширять реальный выпуск <em>Y</em>.
+                </p>
+            </div>
+
+            <!-- Graph 2: Money Market (Vertical Ms) -->
+            <div class="card">
+                <div class="card-title">
+                    <span data-i18n="g2Title">2. Денежный рынок (предложение и спрос на деньги)</span>
+                    <span class="agg-pill" style="background:#fee2e2; color:#dc2626;">Ms — Md</span>
+                </div>
+                <div class="svg-wrap">
+                    <svg viewBox="0 0 460 310" width="460" height="310">
+                        <!-- Axes -->
+                        <line x1="65" y1="30" x2="65" y2="260" stroke="#334155" stroke-width="2"/>
+                        <line x1="65" y1="260" x2="430" y2="260" stroke="#334155" stroke-width="2"/>
+                        <!-- Dashed guides -->
+                        <line x1="65" y1="145" x2="245" y2="145" stroke="#94a3b8" stroke-dasharray="5,5" stroke-width="1.5"/>
+                        <!-- Vertical Money Supply Ms (RED) -->
+                        <line x1="245" y1="38" x2="245" y2="260" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>
+                        <text x="253" y="50" fill="#dc2626" font-weight="700" font-size="14">(M/P)ˢ</text>
+                        <!-- Downward Money Demand Md -->
+                        <line x1="105" y1="60" x2="395" y2="230" stroke="#001e50" stroke-width="3.5" stroke-linecap="round"/>
+                        <text x="375" y="212" fill="#001e50" font-weight="700" font-size="14">Mᵈ/P</text>
+                        <!-- Equilibrium -->
+                        <circle cx="245" cy="145" r="6" fill="#fbbf24" stroke="#dc2626" stroke-width="2.5"/>
+                        <text x="256" y="138" fill="#001e50" font-weight="700" font-size="13">E₀ (i*)</text>
+                        <!-- Labels -->
+                        <text x="46" y="149" fill="#334155" font-weight="700" font-size="13">i*</text>
+                        <text x="234" y="278" fill="#dc2626" font-weight="700" font-size="13">M̄/P</text>
+                        <text x="18" y="150" fill="#001e50" font-weight="700" font-size="13" transform="rotate(-90 18,150)" text-anchor="middle" data-i18n="axisI">Номинальная ставка (i)</text>
+                        <text x="245" y="300" fill="#001e50" font-weight="700" font-size="13" text-anchor="middle" data-i18n="axisMP">Реальные денежные остатки (M/P)</text>
+                    </svg>
+                </div>
+                <p style="font-size:13.5px; color:#475569; margin-top:8px;" data-i18n="g2Note">
+                    В базовой модели <strong>кривая предложения денег (M/P)ˢ вертикальна</strong>: центральный банк контролирует денежную базу и номинальное предложение <em>M̄</em>, которое в моменте не зависит от рыночной ставки <em>i</em>.
+                </p>
+            </div>
+        </div>
+
+        <!-- Key Conceptual Boundaries -->
+        <div class="card">
+            <div class="card-title" data-i18n="boundTitle">Ключевые отличия денег от смежных экономических категорий</div>
+            <div class="grid-4">
+                <div class="distinction-box">
+                    <h4 data-i18n="b1H">Деньги ≠ Богатство</h4>
+                    <p data-i18n="b1P">Богатство — запас всех активов на дату (недвижимость, акции, облигации и деньги). Деньги — лишь наиболее ликвидная часть богатства.</p>
+                </div>
+                <div class="distinction-box" style="border-left-color: var(--navy);">
+                    <h4 data-i18n="b2H">Деньги ≠ Доход</h4>
+                    <p data-i18n="b2P">Доход — это <em>поток</em> за период времени (например, зарплата в тенге за месяц), тогда как денежный остаток — это <em>запас</em> на конкретный момент.</p>
+                </div>
+                <div class="distinction-box" style="border-left-color: var(--gold);">
+                    <h4 data-i18n="b3H">Деньги ≠ Кредит</h4>
+                    <p data-i18n="b3P">Кредит создаёт долговое требование между заёмщиком и кредитором, хотя выдача банковского кредита одновременно создаёт новый депозит.</p>
+                </div>
+                <div class="distinction-box" style="border-left-color: var(--red);">
+                    <h4 data-i18n="b4H">Деньги ≠ Платёжный инструмент</h4>
+                    <p data-i18n="b4P">Банковская карта, смартфон или QR-код — лишь способ передать команду банку переместить депозит; деньгами является сам остаток на счёте.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TAB 2: THREE FUNCTIONS OF MONEY ==================== -->
+    <section id="tab2" class="tab-panel">
+        <div class="section-header">
+            <h2 data-i18n="s2Title">Три функции денег (нажмите на карточку, чтобы перевернуть)</h2>
+            <p data-i18n="s2Desc">Деньги определяются поведенчески: актив является деньгами потому, что участники рынка ожидают его общепринятого приёма в платежах.</p>
+        </div>
+
+        <div class="grid-3">
+            <!-- Card 1: Medium of exchange -->
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="circle-icon bg-teal" data-i18n="f1Circle">Средство<br>обмена</div>
+                        <h3 style="color:var(--navy); font-size:17px;" data-i18n="f1Sub">Снижает издержки обмена</h3>
+                        <span class="flip-hint" data-i18n="flipHint">↻ Нажмите для пояснения</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3 data-i18n="f1BackTitle">1. Средство обмена (Medium of Exchange)</h3>
+                        <p data-i18n="f1BackText">Устраняет необходимость двойного совпадения потребностей. При бартере продавец должен найти контрагента, который одновременно предлагает нужный товар и хочет получить именно его товар. Деньги сокращают издержки поиска, переговоров и расчётов, поддерживая специализацию и разделение труда.</p>
+                        <div class="flip-formula" data-i18n="f1Tag">Бартер → Специализация</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: Unit of account -->
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="circle-icon bg-navy" data-i18n="f2Circle">Единица<br>счёта</div>
+                        <h3 style="color:var(--navy); font-size:17px;" data-i18n="f2Sub">Делает цены сопоставимыми</h3>
+                        <span class="flip-hint" data-i18n="flipHint">↻ Нажмите для пояснения</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3 data-i18n="f2BackTitle">2. Единица счёта (Unit of Account)</h3>
+                        <p data-i18n="f2BackText">Даёт общую шкалу измерения стоимости и цен. При N товарах бартерная экономика требует N(N−1)/2 относительных цен, тогда как денежная единица позволяет публиковать всего N денежных цен. Чем сложнее экономика, тем огромнее экономия информационных издержек.</p>
+                        <div class="flip-formula">N(N − 1) / 2  →  N</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 3: Store of value -->
+            <div class="flip-card" onclick="this.classList.toggle('flipped')">
+                <div class="flip-card-inner">
+                    <div class="flip-card-front">
+                        <div class="circle-icon bg-gold" data-i18n="f3Circle">Средство<br>сбережения</div>
+                        <h3 style="color:var(--navy); font-size:17px;" data-i18n="f3Sub">Переносит покупательную способность</h3>
+                        <span class="flip-hint" data-i18n="flipHint">↻ Нажмите для пояснения</span>
+                    </div>
+                    <div class="flip-card-back">
+                        <h3 data-i18n="f3BackTitle">3. Средство сбережения (Store of Value)</h3>
+                        <p data-i18n="f3BackText">Переносит покупательную способность из настоящего в будущее. Деньги наиболее ликвидны, но не дают высокой доходности, а их реальная ценность падает при росте уровня цен (инфляции). Отсюда главное противоречие: ликвидность удобна, но её хранение имеет альтернативную стоимость (i).</p>
+                        <div class="flip-formula" data-i18n="f3Tag">Ликвидность vs Доходность (i)</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TAB 3: EVOLUTION OF MONEY & PAYMENTS ==================== -->
+    <section id="tab3" class="tab-panel">
+        <div class="section-header">
+            <h2 data-i18n="s3Title">Эволюция денег и платёжных систем</h2>
+            <p data-i18n="s3Desc">От товарных денег с внутренней ценностью к цифровым валютам центральных банков (CBDC) и безналичной экономике.</p>
+        </div>
+
+        <div class="card">
+            <div class="card-title" data-i18n="evoFlowTitle">Этапы эволюции форм денег</div>
+            <div class="evo-flow">
+                <div class="evo-step">
+                    <span class="evo-badge" data-i18n="step1B">Этап 1</span>
+                    <h4 data-i18n="step1H">Товарные деньги (Commodity)</h4>
+                    <p data-i18n="step1P">Золото, серебро и иные товары с внутренней ценностью. Надёжны, но тяжелы, дороги в транспортировке и сложны в проверке пробы.</p>
+                </div>
+                <div class="evo-step">
+                    <span class="evo-badge" data-i18n="step2B">Этап 2</span>
+                    <h4 data-i18n="step2H">Фиатные деньги (Fiat Money)</h4>
+                    <p data-i18n="step2P">Неразменные бумажные деньги и монеты. Приемлемость опирается на закон, налоговую систему, доверие к эмитенту и сетевой эффект.</p>
+                </div>
+                <div class="evo-step">
+                    <span class="evo-badge" data-i18n="step3B">Этап 3</span>
+                    <h4 data-i18n="step3H">Чеки и депозиты (Checks)</h4>
+                    <p data-i18n="step3P">Передача прав требования по банковскому счёту без перевозки наличных. Снижают издержки крупных расчётов, но требуют клиринга.</p>
+                </div>
+                <div class="evo-step">
+                    <span class="evo-badge" data-i18n="step4B">Этап 4</span>
+                    <h4 data-i18n="step4H">Электронные платежи (E-Payments)</h4>
+                    <p data-i18n="step4P">Платёжные карты, ACH, мобильный банкинг и мгновенные QR-переводы. Ускоряют расчёты при сохранении банковского счёта как основы.</p>
+                </div>
+                <div class="evo-step highlight-cbdc">
+                    <span class="evo-badge" data-i18n="step5B">Этап 5 • CBDC</span>
+                    <h4 data-i18n="step5H">Цифровая валюта ЦБ (Цифровой тенге)</h4>
+                    <p data-i18n="step5P">Прямое цифровое обязательство центрального банка, дополняющее наличные и безналичные деньги. В Казахстане правовой статус закреплён в январе 2026 года.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Country Comparison: Kazakhstan vs USA -->
+        <div class="grid-2">
+            <div class="card">
+                <div class="card-title">
+                    <span data-i18n="kzPayTitle">🇰🇿 Казахстан (данные НБК, сентябрь 2026)</span>
+                    <span class="agg-pill">96.48% карты</span>
+                </div>
+                <div style="margin: 14px 0;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700; margin-bottom:6px;">
+                        <span style="color:var(--teal);" data-i18n="kzCardBar">Платёжные карты: 96.48%</span>
+                        <span style="color:var(--muted);" data-i18n="kzOtherBar">Прочее: 3.52%</span>
+                    </div>
+                    <div style="width:100%; height:26px; background:#e2e8f0; border-radius:8px; overflow:hidden; display:flex;">
+                        <div style="width:96.48%; background:var(--teal); height:100%;"></div>
+                        <div style="width:3.52%; background:#94a3b8; height:100%;"></div>
+                    </div>
+                </div>
+                <p style="font-size:13.8px; color:#475569;" data-i18n="kzPayDesc">
+                    В Казахстане на платёжные карты пришлось <strong>96,48% всех операций</strong> по количеству с учтёнными инструментами, причём внутри карточных операций <strong>98,68% составили безналичные платежи</strong>. С января 2026 года цифровой тенге законодательно закреплён как третья форма национальной валюты.
+                </p>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <span data-i18n="usPayTitle">🇺🇸 США (данные ФРС, 2024 / отчёт 2026)</span>
+                    <span class="agg-pill" style="background:#fef3c7; color:#92400e;">79% карты • 4% чеки</span>
+                </div>
+                <div style="margin: 14px 0;">
+                    <div style="display:flex; justify-content:space-between; font-size:13px; font-weight:700; margin-bottom:6px;">
+                        <span style="color:var(--teal);" data-i18n="usCardBar">Карты: 79%</span>
+                        <span style="color:var(--gold);" data-i18n="usCheckBar">Чеки: 4%</span>
+                        <span style="color:var(--muted);" data-i18n="usAchBar">ACH и др.: 17%</span>
+                    </div>
+                    <div style="width:100%; height:26px; background:#e2e8f0; border-radius:8px; overflow:hidden; display:flex;">
+                        <div style="width:79%; background:var(--teal); height:100%;"></div>
+                        <div style="width:4%; background:var(--gold); height:100%;"></div>
+                        <div style="width:17%; background:#94a3b8; height:100%;"></div>
+                    </div>
+                </div>
+                <p style="font-size:13.8px; color:#475569;" data-i18n="usPayDesc">
+                    В США банковские карты обеспечивают <strong>79% количества</strong> основных безналичных транзакций, система <strong>ACH проводит 74% их стоимостного объёма</strong>, а использование бумажных чеков сократилось до 4% (9,2 млрд транзакций в год).
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TAB 4: MEASURING MONEY STOCK ==================== -->
+    <section id="tab4" class="tab-panel">
+        <div class="section-header">
+            <h2 data-i18n="s4Title">Измерение денежной массы: шкала ликвидности</h2>
+            <p data-i18n="s4Desc">Центральные банки ранжируют денежные агрегаты от наиболее ликвидных средств платежа (M0, M1) к более широким квазиденьгам (M2, M3).</p>
+        </div>
+
+        <div class="grid-2">
+            <!-- Table 1: USA Aggregates -->
+            <div class="card">
+                <div class="card-title">
+                    <span data-i18n="tblUsTitle">🇺🇸 Денежные агрегаты США (ФРС США, H.6)</span>
+                    <span class="agg-pill">M1 • M2</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:90px;" data-i18n="thAgg">Агрегат</th>
+                            <th data-i18n="thComp">Состав и экономический смысл</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="agg-pill">M1</span></td>
+                            <td data-i18n="usM1Desc">Наличные вне банков + депозиты до востребования + другие ликвидные депозиты, включая <strong>сберегательные счета</strong> (с мая 2020 г.).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="agg-pill">M2</span></td>
+                            <td data-i18n="usM2Desc"><strong>M1</strong> + малые срочные депозиты (до $100 тыс.) + паи розничных фондов денежного рынка (за вычетом пенсионных счетов IRA и Keogh).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="agg-pill" style="background:#f1f5f9; color:#64748b;">M3</span></td>
+                            <td data-i18n="usM3Desc">Публикация официального агрегата M3 прекращена ФРС США в 2006 году.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Table 2: Kazakhstan Aggregates -->
+            <div class="card">
+                <div class="card-title">
+                    <span data-i18n="tblKzTitle">🇰🇿 Денежные агрегаты Казахстана (НБК)</span>
+                    <span class="agg-pill">M0 • M1 • M2 • M3</span>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:90px;" data-i18n="thAgg">Агрегат</th>
+                            <th data-i18n="thComp">Состав и экономический смысл</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="agg-pill">M0</span></td>
+                            <td data-i18n="kzM0Desc">Наличные деньги в обращении (вне депозитных организаций).</td>
+                        </tr>
+                        <tr>
+                            <td><span class="agg-pill">M1</span></td>
+                            <td data-i18n="kzM1Desc"><strong>M0</strong> + переводные депозиты в <strong>тенге</strong> населения и небанковских юридических лиц.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="agg-pill">M2</span></td>
+                            <td data-i18n="kzM2Desc"><strong>M1</strong> + другие (срочные/сберегательные) депозиты в тенге + <strong>переводные депозиты в иностранной валюте</strong>.</td>
+                        </tr>
+                        <tr>
+                            <td><span class="agg-pill">M3</span></td>
+                            <td data-i18n="kzM3Desc"><strong>M2</strong> + <strong>другие депозиты в иностранной валюте</strong> (широкая денежная масса).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Mandatory Callout: Change in US Methodology -->
+        <div class="callout-amber">
+            <h4 data-i18n="methTitle">⚠️ Изменение методологии США (Change in US Methodology, 2020 и 2026 гг.)</h4>
+            <p data-i18n="methP1" style="margin-bottom:8px;">
+                <strong>Май 2020 года (структурный разрыв M1):</strong> В марте 2020 г. ФРС обнулила нормативы обязательных резервов, а в апреле отменила лимит в 6 переводов в месяц со сберегательных счетов. С мая 2020 г. сберегательные депозиты включены в компонент «других ликвидных депозитов» внутри <strong>M1</strong>. Это вызвало одномоментный скачок M1 примерно на <strong>$11,2 трлн</strong>, что является изменением статистического определения, а не внезапной эмиссией новой ликвидности (M2 при этом не изменился).
+            </p>
+            <p data-i18n="methP2">
+                <strong>Июль 2026 года и сопоставимость с РК:</strong> В июле 2026 г. ФРС перенесла вычитание остатков IRA и Keogh на уровень совокупного M2 с ретроспективным пересчётом сезонно скорректированных рядов. Кроме того, при сравнении стран важно учитывать: в США публикуются среднемесячные <em>сезонно скорректированные</em> данные, тогда как НБК публикует данные на <em>конец месяца без сезонной корректировки</em>, а M1 Казахстана включает только тенговые остатки.
+            </p>
+        </div>
+    </section>
+
+    <!-- ==================== TAB 5: AGGREGATES DATA (USA & KAZAKHSTAN) ==================== -->
+    <section id="tab5" class="tab-panel">
+        <div class="section-header">
+            <h2 data-i18n="s5Title">Динамика денежных агрегатов: США и Казахстан (2025–2026)</h2>
+            <p data-i18n="s5Desc">Актуальные официальные статистические ряды ФРС США (H.6) и Национального Банка Республики Казахстан.</p>
+        </div>
+
+        <div class="sub-tabs">
+            <button class="sub-tab-btn active" onclick="openSubTab('agg-us', this)" data-i18n="subUs">🇺🇸 США (ФРС, H.6)</button>
+            <button class="sub-tab-btn" onclick="openSubTab('agg-kz', this)" data-i18n="subKz">🇰🇿 Казахстан (НБК)</button>
+        </div>
+
+        <!-- Sub-panel USA -->
+        <div id="agg-us" class="sub-panel active">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title">
+                        <span data-i18n="usChartTitle">Денежные агрегаты США: M1 и M2 (трлн $)</span>
+                        <span class="agg-pill">May 2025 – Sep 2026</span>
+                    </div>
+                    <div class="svg-wrap">
+                        <svg viewBox="0 0 500 300" width="500" height="300">
+                            <!-- Grid lines -->
+                            <line x1="55" y1="30" x2="475" y2="30" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="80" x2="475" y2="80" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="130" x2="475" y2="130" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="180" x2="475" y2="180" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="230" x2="475" y2="230" stroke="#334155" stroke-width="1.5"/>
+                            <!-- Y axis labels (18 to 24 tn) -->
+                            <text x="45" y="34" font-size="11" fill="#64748b" text-anchor="end">24</text>
+                            <text x="45" y="84" font-size="11" fill="#64748b" text-anchor="end">22.5</text>
+                            <text x="45" y="134" font-size="11" fill="#64748b" text-anchor="end">21</text>
+                            <text x="45" y="184" font-size="11" fill="#64748b" text-anchor="end">19.5</text>
+                            <text x="45" y="234" font-size="11" fill="#64748b" text-anchor="end">18</text>
+                            <text x="15" y="130" font-size="12" fill="#001e50" font-weight="700" transform="rotate(-90 15,130)" text-anchor="middle" data-i18n="trilUsd">трлн USD</text>
+
+                            <!-- M2 Line (21.81 -> 23.41) -->
+                            <polyline fill="none" stroke="#001e50" stroke-width="3.5"
+                                points="70,103 120,97 170,91 220,84 270,74 320,66 370,58 420,53 465,49"/>
+                            <!-- M1 Line (18.64 -> 20.06) -->
+                            <polyline fill="none" stroke="#187a87" stroke-width="3.5"
+                                points="70,208 120,202 170,196 220,191 270,181 320,173 370,168 420,164 465,161"/>
+
+                            <!-- End dots & callouts -->
+                            <circle cx="465" cy="49" r="5" fill="#001e50"/>
+                            <text x="460" y="38" font-size="11.5" font-weight="700" fill="#001e50" text-anchor="end">M2: $23.41 трлн (Sep 26)</text>
+
+                            <circle cx="465" cy="161" r="5" fill="#187a87"/>
+                            <text x="460" y="150" font-size="11.5" font-weight="700" fill="#187a87" text-anchor="end">M1: $20.06 трлн (Sep 26)</text>
+
+                            <!-- X-axis dates -->
+                            <text x="70" y="250" font-size="11" fill="#475569" text-anchor="middle">May25</text>
+                            <text x="170" y="250" font-size="11" fill="#475569" text-anchor="middle">Sep25</text>
+                            <text x="270" y="250" font-size="11" fill="#475569" text-anchor="middle">Jan26</text>
+                            <text x="370" y="250" font-size="11" fill="#475569" text-anchor="middle">May26</text>
+                            <text x="465" y="250" font-size="11" fill="#475569" text-anchor="middle">Sep26</text>
+                        </svg>
+                    </div>
+                    <p style="font-size:13px; color:#64748b;" data-i18n="usChartNote">Денежная база США (сентябрь 2026) составила <strong>$5,449.8 млрд</strong> ($2,483 млрд наличных + $2,967 млрд резервов банков в ФРС).</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title" data-i18n="usTblTitle">Официальные показатели США (осень 2026)</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="thInd">Показатель</th>
+                                <th data-i18n="thVal">Значение</th>
+                                <th data-i18n="thDate">Дата</th>
+                                <th data-i18n="thYoY">За год (YoY)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>M1</strong></td>
+                                <td>$20,061.2 млрд</td>
+                                <td>Сен 2026</td>
+                                <td style="color:#16a34a; font-weight:700;">+6.2%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>M2</strong></td>
+                                <td>$23,413.9 млрд</td>
+                                <td>Сен 2026</td>
+                                <td style="color:#16a34a; font-weight:700;">+5.7%</td>
+                            </tr>
+                            <tr>
+                                <td data-i18n="rowBase"><strong>Денежная база</strong></td>
+                                <td>$5,449.8 млрд</td>
+                                <td>Сен 2026</td>
+                                <td style="color:#dc2626; font-weight:700;">−0.5%</td>
+                            </tr>
+                            <tr>
+                                <td data-i18n="rowFedRate"><strong>Ставка Fed Funds</strong></td>
+                                <td><strong>3.88%</strong></td>
+                                <td>12 ноя 2026</td>
+                                <td data-i18n="rowFedRange">диапазон 3.75–4.00%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-panel Kazakhstan -->
+        <div id="agg-kz" class="sub-panel">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title">
+                        <span data-i18n="kzChartTitle">Денежные агрегаты Казахстана: M0–M3 (трлн ₸)</span>
+                        <span class="agg-pill">Dec 2024 – Oct 2026</span>
+                    </div>
+                    <div class="svg-wrap">
+                        <svg viewBox="0 0 500 300" width="500" height="300">
+                            <!-- Grid -->
+                            <line x1="55" y1="30" x2="475" y2="30" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="80" x2="475" y2="80" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="130" x2="475" y2="130" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="180" x2="475" y2="180" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="230" x2="475" y2="230" stroke="#334155" stroke-width="1.5"/>
+                            <!-- Y axis (0 to 60 tn KZT) -->
+                            <text x="45" y="34" font-size="11" fill="#64748b" text-anchor="end">60</text>
+                            <text x="45" y="84" font-size="11" fill="#64748b" text-anchor="end">45</text>
+                            <text x="45" y="134" font-size="11" fill="#64748b" text-anchor="end">30</text>
+                            <text x="45" y="184" font-size="11" fill="#64748b" text-anchor="end">15</text>
+                            <text x="45" y="234" font-size="11" fill="#64748b" text-anchor="end">0</text>
+                            <text x="15" y="130" font-size="12" fill="#001e50" font-weight="700" transform="rotate(-90 15,130)" text-anchor="middle" data-i18n="trilKzt">трлн KZT (₸)</text>
+
+                            <!-- M3 (45.7 -> 57.77) -->
+                            <polyline fill="none" stroke="#001e50" stroke-width="3.5"
+                                points="70,78 125,81 180,73 235,66 290,54 345,61 400,48 465,37"/>
+                            <!-- M2 (39.2 -> 50.66) -->
+                            <polyline fill="none" stroke="#187a87" stroke-width="3.5"
+                                points="70,99 125,102 180,94 235,88 290,77 345,84 400,70 465,61"/>
+                            <!-- M1 (11.4 -> 11.93) -->
+                            <polyline fill="none" stroke="#38bdf8" stroke-width="3"
+                                points="70,192 125,195 180,192 235,193 290,190 345,192 400,190 465,190"/>
+                            <!-- M0 (4.5 -> 4.91) -->
+                            <polyline fill="none" stroke="#d99b26" stroke-width="3"
+                                points="70,215 125,216 180,214 235,214 290,214 345,215 400,214 465,214"/>
+
+                            <!-- Labels -->
+                            <text x="465" y="27" font-size="11" font-weight="700" fill="#001e50" text-anchor="end">M3: ₸57.77 трлн</text>
+                            <text x="465" y="53" font-size="11" font-weight="700" fill="#187a87" text-anchor="end">M2: ₸50.66 трлн</text>
+                            <text x="465" y="182" font-size="11" font-weight="700" fill="#0284c7" text-anchor="end">M1: ₸11.93 трлн</text>
+                            <text x="465" y="207" font-size="11" font-weight="700" fill="#b45309" text-anchor="end">M0: ₸4.91 трлн</text>
+
+                            <!-- X-axis -->
+                            <text x="70" y="250" font-size="11" fill="#475569" text-anchor="middle">Dec24</text>
+                            <text x="180" y="250" font-size="11" fill="#475569" text-anchor="middle">Jun25</text>
+                            <text x="290" y="250" font-size="11" fill="#475569" text-anchor="middle">Dec25</text>
+                            <text x="400" y="250" font-size="11" fill="#475569" text-anchor="middle">Jun26</text>
+                            <text x="465" y="250" font-size="11" fill="#475569" text-anchor="middle">Oct26</text>
+                        </svg>
+                    </div>
+                    <p style="font-size:13px; color:#64748b;" data-i18n="kzChartNote">Разница <strong>M3 − M2 = ₸7.114 трлн</strong> отражает срочные валютные депозиты, а <strong>M2 − M1 = ₸38.731 трлн</strong> — срочные тенговые и переводные валютные вклады.</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title" data-i18n="kzTblTitle">Официальные показатели Казахстана (октябрь 2026)</div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-i18n="thInd">Показатель</th>
+                                <th data-i18n="thOct">Октябрь 2026</th>
+                                <th data-i18n="thYtd">К дек 2025</th>
+                                <th data-i18n="thYoY">За год (YoY)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td data-i18n="rowResMoney"><strong>Резервные деньги</strong></td>
+                                <td>₸17.180 трлн</td>
+                                <td>+9.6%</td>
+                                <td style="color:#16a34a; font-weight:700;">+15.7%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>M0</strong></td>
+                                <td>₸4.906 трлн</td>
+                                <td>+3.3%</td>
+                                <td style="color:#16a34a; font-weight:700;">+5.5%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>M1</strong></td>
+                                <td>₸11.929 трлн</td>
+                                <td>0.0%</td>
+                                <td style="color:#16a34a; font-weight:700;">+6.9%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>M2</strong></td>
+                                <td>₸50.660 трлн</td>
+                                <td>+10.6%</td>
+                                <td style="color:#16a34a; font-weight:700;">+19.3%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>M3</strong></td>
+                                <td>₸57.774 трлн</td>
+                                <td>+9.5%</td>
+                                <td style="color:#16a34a; font-weight:700;">+17.1%</td>
+                            </tr>
+                            <tr>
+                                <td data-i18n="rowBaseRate"><strong>Базовая ставка НБК</strong></td>
+                                <td><strong>15.75%</strong></td>
+                                <td>коридор ±1 п.п.</td>
+                                <td>с 27 окт 2026</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TAB 6: MONEY SUPPLY & INTERACTIVE EQUILIBRIUM ==================== -->
+    <section id="tab6" class="tab-panel">
+        <div class="section-header">
+            <h2 data-i18n="s6Title">Предложение денег и интерактивное равновесие денежного рынка</h2>
+            <p data-i18n="s6Desc">Как формируется денежная масса (MB = C + R) и как центральные банки США и Казахстана достигают целевых процентных ставок.</p>
+        </div>
+
+        <!-- How Money Supply is Formed -->
+        <div class="card">
+            <div class="card-title" data-i18n="supMechTitle">Формирование предложения денег и современные операционные режимы</div>
+            <p style="font-size:14px; color:#334155; margin-bottom:14px;" data-i18n="supMechText">
+                Денежная база <strong>MB = C + R</strong> создаётся центральным банком, но широкая денежная масса (M2/M3) формируется совместно центральным банком, коммерческими банками (выдача кредитов создаёт депозиты) и населением (выбор между наличными и вкладами). На практике последовательность чаще идёт от <em>кредитного решения → к депозиту → к потребности в резервах</em>, а ЦБ эластично управляет резервами, удерживая краткосрочную ставку в целевом коридоре.
+            </p>
+            <table>
+                <thead>
+                    <tr>
+                        <th data-i18n="thEl">Элемент</th>
+                        <th data-i18n="thFed">🇺🇸 Федеральная резервная система (ФРС)</th>
+                        <th data-i18n="thNbk">🇰🇿 Национальный Банк Казахстана (НБК)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-i18n="op1"><strong>Операционная цель</strong></td>
+                        <td data-i18n="op1Us">Ставка федеральных фондов (Federal Funds Rate)</td>
+                        <td data-i18n="op1Kz">Ставки денежного рынка (TONIA) вокруг базовой ставки</td>
+                    </tr>
+                    <tr>
+                        <td data-i18n="op2"><strong>Ключевой режим</strong></td>
+                        <td data-i18n="op2Us">Система достаточных резервов (Ample Reserves)</td>
+                        <td data-i18n="op2Kz">Процентный коридор (±1 п.п.) и управление ликвидностью</td>
+                    </tr>
+                    <tr>
+                        <td data-i18n="op3"><strong>Ставка на 16.11.2026</strong></td>
+                        <td><strong>3.75–4.00%</strong> (эффективная 3.88%)</td>
+                        <td><strong>15.75%</strong> (коридор 14.75–16.75%)</td>
+                    </tr>
+                    <tr>
+                        <td data-i18n="op4"><strong>Инструменты</strong></td>
+                        <td data-i18n="op4Us">Процент по резервам (IORB), операции репо и обратного репо (ON RRP)</td>
+                        <td data-i18n="op4Kz">Постоянные механизмы, ноты/депозиты НБК, МРТ и зеркалирование</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Interactive Equilibrium Simulator: USA vs Kazakhstan Tabs -->
+        <div class="card">
+            <div class="card-title">
+                <span data-i18n="simEqTitle">Интерактивный симулятор равновесия: сдвиг предложения денег (M/P)ˢ</span>
+                <span class="agg-pill" style="background:#fee2e2; color:#dc2626;" data-i18n="redLineBadge">Красная линия = (M/P)ˢ</span>
+            </div>
+
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" onclick="openSubTab('eq-kz', this)" data-i18n="eqTabKz">🇰🇿 Казахстан (Базовая ставка 15.75%)</button>
+                <button class="sub-tab-btn" onclick="openSubTab('eq-us', this)" data-i18n="eqTabUs">🇺🇸 США (Целевой диапазон 3.75–4.00%)</button>
+            </div>
+
+            <!-- Kazakhstan Interactive Chart -->
+            <div id="eq-kz" class="sub-panel active">
+                <div class="grid-2" style="align-items:center;">
+                    <div>
+                        <div class="slider-box">
+                            <div class="slider-header">
+                                <span data-i18n="slKzMs">Реальное предложение денег (M/P)ˢ, трлн ₸:</span>
+                                <span class="slider-val" id="kzMsVal">50.66 трлн ₸</span>
+                            </div>
+                            <input type="range" class="red-slider" id="kzMsSlider" min="38" max="64" step="0.02" value="50.66" oninput="updateKzEq()">
+                            <div style="display:flex; justify-content:space-between; font-size:11.5px; color:#64748b; margin-top:6px;">
+                                <span data-i18n="tightPolicy">← Сжатие ликвидности (ставка растёт)</span>
+                                <span data-i18n="easePolicy">Экспансия (ставка падает) →</span>
+                            </div>
+                        </div>
+
+                        <div class="slider-box">
+                            <div class="slider-header">
+                                <span data-i18n="slKzY">Сдвиг спроса на деньги Mᵈ/P (доход Y / инфл. ожидания):</span>
+                                <span class="slider-val teal-val" id="kzMdVal">Базовый (0)</span>
+                            </div>
+                            <input type="range" class="teal-slider" id="kzMdSlider" min="-4" max="4" step="0.5" value="0" oninput="updateKzEq()">
+                        </div>
+
+                        <div id="kzStatus" class="eq-status target-hit">
+                            <span id="kzStatusText">✓ Равновесие НБК достигнуто: ставка i = 15.75% (коридор 14.75–16.75%)</span>
+                            <button onclick="resetKzEq()" style="border:none; background:#001e50; color:white; padding:5px 11px; border-radius:6px; cursor:pointer; font-size:12px;" data-i18n="btnReset">Сброс (15.75%)</button>
+                        </div>
+                    </div>
+
+                    <div class="svg-wrap">
+                        <svg viewBox="0 0 460 310" width="460" height="310">
+                            <!-- NBK Corridor Band (14.75% - 16.75%) -->
+                            <rect x="65" y="128" width="365" height="28" fill="#dcfce7" opacity="0.75"/>
+                            <text x="425" y="124" font-size="10.5" fill="#15803d" font-weight="700" text-anchor="end">Коридор НБК 14.75–16.75%</text>
+                            <!-- Axes -->
+                            <line x1="65" y1="25" x2="65" y2="260" stroke="#334155" stroke-width="2"/>
+                            <line x1="65" y1="260" x2="430" y2="260" stroke="#334155" stroke-width="2"/>
+                            <!-- Initial Reference Ms0 -->
+                            <line x1="245" y1="35" x2="245" y2="260" stroke="#fca5a5" stroke-width="2" stroke-dasharray="4,4"/>
+                            <!-- Md Curve -->
+                            <line id="kzMdLine" x1="100" y1="55" x2="395" y2="232" stroke="#001e50" stroke-width="3.5" stroke-linecap="round"/>
+                            <text id="kzMdLabel" x="380" y="215" fill="#001e50" font-weight="700" font-size="13">Mᵈ/P</text>
+                            <!-- Dynamic Guides -->
+                            <line id="kzGuideH" x1="65" y1="142" x2="245" y2="142" stroke="#dc2626" stroke-dasharray="5,4" stroke-width="1.5"/>
+                            <!-- Vertical RED Ms Line -->
+                            <line id="kzMsLine" x1="245" y1="35" x2="245" y2="260" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>
+                            <text id="kzMsLabel" x="252" y="48" fill="#dc2626" font-weight="700" font-size="13">(M/P)ˢ</text>
+                            <!-- Equilibrium Point -->
+                            <circle id="kzEqDot" cx="245" cy="142" r="6.5" fill="#fbbf24" stroke="#dc2626" stroke-width="2.5"/>
+                            <text id="kzEqText" x="255" y="135" fill="#001e50" font-weight="700" font-size="13">E (15.75%)</text>
+                            <!-- Axis Labels -->
+                            <text id="kzRateAxisLabel" x="58" y="146" fill="#dc2626" font-weight="700" font-size="12" text-anchor="end">15.75%</text>
+                            <text x="16" y="145" fill="#001e50" font-weight="700" font-size="12" transform="rotate(-90 16,145)" text-anchor="middle" data-i18n="axisI">Ставка i (%)</text>
+                            <text x="245" y="295" fill="#001e50" font-weight="700" font-size="12" text-anchor="middle" data-i18n="axisMpKz">Реальные денежные остатки M/P (трлн ₸)</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USA Interactive Chart -->
+            <div id="eq-us" class="sub-panel">
+                <div class="grid-2" style="align-items:center;">
+                    <div>
+                        <div class="slider-box">
+                            <div class="slider-header">
+                                <span data-i18n="slUsMs">Реальное предложение денег (M/P)ˢ, трлн $:</span>
+                                <span class="slider-val" id="usMsVal">$23.41 трлн</span>
+                            </div>
+                            <input type="range" class="red-slider" id="usMsSlider" min="18" max="29" step="0.05" value="23.41" oninput="updateUsEq()">
+                            <div style="display:flex; justify-content:space-between; font-size:11.5px; color:#64748b; margin-top:6px;">
+                                <span data-i18n="tightPolicy">← Сжатие ликвидности (ставка растёт)</span>
+                                <span data-i18n="easePolicy">Экспансия (ставка падает) →</span>
+                            </div>
+                        </div>
+
+                        <div class="slider-box">
+                            <div class="slider-header">
+                                <span data-i18n="slUsY">Сдвиг спроса на деньги Mᵈ/P (доход Y / цены P):</span>
+                                <span class="slider-val teal-val" id="usMdVal">Базовый (0)</span>
+                            </div>
+                            <input type="range" class="teal-slider" id="usMdSlider" min="-2.5" max="2.5" step="0.25" value="0" oninput="updateUsEq()">
+                        </div>
+
+                        <div id="usStatus" class="eq-status target-hit">
+                            <span id="usStatusText">✓ Равновесие ФРС достигнуто: ставка i = 3.88% (в диапазоне 3.75–4.00%)</span>
+                            <button onclick="resetUsEq()" style="border:none; background:#001e50; color:white; padding:5px 11px; border-radius:6px; cursor:pointer; font-size:12px;" data-i18n="btnResetUs">Сброс (3.88%)</button>
+                        </div>
+                    </div>
+
+                    <div class="svg-wrap">
+                        <svg viewBox="0 0 460 310" width="460" height="310">
+                            <!-- Fed Target Range Band (3.75% - 4.00%) -->
+                            <rect x="65" y="135" width="365" height="16" fill="#dcfce7" opacity="0.85"/>
+                            <text x="425" y="130" font-size="10.5" fill="#15803d" font-weight="700" text-anchor="end">Диапазон ФРС 3.75–4.00%</text>
+                            <!-- Axes -->
+                            <line x1="65" y1="25" x2="65" y2="260" stroke="#334155" stroke-width="2"/>
+                            <line x1="65" y1="260" x2="430" y2="260" stroke="#334155" stroke-width="2"/>
+                            <!-- Initial Reference Ms0 -->
+                            <line x1="245" y1="35" x2="245" y2="260" stroke="#fca5a5" stroke-width="2" stroke-dasharray="4,4"/>
+                            <!-- Md Curve -->
+                            <line id="usMdLine" x1="100" y1="55" x2="395" y2="232" stroke="#001e50" stroke-width="3.5" stroke-linecap="round"/>
+                            <text id="usMdLabel" x="380" y="215" fill="#001e50" font-weight="700" font-size="13">Mᵈ/P</text>
+                            <!-- Dynamic Guides -->
+                            <line id="usGuideH" x1="65" y1="143" x2="245" y2="143" stroke="#dc2626" stroke-dasharray="5,4" stroke-width="1.5"/>
+                            <!-- Vertical RED Ms Line -->
+                            <line id="usMsLine" x1="245" y1="35" x2="245" y2="260" stroke="#dc2626" stroke-width="4" stroke-linecap="round"/>
+                            <text id="usMsLabel" x="252" y="48" fill="#dc2626" font-weight="700" font-size="13">(M/P)ˢ</text>
+                            <!-- Equilibrium Point -->
+                            <circle id="usEqDot" cx="245" cy="143" r="6.5" fill="#fbbf24" stroke="#dc2626" stroke-width="2.5"/>
+                            <text id="usEqText" x="255" y="136" fill="#001e50" font-weight="700" font-size="13">E (3.88%)</text>
+                            <!-- Axis Labels -->
+                            <text id="usRateAxisLabel" x="58" y="147" fill="#dc2626" font-weight="700" font-size="12" text-anchor="end">3.88%</text>
+                            <text x="16" y="145" fill="#001e50" font-weight="700" font-size="12" transform="rotate(-90 16,145)" text-anchor="middle" data-i18n="axisI">Ставка i (%)</text>
+                            <text x="245" y="295" fill="#001e50" font-weight="700" font-size="12" text-anchor="middle" data-i18n="axisMpUs">Реальные денежные остатки M/P (трлн $)</text>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Major Shifts Table -->
+        <div class="card">
+            <div class="card-title" data-i18n="shiftsTitle">Главные сдвиги на денежном рынке (Major Shifts)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th data-i18n="sh1">Шок / Фактор</th>
+                        <th data-i18n="sh2">Сдвиг кривой</th>
+                        <th data-i18n="sh3">Краткосрочный результат (ceteris paribus)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td data-i18n="r1c1"><strong>Рост реального дохода (Y ↑)</strong></td>
+                        <td><span class="agg-pill">Mᵈ вправо</span></td>
+                        <td data-i18n="r1c3">Больше сделок → спрос на деньги растёт → равновесная ставка <strong>i повышается</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td data-i18n="r2c1"><strong>Рост уровня цен (P ↑)</strong></td>
+                        <td><span class="agg-pill">Номинальный Mᵈ вправо</span></td>
+                        <td data-i18n="r2c3">Для прежнего объёма покупок нужно больше номинальных остатков; при фиксированном M̄ реальное предложение (M/P)ˢ сдвигается влево и <strong>i растёт</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td data-i18n="r3c1"><strong>Рост предложения денег (Mˢ ↑)</strong></td>
+                        <td><span class="agg-pill" style="background:#fee2e2; color:#dc2626;">Mˢ вправо</span></td>
+                        <td data-i18n="r3c3">Избыток ликвидности → агенты покупают облигации → цены облигаций растут, а доходность (ставка <strong>i</strong>) <strong>снижается</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td data-i18n="r4c1"><strong>Рост доходности альтернатив</strong></td>
+                        <td><span class="agg-pill">Mᵈ влево</span></td>
+                        <td data-i18n="r4c3">Альтернативная стоимость хранения денег возрастает → спрос на деньги падает.</td>
+                    </tr>
+                    <tr>
+                        <td data-i18n="r5c1"><strong>Рост неопределённости</strong></td>
+                        <td><span class="agg-pill">Предосторожный Mᵈ вправо</span></td>
+                        <td data-i18n="r5c3">Ликвидность ценится выше → компании и домохозяйства формируют больший защитный буфер.</td>
+                    </tr>
+                    <tr>
+                        <td data-i18n="r6c1"><strong>Финансовые инновации</strong></td>
+                        <td><span class="agg-pill">Параметры Mᵈ меняются</span></td>
+                        <td data-i18n="r6c3">Снижение издержек перевода средств уменьшает потребность в остатках и может нарушить стабильность функции спроса.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <!-- ==================== TAB 7: THEORIES OF MONEY DEMAND & VELOCITY ==================== -->
+    <section id="tab7" class="tab-panel">
+        <div class="section-header">
+            <h2 data-i18n="s7Title">Теории спроса на деньги и скорость обращения</h2>
+            <p data-i18n="s7Desc">От классического уравнения обмена Фишера до теории предпочтения ликвидности Кейнса, модели запасов Баумоля–Тобина и портфельного подхода Фридмана.</p>
+        </div>
+
+        <div class="sub-tabs" style="flex-wrap:wrap;">
+            <button class="sub-tab-btn active" onclick="openSubTab('th-fisher', this)" data-i18n="thTab1">1. Количественная теория и скорость (V)</button>
+            <button class="sub-tab-btn" onclick="openSubTab('th-keynes', this)" data-i18n="thTab2">2. Предпочтение ликвидности Кейнса</button>
+            <button class="sub-tab-btn" onclick="openSubTab('th-baumol', this)" data-i18n="thTab3">3. Модель Баумоля–Тобина (12 мес.)</button>
+            <button class="sub-tab-btn" onclick="openSubTab('th-friedman', this)" data-i18n="thTab4">4. Тобин и теория Фридмана</button>
+        </div>
+
+        <!-- Sub-panel 1: Quantity Theory & Velocity -->
+        <div id="th-fisher" class="sub-panel active">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title" data-i18n="qtmTitle">Уравнение обмена Фишера и скорость обращения</div>
+                    <p style="font-size:14px; color:#334155; margin-bottom:12px;" data-i18n="qtmP1">
+                        Скорость обращения денег <strong>V = (P × Y) / M</strong> показывает, сколько раз в среднем денежная единица оборачивается за год при покупке конечных товаров и услуг. Отсюда следует тождество обмена: <strong>M × V = P × Y</strong>.
+                    </p>
+                    <p style="font-size:14px; color:#334155; margin-bottom:12px;" data-i18n="qtmP2">
+                        Ирвинг Фишер полагал, что платёжные технологии меняются медленно, поэтому в краткосрочном периоде <strong>V ≈ const</strong>, а при полной занятости выпуск <strong>Y</strong> задан. Тогда спрос на деньги зависит только от номинального дохода: <strong>Mᵈ = k · P · Y</strong> (где <em>k = 1/V</em>), и процентная ставка <em>i</em> на спрос напрямую не влияет.
+                    </p>
+                    <div class="callout-amber" style="margin-top:12px;">
+                        <h4 data-i18n="qtmGrowthH">Уравнение в темпах роста: gₘ + gᵥ = π + gᵧ</h4>
+                        <p data-i18n="qtmGrowthP">В долгосрочном периоде устойчивый рост денежной массы намного быстрее роста реального выпуска неизбежно порождает инфляцию (π ≈ gₘ − gᵧ).</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">
+                        <span data-i18n="velChartTitle">Скорость обращения M2 в США (2019 Q4 – 2026 Q3)</span>
+                        <span class="agg-pill">FRED M2V</span>
+                    </div>
+                    <div class="svg-wrap">
+                        <svg viewBox="0 0 480 280" width="480" height="280">
+                            <!-- Grid -->
+                            <line x1="55" y1="30" x2="455" y2="30" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="80" x2="455" y2="80" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="130" x2="455" y2="130" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="180" x2="455" y2="180" stroke="#e2e8f0" stroke-width="1"/>
+                            <line x1="55" y1="230" x2="455" y2="230" stroke="#334155" stroke-width="1.5"/>
+                            <!-- Y axis (1.10 to 1.50) -->
+                            <text x="45" y="34" font-size="11" fill="#64748b" text-anchor="end">1.50</text>
+                            <text x="45" y="84" font-size="11" fill="#64748b" text-anchor="end">1.40</text>
+                            <text x="45" y="134" font-size="11" fill="#64748b" text-anchor="end">1.30</text>
+                            <text x="45" y="184" font-size="11" fill="#64748b" text-anchor="end">1.20</text>
+                            <text x="45" y="234" font-size="11" fill="#64748b" text-anchor="end">1.10</text>
+
+                            <!-- Shaded area -->
+                            <polygon fill="#e6f4f6" opacity="0.7"
+                                points="70,62 125,197 180,198 235,154 290,95 345,80 400,73 445,71 445,230 70,230"/>
+                            <!-- Velocity Line -->
+                            <polyline fill="none" stroke="#187a87" stroke-width="3.5"
+                                points="70,62 125,197 180,198 235,154 290,95 345,80 400,73 445,71"/>
+                            <!-- Data points -->
+                            <circle cx="70" cy="62" r="4.5" fill="#001e50"/>
+                            <text x="75" y="52" font-size="11" font-weight="700" fill="#001e50">1.435</text>
+
+                            <circle cx="125" cy="197" r="4.5" fill="#dc2626"/>
+                            <text x="132" y="212" font-size="10.5" font-weight="700" fill="#dc2626" data-i18n="panDrop">1.165 (пандемия)</text>
+
+                            <circle cx="445" cy="71" r="5" fill="#187a87"/>
+                            <text x="445" y="58" font-size="11" font-weight="700" fill="#187a87" text-anchor="end">1.417 (2026 Q3)</text>
+
+                            <!-- X-axis -->
+                            <text x="70" y="248" font-size="10.5" fill="#475569" text-anchor="middle">19Q4</text>
+                            <text x="125" y="248" font-size="10.5" fill="#475569" text-anchor="middle">20Q4</text>
+                            <text x="180" y="248" font-size="10.5" fill="#475569" text-anchor="middle">21Q4</text>
+                            <text x="235" y="248" font-size="10.5" fill="#475569" text-anchor="middle">22Q4</text>
+                            <text x="290" y="248" font-size="10.5" fill="#475569" text-anchor="middle">23Q4</text>
+                            <text x="345" y="248" font-size="10.5" fill="#475569" text-anchor="middle">24Q4</text>
+                            <text x="400" y="248" font-size="10.5" fill="#475569" text-anchor="middle">25Q4</text>
+                            <text x="445" y="248" font-size="10.5" fill="#475569" text-anchor="middle">26Q3</text>
+                        </svg>
+                    </div>
+                    <p style="font-size:13px; color:#64748b;" data-i18n="velNote">Скорость обращения <strong>не постоянна</strong>: она резко упала в 2020 г. до 1.126 из-за роста сбережений и фискальных трансфертов, а затем восстановилась до 1.417 в III кв. 2026 г. (скорость M1 — 1.653).</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-panel 2: Keynes Liquidity Preference -->
+        <div id="th-keynes" class="sub-panel">
+            <div class="card">
+                <div class="card-title" data-i18n="keynesTitle">Теория предпочтения ликвидности Дж. М. Кейнса: Mᵈ / P = f(i, Y)</div>
+                <div class="grid-3" style="margin-bottom:16px;">
+                    <div class="distinction-box">
+                        <h4 data-i18n="km1H">1. Транзакционный мотив</h4>
+                        <p data-i18n="km1P">Разрыв во времени между получением дохода и текущими расходами. Прямо пропорционален доходу <strong>Y</strong> (<em>fᵧ &gt; 0</em>).</p>
+                    </div>
+                    <div class="distinction-box" style="border-left-color:var(--gold);">
+                        <h4 data-i18n="km2H">2. Мотив предосторожности</h4>
+                        <p data-i18n="km2P">Запас на непредвиденные расходы и внезапные выгодные покупки. Растёт с доходом <strong>Y</strong> и экономической неопределённостью.</p>
+                    </div>
+                    <div class="distinction-box" style="border-left-color:var(--red);">
+                        <h4 data-i18n="km3H">3. Спекулятивный мотив</h4>
+                        <p data-i18n="km3P">Выбор между деньгами и облигациями. При низкой ставке <strong>i</strong> ожидается её рост и падение цен облигаций → спрос на деньги высок (<em>fᵢ &lt; 0</em>).</p>
+                    </div>
+                </div>
+                <p style="font-size:14px; color:#334155;" data-i18n="keynesVelNote">
+                    <strong>Следствие для скорости обращения:</strong> поскольку <em>V = Y / f(i, Y)</em>, рост процентной ставки снижает желаемые денежные остатки и <strong>повышает скорость обращения денег</strong>. Скорость становится процикличной и зависит от ожиданий рынка относительно «нормальной» процентной ставки.
+                </p>
+            </div>
+        </div>
+
+        <!-- Sub-panel 3: Baumol-Tobin Model (12 Months Annual Sawtooth) -->
+        <div id="th-baumol" class="sub-panel">
+            <div class="card">
+                <div class="card-title">
+                    <span data-i18n="btTitle">Модель управления запасами Баумоля–Тобина (годовой горизонт: 12 месяцев)</span>
+                    <span class="agg-pill">M̄* = √(bT / 2i)</span>
+                </div>
+                <p style="font-size:14px; color:#475569; margin-bottom:16px;" data-i18n="btIntro">
+                    Даже транзакционный спрос на деньги чувствителен к процентной ставке <em>i</em> и издержкам конвертации <em>b</em>. Изменяйте частоту снятия/конвертации средств в течение <strong>полного года (12 месяцев)</strong> — от 12 раз (1 раз в месяц, 12 зубчиков) до 24 раз (каждые полмесяца, 24 зубчика) и выше!
+                </p>
+
+                <div class="grid-3" style="margin-bottom:16px;">
+                    <div class="slider-box" style="margin-bottom:0;">
+                        <div class="slider-header">
+                            <span data-i18n="btSlN">Число конверсий в год (N):</span>
+                            <span class="slider-val" id="btNVal">12 раз (1 раз/мес.)</span>
+                        </div>
+                        <input type="range" class="red-slider" id="btNSlider" min="4" max="36" step="2" value="12" oninput="updateBaumol()">
+                        <div style="display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-top:4px;">
+                            <span>4 (квартал)</span>
+                            <span>12 (мес.)</span>
+                            <span>24 (полмес.)</span>
+                            <span>36</span>
+                        </div>
+                    </div>
+
+                    <div class="slider-box" style="margin-bottom:0;">
+                        <div class="slider-header">
+                            <span data-i18n="btSlT">Годовой доход / расходы (T):</span>
+                            <span class="slider-val teal-val" id="btTVal">12 000</span>
+                        </div>
+                        <input type="range" class="teal-slider" id="btTSlider" min="6000" max="24000" step="1200" value="12000" oninput="updateBaumol()">
+                    </div>
+
+                    <div class="slider-box" style="margin-bottom:0;">
+                        <div class="slider-header">
+                            <span data-i18n="btSlI">Ставка i (%) и издержки b:</span>
+                            <span class="slider-val teal-val" id="btIVal">i = 15.75% | b = 25</span>
+                        </div>
+                        <input type="range" class="teal-slider" id="btISlider" min="3" max="20" step="0.25" value="15.75" oninput="updateBaumol()">
+                    </div>
+                </div>
+
+                <!-- Metrics Strip -->
+                <div class="grid-4" style="margin-bottom:16px;">
+                    <div class="formula-item">
+                        <div class="f-label" data-i18n="btM1">Сумма одной конверсии (C = T/N)</div>
+                        <div class="f-math" id="btWithdraw">1 000</div>
+                    </div>
+                    <div class="formula-item">
+                        <div class="f-label" data-i18n="btM2">Средний остаток (M̄ = C/2)</div>
+                        <div class="f-math" id="btAvgBal" style="color:var(--red);">500</div>
+                    </div>
+                    <div class="formula-item">
+                        <div class="f-label" data-i18n="btM3">Оптимальный остаток M̄* = √(bT/2i)</div>
+                        <div class="f-math" id="btOptBal" style="color:var(--teal);">976</div>
+                    </div>
+                    <div class="formula-item">
+                        <div class="f-label" data-i18n="btM4">Годовая скорость (V = T / M̄)</div>
+                        <div class="f-math" id="btVel">24.0</div>
+                    </div>
+                </div>
+
+                <!-- 12-Month Sawtooth SVG Chart -->
+                <div class="svg-wrap">
+                    <svg id="btSvg" viewBox="0 0 920 270" width="920" height="270"></svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-panel 4: Tobin & Friedman -->
+        <div id="th-friedman" class="sub-panel">
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-title" data-i18n="tobinTitle">Портфельный подход Дж. Тобина (Риск и диверсификация)</div>
+                    <p style="font-size:14px; color:#334155; margin-bottom:10px;" data-i18n="tobinP1">
+                        В исходной спекулятивной модели Кейнса инвестор держит либо только деньги, либо только облигации. Джеймс Тобин ввёл <strong>фактор риска</strong>: рыночные цены облигаций колеблются, тогда как номинальная стоимость денег стабильна.
+                    </p>
+                    <p style="font-size:14px; color:#334155;" data-i18n="tobinP2">
+                        Инвестор, не склонный к риску, рационально формирует <strong>диверсифицированный портфель</strong> из денег и доходных активов даже тогда, когда ожидаемая доходность облигаций выше.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <div class="card-title" data-i18n="friedTitle">Современная теория спроса на деньги М. Фридмана</div>
+                    <div class="flip-formula" style="background:#f1f5f9; color:var(--navy); font-weight:700; margin-bottom:12px; border:1px solid #cbd5e1;">
+                        Mᵈ / P = f( Yₚ ,  r_b − r_m ,  r_e − r_m ,  πᵉ − r_m )
+                    </div>
+                    <p style="font-size:13.8px; color:#334155; margin-bottom:8px;" data-i18n="friedP1">
+                        Милтон Фридман рассматривал деньги как один из активов наряду с облигациями (<em>r_b</em>), акциями (<em>r_e</em>) и реальными товарами (ожидаемая инфляция <em>πᵉ</em>). Спрос на реальные остатки зависит от <strong>постоянного дохода (Yₚ)</strong> и <strong>спрэдов доходности</strong> альтернативных активов относительно доходности самих денег (<em>r_m</em>).
+                    </p>
+                    <p style="font-size:13.8px; color:#334155;" data-i18n="friedP2">
+                        Поскольку постоянный доход <em>Yₚ</em> колеблется слабее текущего дохода, а банки корректируют <em>r_m</em> вслед за рынком, функция спроса на деньги по Фридману относительно стабильна, а скорость обращения предсказуема.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Comparative Table of Theories -->
+            <div class="card">
+                <div class="card-title" data-i18n="compThTitle">Сравнительная матрица теорий спроса на деньги</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-i18n="ct1">Теория / Автор</th>
+                            <th data-i18n="ct2">Ключевые факторы спроса</th>
+                            <th data-i18n="ct3">Роль процентной ставки (i)</th>
+                            <th data-i18n="ct4">Вывод о скорости обращения (V)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>И. Фишер</strong></td>
+                            <td data-i18n="ctF2">Сделки и номинальный доход (PY)</td>
+                            <td data-i18n="ctF3">Напрямую не входит в функцию</td>
+                            <td data-i18n="ctF4">Приблизительно постоянна в краткосрочном периоде</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Дж. М. Кейнс</strong></td>
+                            <td data-i18n="ctK2">3 мотива: транзакционный, предосторожности, спекулятивный</td>
+                            <td data-i18n="ctK3">Рост ставки <em>i</em> снижает спрос на деньги</td>
+                            <td data-i18n="ctK4">Нестабильна, проциклична, зависит от ожиданий</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Баумоль — Тобин</strong></td>
+                            <td data-i18n="ctB2">Объём платежей (T) и издержки конвертации (b)</td>
+                            <td data-i18n="ctB3">Даже транзакционный остаток убывает с ростом <em>i</em> (√(bT/2i))</td>
+                            <td data-i18n="ctB4">Растёт при повышении ставки <em>i</em> и снижении комиссий <em>b</em></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Дж. Тобин</strong></td>
+                            <td data-i18n="ctT2">Доходность и волатильность (риск) облигаций</td>
+                            <td data-i18n="ctT3">Влияет через соотношение доходности и риска</td>
+                            <td data-i18n="ctT4">Зависит от портфельного выбора и неприятия риска</td>
+                        </tr>
+                        <tr>
+                            <td><strong>М. Фридман</strong></td>
+                            <td data-i18n="ctFr2">Постоянный доход (Yₚ) и спрэды доходности активов</td>
+                            <td data-i18n="ctFr3">Малое влияние из-за спрэдов (r_asset − r_m)</td>
+                            <td data-i18n="ctFr4">Предсказуема при стабильной функции спроса</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================== TAB 8: CONCLUSIONS & KEY FORMULAS ==================== -->
+    <section id="tab8" class="tab-panel">
+        <div class="section-header">
+            <h2 data-i18n="s8Title">Заключение и свод ключевых формул</h2>
+            <p data-i18n="s8Desc">Главные аналитические выводы темы «Денежный рынок» и справочник формул для решения задач.</p>
+        </div>
+
+        <!-- Key Formulas Block -->
+        <div class="card">
+            <div class="card-title" data-i18n="formTitle">Ключевые формулы денежного рынка</div>
+            <div class="formula-grid">
+                <div class="formula-item">
+                    <div class="f-label" data-i18n="fl1">Реальное предложение денег</div>
+                    <div class="f-math">(M / P)ˢ = M̄ / P</div>
+                    <div class="f-desc" data-i18n="fd1">Номинальный запас M̄, делённый на уровень цен P</div>
+                </div>
+                <div class="formula-item">
+                    <div class="f-label" data-i18n="fl2">Денежная база</div>
+                    <div class="f-math">MB = C + R</div>
+                    <div class="f-desc" data-i18n="fd2">Наличные вне банков (C) + резервы банков в ЦБ (R)</div>
+                </div>
+                <div class="formula-item">
+                    <div class="f-label" data-i18n="fl3">Уравнение обмена и скорость</div>
+                    <div class="f-math">M · V = P · Y  ⇒  V = PY / M</div>
+                    <div class="f-desc" data-i18n="fd3">Тождество Фишера; в темпах: gₘ + gᵥ = π + gᵧ</div>
+                </div>
+                <div class="formula-item">
+                    <div class="f-label" data-i18n="fl4">Классический спрос на деньги</div>
+                    <div class="f-math">Mᵈ = k · P · Y  (k = 1/V)</div>
+                    <div class="f-desc" data-i18n="fd4">Спрос определяется номинальным доходом PY</div>
+                </div>
+                <div class="formula-item">
+                    <div class="f-label" data-i18n="fl5">Предпочтение ликвидности Кейнса</div>
+                    <div class="f-math">Mᵈ / P = f(i, Y)</div>
+                    <div class="f-desc" data-i18n="fd5">Чувствительность: fᵢ &lt; 0 (по ставке), fᵧ &gt; 0 (по доходу)</div>
+                </div>
+                <div class="formula-item">
+                    <div class="f-label" data-i18n="fl6">Модель Баумоля–Тобина</div>
+                    <div class="f-math">M̄* = √( b · T / 2i )</div>
+                    <div class="f-desc" data-i18n="fd6">Оптимальный средний остаток; эластичность по i равна −0.5</div>
+                </div>
+                <div class="formula-item">
+                    <div class="f-label" data-i18n="fl7">Функция спроса М. Фридмана</div>
+                    <div class="f-math">Mᵈ/P = f(Yₚ, r_b−r_m, r_e−r_m, πᵉ−r_m)</div>
+                    <div class="f-desc" data-i18n="fd7">Зависимость от постоянного дохода и спрэдов доходности</div>
+                </div>
+                <div class="formula-item">
+                    <div class="f-label" data-i18n="fl8">Комбинаторика цен при бартере</div>
+                    <div class="f-math">N(N − 1) / 2  vs  N</div>
+                    <div class="f-desc" data-i18n="fd8">Сокращение числа относительных цен при введении единицы счёта</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Integrated Conclusion -->
+        <div class="card" style="background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%); border-left: 6px solid var(--navy);">
+            <div class="card-title" data-i18n="concTitle">Заключение: логика современного денежного рынка</div>
+            <div class="grid-2">
+                <div>
+                    <p style="font-size:14.2px; color:#1e293b; margin-bottom:10px;" data-i18n="concP1">
+                        <strong>1. Природа денег и агрегатов:</strong> Деньги определяются общепринятой приемлемостью в платежах, а не физическим носителем. Денежные агрегаты (M0, M1, M2, M3) — это статистические шкалы ликвидности, методология которых различается между странами (например, включение сберегательных депозитов в M1 США с мая 2020 г. и учёт валютных вкладов в M2/M3 Казахстана).
+                    </p>
+                    <p style="font-size:14.2px; color:#1e293b;" data-i18n="concP2">
+                        <strong>2. Спрос на деньги и скорость обращения:</strong> Экономические агенты балансируют между удобством ликвидности и альтернативной стоимостью упущенного процента <em>i</em>. Поскольку скорость обращения денег <em>V</em> меняется под влиянием ставок, инфляционных ожиданий и цифровых платёжных технологий, связь между денежной массой и номинальным ВВП является реальной, но не механической.
+                    </p>
+                </div>
+                <div>
+                    <p style="font-size:14.2px; color:#1e293b; margin-bottom:10px;" data-i18n="concP3">
+                        <strong>3. Современная денежно-кредитная политика:</strong> Центральный банк не может одновременно жёстко фиксировать и объём резервов, и процентную ставку. Поэтому современные регуляторы (как ФРС США в коридоре 3.75–4.00%, так и НБК при базовой ставке 15.75%) таргетируют <strong>краткосрочную процентную ставку</strong>, эластично управляя банковской ликвидностью, а денежные агрегаты используют как важные информационные индикаторы.
+                    </p>
+                    <div style="background:var(--navy); color:white; padding:12px 16px; border-radius:10px; font-size:13.5px;" data-i18n="concHighlight">
+                        <strong>Главный синтез:</strong> Равновесие на денежном рынке устанавливает цену ликвидности (ставку <em>i</em>), которая через инвестиции и потребительский спрос транслируется в совокупный спрос (AD) на рынке товаров и услуг.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<footer>
+    <p><strong data-i18n="foot1">Almaty Management University (AlmaU) • Школа цифровых технологий и экономики (SDTE), 2026</strong></p>
+    <p data-i18n="foot2">Интерактивный учебный дашборд по курсу «Принципы экономики» | Данные актуальны на 16 ноября 2026 г.</p>
+</footer>
+
+<script>
+    // ==================== TRANSLATIONS (RU / EN) ====================
+    const i18n = {
+        ru: {
+            mainTitle: "Денежный рынок: Спрос на деньги и предложение денег",
+            subTitle: "Курс «Принципы экономики» | Almaty Management University (AlmaU) • Школа цифровых технологий и экономики (SDTE), 2026",
+            t1: "Как работает денежный рынок",
+            t2: "Функции денег",
+            t3: "Эволюция денег и платежей",
+            t4: "Измерение денежной массы",
+            t5: "Агрегаты: США и Казахстан",
+            t6: "Предложение денег и равновесие",
+            t7: "Теории спроса и скорость",
+            t8: "Итоги и ключевые формулы",
+            s1Title: "Как работает денежный рынок и чем он отличается от рынка товаров и услуг",
+            s1Desc: "Деньги — наиболее ликвидный актив. На денежном рынке ценой выступает номинальная процентная ставка (i), а на рынке товаров и услуг — общий уровень цен (P).",
+            g1Title: "1. Рынок товаров и услуг (краткосрочный период)",
+            g2Title: "2. Денежный рынок (предложение и спрос на деньги)",
+            axisP: "Уровень цен (P)",
+            axisY: "Реальный выпуск (Y)",
+            axisI: "Номинальная ставка (i)",
+            axisMP: "Реальные денежные остатки (M/P)",
+            g1Note: "Кривая краткосрочного совокупного предложения <strong>SRAS имеет положительный наклон</strong> из-за жёсткости цен и зарплат: рост уровня цен <em>P</em> стимулирует фирмы расширять реальный выпуск <em>Y</em>.",
+            g2Note: "В базовой модели <strong>кривая предложения денег (M/P)ˢ вертикальна</strong>: центральный банк контролирует денежную базу и номинальное предложение <em>M̄</em>, которое в моменте не зависит от рыночной ставки <em>i</em>.",
+            boundTitle: "Ключевые отличия денег от смежных экономических категорий",
+            b1H: "Деньги ≠ Богатство",
+            b1P: "Богатство — запас всех активов на дату (недвижимость, акции, облигации и деньги). Деньги — лишь наиболее ликвидная часть богатства.",
+            b2H: "Деньги ≠ Доход",
+            b2P: "Доход — это <em>поток</em> за период времени (например, зарплата в тенге за месяц), тогда как денежный остаток — это <em>запас</em> на конкретный момент.",
+            b3H: "Деньги ≠ Кредит",
+            b3P: "Кредит создаёт долговое требование между заёмщиком и кредитором, хотя выдача банковского кредита одновременно создаёт новый депозит.",
+            b4H: "Деньги ≠ Платёжный инструмент",
+            b4P: "Банковская карта, смартфон или QR-код — лишь способ передать команду банку переместить депозит; деньгами является сам остаток на счёте.",
+            s2Title: "Три функции денег (нажмите на карточку, чтобы перевернуть)",
+            s2Desc: "Деньги определяются поведенчески: актив является деньгами потому, что участники рынка ожидают его общепринятого приёма в платежах.",
+            f1Circle: "Средство<br>обмена",
+            f1Sub: "Снижает издержки обмена",
+            f1BackTitle: "1. Средство обмена (Medium of Exchange)",
+            f1BackText: "Устраняет необходимость двойного совпадения потребностей. При бартере продавец должен найти контрагента, который одновременно предлагает нужный товар и хочет получить именно его товар. Деньги сокращают издержки поиска, переговоров и расчётов, поддерживая специализацию и разделение труда.",
+            f1Tag: "Бартер → Специализация",
+            f2Circle: "Единица<br>счёта",
+            f2Sub: "Делает цены сопоставимыми",
+            f2BackTitle: "2. Единица счёта (Unit of Account)",
+            f2BackText: "Даёт общую шкалу измерения стоимости и цен. При N товарах бартерная экономика требует N(N−1)/2 относительных цен, тогда как денежная единица позволяет публиковать всего N денежных цен. Чем сложнее экономика, тем огромнее экономия информационных издержек.",
+            f3Circle: "Средство<br>сбережения",
+            f3Sub: "Переносит покупательную способность",
+            f3BackTitle: "3. Средство сбережения (Store of Value)",
+            f3BackText: "Переносит покупательную способность из настоящего в будущее. Деньги наиболее ликвидны, но не дают высокой доходности, а их реальная ценность падает при росте уровня цен (инфляции). Отсюда главное противоречие: ликвидность удобна, но её хранение имеет альтернативную стоимость (i).",
+            f3Tag: "Ликвидность vs Доходность (i)",
+            flipHint: "↻ Нажмите для пояснения",
+            s3Title: "Эволюция денег и платёжных систем",
+            s3Desc: "От товарных денег с внутренней ценностью к цифровым валютам центральных банков (CBDC) и безналичной экономике.",
+            evoFlowTitle: "Этапы эволюции форм денег",
+            step1B: "Этап 1",
+            step1H: "Товарные деньги (Commodity)",
+            step1P: "Золото, серебро и иные товары с внутренней ценностью. Надёжны, но тяжелы, дороги в транспортировке и сложны в проверке пробы.",
+            step2B: "Этап 2",
+            step2H: "Фиатные деньги (Fiat Money)",
+            step2P: "Неразменные бумажные деньги и монеты. Приемлемость опирается на закон, налоговую систему, доверие к эмитенту и сетевой эффект.",
+            step3B: "Этап 3",
+            step3H: "Чеки и депозиты (Checks)",
+            step3P: "Передача прав требования по банковскому счёту без перевозки наличных. Снижают издержки крупных расчётов, но требуют клиринга.",
+            step4B: "Этап 4",
+            step4H: "Электронные платежи (E-Payments)",
+            step4P: "Платёжные карты, ACH, мобильный банкинг и мгновенные QR-переводы. Ускоряют расчёты при сохранении банковского счёта как основы.",
+            step5B: "Этап 5 • CBDC",
+            step5H: "Цифровая валюта ЦБ (Цифровой тенге)",
+            step5P: "Прямое цифровое обязательство центрального банка, дополняющее наличные и безналичные деньги. В Казахстане правовой статус закреплён в январе 2026 года.",
+            kzPayTitle: "🇰🇿 Казахстан (данные НБК, сентябрь 2026)",
+            kzCardBar: "Платёжные карты: 96.48%",
+            kzOtherBar: "Прочее: 3.52%",
+            kzPayDesc: "В Казахстане на платёжные карты пришлось <strong>96,48% всех операций</strong> по количеству с учтёнными инструментами, причём внутри карточных операций <strong>98,68% составили безналичные платежи</strong>. С января 2026 года цифровой тенге законодательно закреплён как третья форма национальной валюты.",
+            usPayTitle: "🇺🇸 США (данные ФРС, 2024 / отчёт 2026)",
+            usCardBar: "Карты: 79%",
+            usCheckBar: "Чеки: 4%",
+            usAchBar: "ACH и др.: 17%",
+            usPayDesc: "В США банковские карты обеспечивают <strong>79% количества</strong> основных безналичных транзакций, система <strong>ACH проводит 74% их стоимостного объёма</strong>, а использование бумажных чеков сократилось до 4% (9,2 млрд транзакций в год).",
+            s4Title: "Измерение денежной массы: шкала ликвидности",
+            s4Desc: "Центральные банки ранжируют денежные агрегаты от наиболее ликвидных средств платежа (M0, M1) к более широким квазиденьгам (M2, M3).",
+            tblUsTitle: "🇺🇸 Денежные агрегаты США (ФРС США, H.6)",
+            tblKzTitle: "🇰🇿 Денежные агрегаты Казахстана (НБК)",
+            thAgg: "Агрегат",
+            thComp: "Состав и экономический смысл",
+            usM1Desc: "Наличные вне банков + депозиты до востребования + другие ликвидные депозиты, включая <strong>сберегательные счета</strong> (с мая 2020 г.).",
+            usM2Desc: "<strong>M1</strong> + малые срочные депозиты (до $100 тыс.) + паи розничных фондов денежного рынка (за вычетом пенсионных счетов IRA и Keogh).",
+            usM3Desc: "Публикация официального агрегата M3 прекращена ФРС США в 2006 году.",
+            kzM0Desc: "Наличные деньги в обращении (вне депозитных организаций).",
+            kzM1Desc: "<strong>M0</strong> + переводные депозиты в <strong>тенге</strong> населения и небанковских юридических лиц.",
+            kzM2Desc: "<strong>M1</strong> + другие (срочные/сберегательные) депозиты в тенге + <strong>переводные депозиты в иностранной валюте</strong>.",
+            kzM3Desc: "<strong>M2</strong> + <strong>другие депозиты в иностранной валюте</strong> (широкая денежная масса).",
+            methTitle: "⚠️ Изменение методологии США (Change in US Methodology, 2020 и 2026 гг.)",
+            methP1: "<strong>Май 2020 года (структурный разрыв M1):</strong> В марте 2020 г. ФРС обнулила нормативы обязательных резервов, а в апреле отменила лимит в 6 переводов в месяц со сберегательных счетов. С мая 2020 г. сберегательные депозиты включены в компонент «других ликвидных депозитов» внутри <strong>M1</strong>. Это вызвало одномоментный скачок M1 примерно на <strong>$11,2 трлн</strong>, что является изменением статистического определения, а не внезапной эмиссией новой ликвидности (M2 при этом не изменился).",
+            methP2: "<strong>Июль 2026 года и сопоставимость с РК:</strong> В июле 2026 г. ФРС перенесла вычитание остатков IRA и Keogh на уровень совокупного M2 с ретроспективным пересчётом сезонно скорректированных рядов. Кроме того, при сравнении стран важно учитывать: в США публикуются среднемесячные <em>сезонно скорректированные</em> данные, тогда как НБК публикует данные на <em>конец месяца без сезонной корректировки</em>, а M1 Казахстана включает только тенговые остатки.",
+            s5Title: "Динамика денежных агрегатов: США и Казахстан (2025–2026)",
+            s5Desc: "Актуальные официальные статистические ряды ФРС США (H.6) и Национального Банка Республики Казахстан.",
+            subUs: "🇺🇸 США (ФРС, H.6)",
+            subKz: "🇰🇿 Казахстан (НБК)",
+            usChartTitle: "Денежные агрегаты США: M1 и M2 (трлн $)",
+            trilUsd: "трлн USD",
+            usChartNote: "Денежная база США (сентябрь 2026) составила <strong>$5,449.8 млрд</strong> ($2,483 млрд наличных + $2,967 млрд резервов банков в ФРС).",
+            usTblTitle: "Официальные показатели США (осень 2026)",
+            thInd: "Показатель",
+            thVal: "Значение",
+            thDate: "Дата",
+            thYoY: "За год (YoY)",
+            rowBase: "<strong>Денежная база</strong>",
+            rowFedRate: "<strong>Ставка Fed Funds</strong>",
+            rowFedRange: "диапазон 3.75–4.00%",
+            kzChartTitle: "Денежные агрегаты Казахстана: M0–M3 (трлн ₸)",
+            trilKzt: "трлн KZT (₸)",
+            kzChartNote: "Разница <strong>M3 − M2 = ₸7.114 трлн</strong> отражает срочные валютные депозиты, а <strong>M2 − M1 = ₸38.731 трлн</strong> — срочные тенговые и переводные валютные вклады.",
+            kzTblTitle: "Официальные показатели Казахстана (октябрь 2026)",
+            thOct: "Октябрь 2026",
+            thYtd: "К дек 2025",
+            rowResMoney: "<strong>Резервные деньги</strong>",
+            rowBaseRate: "<strong>Базовая ставка НБК</strong>",
+            s6Title: "Предложение денег и интерактивное равновесие денежного рынка",
+            s6Desc: "Как формируется денежная масса (MB = C + R) и как центральные банки США и Казахстана достигают целевых процентных ставок.",
+            supMechTitle: "Формирование предложения денег и современные операционные режимы",
+            supMechText: "Денежная база <strong>MB = C + R</strong> создаётся центральным банком, но широкая денежная масса (M2/M3) формируется совместно центральным банком, коммерческими банками (выдача кредитов создаёт депозиты) и населением (выбор между наличными и вкладами). На практике последовательность чаще идёт от <em>кредитного решения → к депозиту → к потребности в резервах</em>, а ЦБ эластично управляет резервами, удерживая краткосрочную ставку в целевом коридоре.",
+            thEl: "Элемент",
+            thFed: "🇺🇸 Федеральная резервная система (ФРС)",
+            thNbk: "🇰🇿 Национальный Банк Казахстана (НБК)",
+            op1: "<strong>Операционная цель</strong>",
+            op1Us: "Ставка федеральных фондов (Federal Funds Rate)",
+            op1Kz: "Ставки денежного рынка (TONIA) вокруг базовой ставки",
+            op2: "<strong>Ключевой режим</strong>",
+            op2Us: "Система достаточных резервов (Ample Reserves)",
+            op2Kz: "Процентный коридор (±1 п.п.) и управление ликвидностью",
+            op3: "<strong>Ставка на 16.11.2026</strong>",
+            op4: "<strong>Инструменты</strong>",
+            op4Us: "Процент по резервам (IORB), операции репо и обратного репо (ON RRP)",
+            op4Kz: "Постоянные механизмы, ноты/депозиты НБК, МРТ и зеркалирование",
+            simEqTitle: "Интерактивный симулятор равновесия: сдвиг предложения денег (M/P)ˢ",
+            redLineBadge: "Красная линия = (M/P)ˢ",
+            eqTabKz: "🇰🇿 Казахстан (Базовая ставка 15.75%)",
+            eqTabUs: "🇺🇸 США (Целевой диапазон 3.75–4.00%)",
+            slKzMs: "Реальное предложение денег (M/P)ˢ, трлн ₸:",
+            slUsMs: "Реальное предложение денег (M/P)ˢ, трлн $:",
+            slKzY: "Сдвиг спроса на деньги Mᵈ/P (доход Y / инфл. ожидания):",
+            slUsY: "Сдвиг спроса на деньги Mᵈ/P (доход Y / цены P):",
+            tightPolicy: "← Сжатие ликвидности (ставка растёт)",
+            easePolicy: "Экспансия (ставка падает) →",
+            btnReset: "Сброс (15.75%)",
+            btnResetUs: "Сброс (3.88%)",
+            axisMpKz: "Реальные денежные остатки M/P (трлн ₸)",
+            axisMpUs: "Реальные денежные остатки M/P (трлн $)",
+            shiftsTitle: "Главные сдвиги на денежном рынке (Major Shifts)",
+            sh1: "Шок / Фактор",
+            sh2: "Сдвиг кривой",
+            sh3: "Краткосрочный результат (ceteris paribus)",
+            r1c1: "<strong>Рост реального дохода (Y ↑)</strong>",
+            r1c3: "Больше сделок → спрос на деньги растёт → равновесная ставка <strong>i повышается</strong>.",
+            r2c1: "<strong>Рост уровня цен (P ↑)</strong>",
+            r2c3: "Для прежнего объёма покупок нужно больше номинальных остатков; при фиксированном M̄ реальное предложение (M/P)ˢ сдвигается влево и <strong>i растёт</strong>.",
+            r3c1: "<strong>Рост предложения денег (Mˢ ↑)</strong>",
+            r3c3: "Избыток ликвидности → агенты покупают облигации → цены облигаций растут, а доходность (ставка <strong>i</strong>) <strong>снижается</strong>.",
+            r4c1: "<strong>Рост доходности альтернатив</strong>",
+            r4c3: "Альтернативная стоимость хранения денег возрастает → спрос на деньги падает.",
+            r5c1: "<strong>Рост неопределённости</strong>",
+            r5c3: "Ликвидность ценится выше → компании и домохозяйства формируют больший защитный буфер.",
+            r6c1: "<strong>Финансовые инновации</strong>",
+            r6c3: "Снижение издержек перевода средств уменьшает потребность в остатках и может нарушить стабильность функции спроса.",
+            s7Title: "Теории спроса на деньги и скорость обращения",
+            s7Desc: "От классического уравнения обмена Фишера до теории предпочтения ликвидности Кейнса, модели запасов Баумоля–Тобина и портфельного подхода Фридмана.",
+            thTab1: "1. Количественная теория и скорость (V)",
+            thTab2: "2. Предпочтение ликвидности Кейнса",
+            thTab3: "3. Модель Баумоля–Тобина (12 мес.)",
+            thTab4: "4. Тобин и теория Фридмана",
+            qtmTitle: "Уравнение обмена Фишера и скорость обращения",
+            qtmP1: "Скорость обращения денег <strong>V = (P × Y) / M</strong> показывает, сколько раз в среднем денежная единица оборачивается за год при покупке конечных товаров и услуг. Отсюда следует тождество обмена: <strong>M × V = P × Y</strong>.",
+            qtmP2: "Ирвинг Фишер полагал, что платёжные технологии меняются медленно, поэтому в краткосрочном периоде <strong>V ≈ const</strong>, а при полной занятости выпуск <strong>Y</strong> задан. Тогда спрос на деньги зависит только от номинального дохода: <strong>Mᵈ = k · P · Y</strong> (где <em>k = 1/V</em>), и процентная ставка <em>i</em> на спрос напрямую не влияет.",
+            qtmGrowthH: "Уравнение в темпах роста: gₘ + gᵥ = π + gᵧ",
+            qtmGrowthP: "В долгосрочном периоде устойчивый рост денежной массы намного быстрее роста реального выпуска неизбежно порождает инфляцию (π ≈ gₘ − gᵧ).",
+            velChartTitle: "Скорость обращения M2 в США (2019 Q4 – 2026 Q3)",
+            panDrop: "1.165 (пандемия)",
+            velNote: "Скорость обращения <strong>не постоянна</strong>: она резко упала в 2020 г. до 1.126 из-за роста сбережений и фискальных трансфертов, а затем восстановилась до 1.417 в III кв. 2026 г. (скорость M1 — 1.653).",
+            keynesTitle: "Теория предпочтения ликвидности Дж. М. Кейнса: Mᵈ / P = f(i, Y)",
+            km1H: "1. Транзакционный мотив",
+            km1P: "Разрыв во времени между получением дохода и текущими расходами. Прямо пропорционален доходу <strong>Y</strong> (<em>fᵧ &gt; 0</em>).",
+            km2H: "2. Мотив предосторожности",
+            km2P: "Запас на непредвиденные расходы и внезапные выгодные покупки. Растёт с доходом <strong>Y</strong> и экономической неопределённостью.",
+            km3H: "3. Спекулятивный мотив",
+            km3P: "Выбор между деньгами и облигациями. При низкой ставке <strong>i</strong> ожидается её рост и падение цен облигаций → спрос на деньги высок (<em>fᵢ &lt; 0</em>).",
+            keynesVelNote: "<strong>Следствие для скорости обращения:</strong> поскольку <em>V = Y / f(i, Y)</em>, рост процентной ставки снижает желаемые денежные остатки и <strong>повышает скорость обращения денег</strong>. Скорость становится процикличной и зависит от ожиданий рынка относительно «нормальной» процентной ставки.",
+            btTitle: "Модель управления запасами Баумоля–Тобина (годовой горизонт: 12 месяцев)",
+            btIntro: "Даже транзакционный спрос на деньги чувствителен к процентной ставке <em>i</em> и издержкам конвертации <em>b</em>. Изменяйте частоту снятия/конвертации средств в течение <strong>полного года (12 месяцев)</strong> — от 12 раз (1 раз в месяц, 12 зубчиков) до 24 раз (каждые полмесяца, 24 зубчика) и выше!",
+            btSlN: "Число конверсий в год (N):",
+            btSlT: "Годовой доход / расходы (T):",
+            btSlI: "Ставка i (%) и издержки b:",
+            btM1: "Сумма одной конверсии (C = T/N)",
+            btM2: "Средний остаток (M̄ = C/2)",
+            btM3: "Оптимальный остаток M̄* = √(bT/2i)",
+            btM4: "Годовая скорость (V = T / M̄)",
+            tobinTitle: "Портфельный подход Дж. Тобина (Риск и диверсификация)",
+            tobinP1: "В исходной спекулятивной модели Кейнса инвестор держит либо только деньги, либо только облигации. Джеймс Тобин ввёл <strong>фактор риска</strong>: рыночные цены облигаций колеблются, тогда как номинальная стоимость денег стабильна.",
+            tobinP2: "Инвестор, не склонный к риску, рационально формирует <strong>диверсифицированный портфель</strong> из денег и доходных активов даже тогда, когда ожидаемая доходность облигаций выше.",
+            friedTitle: "Современная теория спроса на деньги М. Фридмана",
+            friedP1: "Милтон Фридман рассматривал деньги как один из активов наряду с облигациями (<em>r_b</em>), акциями (<em>r_e</em>) и реальными товарами (ожидаемая инфляция <em>πᵉ</em>). Спрос на реальные остатки зависит от <strong>постоянного дохода (Yₚ)</strong> и <strong>спрэдов доходности</strong> альтернативных активов относительно доходности самих денег (<em>r_m</em>).",
+            friedP2: "Поскольку постоянный доход <em>Yₚ</em> колеблется слабее текущего дохода, а банки корректируют <em>r_m</em> вслед за рынком, функция спроса на деньги по Фридману относительно стабильна, а скорость обращения предсказуема.",
+            compThTitle: "Сравнительная матрица теорий спроса на деньги",
+            ct1: "Теория / Автор",
+            ct2: "Ключевые факторы спроса",
+            ct3: "Роль процентной ставки (i)",
+            ct4: "Вывод о скорости обращения (V)",
+            ctF2: "Сделки и номинальный доход (PY)",
+            ctF3: "Напрямую не входит в функцию",
+            ctF4: "Приблизительно постоянна в краткосрочном периоде",
+            ctK2: "3 мотива: транзакционный, предосторожности, спекулятивный",
+            ctK3: "Рост ставки <em>i</em> снижает спрос на деньги",
+            ctK4: "Нестабильна, проциклична, зависит от ожиданий",
+            ctB2: "Объём платежей (T) и издержки конвертации (b)",
+            ctB3: "Даже транзакционный остаток убывает с ростом <em>i</em> (√(bT/2i))",
+            ctB4: "Растёт при повышении ставки <em>i</em> и снижении комиссий <em>b</em>",
+            ctT2: "Доходность и волатильность (риск) облигаций",
+            ctT3: "Влияет через соотношение доходности и риска",
+            ctT4: "Зависит от портфельного выбора и неприятия риска",
+            ctFr2: "Постоянный доход (Yₚ) и спрэды доходности активов",
+            ctFr3: "Малое влияние из-за спрэдов (r_asset − r_m)",
+            ctFr4: "Предсказуема при стабильной функции спроса",
+            s8Title: "Заключение и свод ключевых формул",
+            s8Desc: "Главные аналитические выводы темы «Денежный рынок» и справочник формул для решения задач.",
+            formTitle: "Ключевые формулы денежного рынка",
+            fl1: "Реальное предложение денег",
+            fd1: "Номинальный запас M̄, делённый на уровень цен P",
+            fl2: "Денежная база",
+            fd2: "Наличные вне банков (C) + резервы банков в ЦБ (R)",
+            fl3: "Уравнение обмена и скорость",
+            fd3: "Тождество Фишера; в темпах: gₘ + gᵥ = π + gᵧ",
+            fl4: "Классический спрос на деньги",
+            fd4: "Спрос определяется номинальным доходом PY",
+            fl5: "Предпочтение ликвидности Кейнса",
+            fd5: "Чувствительность: fᵢ < 0 (по ставке), fᵧ > 0 (по доходу)",
+            fl6: "Модель Баумоля–Тобина",
+            fd6: "Оптимальный средний остаток; эластичность по i равна −0.5",
+            fl7: "Функция спроса М. Фридмана",
+            fd7: "Зависимость от постоянного дохода и спрэдов доходности",
+            fl8: "Комбинаторика цен при бартере",
+            fd8: "Сокращение числа относительных цен при введении единицы счёта",
+            concTitle: "Заключение: логика современного денежного рынка",
+            concP1: "<strong>1. Природа денег и агрегатов:</strong> Деньги определяются общепринятой приемлемостью в платежах, а не физическим носителем. Денежные агрегаты (M0, M1, M2, M3) — это статистические шкалы ликвидности, методология которых различается между странами (например, включение сберегательных депозитов в M1 США с мая 2020 г. и учёт валютных вкладов в M2/M3 Казахстана).",
+            concP2: "<strong>2. Спрос на деньги и скорость обращения:</strong> Экономические агенты балансируют между удобством ликвидности и альтернативной стоимостью упущенного процента <em>i</em>. Поскольку скорость обращения денег <em>V</em> меняется под влиянием ставок, инфляционных ожиданий и цифровых платёжных технологий, связь между денежной массой и номинальным ВВП является реальной, но не механической.",
+            concP3: "<strong>3. Современная денежно-кредитная политика:</strong> Центральный банк не может одновременно жёстко фиксировать и объём резервов, и процентную ставку. Поэтому современные регуляторы (как ФРС США в коридоре 3.75–4.00%, так и НБК при базовой ставке 15.75%) таргетируют <strong>краткосрочную процентную ставку</strong>, эластично управляя банковской ликвидностью, а денежные агрегаты используют как важные информационные индикаторы.",
+            concHighlight: "<strong>Главный синтез:</strong> Равновесие на денежном рынке устанавливает цену ликвидности (ставку <em>i</em>), которая через инвестиции и потребительский спрос транслируется в совокупный спрос (AD) на рынке товаров и услуг.",
+            foot1: "Almaty Management University (AlmaU) • Школа цифровых технологий и экономики (SDTE), 2026",
+            foot2: "Интерактивный учебный дашборд по курсу «Принципы экономики» | Данные актуальны на 16 ноября 2026 г."
+        },
+        en: {
+            mainTitle: "Money Market: Money Demand and Money Supply",
+            subTitle: "Principles of Economics | Almaty Management University (AlmaU) • School of Digital Technologies & Economics (SDTE), 2026",
+            t1: "How the Money Market Works",
+            t2: "Functions of Money",
+            t3: "Evolution of Money & Payments",
+            t4: "Measuring the Money Stock",
+            t5: "Aggregates: USA & Kazakhstan",
+            t6: "Money Supply & Equilibrium",
+            t7: "Demand Theories & Velocity",
+            t8: "Conclusions & Key Formulas",
+            s1Title: "How the Money Market Works vs. the Goods and Services Market",
+            s1Desc: "Money is the most liquid asset. In the money market, the price is the nominal interest rate (i), whereas in the goods market it is the overall price level (P).",
+            g1Title: "1. Goods & Services Market (Short Run)",
+            g2Title: "2. Money Market (Money Supply & Demand)",
+            axisP: "Price Level (P)",
+            axisY: "Real Output (Y)",
+            axisI: "Nominal Interest Rate (i)",
+            axisMP: "Real Money Balances (M/P)",
+            g1Note: "The short-run aggregate supply curve <strong>SRAS is upward-sloping</strong> due to sticky prices and wages: a higher price level <em>P</em> induces firms to expand real output <em>Y</em>.",
+            g2Note: "In the baseline model, <strong>the money supply curve (M/P)ˢ is vertical</strong>: the central bank controls the monetary base and nominal stock <em>M̄</em>, which is fixed at any given market rate <em>i</em>.",
+            boundTitle: "Key Conceptual Boundaries: What Money Is Not",
+            b1H: "Money ≠ Wealth",
+            b1P: "Wealth is the stock of all assets at a date (property, equities, bonds, and money). Money is only the most liquid component of wealth.",
+            b2H: "Money ≠ Income",
+            b2P: "Income is a <em>flow</em> per unit of time (e.g., monthly salary), whereas a money balance is a <em>stock</em> measured at a specific point in time.",
+            b3H: "Money ≠ Credit",
+            b3P: "Credit creates a debt claim between borrower and lender, although granting a bank loan simultaneously creates a new deposit.",
+            b4H: "Money ≠ Payment Instrument",
+            b4P: "A debit card, smartphone, or QR code merely instructs a bank to transfer a deposit; the money itself is the balance in the account.",
+            s2Title: "Three Functions of Money (Click a Card to Flip)",
+            s2Desc: "Money is defined behaviorally: an asset serves as money because market participants expect others to accept it in payment.",
+            f1Circle: "Medium of<br>exchange",
+            f1Sub: "Lowers exchange costs",
+            f1BackTitle: "1. Medium of Exchange",
+            f1BackText: "Eliminates the need for a double coincidence of wants. Barter requires finding a counterparty who both supplies the desired good and wants exactly what the seller offers. Money lowers search, bargaining, and settlement costs and supports specialization.",
+            f1Tag: "Barter → Specialization",
+            f2Circle: "Unit of<br>account",
+            f2Sub: "Makes prices comparable",
+            f2BackTitle: "2. Unit of Account",
+            f2BackText: "Provides a common yardstick for quoting prices and recording debts. With N goods, barter requires N(N−1)/2 relative prices, whereas a monetary unit permits just N quoted prices. Informational savings grow rapidly as an economy becomes more complex.",
+            f3Circle: "Store of<br>value",
+            f3Sub: "Carries purchasing power forward",
+            f3BackTitle: "3. Store of Value",
+            f3BackText: "Transfers purchasing power through time. Money is the most liquid asset, though it does not offer the highest yield, and its real value falls when the price level rises. This creates the core tradeoff: liquidity is useful, but holding it carries an opportunity cost (i).",
+            f3Tag: "Liquidity vs. Yield (i)",
+            flipHint: "↻ Click to flip & explain",
+            s3Title: "The Evolution of Money and Payment Systems",
+            s3Desc: "From commodity money with intrinsic value to Central Bank Digital Currencies (CBDC) and cashless economies.",
+            evoFlowTitle: "Stages in the Evolution of Money",
+            step1B: "Stage 1",
+            step1H: "Commodity Money",
+            step1P: "Gold, silver, and items with intrinsic value. Reliable, yet heavy, costly to transport, and difficult to assay.",
+            step2B: "Stage 2",
+            step2H: "Fiat Money",
+            step2P: "Inconvertible paper currency and coins. Acceptability rests on legal tender status, taxation, issuer credibility, and network trust.",
+            step3B: "Stage 3",
+            step3H: "Checks & Bank Deposits",
+            step3P: "Transferring deposit claims without moving physical cash. Lowers large settlement costs, though clearing takes time.",
+            step4B: "Stage 4",
+            step4H: "Electronic Payments",
+            step4P: "Payment cards, ACH transfers, mobile banking, and instant QR payments. Speeds up settlement while the bank balance remains the money.",
+            step5B: "Stage 5 • CBDC",
+            step5H: "Central Bank Digital Currency (Digital Tenge)",
+            step5P: "A direct digital liability of the central bank complementing cash and bank money. Kazakhstan enacted its legal status in January 2026.",
+            kzPayTitle: "🇰🇿 Kazakhstan (NBK Data, September 2026)",
+            kzCardBar: "Payment Cards: 96.48%",
+            kzOtherBar: "Other: 3.52%",
+            kzPayDesc: "In Kazakhstan, payment cards accounted for <strong>96.48% of total transactions</strong> by count among reported instruments, with <strong>98.68% of card activity being cashless</strong>. Since January 2026, the Digital Tenge is legally established as the third form of national currency.",
+            usPayTitle: "🇺🇸 United States (Fed Data, 2024 / 2026 Report)",
+            usCardBar: "Cards: 79%",
+            usCheckBar: "Checks: 4%",
+            usAchBar: "ACH & Other: 17%",
+            usPayDesc: "In the United States, cards accounted for <strong>79% of the number</strong> of core noncash payments, <strong>ACH carried 74% of their value</strong>, and check usage declined to 4% (9.2 billion transactions).",
+            s4Title: "Measuring the Money Stock: Liquidity Scale",
+            s4Desc: "Central banks arrange monetary aggregates along a liquidity spectrum from immediately spendable balances (M0, M1) to near-money assets (M2, M3).",
+            tblUsTitle: "🇺🇸 United States Monetary Aggregates (Fed H.6)",
+            tblKzTitle: "🇰🇿 Kazakhstan Monetary Aggregates (NBK)",
+            thAgg: "Aggregate",
+            thComp: "Components and Economic Meaning",
+            usM1Desc: "Currency outside banks + demand deposits + other liquid deposits including <strong>savings accounts</strong> (since May 2020).",
+            usM2Desc: "<strong>M1</strong> + small-denomination time deposits (under $100k) + retail money market funds less IRA and Keogh retirement balances.",
+            usM3Desc: "Official M3 publication was discontinued by the Federal Reserve in 2006.",
+            kzM0Desc: "Currency in circulation outside depository organizations.",
+            kzM1Desc: "<strong>M0</strong> + transferable deposits in <strong>tenge</strong> held by households and nonbank legal entities.",
+            kzM2Desc: "<strong>M1</strong> + other (time/savings) tenge deposits + <strong>transferable foreign currency deposits</strong>.",
+            kzM3Desc: "<strong>M2</strong> + <strong>other foreign currency deposits</strong> (broad money supply).",
+            methTitle: "⚠️ Change in US Methodology (2020 and 2026 Revisions)",
+            methP1: "<strong>May 2020 (Structural Break in M1):</strong> In March 2020 the Fed reduced reserve requirements to zero, and in April removed the six-transfer limit on savings accounts. Starting May 2020, savings deposits entered 'other liquid deposits' inside <strong>M1</strong>. This caused a ~$11.2 trillion jump that represents a definitional reclassification rather than sudden new liquidity creation (M2 was unaffected).",
+            methP2: "<strong>July 2026 & Cross-Country Comparability:</strong> In July 2026 the Fed moved IRA/Keogh netting to aggregate M2 and revised seasonally adjusted history. Note also that Fed H.6 reports <em>seasonally adjusted monthly averages</em>, whereas NBK reports <em>end-of-month unadjusted stocks</em>, and Kazakhstan M1 covers tenge balances only.",
+            s5Title: "Monetary Aggregates Dynamics: USA and Kazakhstan (2025–2026)",
+            s5Desc: "Latest official statistical series from the Federal Reserve (H.6) and the National Bank of Kazakhstan.",
+            subUs: "🇺🇸 United States (Fed H.6)",
+            subKz: "🇰🇿 Kazakhstan (NBK)",
+            usChartTitle: "US Monetary Aggregates: M1 & M2 ($ Trillions)",
+            trilUsd: "USD Trillions",
+            usChartNote: "The US Monetary Base (Sep 2026) stood at <strong>$5,449.8 billion</strong> ($2,483 bn currency + $2,967 bn depository institution reserves at the Fed).",
+            usTblTitle: "Official US Indicators (Autumn 2026)",
+            thInd: "Indicator",
+            thVal: "Latest Value",
+            thDate: "Date",
+            thYoY: "YoY Change",
+            rowBase: "<strong>Monetary Base</strong>",
+            rowFedRate: "<strong>Effective Fed Funds</strong>",
+            rowFedRange: "3.75–4.00% target range",
+            kzChartTitle: "Kazakhstan Monetary Aggregates: M0–M3 (₸ Trillions)",
+            trilKzt: "KZT Trillions (₸)",
+            kzChartNote: "The <strong>M3 − M2 gap (₸7.114 tn)</strong> reflects time foreign currency deposits, while <strong>M2 − M1 (₸38.731 tn)</strong> captures time tenge and transferable FX deposits.",
+            kzTblTitle: "Official Kazakhstan Indicators (October 2026)",
+            thOct: "October 2026",
+            thYtd: "vs. Dec 2025",
+            rowResMoney: "<strong>Reserve Money</strong>",
+            rowBaseRate: "<strong>NBK Base Rate</strong>",
+            s6Title: "The Supply of Money & Interactive Money Market Equilibrium",
+            s6Desc: "How broad money (MB = C + R) is created and how the Fed and NBK implement their target interest rates.",
+            supMechTitle: "Money Creation and Modern Operating Frameworks",
+            supMechText: "The monetary base <strong>MB = C + R</strong> is issued by the central bank, while broad money (M2/M3) is jointly shaped by the central bank, commercial banks (lending creates deposits), and the public (currency-to-deposit choice). Modern causality runs from <em>credit decisions → deposits → reserve needs</em>, with the central bank supplying reserves elastically to keep short-term rates on target.",
+            thEl: "Element",
+            thFed: "🇺🇸 Federal Reserve System (Fed)",
+            thNbk: "🇰🇿 National Bank of Kazakhstan (NBK)",
+            op1: "<strong>Operating Target</strong>",
+            op1Us: "Federal Funds Rate",
+            op1Kz: "Money market rates (TONIA) around the Base Rate",
+            op2: "<strong>Key Framework</strong>",
+            op2Us: "Ample Reserves System",
+            op2Kz: "Interest rate corridor (±1 pp) & liquidity management",
+            op3: "<strong>Rate on 16 Nov 2026</strong>",
+            op4: "<strong>Main Instruments</strong>",
+            op4Us: "IORB, repo and overnight reverse repo (ON RRP) facilities",
+            op4Kz: "Standing facilities, NBK notes/deposits, MRR & mirroring",
+            simEqTitle: "Interactive Equilibrium Simulator: Shifting Money Supply (M/P)ˢ",
+            redLineBadge: "Red Line = (M/P)ˢ",
+            eqTabKz: "🇰🇿 Kazakhstan (Base Rate 15.75%)",
+            eqTabUs: "🇺🇸 United States (Target Range 3.75–4.00%)",
+            slKzMs: "Real Money Supply (M/P)ˢ, KZT trillions:",
+            slUsMs: "Real Money Supply (M/P)ˢ, USD trillions:",
+            slKzY: "Money Demand Shift Mᵈ/P (Income Y / Inflation Exp.):",
+            slUsY: "Money Demand Shift Mᵈ/P (Income Y / Prices P):",
+            tightPolicy: "← Liquidity Drain (Rate Rises)",
+            easePolicy: "Liquidity Expansion (Rate Falls) →",
+            btnReset: "Reset (15.75%)",
+            btnResetUs: "Reset (3.88%)",
+            axisMpKz: "Real Money Balances M/P (KZT trillions)",
+            axisMpUs: "Real Money Balances M/P (USD trillions)",
+            shiftsTitle: "Major Shifts in the Money Market",
+            sh1: "Shock / Factor",
+            sh2: "Curve Shift",
+            sh3: "Short-Run Result (ceteris paribus)",
+            r1c1: "<strong>Higher Real Income (Y ↑)</strong>",
+            r1c3: "More transactions → money demand rises → equilibrium interest rate <strong>i increases</strong>.",
+            r2c1: "<strong>Higher Price Level (P ↑)</strong>",
+            r2c3: "More nominal balances needed; with fixed M̄, real supply (M/P)ˢ shifts left and <strong>i rises</strong>.",
+            r3c1: "<strong>Higher Money Supply (Mˢ ↑)</strong>",
+            r3c3: "Excess liquidity → agents buy bonds → bond prices rise and yields (rate <strong>i</strong>) <strong>fall</strong>.",
+            r4c1: "<strong>Higher Return on Alternatives</strong>",
+            r4c3: "Opportunity cost of holding money rises → money demand shifts left.",
+            r5c1: "<strong>Greater Uncertainty</strong>",
+            r5c3: "Liquidity becomes more valuable → precautionary money demand shifts right.",
+            r6c1: "<strong>Financial Innovation</strong>",
+            r6c3: "Lower conversion costs reduce desired balances and may destabilize money demand.",
+            s7Title: "Theories of Money Demand and Velocity",
+            s7Desc: "From Fisher's Quantity Theory of Money to Keynes's Liquidity Preference, Baumol-Tobin inventory management, and Friedman's asset demand.",
+            thTab1: "1. Quantity Theory & Velocity (V)",
+            thTab2: "2. Keynes Liquidity Preference",
+            thTab3: "3. Baumol-Tobin Model (12 Mos.)",
+            thTab4: "4. Tobin & Friedman Theory",
+            qtmTitle: "Fisher's Equation of Exchange and Velocity",
+            qtmP1: "Velocity <strong>V = (P × Y) / M</strong> measures nominal output per unit of money per year, yielding the equation of exchange: <strong>M × V = P × Y</strong>.",
+            qtmP2: "Irving Fisher argued that payment institutions change slowly, so <strong>V ≈ const</strong> in the short run and full-employment output <strong>Y</strong> is given. Money demand depends solely on nominal income: <strong>Mᵈ = k · P · Y</strong> (where <em>k = 1/V</em>), with no direct interest rate term.",
+            qtmGrowthH: "Growth Rate Form: gₘ + gᵥ = π + gᵧ",
+            qtmGrowthP: "In the long run, persistent money growth well above real output growth causes inflation (π ≈ gₘ − gᵧ).",
+            velChartTitle: "US M2 Velocity (2019 Q4 – 2026 Q3)",
+            panDrop: "1.165 (pandemic)",
+            velNote: "Velocity is <strong>not constant</strong>: it dropped sharply in 2020 to 1.126 due to surging deposits and transfers, before recovering to 1.417 in 2026 Q3 (M1 velocity was 1.653).",
+            keynesTitle: "Keynes's Liquidity Preference Theory: Mᵈ / P = f(i, Y)",
+            km1H: "1. Transactions Motive",
+            km1P: "Bridges the timing gap between income receipts and expenditures. Increases with income <strong>Y</strong> (<em>fᵧ &gt; 0</em>).",
+            km2H: "2. Precautionary Motive",
+            km2P: "Provides a buffer for unexpected bills and sudden bargains. Rises with income <strong>Y</strong> and uncertainty.",
+            km3H: "3. Speculative Motive",
+            km3P: "Choice between money and bonds. When <strong>i</strong> is low, expected rate hikes imply bond capital losses → higher money demand (<em>fᵢ &lt; 0</em>).",
+            keynesVelNote: "<strong>Implication for Velocity:</strong> Because <em>V = Y / f(i, Y)</em>, a higher interest rate lowers desired money balances and <strong>increases velocity</strong>. Velocity is procyclical and shifts with expectations of the normal interest rate.",
+            btTitle: "Baumol-Tobin Inventory Model (Full Year Horizon: 12 Months)",
+            btIntro: "Even transactions balances respond to the interest rate <em>i</em> and conversion cost <em>b</em>. Adjust the number of conversions across a <strong>full 12-month year</strong>—from 12 conversions (once per month, 12 sawteeth) to 24 conversions (every half-month, 24 sawteeth) and beyond!",
+            btSlN: "Conversions per Year (N):",
+            btSlT: "Annual Spending / Income (T):",
+            btSlI: "Interest Rate i (%) & Cost b:",
+            btM1: "Withdrawal Size (C = T/N)",
+            btM2: "Average Balance (M̄ = C/2)",
+            btM3: "Optimal Balance M̄* = √(bT/2i)",
+            btM4: "Annual Velocity (V = T / M̄)",
+            tobinTitle: "James Tobin's Portfolio Approach (Risk & Diversification)",
+            tobinP1: "Keynes's speculative model implied holding either all money or all bonds. Tobin introduced <strong>risk</strong>: bond prices fluctuate while money's nominal value is certain.",
+            tobinP2: "A risk-averse investor rationally holds a <strong>diversified portfolio</strong> of both money and bonds even when bonds offer a higher expected return.",
+            friedTitle: "Milton Friedman's Modern Quantity Theory",
+            friedP1: "Friedman treated money as one asset among bonds (<em>r_b</em>), equities (<em>r_e</em>), and goods (expected inflation <em>πᵉ</em>). Real money demand depends on <strong>permanent income (Yₚ)</strong> and <strong>return spreads</strong> of alternative assets over money (<em>r_m</em>).",
+            friedP2: "Because permanent income <em>Yₚ</em> fluctuates less than current income and banks adjust <em>r_m</em> with market rates, Friedman's money demand function is relatively stable and velocity is predictable.",
+            compThTitle: "Comparative Matrix of Money Demand Theories",
+            ct1: "Theory / Author",
+            ct2: "Core Drivers of Demand",
+            ct3: "Role of Interest Rate (i)",
+            ct4: "Implication for Velocity (V)",
+            ctF2: "Transactions & nominal income (PY)",
+            ctF3: "Not directly included",
+            ctF4: "Approximately constant in the short run",
+            ctK2: "3 motives: transactions, precautionary, speculative",
+            ctK3: "Higher <em>i</em> lowers money demand",
+            ctK4: "Unstable, procyclical, expectation-driven",
+            ctB2: "Payment volume (T) & conversion cost (b)",
+            ctB3: "Transactions balances fall with <em>i</em> (√(bT/2i))",
+            ctB4: "Rises when <em>i</em> increases or fee <em>b</em> falls",
+            ctT2: "Expected return and bond price risk",
+            ctT3: "Operates via risk-return tradeoff",
+            ctT4: "Depends on portfolio diversification",
+            ctFr2: "Permanent income (Yₚ) & asset return spreads",
+            ctFr3: "Small sensitivity via spreads (r_asset − r_m)",
+            ctFr4: "Predictable if demand function is stable",
+            s8Title: "Conclusions and Key Formulas",
+            s8Desc: "Core analytical takeaways from the Money Market module and formula reference sheet.",
+            formTitle: "Key Money Market Formulas",
+            fl1: "Real Money Supply",
+            fd1: "Nominal money stock M̄ divided by price level P",
+            fl2: "Monetary Base",
+            fd2: "Currency outside banks (C) + bank reserves at CB (R)",
+            fl3: "Equation of Exchange & Velocity",
+            fd3: "Fisher identity; in growth rates: gₘ + gᵥ = π + gᵧ",
+            fl4: "Classical Money Demand",
+            fd4: "Demand driven proportionally by nominal income PY",
+            fl5: "Keynes Liquidity Preference",
+            fd5: "Sensitivities: fᵢ < 0 (interest rate), fᵧ > 0 (income)",
+            fl6: "Baumol-Tobin Optimal Balance",
+            fd6: "Optimal average cash balance; interest elasticity is −0.5",
+            fl7: "Friedman Asset Demand",
+            fd7: "Driven by permanent income and relative return spreads",
+            fl8: "Barter Price Combinatorics",
+            fd8: "Reduction in relative prices via a unit of account",
+            concTitle: "Conclusion: Logic of the Modern Money Market",
+            concP1: "<strong>1. Nature of Money & Aggregates:</strong> Money is defined by general acceptability in payments rather than physical form. Monetary aggregates (M0, M1, M2, M3) are statistical liquidity scales whose definitions vary across jurisdictions (e.g., inclusion of savings accounts in US M1 since May 2020 and FX deposits in Kazakhstan M2/M3).",
+            concP2: "<strong>2. Money Demand & Velocity:</strong> Agents balance the convenience of liquidity against the opportunity cost of forgone interest <em>i</em>. Because velocity <em>V</em> responds to interest rates, expectations, and digital payment innovations, the link between money growth and nominal GDP is real but not mechanical.",
+            concP3: "<strong>3. Modern Monetary Policy:</strong> A central bank cannot simultaneously fix both exact reserve quantities and the market interest rate. Modern central banks (such as the Fed at 3.75–4.00% and the NBK at 15.75%) target a <strong>short-term policy rate</strong> by managing reserves elastically, treating monetary aggregates as vital informative indicators.",
+            concHighlight: "<strong>Core Synthesis:</strong> Money market equilibrium determines the price of liquidity (interest rate <em>i</em>), which transmits through investment and consumption to Aggregate Demand (AD) in the goods market.",
+            foot1: "Almaty Management University (AlmaU) • School of Digital Technologies & Economics (SDTE), 2026",
+            foot2: "Interactive Learning Dashboard for «Principles of Economics» | Data current as of 16 November 2026"
+        }
+    };
+
+    let currentLang = 'ru';
+
+    function setLang(lang) {
+        currentLang = lang;
+        document.getElementById('btn-ru').classList.toggle('active', lang === 'ru');
+        document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+        document.documentElement.lang = lang;
+
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (i18n[lang][key]) {
+                el.innerHTML = i18n[lang][key];
+            }
+        });
+
+        updateKzEq();
+        updateUsEq();
+        updateBaumol();
+    }
+
+    // ==================== NAVIGATION TABS ====================
+    function openTab(tabId, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    function openSubTab(subId, btn) {
+        const parent = btn.closest('.tab-panel');
+        parent.querySelectorAll('.sub-panel').forEach(p => p.classList.remove('active'));
+        parent.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(subId).classList.add('active');
+        btn.classList.add('active');
+    }
+
+    // ==================== INTERACTIVE EQUILIBRIUM: KAZAKHSTAN ====================
+    function updateKzEq() {
+        const ms = parseFloat(document.getElementById('kzMsSlider').value); // default 50.66
+        const mdShift = parseFloat(document.getElementById('kzMdSlider').value); // default 0
+
+        document.getElementById('kzMsVal').textContent = currentLang === 'ru'
+            ? `${ms.toFixed(2)} трлн ₸`
+            : `₸${ms.toFixed(2)} tn`;
+
+        document.getElementById('kzMdVal').textContent = mdShift === 0
+            ? (currentLang === 'ru' ? 'Базовый (0)' : 'Baseline (0)')
+            : (mdShift > 0 ? `+${mdShift.toFixed(1)}` : `${mdShift.toFixed(1)}`);
+
+        // Equilibrium rate model: baseline ms=50.66, mdShift=0 => i = 15.75%
+        // Slope: 1 tn increase in Ms lowers i by 0.45 pp; +1 unit Md shift raises i by 0.85 pp
+        let rate = 15.75 - 0.45 * (ms - 50.66) + 0.85 * mdShift;
+        rate = Math.max(8.0, Math.min(24.0, rate));
+
+        // Map Ms (38..64) -> X (120..370), where 50.66 -> 245
+        const x = 245 + (ms - 50.66) * (125 / 13.34);
+        // Map mdShift (-4..4) -> dxShift (-45..45)
+        const dx = mdShift * 11.25;
+        // Md line: passes through (245 + dx, 142) with slope dy/dx = 0.6
+        const y = 142 + 0.6 * (x - (245 + dx));
+
+        document.getElementById('kzMsLine').setAttribute('x1', x);
+        document.getElementById('kzMsLine').setAttribute('x2', x);
+        document.getElementById('kzMsLabel').setAttribute('x', Math.min(x + 7, 395));
+
+        document.getElementById('kzMdLine').setAttribute('x1', 100 + dx);
+        document.getElementById('kzMdLine').setAttribute('x2', 395 + dx);
+        document.getElementById('kzMdLabel').setAttribute('x', Math.min(380 + dx, 415));
+
+        document.getElementById('kzGuideH').setAttribute('x2', x);
+        document.getElementById('kzGuideH').setAttribute('y1', y);
+        document.getElementById('kzGuideH').setAttribute('y2', y);
+
+        document.getElementById('kzEqDot').setAttribute('cx', x);
+        document.getElementById('kzEqDot').setAttribute('cy', y);
+
+        document.getElementById('kzEqText').setAttribute('x', Math.min(x + 10, 365));
+        document.getElementById('kzEqText').setAttribute('y', y - 7);
+        document.getElementById('kzEqText').textContent = `E (${rate.toFixed(2)}%)`;
+
+        document.getElementById('kzRateAxisLabel').setAttribute('y', y + 4);
+        document.getElementById('kzRateAxisLabel').textContent = `${rate.toFixed(2)}%`;
+
+        const statusBox = document.getElementById('kzStatus');
+        const statusText = document.getElementById('kzStatusText');
+        if (rate >= 14.75 && rate <= 16.75) {
+            statusBox.className = 'eq-status target-hit';
+            statusText.textContent = currentLang === 'ru'
+                ? `✓ Равновесие в целевом коридоре НБК: i = ${rate.toFixed(2)}% (базовая ставка 15.75%, коридор 14.75–16.75%)`
+                : `✓ Equilibrium within NBK corridor: i = ${rate.toFixed(2)}% (Base rate 15.75%, corridor 14.75–16.75%)`;
+        } else {
+            statusBox.className = 'eq-status off-target';
+            statusText.textContent = currentLang === 'ru'
+                ? `⚡ Вне коридора НБК: ставка i = ${rate.toFixed(2)}% (требуется операция стерилизации/предоставления ликвидности)`
+                : `⚡ Outside NBK corridor: rate i = ${rate.toFixed(2)}% (open market liquidity adjustment needed)`;
+        }
+    }
+
+    function resetKzEq() {
+        document.getElementById('kzMsSlider').value = 50.66;
+        document.getElementById('kzMdSlider').value = 0;
+        updateKzEq();
+    }
+
+    // ==================== INTERACTIVE EQUILIBRIUM: USA ====================
+    function updateUsEq() {
+        const ms = parseFloat(document.getElementById('usMsSlider').value); // default 23.41
+        const mdShift = parseFloat(document.getElementById('usMdSlider').value); // default 0
+
+        document.getElementById('usMsVal').textContent = `$${ms.toFixed(2)} ${currentLang === 'ru' ? 'трлн' : 'tn'}`;
+        document.getElementById('usMdVal').textContent = mdShift === 0
+            ? (currentLang === 'ru' ? 'Базовый (0)' : 'Baseline (0)')
+            : (mdShift > 0 ? `+${mdShift.toFixed(2)}` : `${mdShift.toFixed(2)}`);
+
+        // Baseline: ms=23.41, mdShift=0 => i = 3.88% (target 3.75-4.00%)
+        let rate = 3.88 - 0.35 * (ms - 23.41) + 0.65 * mdShift;
+        rate = Math.max(0.5, Math.min(8.0, rate));
+
+        const x = 245 + (ms - 23.41) * (125 / 5.59);
+        const dx = mdShift * 18;
+        const y = 143 + 0.6 * (x - (245 + dx));
+
+        document.getElementById('usMsLine').setAttribute('x1', x);
+        document.getElementById('usMsLine').setAttribute('x2', x);
+        document.getElementById('usMsLabel').setAttribute('x', Math.min(x + 7, 395));
+
+        document.getElementById('usMdLine').setAttribute('x1', 100 + dx);
+        document.getElementById('usMdLine').setAttribute('x2', 395 + dx);
+        document.getElementById('usMdLabel').setAttribute('x', Math.min(380 + dx, 415));
+
+        document.getElementById('usGuideH').setAttribute('x2', x);
+        document.getElementById('usGuideH').setAttribute('y1', y);
+        document.getElementById('usGuideH').setAttribute('y2', y);
+
+        document.getElementById('usEqDot').setAttribute('cx', x);
+        document.getElementById('usEqDot').setAttribute('cy', y);
+
+        document.getElementById('usEqText').setAttribute('x', Math.min(x + 10, 365));
+        document.getElementById('usEqText').setAttribute('y', y - 7);
+        document.getElementById('usEqText').textContent = `E (${rate.toFixed(2)}%)`;
+
+        document.getElementById('usRateAxisLabel').setAttribute('y', y + 4);
+        document.getElementById('usRateAxisLabel').textContent = `${rate.toFixed(2)}%`;
+
+        const statusBox = document.getElementById('usStatus');
+        const statusText = document.getElementById('usStatusText');
+        if (rate >= 3.75 && rate <= 4.00) {
+            statusBox.className = 'eq-status target-hit';
+            statusText.textContent = currentLang === 'ru'
+                ? `✓ Равновесие в целевом диапазоне ФРС: i = ${rate.toFixed(2)}% (цель FOMC 3.75–4.00%)`
+                : `✓ Equilibrium within Fed target range: i = ${rate.toFixed(2)}% (FOMC target 3.75–4.00%)`;
+        } else {
+            statusBox.className = 'eq-status off-target';
+            statusText.textContent = currentLang === 'ru'
+                ? `⚡ Вне целевого диапазона ФРС: ставка i = ${rate.toFixed(2)}% (требуется корректировка IORB / ON RRP)`
+                : `⚡ Outside Fed target range: rate i = ${rate.toFixed(2)}% (IORB / ON RRP adjustment needed)`;
+        }
+    }
+
+    function resetUsEq() {
+        document.getElementById('usMsSlider').value = 23.41;
+        document.getElementById('usMdSlider').value = 0;
+        updateUsEq();
+    }
+
+    // ==================== BAUMOL-TOBIN 12-MONTH SAWTOOTH MODEL ====================
+    function updateBaumol() {
+        const N = parseInt(document.getElementById('btNSlider').value, 10); // conversions per year (e.g. 12 or 24)
+        const T = parseFloat(document.getElementById('btTSlider').value); // annual spending
+        const iPct = parseFloat(document.getElementById('btISlider').value); // annual interest rate %
+        const b = 25; // fixed conversion cost
+        const i = iPct / 100;
+
+        const C = T / N; // withdrawal per conversion
+        const avgM = C / 2; // average cash balance
+        const optM = Math.sqrt((b * T) / (2 * i));
+        const vel = T / avgM;
+
+        // Labels
+        if (currentLang === 'ru') {
+            let freqNote = `${N} раз/год`;
+            if (N === 12) freqNote = '12 раз (1 раз/мес.)';
+            else if (N === 24) freqNote = '24 раза (каждые 0.5 мес.)';
+            else if (N === 4) freqNote = '4 раза (1 раз/квартал)';
+            document.getElementById('btNVal').textContent = freqNote;
+        } else {
+            let freqNote = `${N} / year`;
+            if (N === 12) freqNote = '12 (once/month)';
+            else if (N === 24) freqNote = '24 (every 0.5 mo.)';
+            else if (N === 4) freqNote = '4 (quarterly)';
+            document.getElementById('btNVal').textContent = freqNote;
+        }
+
+        document.getElementById('btTVal').textContent = T.toLocaleString('ru-RU');
+        document.getElementById('btIVal').textContent = `i = ${iPct.toFixed(2)}% | b = ${b}`;
+        document.getElementById('btWithdraw').textContent = Math.round(C).toLocaleString('ru-RU');
+        document.getElementById('btAvgBal').textContent = Math.round(avgM).toLocaleString('ru-RU');
+        document.getElementById('btOptBal').textContent = Math.round(optM).toLocaleString('ru-RU');
+        document.getElementById('btVel').textContent = vel.toFixed(1);
+
+        // Draw SVG Sawtooth over 12 months
+        const svg = document.getElementById('btSvg');
+        const left = 65, right = 895, top = 25, bottom = 225;
+        const width = right - left;
+        const height = bottom - top;
+        const maxScaleY = 6000; // max withdrawal C when T=24000, N=4
+
+        const yTop = bottom - Math.min(C / maxScaleY, 1) * height;
+        const yAvg = bottom - Math.min(avgM / maxScaleY, 1) * height;
+
+        let pathD = '';
+        let dashedDrops = '';
+        const stepW = width / N;
+
+        for (let k = 0; k < N; k++) {
+            const xStart = left + k * stepW;
+            const xEnd = left + (k + 1) * stepW;
+            if (k > 0) {
+                dashedDrops += `<line x1="${xStart.toFixed(1)}" y1="${bottom}" x2="${xStart.toFixed(1)}" y2="${yTop.toFixed(1)}" stroke="#94a3b8" stroke-dasharray="3,3" stroke-width="1"/>`;
+            }
+            pathD += `M ${xStart.toFixed(1)} ${yTop.toFixed(1)} L ${xEnd.toFixed(1)} ${bottom} `;
+        }
+
+        const monthsRu = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек'];
+        const monthsEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const mLabels = currentLang === 'ru' ? monthsRu : monthsEn;
+
+        let monthTicks = '';
+        for (let m = 0; m <= 12; m++) {
+            const xm = left + (m / 12) * width;
+            monthTicks += `<line x1="${xm.toFixed(1)}" y1="${bottom}" x2="${xm.toFixed(1)}" y2="${bottom + 5}" stroke="#334155" stroke-width="1.5"/>`;
+            if (m < 12) {
+                const xMid = left + ((m + 0.5) / 12) * width;
+                monthTicks += `<text x="${xMid.toFixed(1)}" y="${bottom + 20}" font-size="11.5" font-weight="600" fill="#475569" text-anchor="middle">${mLabels[m]}</text>`;
+            }
+        }
+
+        const avgLabelText = currentLang === 'ru'
+            ? `Средний остаток M̄ = ${Math.round(avgM).toLocaleString('ru-RU')}`
+            : `Average Balance M̄ = ${Math.round(avgM).toLocaleString('en-US')}`;
+
+        const yAxisLabel = currentLang === 'ru' ? 'Денежный остаток' : 'Cash Balance';
+        const xAxisLabel = currentLang === 'ru' ? 'Месяцы года (12 месяцев)' : 'Months of the Year (12 Months)';
+
+        svg.innerHTML = `
+            <!-- Horizontal grid -->
+            <line x1="${left}" y1="${top}" x2="${right}" y2="${top}" stroke="#e2e8f0" stroke-width="1"/>
+            <line x1="${left}" y1="${(top+bottom)/2}" x2="${right}" y2="${(top+bottom)/2}" stroke="#e2e8f0" stroke-width="1"/>
+            <!-- Axes -->
+            <line x1="${left}" y1="${top}" x2="${left}" y2="${bottom}" stroke="#334155" stroke-width="2"/>
+            <line x1="${left}" y1="${bottom}" x2="${right}" y2="${bottom}" stroke="#334155" stroke-width="2"/>
+            <!-- Y ticks -->
+            <text x="${left - 8}" y="${top + 4}" font-size="11" fill="#64748b" text-anchor="end">6 000</text>
+            <text x="${left - 8}" y="${(top+bottom)/2 + 4}" font-size="11" fill="#64748b" text-anchor="end">3 000</text>
+            <text x="${left - 8}" y="${bottom + 4}" font-size="11" fill="#64748b" text-anchor="end">0</text>
+            <text x="18" y="${(top+bottom)/2}" font-size="12" font-weight="700" fill="#001e50" transform="rotate(-90 18,${(top+bottom)/2})" text-anchor="middle">${yAxisLabel}</text>
+
+            <!-- Vertical conversion jumps -->
+            ${dashedDrops}
+            <!-- Sawtooth curve -->
+            <path d="${pathD}" fill="none" stroke="#187a87" stroke-width="2.6" stroke-linejoin="round"/>
+            <!-- Average line (Gold dashed) -->
+            <line x1="${left}" y1="${yAvg.toFixed(1)}" x2="${right}" y2="${yAvg.toFixed(1)}" stroke="#d99b26" stroke-width="2.5" stroke-dasharray="8,5"/>
+            <rect x="${right - 225}" y="${Math.max(yAvg - 24, top)}" width="220" height="20" rx="5" fill="#fffbeb" stroke="#d99b26"/>
+            <text x="${right - 115}" y="${Math.max(yAvg - 10, top + 14)}" font-size="11.5" font-weight="700" fill="#92400e" text-anchor="middle">${avgLabelText}</text>
+
+            <!-- Months X axis -->
+            ${monthTicks}
+            <text x="${(left+right)/2}" y="264" font-size="12" font-weight="700" fill="#001e50" text-anchor="middle">${xAxisLabel}</text>
+        `;
+    }
+
+    // Initialize on load
+    window.addEventListener('DOMContentLoaded', () => {
+        updateKzEq();
+        updateUsEq();
+        updateBaumol();
+    });
+</script>
+
+</body>
+</html>
