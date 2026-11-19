@@ -1,0 +1,1610 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Макроэкономическая нестабильность: Безработица и инфляция | AlmaU</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0b0f19',
+                        cardbg: '#151c2c',
+                        cardborder: '#2a364f',
+                        neoncyan: '#00f2fe',
+                        neonmagenta: '#ff007f',
+                        neonemerald: '#10b981',
+                        neonamber: '#f59e0b',
+                        neonred: '#ef4444',
+                        neonpurple: '#a855f7'
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0b0f19;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        .striped-bg {
+            background: repeating-linear-stripes(
+                45deg,
+                #334155,
+                #334155 10px,
+                #1e293b 10px,
+                #1e293b 20px
+            );
+        }
+        /* 3D Flip Card Styles */
+        .perspective { perspective: 1000px; }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card:hover .flip-card-inner, .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 0.75rem;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #2a364f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f2fe; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-neoncyan selection:text-black">
+
+    <!-- HEADER BLOCK -->
+    <header class="border-b border-cardborder bg-cardbg/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <!-- Logo & Titles -->
+                <div class="flex items-center gap-4 text-center md:text-left">
+                    <div class="w-14 h-14 rounded-full border-2 border-neoncyan/50 p-1 bg-white/5 flex items-center justify-center shrink-0">
+                        <img src="almau.jpg" alt="AlmaU Logo" class="w-full h-full object-contain rounded-full" onerror="this.onerror=null; this.src='https://via.placeholder.com/60?text=AlmaU';">
+                    </div>
+                    <div>
+                        <h1 id="main-title" class="text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-neoncyan via-blue-400 to-neonpurple bg-clip-text text-transparent">
+                            Макроэкономическая нестабильность: Безработица и инфляция
+                        </h1>
+                        <p id="sub-title" class="text-xs text-slate-300 mt-1 font-semibold flex items-center justify-center md:justify-start gap-2 flex-wrap">
+                            <span id="sub-principles">Принципы экономики</span>
+                            <span class="text-neoncyan font-bold">•</span>
+                            <span>Economics | Macroeconomics</span>
+                            <span class="text-neoncyan font-bold">•</span>
+                            <span id="sub-school" class="text-slate-200 font-bold">AlmaU | Школа цифровых технологий и экономики</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Controls: Language Switcher -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-darkbg p-1 rounded-xl border border-cardborder flex items-center shadow-inner">
+                        <button id="lang-ru-btn" onclick="setLanguage('ru')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-neoncyan text-black shadow-lg">
+                            RU
+                        </button>
+                        <button id="lang-en-btn" onclick="setLanguage('en')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all duration-200">
+                            EN
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Tabs Bar (Растянуто во всю ширину / Full Width Block Buttons) -->
+            <nav class="grid grid-cols-2 md:grid-cols-4 gap-2 mt-6 border-b border-cardborder/50 pb-2">
+                <button onclick="switchTab('unemployment')" id="tab-btn-unemployment" class="tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-bold text-sm transition-all border-neoncyan text-neoncyan bg-neoncyan/10">
+                    <i data-lucide="users" class="w-4 h-4"></i>
+                    <span id="tab-label-unemp">1. Безработица</span>
+                </button>
+                <button onclick="switchTab('inflation')" id="tab-btn-inflation" class="tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-bold text-sm transition-all border-slate-700 text-slate-400 bg-darkbg/50 hover:text-slate-200">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    <span id="tab-label-inf">2. Инфляция</span>
+                </button>
+                <button onclick="switchTab('phillips')" id="tab-btn-phillips" class="tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-bold text-sm transition-all border-slate-700 text-slate-400 bg-darkbg/50 hover:text-slate-200">
+                    <i data-lucide="activity" class="w-4 h-4"></i>
+                    <span id="tab-label-phil">3. Кривая Филлипса</span>
+                </button>
+                <button onclick="switchTab('assignments')" id="tab-btn-assignments" class="tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-bold text-sm transition-all border-slate-700 text-slate-400 bg-darkbg/50 hover:text-slate-200">
+                    <i data-lucide="calculator" class="w-4 h-4"></i>
+                    <span id="tab-label-assign">4. Задачи и практикум</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- ==================== TAB 1: UNEMPLOYMENT ==================== -->
+        <section id="tab-content-unemployment" class="tab-content space-y-8">
+            
+            <!-- SECTION 1.1: POPULATION BREAKDOWN (WITH US / KZ SWITCHER) -->
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2" id="bls-head-title">
+                            <i data-lucide="pie-chart" class="text-neoncyan"></i>
+                            <span id="bls-head-txt">Структура населения США (BLS 16+, 2026)</span>
+                        </h2>
+                        <p class="text-xs text-slate-300 mt-1" id="bls-head-sub">Гражданское население старше 16 лет и полная демографическая модель</p>
+                    </div>
+
+                    <!-- Region Selector (US vs KZ) -->
+                    <div class="flex items-center gap-3">
+                        <div class="bg-darkbg p-1 rounded-xl border border-cardborder flex items-center shadow-inner">
+                            <button id="region-us-btn" onclick="setRegion('us')" class="px-3 py-1 rounded-lg text-xs font-bold transition-all bg-neoncyan text-black">
+                                🇺🇸 США / US
+                            </button>
+                            <button id="region-kz-btn" onclick="setRegion('kz')" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all">
+                                🇰🇿 Казахстан / KZ (stat.gov.kz)
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2 bg-darkbg/80 px-4 py-2 rounded-xl border border-cardborder text-xs">
+                            <span class="text-slate-300 font-semibold" id="bls-total-label">Население:</span>
+                            <span id="bls-total-val" class="text-neoncyan font-bold font-mono text-sm">~343.0 M</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Custom Dynamic Visual Stacked Bar -->
+                <div class="space-y-3">
+                    <div class="flex h-12 w-full rounded-xl overflow-hidden border border-cardborder/80 p-1 bg-darkbg gap-1">
+                        <div id="bar-employed" class="bg-neonemerald text-slate-950 font-extrabold text-xs flex items-center justify-center transition-all duration-300 rounded-lg" style="width: 47.7%;" title="Employed">
+                            <span id="bar-emp-txt" class="truncate px-1">163.6M</span>
+                        </div>
+                        <div id="bar-unemployed" class="bg-neonred text-white font-extrabold text-xs flex items-center justify-center transition-all duration-300 rounded-lg" style="width: 2.1%;" title="Unemployed">
+                            <span id="bar-unemp-txt" class="truncate px-0.5">7.1M</span>
+                        </div>
+                        <div id="bar-nilf" class="bg-blue-600 text-white font-extrabold text-xs flex items-center justify-center transition-all duration-300 rounded-lg" style="width: 30.6%;" title="Not in Labor Force">
+                            <span id="bar-nilf-txt" class="truncate px-1">105.0M</span>
+                        </div>
+                        <div id="bar-outside" class="striped-bg border border-slate-600 text-slate-200 font-extrabold text-xs flex items-center justify-center transition-all duration-300 rounded-lg" style="width: 19.6%;" title="Outside BLS / Stat Universe">
+                            <span id="bar-outside-txt" class="truncate px-1">~67.3M</span>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Legend Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+                        <div class="p-3 bg-darkbg/50 rounded-xl border border-neonemerald/30 flex flex-col justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-neonemerald"></div>
+                                <span class="text-xs font-semibold text-slate-200" id="leg-emp">Занятые (E)</span>
+                            </div>
+                            <div class="text-lg font-bold text-neonemerald font-mono mt-1" id="val-emp">163.615 M</div>
+                        </div>
+                        <div class="p-3 bg-darkbg/50 rounded-xl border border-neonred/30 flex flex-col justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-neonred"></div>
+                                <span class="text-xs font-semibold text-slate-200" id="leg-unemp">Безработные (U)</span>
+                            </div>
+                            <div class="text-lg font-bold text-neonred font-mono mt-1" id="val-unemp">7.068 M</div>
+                        </div>
+                        <div class="p-3 bg-darkbg/50 rounded-xl border border-blue-500/30 flex flex-col justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full bg-blue-600"></div>
+                                <span class="text-xs font-semibold text-slate-200" id="leg-nilf">Вне рабочей силы</span>
+                            </div>
+                            <div class="text-lg font-bold text-blue-400 font-mono mt-1" id="val-nilf">104.999 M</div>
+                        </div>
+                        <div class="p-3 bg-darkbg/50 rounded-xl border border-slate-600 flex flex-col justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-3 h-3 rounded-full striped-bg border border-slate-400"></div>
+                                <span class="text-xs font-semibold text-slate-200" id="leg-outside">Вне официальной сферы</span>
+                            </div>
+                            <div class="text-lg font-bold text-slate-300 font-mono mt-1" id="val-outside">~67.300 M</div>
+                        </div>
+                    </div>
+
+                    <!-- Clarification Box -->
+                    <div class="mt-4 p-4 rounded-xl bg-slate-900/90 border border-slate-700 text-xs leading-relaxed space-y-2">
+                        <div class="flex items-center gap-2 text-neonamber font-bold">
+                            <i data-lucide="help-circle" class="w-4 h-4"></i>
+                            <span id="bls-note-head">Почему часть населения выделена серой штриховкой?</span>
+                        </div>
+                        <p id="bls-note-body" class="text-slate-200">
+                            Официальная статистика учитывает рабочую силу в рамках гражданского населения 15+ (или 16+ в США). В серую зону входят дети до 15/16 лет, военнослужащие и лица в закрытых институциональных учреждениях.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 1.2: INTERACTIVE LABOR FORCE SIMULATOR & HISTORICAL CHART (35 YEARS) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Slider & Controls -->
+                <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl flex flex-col justify-between space-y-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2" id="sim-title">
+                            <i data-lucide="sliders" class="text-neoncyan"></i>
+                            Симулятор рынка труда
+                        </h3>
+                        <p class="text-xs text-slate-300 mt-1" id="sim-desc">Изменяйте количество безработных в пределах рабочей силы</p>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between text-sm font-semibold mb-2">
+                                <span class="text-slate-200" id="sim-unemp-label">Количество безработных (U):</span>
+                                <span id="sim-u-display" class="text-neonred font-mono font-bold">7.07 M</span>
+                            </div>
+                            <input type="range" id="unemp-slider" min="2.0" max="18.0" step="0.1" value="7.068"
+                                   oninput="updateLaborSimulator()"
+                                   class="w-full h-2 bg-darkbg rounded-lg appearance-none cursor-pointer accent-neonred">
+                            <div class="flex justify-between text-[11px] text-slate-400 mt-1 font-mono" id="sim-slider-range">
+                                <span>2.0 M</span>
+                                <span>10.0 M</span>
+                                <span>18.0 M</span>
+                            </div>
+                        </div>
+
+                        <!-- Live Formulas -->
+                        <div class="space-y-3 bg-darkbg p-4 rounded-xl border border-cardborder font-mono text-xs">
+                            <div class="flex justify-between items-center border-b border-cardborder/50 pb-2">
+                                <span class="text-slate-300" id="formula-u-label">Уровень безработицы (u):</span>
+                                <span id="calc-u-val" class="text-neonred font-bold text-base">4.14%</span>
+                            </div>
+                            <div class="text-[11px] text-slate-400" id="formula-u-math">
+                                $u = \frac{U}{L} \times 100\%$
+                            </div>
+                            <div class="flex justify-between items-center border-b border-cardborder/50 pb-2 pt-1">
+                                <span class="text-slate-300" id="formula-lfpr-label">Участие в рабочей силе (LFPR):</span>
+                                <span id="calc-lfpr-val" class="text-neoncyan font-bold text-base">61.91%</span>
+                            </div>
+                            <div class="text-[11px] text-slate-400" id="formula-lfpr-math">
+                                $LFPR = \frac{L}{P_{15/16+}} \times 100\%$
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="resetLaborSimulator()" class="w-full py-2.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-slate-200 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                        <span id="btn-reset-sim">Сбросить к реальным данным</span>
+                    </button>
+                </div>
+
+                <!-- Live Chart (35 Years History) -->
+                <div class="lg:col-span-2 bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-white mb-1" id="hist-chart-title">Динамика безработицы за 35 лет (1991–2026)</h3>
+                        <p class="text-xs text-slate-300 mb-4" id="hist-chart-sub">Сравнение фактического уровня безработицы и естественной нормы (NROU / NAIRU)</p>
+                    </div>
+                    <div class="h-64 w-full">
+                        <canvas id="unemploymentHistoryChart"></canvas>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-slate-300 mt-2 border-t border-cardborder/50 pt-2 font-medium">
+                        <span id="hist-peak-txt">Кризисный пик: <strong class="text-neonred font-bold">14.8%</strong></span>
+                        <span id="hist-curr-txt">Текущий уровень (2026): <strong class="text-neonemerald font-bold">4.1%</strong></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 1.3: TYPES OF UNEMPLOYMENT -->
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl space-y-6">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2" id="types-head">
+                    <i data-lucide="layers" class="text-neoncyan"></i>
+                    Виды и причины безработицы
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-darkbg/70 border border-cardborder rounded-xl p-5 hover:border-neoncyan/50 transition-all">
+                        <div class="w-10 h-10 rounded-lg bg-neoncyan/10 border border-neoncyan/30 flex items-center justify-center text-neoncyan mb-4">
+                            <i data-lucide="search"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-2" id="type-fric-title">Фрикционная (Frictional)</h3>
+                        <p class="text-xs text-slate-200 leading-relaxed" id="type-fric-desc">
+                            Связана с поиском или ожиданием работы в ближайшем будущем. Возникает из-за времени, необходимого для сопоставления квалификации рабочих и вакансий.
+                        </p>
+                    </div>
+
+                    <div class="bg-darkbg/70 border border-cardborder rounded-xl p-5 hover:border-neonamber/50 transition-all">
+                        <div class="w-10 h-10 rounded-lg bg-neonamber/10 border border-neonamber/30 flex items-center justify-center text-neonamber mb-4">
+                            <i data-lucide="cpu"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-2" id="type-struct-title">Структурная (Structural)</h3>
+                        <p class="text-xs text-slate-200 leading-relaxed" id="type-struct-desc">
+                            Возникает из-за несовпадения структуры спроса и предложения труда (технологический прогресс, законы о минимальной зарплате, профсоюзы).
+                        </p>
+                    </div>
+
+                    <div class="bg-darkbg/70 border border-cardborder rounded-xl p-5 hover:border-neonred/50 transition-all">
+                        <div class="w-10 h-10 rounded-lg bg-neonred/10 border border-neonred/30 flex items-center justify-center text-neonred mb-4">
+                            <i data-lucide="trending-down"></i>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-2" id="type-cyc-title">Циклическая (Cyclical)</h3>
+                        <p class="text-xs text-slate-200 leading-relaxed" id="type-cyc-desc">
+                            Отклонение фактической безработицы от естественной нормы (NAIRU). Вызывается спадом совокупного спроса в экономике.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="border-t border-cardborder/60 pt-6">
+                    <h3 class="text-sm font-bold text-slate-100 mb-4" id="eff-wages-title">Теория эффективной заработной платы (Why firms pay above equilibrium):</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-3 bg-darkbg border border-cardborder rounded-lg text-xs">
+                            <span class="font-bold text-neoncyan block mb-1" id="eff-1-t">1. Здоровье рабочих</span>
+                            <span class="text-slate-300" id="eff-1-d">Более высокая оплата улучшает питание и здоровье, повышая производительность.</span>
+                        </div>
+                        <div class="p-3 bg-darkbg border border-cardborder rounded-lg text-xs">
+                            <span class="font-bold text-neonemerald block mb-1" id="eff-2-t">2. Текучесть кадров</span>
+                            <span class="text-slate-300" id="eff-2-d">Снижает затраты на найм и обучение новых сотрудников.</span>
+                        </div>
+                        <div class="p-3 bg-darkbg border border-cardborder rounded-lg text-xs">
+                            <span class="font-bold text-neonamber block mb-1" id="eff-3-t">3. Качество кадров</span>
+                            <span class="text-slate-300" id="eff-3-d">Привлекает лучших специалистов из пула соискателей.</span>
+                        </div>
+                        <div class="p-3 bg-darkbg border border-cardborder rounded-lg text-xs">
+                            <span class="font-bold text-neonpurple block mb-1" id="eff-4-t">4. Усилия рабочих</span>
+                            <span class="text-slate-300" id="eff-4-d">Повышает стоимость потери работы, стимулируя усердие.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 1.4: OKUN'S LAW CALCULATOR WITH SLIDERS -->
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2" id="okun-title">
+                            <i data-lucide="calculator" class="text-neonemerald"></i>
+                            Закон Оукена и отставание ВВП (GDP Gap)
+                        </h2>
+                        <p class="text-xs text-slate-300 mt-1" id="okun-sub">Артур Оукен: Каждый 1% превышения естественной нормы безработицы создает отставание ВВП на 2%</p>
+                    </div>
+                    <div class="px-3 py-1 bg-neonemerald/10 border border-neonemerald/30 text-neonemerald text-xs font-mono font-bold rounded-lg">
+                        GDP Gap = -2.0 × (u - u_n)
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                    <!-- Sliders instead of manual input -->
+                    <div class="space-y-5 bg-darkbg p-5 rounded-xl border border-cardborder">
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1">
+                                <span class="text-slate-200" id="okun-actual-lbl">Фактическая безработица (u):</span>
+                                <span id="okun-u-disp" class="text-neonred font-mono font-bold">8.0%</span>
+                            </div>
+                            <input type="range" id="okun-u-slider" min="2.0" max="15.0" step="0.1" value="8.0" oninput="calculateOkun()" class="w-full h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-neonred">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1">
+                                <span class="text-slate-200" id="okun-nat-lbl">Естественная норма (u_n):</span>
+                                <span id="okun-un-disp" class="text-neonemerald font-mono font-bold">4.5%</span>
+                            </div>
+                            <input type="range" id="okun-un-slider" min="3.0" max="8.0" step="0.1" value="4.5" oninput="calculateOkun()" class="w-full h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-neonemerald">
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-semibold mb-1">
+                                <span class="text-slate-200" id="okun-gdp-lbl">Потенциальный ВВП ($ млрд):</span>
+                                <span id="okun-gdp-disp" class="text-white font-mono font-bold">$1000B</span>
+                            </div>
+                            <input type="range" id="okun-gdp-slider" min="100" max="3000" step="50" value="1000" oninput="calculateOkun()" class="w-full h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-white">
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2 space-y-4">
+                        <!-- Dynamic GDP Gap Timeline Bar -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-slate-300" id="okun-compare-lbl">Фактический ВВП vs Потенциальный ВВП</span>
+                                <span id="okun-timeline-val" class="text-neonred font-bold">93.0% от Потенциала</span>
+                            </div>
+                            <div class="h-7 w-full bg-darkbg border border-cardborder rounded-lg overflow-hidden flex">
+                                <div id="okun-bar-actual" class="bg-neonemerald h-full transition-all duration-300 flex items-center justify-center text-[11px] text-black font-bold" style="width: 93%;">
+                                    Фактический ВВП
+                                </div>
+                                <div id="okun-bar-loss" class="bg-neonred h-full transition-all duration-300 flex items-center justify-center text-[11px] text-white font-bold" style="width: 7%;">
+                                    Потеря ВВП
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-darkbg rounded-xl border border-neonred/30">
+                                <span class="text-xs text-slate-300 block" id="okun-res-gap-lbl">Отставание ВВП (%):</span>
+                                <span id="okun-gap-pct" class="text-2xl font-black text-neonred font-mono">-7.00%</span>
+                            </div>
+                            <div class="p-4 bg-darkbg rounded-xl border border-neonmagenta/30">
+                                <span class="text-xs text-slate-300 block" id="okun-res-loss-lbl">Абсолютные потери ($ млрд):</span>
+                                <span id="okun-loss-abs" class="text-2xl font-black text-neonmagenta font-mono">-$70.00B</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ==================== TAB 2: INFLATION ==================== -->
+        <section id="tab-content-inflation" class="tab-content hidden space-y-8">
+            
+            <!-- SECTION 2.1: MONEY SUPPLY DASHBOARD -->
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2" id="inf-sim-title">
+                            <i data-lucide="coins" class="text-neonamber"></i>
+                            Денежное равновесие и предложение денег
+                        </h2>
+                        <p class="text-xs text-slate-300 mt-1" id="inf-sim-sub">Интерактивная модель: Эмиссия денег снижает ценность денег (1/P) и повышает уровень цен (P)</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-darkbg p-5 rounded-xl border border-cardborder space-y-6 flex flex-col justify-between">
+                        <div>
+                            <label class="text-xs font-bold text-slate-200 block mb-2" id="ms-slider-lbl">Предложение денег (MS):</label>
+                            <input type="range" id="ms-slider" min="2.0" max="8.0" step="0.2" value="4.0" oninput="updateInflationChart()" class="w-full h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-neoncyan">
+                            <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
+                                <span>MS_1 (2.0)</span>
+                                <span id="ms-curr-lbl">Текущее (4.0)</span>
+                                <span>MS_2 (8.0)</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3 font-mono text-xs">
+                            <div class="p-3 bg-slate-900 rounded-lg border border-neoncyan/30 flex justify-between">
+                                <span class="text-slate-300" id="val-money-lbl">Ценность денег (1/P):</span>
+                                <span id="val-money-disp" class="text-neoncyan font-bold">0.50</span>
+                            </div>
+                            <div class="p-3 bg-slate-900 rounded-lg border border-neonred/30 flex justify-between">
+                                <span class="text-slate-300" id="price-lvl-lbl">Уровень цен (P):</span>
+                                <span id="price-lvl-disp" class="text-neonred font-bold">2.00</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-300 leading-relaxed border-t border-cardborder pt-3" id="ms-explain-text">
+                            При увеличении предложения денег с MS1 до MS2 у населения появляется избыток наличных денег. Попытки потратить их поднимают уровень цен P с A до B.
+                        </p>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-darkbg p-4 rounded-xl border border-cardborder">
+                        <div class="h-72 w-full">
+                            <canvas id="moneySupplyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2.2: THEORIES & TYPES OF INFLATION -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-neoncyan/10 text-neoncyan rounded-lg border border-neoncyan/30">
+                            <i data-lucide="book-open"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white" id="class-app-title">Классический подход (Classical Approach)</h3>
+                    </div>
+                    <ul class="space-y-3 text-xs text-slate-200">
+                        <li class="bg-darkbg p-3 rounded-lg border border-cardborder">
+                            <strong class="text-neoncyan block mb-1" id="qtm-title">Количественная теория денег (Quantity Theory of Money):</strong>
+                            <span id="qtm-desc">Рост денежной массы является главной причиной долгосрочной инфляции.</span>
+                            <div class="mt-2 text-center text-sm font-mono font-bold text-white bg-slate-900 py-1 rounded">M × V = P × Y</div>
+                        </li>
+                        <li class="bg-darkbg p-3 rounded-lg border border-cardborder">
+                            <strong class="text-neonemerald block mb-1" id="neut-title">Нейтральность денег (Monetary Neutrality):</strong>
+                            <span id="neut-desc">Изменение денежной массы влияет на номинальные переменные (P, W), но не затрагивает реальные (Y, u).</span>
+                        </li>
+                        <li class="bg-darkbg p-3 rounded-lg border border-cardborder">
+                            <strong class="text-neonamber block mb-1" id="fish-title">Эффект Фишера (Fisher Effect):</strong>
+                            <span id="fish-desc">Рост ожидаемой инфляции на 1% увеличивает номинальную процентную ставку на 1%.</span>
+                            <div class="mt-1 text-right font-mono text-neonamber font-bold">i = r + π^e</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl space-y-4">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-neonmagenta/10 text-neonmagenta rounded-lg border border-neonmagenta/30">
+                            <i data-lucide="flame"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-white" id="keyn-app-title">Виды и источники инфляции</h3>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="p-3 bg-darkbg border border-neoncyan/30 rounded-xl">
+                            <span class="text-xs font-bold text-neoncyan block mb-1" id="dp-title">Инфляция спроса (Demand-Pull)</span>
+                            <p class="text-[11px] text-slate-300" id="dp-desc">«Слишком много денег гоняется за слишком малым количеством товаров» при полной занятости.</p>
+                        </div>
+                        <div class="p-3 bg-darkbg border border-neonred/30 rounded-xl">
+                            <span class="text-xs font-bold text-neonred block mb-1" id="cp-title">Инфляция издержек (Cost-Push)</span>
+                            <p class="text-[11px] text-slate-300" id="cp-desc">Рост издержек производства на единицу продукции (сырьевые шоки, рост зарплат).</p>
+                        </div>
+                    </div>
+
+                    <!-- 3D Flip Cards for Inflation Types (Corrected threshold to 10%) -->
+                    <div class="grid grid-cols-3 gap-3 h-24">
+                        <div class="flip-card perspective cursor-pointer">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-darkbg border border-neonemerald/40 p-2 flex flex-col justify-center items-center rounded-xl shadow">
+                                    <span class="text-xs font-bold text-neonemerald" id="flip-mod-title">Умеренная</span>
+                                    <span class="text-[10px] text-slate-400 font-mono mt-1">&lt; 10% / год</span>
+                                    <span class="text-[9px] text-slate-500 mt-2" id="flip-hint-1">💡 нажми / наведи</span>
+                                </div>
+                                <div class="flip-card-back bg-slate-900 border border-neonemerald p-2 flex items-center justify-center text-[10px] text-slate-200 rounded-xl" id="flip-mod-back">
+                                    Прогнозируемая инфляция. Стимулирует спрос без разрушения экономики.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flip-card perspective cursor-pointer">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-darkbg border border-neonamber/40 p-2 flex flex-col justify-center items-center rounded-xl shadow">
+                                    <span class="text-xs font-bold text-neonamber" id="flip-gal-title">Галопирующая</span>
+                                    <span class="text-[10px] text-slate-400 font-mono mt-1">10% – 100% / год</span>
+                                    <span class="text-[9px] text-slate-500 mt-2" id="flip-hint-2">💡 нажми / наведи</span>
+                                </div>
+                                <div class="flip-card-back bg-slate-900 border border-neonamber p-2 flex items-center justify-center text-[10px] text-slate-200 rounded-xl" id="flip-gal-back">
+                                    Опасный рост. Контракты привязываются к валюте, сбережения обесцениваются.
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flip-card perspective cursor-pointer">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front bg-darkbg border border-neonred/40 p-2 flex flex-col justify-center items-center rounded-xl shadow">
+                                    <span class="text-xs font-bold text-neonred" id="flip-hyp-title">Гиперинфляция</span>
+                                    <span class="text-[10px] text-slate-400 font-mono mt-1">&gt; 50% / месяц</span>
+                                    <span class="text-[9px] text-slate-500 mt-2" id="flip-hint-3">💡 нажми / наведи</span>
+                                </div>
+                                <div class="flip-card-back bg-slate-900 border border-neonred p-2 flex items-center justify-center text-[10px] text-slate-200 rounded-xl" id="flip-hyp-back">
+                                    Полный крах денежной системы. Переход на бартер и отказ от национальной валюты.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2.3: COSTS & WIZARD OF OZ -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2" id="costs-title">
+                        <i data-lucide="alert-triangle" class="text-neonred"></i>
+                        Издержки инфляции (Costs of Inflation)
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div class="p-3 bg-darkbg border border-cardborder rounded-xl space-y-1">
+                            <strong class="text-neoncyan block text-sm" id="cost-shoe-t">Издержки «стоптанных сапог» (Shoeleather costs)</strong>
+                            <p class="text-slate-300" id="cost-shoe-d">Ресурсы, затрачиваемые на частые посещения банков для минимизации наличных денег.</p>
+                        </div>
+                        <div class="p-3 bg-darkbg border border-cardborder rounded-xl space-y-1">
+                            <strong class="text-neonemerald block text-sm" id="cost-menu-t">Издержки «меню» (Menu costs)</strong>
+                            <p class="text-slate-300" id="cost-menu-d">Затраты фирм на изменение ценников, каталогов и программного обеспечения.</p>
+                        </div>
+                        <div class="p-3 bg-darkbg border border-cardborder rounded-xl space-y-1">
+                            <strong class="text-neonamber block text-sm" id="cost-tax-t">Налоговые искажения (Tax distortions)</strong>
+                            <p class="text-slate-300" id="cost-tax-d">Налогообложение номинального дохода увеличивает налоговое бремя при инфляции.</p>
+                        </div>
+                        <div class="p-3 bg-darkbg border border-cardborder rounded-xl space-y-1">
+                            <strong class="text-neonpurple block text-sm" id="cost-redist-t">Неожиданное перераспределение (Redistribution)</strong>
+                            <p class="text-slate-300" id="cost-redist-d">Неожиданная инфляция обогащает должников и обедняет кредиторов.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl space-y-3">
+                    <h3 class="text-base font-bold text-neonamber flex items-center gap-2" id="oz-title">
+                        <i data-lucide="sparkles"></i>
+                        Волшебник из страны Оз
+                    </h3>
+                    <p class="text-xs text-slate-200 leading-relaxed" id="oz-desc">
+                        Историк Хью Рокофф доказал, что сказка Л. Фрэнка Баума — аллегория денежных дебатов о свободном серебре в США 1890-х гг.
+                    </p>
+                    <div class="space-y-1.5 text-xs font-mono bg-darkbg p-3 rounded-xl border border-cardborder">
+                        <div class="flex justify-between"><span class="text-slate-400" id="oz-1">Дороти:</span><span class="text-slate-100 font-bold">Традиционные ценности</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400" id="oz-2">Страшила:</span><span class="text-slate-100 font-bold">Фермеры (должники)</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400" id="oz-3">Дровосек:</span><span class="text-slate-100 font-bold">Рабочие промзоны</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400" id="oz-4">Дорога из желтого кирпича:</span><span class="text-neonamber font-bold">Золотой стандарт</span></div>
+                        <div class="flex justify-between"><span class="text-slate-400" id="oz-5">Серебряные туфельки:</span><span class="text-slate-200 font-bold">Монетизация серебра</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ==================== TAB 3: PHILLIPS CURVE ==================== -->
+        <section id="tab-content-phillips" class="tab-content hidden space-y-8">
+            
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl space-y-6">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2" id="phil-head-title">
+                            <i data-lucide="activity" class="text-neonpurple"></i>
+                            Кривая Филлипса: Инфляция vs Безработица
+                        </h2>
+                        <p class="text-xs text-slate-300 mt-1" id="phil-head-sub">Связь короткосрочного выбора (SRPC) и долгосрочной вертикальной кривой (LRPC)</p>
+                    </div>
+                    <div class="px-3 py-1 bg-neonpurple/10 border border-neonpurple/30 text-neonpurple text-xs font-mono font-bold rounded-lg">
+                        u = u_n - α(π - π^e)
+                    </div>
+                </div>
+
+                <!-- Theoretical Summary Box from Lecture Notes -->
+                <div class="p-4 bg-darkbg/80 rounded-xl border border-neonpurple/30 text-xs leading-relaxed space-y-2">
+                    <h3 class="text-sm font-bold text-neoncyan" id="phil-theory-head">Теоретические основы (Краткосрочный vs Долгосрочный период):</h3>
+                    <p class="text-slate-200" id="phil-theory-body">
+                        В краткосрочном периоде (SRPC) между инфляцией и безработицей существует обратная связь: стимулирование совокупного спроса (AD) снижает безработицу, но подталкивает инфляцию. В долгосрочном периоде (LRPC) кривая становится вертикальной на уровне естественной нормы безработицы ($u_n$), так как экономические агенты полностью адаптируют свои инфляционные ожидания ($\pi^e$).
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-darkbg p-5 rounded-xl border border-cardborder space-y-6">
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-slate-200 mb-2">
+                                <span id="ad-slider-lbl">Совокупный спрос (AD):</span>
+                                <span id="ad-state-disp" class="text-neoncyan font-mono">Высокий AD</span>
+                            </div>
+                            <input type="range" id="ad-slider" min="1" max="5" step="1" value="4" oninput="updatePhillipsChart()" class="w-full h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-neoncyan">
+                            <p class="text-xs text-slate-300 mt-2" id="ad-explain">
+                                Рост AD сдвигает экономику вдоль SRPC: инфляция растет, безработица падает.
+                            </p>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-slate-200 mb-2">
+                                <span id="pie-slider-lbl">Ожидаемая инфляция (π^e):</span>
+                                <span id="pie-val-disp" class="text-neonmagenta font-mono">2.0%</span>
+                            </div>
+                            <input type="range" id="pie-slider" min="1.0" max="6.0" step="0.5" value="2.0" oninput="updatePhillipsChart()" class="w-full h-2 bg-slate-900 rounded-lg appearance-none cursor-pointer accent-neonmagenta">
+                            <p class="text-xs text-slate-300 mt-2" id="pie-explain">
+                                При адаптации ожиданий кривая SRPC сдвигается вверх. В долгосрочном периоде экономика возвращается к u_n (LRPC).
+                            </p>
+                        </div>
+
+                        <!-- Prominent Large Indicator Values -->
+                        <div class="p-4 bg-slate-900/90 rounded-xl border border-cardborder space-y-3 font-mono">
+                            <div class="flex justify-between items-center border-b border-cardborder/50 pb-2">
+                                <span class="text-xs text-slate-300 font-sans font-bold" id="phil-u-lbl">Безработица (u):</span>
+                                <span id="phil-u-val" class="text-2xl font-extrabold text-neonemerald">3.8%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-xs text-slate-300 font-sans font-bold" id="phil-pi-lbl">Фактическая инфляция (π):</span>
+                                <span id="phil-pi-val" class="text-2xl font-extrabold text-neonred">5.2%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-darkbg p-4 rounded-xl border border-cardborder">
+                        <div class="h-80 w-full">
+                            <canvas id="phillipsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ==================== TAB 4: ASSIGNMENTS ==================== -->
+        <section id="tab-content-assignments" class="tab-content hidden space-y-8">
+            
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl">
+                <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2" id="assign-head-title">
+                    <i data-lucide="check-square" class="text-neonemerald"></i>
+                    Практикум и решение задач
+                </h2>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Task 1: Quantity Theory with Live Visual Graph -->
+                    <div class="bg-darkbg p-5 rounded-xl border border-cardborder space-y-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 text-neoncyan font-bold text-sm mb-2">
+                                <i data-lucide="help-circle" class="w-4 h-4"></i>
+                                <span id="task1-title">Задача 1: Количественная теория денег</span>
+                            </div>
+                            <p class="text-xs text-slate-200 leading-relaxed mb-4" id="task1-desc">
+                                В текущем году M = $500, Номинальный ВВП = $10,000, Реальный ВВП = $5,000.
+                            </p>
+
+                            <div class="space-y-3 text-xs">
+                                <div>
+                                    <label class="text-slate-300 block mb-1 font-semibold" id="t1-qa">a. Уровень цен (P) и Скорость обращения (V):</label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <input type="number" id="ans-t1-p" placeholder="P = ?" oninput="updateTask1Graph()" class="bg-slate-900 border border-cardborder rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-neoncyan">
+                                        <input type="number" id="ans-t1-v" placeholder="V = ?" oninput="updateTask1Graph()" class="bg-slate-900 border border-cardborder rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-neoncyan">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-slate-300 block mb-1 font-semibold" id="t1-qb">b. При V=const и росте Y на 5%, Nom GDP = ? ($):</label>
+                                    <input type="number" id="ans-t1-nomgdp" placeholder="Номинальный ВВП = ?" oninput="updateTask1Graph()" class="w-full bg-slate-900 border border-cardborder rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-neoncyan">
+                                </div>
+                                <div>
+                                    <label class="text-slate-300 block mb-1 font-semibold" id="t1-qc">c. M для стабильного уровня цен P=const ($):</label>
+                                    <input type="number" id="ans-t1-mstable" placeholder="M next year = ?" class="w-full bg-slate-900 border border-cardborder rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-neoncyan">
+                                </div>
+                                <div>
+                                    <label class="text-slate-300 block mb-1 font-semibold" id="t1-qd">d. M для инфляции 10% ($):</label>
+                                    <div class="flex gap-2">
+                                        <input type="number" id="ans-t1-m10" placeholder="M next year = ?" class="w-full bg-slate-900 border border-cardborder rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-neoncyan">
+                                        <button id="btn-check-t1" onclick="checkTask1Full()" class="px-4 py-1.5 bg-neoncyan text-black font-bold rounded-lg hover:opacity-90 shrink-0">Проверить</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Live Graph for Task 1 -->
+                        <div class="mt-4 pt-4 border-t border-cardborder">
+                            <span class="text-[11px] font-bold text-slate-400 block mb-2" id="t1-chart-lbl">Визуализатор равенства M × V = P × Y:</span>
+                            <div class="h-36 w-full">
+                                <canvas id="task1Chart"></canvas>
+                            </div>
+                        </div>
+
+                        <div id="t1-feedback" class="hidden p-3 rounded-lg text-xs font-mono mt-2"></div>
+                    </div>
+
+                    <!-- Task 2: Labor Force & Okun -->
+                    <div class="bg-darkbg p-5 rounded-xl border border-cardborder space-y-4 flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-2 text-neonemerald font-bold text-sm mb-2">
+                                <i data-lucide="help-circle" class="w-4 h-4"></i>
+                                <span id="task2-title">Задача 2: Рынок труда и Закон Оукена</span>
+                            </div>
+                            <p class="text-xs text-slate-200 leading-relaxed mb-4" id="task2-desc">
+                                Население = 3412, Вне рабочей силы = 1579, Безработные = 237. Потенциальный ВВП = $830 млрд при u_n = 5%.
+                            </p>
+
+                            <div class="space-y-4 text-xs">
+                                <div>
+                                    <label class="text-slate-300 block mb-1 font-semibold" id="t2-qa">a. Рабочая сила L и Уровень безработицы u (%):</label>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <input type="number" id="ans-t2-l" placeholder="L = ?" class="bg-slate-900 border border-cardborder rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-neonemerald">
+                                        <input type="number" id="ans-t2-u" step="0.1" placeholder="u (%) = ?" class="bg-slate-900 border border-cardborder rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-neonemerald">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-slate-300 block mb-1 font-semibold" id="t2-qb">b. При u = 12% и u_n = 5%, потеря ВВП по Оукену ($ млрд):</label>
+                                    <div class="flex gap-2">
+                                        <input type="number" id="ans-t2-loss" step="0.1" placeholder="Потеря ВВП = ?" class="w-full bg-slate-900 border border-cardborder rounded-lg px-3 py-1.5 text-white font-mono focus:outline-none focus:border-neonemerald">
+                                        <button id="btn-check-t2" onclick="checkTask2Full()" class="px-4 py-1.5 bg-neonemerald text-slate-950 font-bold rounded-lg hover:opacity-90 shrink-0">Проверить</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="t2-feedback" class="hidden p-3 rounded-lg text-xs font-mono mt-4"></div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER (Removed 'Department' per request) -->
+    <footer class="border-t border-cardborder bg-cardbg/50 py-4 text-center text-xs text-slate-400 font-semibold">
+        <div class="max-w-7xl mx-auto px-4" id="footer-text">
+            AlmaU • School of Digital Technologies and Economics • Macroeconomics © 2026
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let currentLang = 'ru';
+        let currentRegion = 'us'; // 'us' or 'kz'
+        let histChart, msChart, philChart, task1Chart;
+
+        // Data Models for US and KZ
+        const regionData = {
+            us: {
+                totalPop: 343.0,
+                pop16: 275.682,
+                emp: 163.615,
+                unemp: 7.068,
+                nilf: 104.999,
+                outside: 67.318,
+                laborForce: 170.683,
+                nairu: 4.4,
+                histYears: ['1991', '1995', '2000', '2005', '2008', '2010', '2015', 'Apr 2020', '2022', '2026'],
+                histActual: [6.8, 5.6, 4.0, 5.1, 5.8, 9.6, 5.3, 14.8, 3.6, 4.1],
+                histNatural: [5.8, 5.6, 5.1, 5.0, 5.0, 5.0, 4.8, 4.5, 4.4, 4.4]
+            },
+            kz: {
+                // Official Bureau of National Statistics (stat.gov.kz) data
+                totalPop: 20.2, // ~20.2 млн чел. (2026)
+                pop15: 15.6,   // Население 15 лет и старше
+                emp: 9.2,      // Занятое население (~9.2 млн)
+                unemp: 0.45,   // Безработные (~450 тыс., 4.7%)
+                nilf: 5.95,    // Не входящие в рабочую силу (~5.95 млн)
+                outside: 4.6,  // Дети до 15 лет (~4.6 млн)
+                laborForce: 9.65,
+                nairu: 4.7,
+                histYears: ['1991', '1995', '1999', '2004', '2008', '2012', '2016', '2020', '2023', '2026'],
+                histActual: [0.1, 5.4, 13.5, 8.4, 6.6, 5.3, 4.9, 4.9, 4.7, 4.7], // От 90-х до устойчивых 4.7-4.9%
+                histNatural: [5.0, 5.2, 5.5, 5.2, 5.0, 4.8, 4.8, 4.7, 4.7, 4.7]
+            }
+        };
+
+        const i18n = {
+            ru: {
+                mainTitle: "Макроэкономическая нестабильность: Безработица и инфляция",
+                subPrinciples: "Принципы экономики",
+                subSchool: "AlmaU | Школа цифровых технологий и экономики",
+                tabs: { unemp: "1. Безработица", inf: "2. Инфляция", phil: "3. Кривая Филлипса", assign: "4. Задачи и практикум" },
+                bls: {
+                    headUS: "Структура населения США (BLS 16+, 2026)",
+                    headKZ: "Структура населения РК (stat.gov.kz 15+, 2026)",
+                    subUS: "Гражданское население старше 16 лет и полная демографическая модель (BLS)",
+                    subKZ: "Данные Бюро национальной статистики РК (stat.gov.kz, население 15+)",
+                    emp: "Занятые (E)", unemp: "Безработные (U)", nilf: "Вне рабочей силы", outside: "Вне официальной сферы",
+                    totalLbl: "Население:",
+                    noteHead: "Почему часть населения выделена серой штриховкой?",
+                    noteBodyUS: "Всего в США около 343 млн жителей. Однако BLS учитывает только гражданское население старше 16 лет (275.7 M). В серую разницу ~67.3 млн входят дети до 16 лет, военнослужащие и лица в закрытых учреждениях.",
+                    noteBodyKZ: "Население Казахстана составляет около 20.2 млн человек (stat.gov.kz). Бюро нацстатистики учитывает рабочую силу с 15 лет (~15.6 млн). В серую зону ~4.6 млн входят дети до 15 лет и спецконтингент."
+                },
+                sim: {
+                    titleUS: "Симулятор рынка труда (США)",
+                    titleKZ: "Симулятор рынка труда (Казахстан)",
+                    descUS: "Изменяйте количество безработных в пределах рабочей силы L = 170.68M",
+                    descKZ: "Изменяйте количество безработных в пределах рабочей силы L = 9.65M",
+                    unempLbl: "Количество безработных (U):",
+                    uLbl: "Уровень безработицы (u):",
+                    lfprLbl: "Участие в рабочей силе (LFPR):",
+                    resetBtn: "Сбросить к реальным данным"
+                },
+                hist: {
+                    titleUS: "Динамика безработицы США за 35 лет (1991–2026)",
+                    titleKZ: "Динамика безработицы Казахстана за 35 лет (1991–2026)",
+                    sub: "Сравнение фактического уровня безработицы и естественной нормы (NROU / NAIRU)",
+                    peak: "Кризисный пик:",
+                    curr: "Текущий уровень (2026):"
+                },
+                types: {
+                    head: "Виды и причины безработицы",
+                    fricT: "Фрикционная (Frictional)", fricD: "Связана с поиском или ожиданием работы в ближайшем будущем. Возникает из-за времени, необходимого для сопоставления квалификации рабочих и вакансий.",
+                    structT: "Структурная (Structural)", structD: "Возникает из-за несовпадения структуры спроса и предложения труда (технологический прогресс, законы о минимальной зарплате, профсоюзы).",
+                    cycT: "Циклическая (Cyclical)", cycD: "Отклонение фактической безработицы от естественной нормы (NAIRU). Вызывается спадом совокупного спроса в экономике.",
+                    effTitle: "Теория эффективной заработной платы (Why firms pay above equilibrium):",
+                    eff1t: "1. Здоровье рабочих", eff1d: "Более высокая оплата улучшает питание и здоровье, повышая производительность.",
+                    eff2t: "2. Текучесть кадров", eff2d: "Снижает затраты на найм и обучение новых сотрудников.",
+                    eff3t: "3. Качество кадров", eff3d: "Привлекает лучших специалистов из пула соискателей.",
+                    eff4t: "4. Усилия рабочих", eff4d: "Повышает стоимость потери работы, стимулируя усердие."
+                },
+                okun: {
+                    title: "Закон Оукена и отставание ВВП (GDP Gap)",
+                    sub: "Артур Оукен: Каждый 1% превышения естественной нормы безработицы создает отставание ВВП на 2%",
+                    actLbl: "Фактическая безработица (u):", natLbl: "Естественная норма (u_n):", gdpLbl: "Потенциальный ВВП ($ млрд):",
+                    compareLbl: "Фактический ВВП vs Потенциальный ВВП",
+                    resGap: "Отставание ВВП (%):", resLoss: "Абсолютные потери ($ млрд):"
+                },
+                infSim: {
+                    title: "Денежное равновесие и предложение денег",
+                    sub: "Интерактивная модель: Эмиссия денег снижает ценность денег (1/P) и повышает уровень цен (P)",
+                    msLbl: "Предложение денег (MS):", msCurr: "Текущее (4.0)", valLbl: "Ценность денег (1/P):", priceLbl: "Уровень цен (P):",
+                    explain: "При увеличении предложения денег с MS1 до MS2 у населения появляется избыток наличных денег. Попытки потратить их поднимают уровень цен P с A до B."
+                },
+                classApp: {
+                    title: "Классический подход (Classical Approach)",
+                    qtmT: "Количественная теория денег (Quantity Theory of Money):", qtmD: "Рост денежной массы является главной причиной долгосрочной инфляции.",
+                    neutT: "Нейтральность денег (Monetary Neutrality):", neutD: "Изменение денежной массы влияет на номинальные переменные (P, W), но не затрагивает реальные (Y, u).",
+                    fishT: "Эффект Фишера (Fisher Effect):", fishD: "Рост ожидаемой инфляции на 1% увеличивает номинальную процентную ставку на 1%."
+                },
+                keynApp: {
+                    title: "Виды и источники инфляции",
+                    dpT: "Инфляция спроса (Demand-Pull)", dpD: "«Слишком много денег гоняется за слишком малым количеством товаров» при полной занятости.",
+                    cpT: "Инфляция издержек (Cost-Push)", cpD: "Рост издержек производства на единицу продукции (сырьевые шоки, рост зарплат).",
+                    flipMod: "Умеренная", flipModB: "Прогнозируемая инфляция. Стимулирует спрос без разрушения экономики.",
+                    flipGal: "Галопирующая", flipGalB: "Опасный рост. Контракты привязываются к валюте, сбережения обесцениваются.",
+                    flipHyp: "Гиперинфляция", flipHypB: "Полный крах денежной системы. Переход на бартер и отказ от национальной валюты.",
+                    hint: "💡 нажми / наведи"
+                },
+                costs: {
+                    title: "Издержки инфляции (Costs of Inflation)",
+                    shoeT: "Издержки «стоптанных сапог» (Shoeleather costs)", shoeD: "Ресурсы, затрачиваемые на частые посещения банков для минимизации наличных денег.",
+                    menuT: "Издержки «меню» (Menu costs)", menuD: "Затраты фирм на изменение ценников, каталогов и программного обеспечения.",
+                    taxT: "Налоговые искажения (Tax distortions)", taxD: "Налогообложение номинального дохода увеличивает налоговое бремя при инфляции.",
+                    redistT: "Неожиданное перераспределение (Redistribution)", redistD: "Неожиданная инфляция обогащает должников и обедняет кредиторов."
+                },
+                oz: {
+                    title: "Волшебник из страны Оз",
+                    desc: "Историк Хью Рокофф доказал, что сказка Л. Фрэнка Баума — аллегория денежных дебатов о свободном серебре в США 1890-х гг.",
+                    oz1: "Дороти:", oz1v: "Традиционные ценности",
+                    oz2: "Страшила:", oz2v: "Фермеры (должники)",
+                    oz3: "Дровосек:", oz3v: "Рабочие промзоны",
+                    oz4: "Дорога из желтого кирпича:", oz4v: "Золотой стандарт",
+                    oz5: "Серебряные туфельки:", oz5v: "Монетизация серебра"
+                },
+                phil: {
+                    title: "Кривая Филлипса: Инфляция vs Безработица",
+                    sub: "Связь короткосрочного выбора (SRPC) и долгосрочной вертикальной кривой (LRPC)",
+                    theoryHead: "Теоретические основы (Краткосрочный vs Долгосрочный период):",
+                    theoryBody: "В краткосрочном периоде (SRPC) между инфляцией и безработицей существует обратная связь: стимулирование совокупного спроса (AD) снижает безработицу, но подталкивает инфляцию. В долгосрочном периоде (LRPC) кривая становится вертикальной на уровне естественной нормы безработицы (u_n), так как экономические агенты полностью адаптируют свои инфляционные ожидания.",
+                    adLbl: "Совокупный спрос (AD):", pieLbl: "Ожидаемая инфляция (π^e):",
+                    uLbl: "Безработица (u):", piLbl: "Фактическая инфляция (π):"
+                },
+                assign: {
+                    headTitle: "Практикум и решение задач",
+                    t1Title: "Задача 1: Количественная теория денег",
+                    t1Desc: "В текущем году M = $500, Номинальный ВВП = $10,000, Реальный ВВП = $5,000.",
+                    t1qa: "a. Уровень цен (P) и Скорость обращения (V):",
+                    t1qb: "b. При V=const и росте Y на 5%, Nom GDP = ? ($):",
+                    t1qc: "c. M для стабильного уровня цен P=const ($):",
+                    t1qd: "d. M для инфляции 10% ($):",
+                    t1ChartLbl: "Визуализатор равенства M × V = P × Y:",
+                    t2Title: "Задача 2: Рынок труда и Закон Оукена",
+                    t2Desc: "Население = 3412, Вне рабочей силы = 1579, Безработные = 237. Потенциальный ВВП = $830 млрд при u_n = 5%.",
+                    t2qa: "a. Рабочая сила L и Уровень безработицы u (%):",
+                    t2qb: "b. При u = 12% и u_n = 5%, потеря ВВП по Оукену ($ млрд):",
+                    checkBtn: "Проверить"
+                },
+                footer: "AlmaU • School of Digital Technologies and Economics • Macroeconomics © 2026"
+            },
+            en: {
+                mainTitle: "Macroeconomic Instability: Unemployment and Inflation",
+                subPrinciples: "Principles of Economics",
+                subSchool: "AlmaU | School of Digital Technologies and Economics",
+                tabs: { unemp: "1. Unemployment", inf: "2. Inflation", phil: "3. Phillips Curve", assign: "4. Assignments & Practice" },
+                bls: {
+                    headUS: "U.S. Population Structure (BLS 16+, 2026)",
+                    headKZ: "Kazakhstan Population Structure (stat.gov.kz 15+, 2026)",
+                    subUS: "Civilian noninstitutional population 16+ and demographic framework (BLS)",
+                    subKZ: "Bureau of National Statistics of Kazakhstan (stat.gov.kz, population 15+)",
+                    emp: "Employed (E)", unemp: "Unemployed (U)", nilf: "Not in Labor Force", outside: "Outside Official Survey",
+                    totalLbl: "Population:",
+                    noteHead: "Why are some people striped in gray?",
+                    noteBodyUS: "Total U.S. population is ~343M. BLS surveys civilian population age 16+ (275.7M). The ~67.3M gray difference includes children under 16, active military, and institutionalized population.",
+                    noteBodyKZ: "Total Kazakhstan population is ~20.2M (stat.gov.kz). Labor force is surveyed from age 15+ (~15.6M). The ~4.6M gray area includes children under 15 and special institutional categories."
+                },
+                sim: {
+                    titleUS: "Labor Market Simulator (U.S.)",
+                    titleKZ: "Labor Market Simulator (Kazakhstan)",
+                    descUS: "Adjust Unemployed (U) within Labor Force L = 170.68M",
+                    descKZ: "Adjust Unemployed (U) within Labor Force L = 9.65M",
+                    unempLbl: "Unemployed Count (U):",
+                    uLbl: "Unemployment Rate (u):",
+                    lfprLbl: "Labor Force Participation (LFPR):",
+                    resetBtn: "Reset to Real Data"
+                },
+                hist: {
+                    titleUS: "35-Year U.S. Unemployment History (1991–2026)",
+                    titleKZ: "35-Year Kazakhstan Unemployment History (1991–2026)",
+                    sub: "Actual Unemployment Rate vs. Natural Rate (NROU / NAIRU)",
+                    peak: "Crisis Peak:",
+                    curr: "Current Level (2026):"
+                },
+                types: {
+                    head: "Types and Causes of Unemployment",
+                    fricT: "Frictional", fricD: "Results because it takes time for workers to search for jobs that best suit their tastes and skills.",
+                    structT: "Structural", structD: "Results because the number of jobs available is insufficient for everyone who wants one (tech shifts, minimum wage, unions).",
+                    cycT: "Cyclical", cycD: "Deviation of actual unemployment from its natural rate (NAIRU) caused by aggregate demand downturns.",
+                    effTitle: "Theory of Efficiency Wages (Why firms pay above equilibrium):",
+                    eff1t: "1. Worker Health", eff1d: "Better pay improves health and nutrition, raising productivity.",
+                    eff2t: "2. Worker Turnover", eff2d: "Reduces turnover and recruitment/training costs.",
+                    eff3t: "3. Worker Quality", eff3d: "Attracts a better applicant pool.",
+                    eff4t: "4. Worker Effort", eff4d: "Increases the cost of getting fired, reducing shirking."
+                },
+                okun: {
+                    title: "Okun's Law and GDP Gap",
+                    sub: "Arthur Okun: Every 1% excess unemployment creates a 2% GDP gap",
+                    actLbl: "Actual Unemployment (u):", natLbl: "Natural Rate (u_n):", gdpLbl: "Potential GDP ($B):",
+                    compareLbl: "Actual GDP vs Potential GDP",
+                    resGap: "GDP Gap (%):", resLoss: "Absolute Loss ($B):"
+                },
+                infSim: {
+                    title: "Monetary Equilibrium & Money Supply",
+                    sub: "Interactive Model: Money expansion lowers value of money (1/P) and raises price level (P)",
+                    msLbl: "Money Supply (MS):", msCurr: "Current (4.0)", valLbl: "Value of Money (1/P):", priceLbl: "Price Level (P):",
+                    explain: "Increasing money supply from MS1 to MS2 creates excess cash holdings. Spending excess money bids up price level P from A to B."
+                },
+                classApp: {
+                    title: "Classical Approach",
+                    qtmT: "Quantity Theory of Money:", qtmD: "Money growth is the primary cause of long-run inflation.",
+                    neutT: "Monetary Neutrality:", neutD: "Changes in money supply affect nominal variables (P, W) but not real variables (Y, u).",
+                    fishT: "Fisher Effect:", fishD: "A 1% increase in expected inflation causes a 1% increase in nominal interest rate."
+                },
+                keynApp: {
+                    title: "Types and Sources of Inflation",
+                    dpT: "Demand-Pull Inflation", dpD: "«Too much money chasing too few goods» at full employment.",
+                    cpT: "Cost-Push Inflation", cpD: "Rise in production costs per unit (resource shocks, wage increases).",
+                    flipMod: "Moderate", flipModB: "Predictable inflation. Stimulates demand without destroying economy.",
+                    flipGal: "Galloping", flipGalB: "Dangerous growth. Contracts index to foreign currency, savings erode.",
+                    flipHyp: "Hyperinflation", flipHypB: "Total collapse of money system. Shift to barter and currency rejection.",
+                    hint: "💡 click / hover"
+                },
+                costs: {
+                    title: "Costs of Inflation",
+                    shoeT: "Shoeleather costs", shoeD: "Resources wasted when inflation encourages people to reduce money holdings.",
+                    menuT: "Menu costs", menuD: "Costs of changing price tags, catalogs, and software.",
+                    taxT: "Tax distortions", taxD: "Taxation of nominal capital gains increases real tax burden.",
+                    redistT: "Arbitrary redistribution", redistD: "Unexpected inflation redistributes wealth among debtors and creditors."
+                },
+                oz: {
+                    title: "The Wizard of Oz Allegory",
+                    desc: "Historian Hugh Rockoff proved Frank Baum's tale is an allegory of 1890s U.S. free silver debates.",
+                    oz1: "Dorothy:", oz1v: "Traditional Values",
+                    oz2: "Scarecrow:", oz2v: "Farmers (Debtors)",
+                    oz3: "Tin Woodman:", oz3v: "Industrial Workers",
+                    oz4: "Yellow Brick Road:", oz4v: "Gold Standard",
+                    oz5: "Ruby (Silver) Slippers:", oz5v: "Free Silver Bimetallism"
+                },
+                phil: {
+                    title: "Phillips Curve: Inflation vs Unemployment",
+                    sub: "Trade-off in the short run (SRPC) vs vertical long run (LRPC)",
+                    theoryHead: "Theoretical Foundations (Short-Run vs Long-Run):",
+                    theoryBody: "In the short run (SRPC), there is a trade-off between inflation and unemployment: stimulating AD lowers unemployment but increases inflation. In the long run (LRPC), the curve is vertical at natural rate (u_n) as economic agents fully adapt inflation expectations.",
+                    adLbl: "Aggregate Demand (AD):", pieLbl: "Expected Inflation (π^e):",
+                    uLbl: "Unemployment (u):", piLbl: "Actual Inflation (π):"
+                },
+                assign: {
+                    headTitle: "Assignments & Practice Workshop",
+                    t1Title: "Task 1: Quantity Theory of Money",
+                    t1Desc: "In the current year M = $500, Nominal GDP = $10,000, Real GDP = $5,000.",
+                    t1qa: "a. Price Level (P) and Velocity (V):",
+                    t1qb: "b. With V=const and Y up 5%, Nom GDP = ? ($):",
+                    t1qc: "c. M required for stable price level P=const ($):",
+                    t1qd: "d. M required for 10% inflation ($):",
+                    t1ChartLbl: "M × V = P × Y Identity Visualizer:",
+                    t2Title: "Task 2: Labor Market & Okun's Law",
+                    t2Desc: "Population = 3412, Not in Labor Force = 1579, Unemployed = 237. Potential GDP = $830B at u_n = 5%.",
+                    t2qa: "a. Labor Force L and Unemployment Rate u (%):",
+                    t2qb: "b. At u = 12% and u_n = 5%, GDP loss under Okun ($B):",
+                    checkBtn: "Check Answer"
+                },
+                footer: "AlmaU • School of Digital Technologies and Economics • Macroeconomics © 2026"
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = i18n[lang];
+
+            document.getElementById('lang-ru-btn').className = lang === 'ru' 
+                ? "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-neoncyan text-black shadow-lg"
+                : "px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all duration-200";
+            document.getElementById('lang-en-btn').className = lang === 'en' 
+                ? "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-neoncyan text-black shadow-lg"
+                : "px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all duration-200";
+
+            document.getElementById('main-title').innerText = t.mainTitle;
+            document.getElementById('sub-principles').innerText = t.subPrinciples;
+            document.getElementById('sub-school').innerText = t.subSchool;
+
+            document.getElementById('tab-label-unemp').innerText = t.tabs.unemp;
+            document.getElementById('tab-label-inf').innerText = t.tabs.inf;
+            document.getElementById('tab-label-phil').innerText = t.tabs.phil;
+            document.getElementById('tab-label-assign').innerText = t.tabs.assign;
+
+            document.getElementById('leg-emp').innerText = t.bls.emp;
+            document.getElementById('leg-unemp').innerText = t.bls.unemp;
+            document.getElementById('leg-nilf').innerText = t.bls.nilf;
+            document.getElementById('leg-outside').innerText = t.bls.outside;
+            document.getElementById('bls-total-label').innerText = t.bls.totalLbl;
+            document.getElementById('bls-note-head').innerText = t.bls.noteHead;
+
+            document.getElementById('formula-u-label').innerText = t.sim.uLbl;
+            document.getElementById('formula-lfpr-label').innerText = t.sim.lfprLbl;
+            document.getElementById('btn-reset-sim').innerText = t.sim.resetBtn;
+            document.getElementById('hist-chart-sub').innerText = t.hist.sub;
+            document.getElementById('hist-peak-txt').childNodes[0].nodeValue = t.hist.peak + " ";
+            document.getElementById('hist-curr-txt').childNodes[0].nodeValue = t.hist.curr + " ";
+
+            document.getElementById('types-head').childNodes[2].nodeValue = " " + t.types.head;
+            document.getElementById('type-fric-title').innerText = t.types.fricT;
+            document.getElementById('type-fric-desc').innerText = t.types.fricD;
+            document.getElementById('type-struct-title').innerText = t.types.structT;
+            document.getElementById('type-struct-desc').innerText = t.types.structD;
+            document.getElementById('type-cyc-title').innerText = t.types.cycT;
+            document.getElementById('type-cyc-desc').innerText = t.types.cycD;
+            document.getElementById('eff-wages-title').innerText = t.types.effTitle;
+            document.getElementById('eff-1-t').innerText = t.types.eff1t; document.getElementById('eff-1-d').innerText = t.types.eff1d;
+            document.getElementById('eff-2-t').innerText = t.types.eff2t; document.getElementById('eff-2-d').innerText = t.types.eff2d;
+            document.getElementById('eff-3-t').innerText = t.types.eff3t; document.getElementById('eff-3-d').innerText = t.types.eff3d;
+            document.getElementById('eff-4-t').innerText = t.types.eff4t; document.getElementById('eff-4-d').innerText = t.types.eff4d;
+
+            document.getElementById('okun-title').childNodes[2].nodeValue = " " + t.okun.title;
+            document.getElementById('okun-sub').innerText = t.okun.sub;
+            document.getElementById('okun-actual-lbl').innerText = t.okun.actLbl;
+            document.getElementById('okun-nat-lbl').innerText = t.okun.natLbl;
+            document.getElementById('okun-gdp-lbl').innerText = t.okun.gdpLbl;
+            document.getElementById('okun-compare-lbl').innerText = t.okun.compareLbl;
+            document.getElementById('okun-res-gap-lbl').innerText = t.okun.resGap;
+            document.getElementById('okun-res-loss-lbl').innerText = t.okun.resLoss;
+
+            document.getElementById('inf-sim-title').childNodes[2].nodeValue = " " + t.infSim.title;
+            document.getElementById('inf-sim-sub').innerText = t.infSim.sub;
+            document.getElementById('ms-slider-lbl').innerText = t.infSim.msLbl;
+            document.getElementById('ms-curr-lbl').innerText = t.infSim.msCurr;
+            document.getElementById('val-money-lbl').innerText = t.infSim.valLbl;
+            document.getElementById('price-lvl-lbl').innerText = t.infSim.priceLbl;
+            document.getElementById('ms-explain-text').innerText = t.infSim.explain;
+
+            document.getElementById('class-app-title').innerText = t.classApp.title;
+            document.getElementById('qtm-title').innerText = t.classApp.qtmT; document.getElementById('qtm-desc').innerText = t.classApp.qtmD;
+            document.getElementById('neut-title').innerText = t.classApp.neutT; document.getElementById('neut-desc').innerText = t.classApp.neutD;
+            document.getElementById('fish-title').innerText = t.classApp.fishT; document.getElementById('fish-desc').innerText = t.classApp.fishD;
+
+            document.getElementById('keyn-app-title').innerText = t.keynApp.title;
+            document.getElementById('dp-title').innerText = t.keynApp.dpT; document.getElementById('dp-desc').innerText = t.keynApp.dpD;
+            document.getElementById('cp-title').innerText = t.keynApp.cpT; document.getElementById('cp-desc').innerText = t.keynApp.cpD;
+            document.getElementById('flip-mod-title').innerText = t.keynApp.flipMod; document.getElementById('flip-mod-back').innerText = t.keynApp.flipModB;
+            document.getElementById('flip-gal-title').innerText = t.keynApp.flipGal; document.getElementById('flip-gal-back').innerText = t.keynApp.flipGalB;
+            document.getElementById('flip-hyp-title').innerText = t.keynApp.flipHyp; document.getElementById('flip-hyp-back').innerText = t.keynApp.flipHypB;
+            document.getElementById('flip-hint-1').innerText = t.keynApp.hint;
+            document.getElementById('flip-hint-2').innerText = t.keynApp.hint;
+            document.getElementById('flip-hint-3').innerText = t.keynApp.hint;
+
+            document.getElementById('costs-title').childNodes[2].nodeValue = " " + t.costs.title;
+            document.getElementById('cost-shoe-t').innerText = t.costs.shoeT; document.getElementById('cost-shoe-d').innerText = t.costs.shoeD;
+            document.getElementById('cost-menu-t').innerText = t.costs.menuT; document.getElementById('cost-menu-d').innerText = t.costs.menuD;
+            document.getElementById('cost-tax-t').innerText = t.costs.taxT; document.getElementById('cost-tax-d').innerText = t.costs.taxD;
+            document.getElementById('cost-redist-t').innerText = t.costs.redistT; document.getElementById('cost-redist-d').innerText = t.costs.redistD;
+
+            document.getElementById('oz-title').childNodes[2].nodeValue = " " + t.oz.title;
+            document.getElementById('oz-desc').innerText = t.oz.desc;
+            document.getElementById('oz-1').innerText = t.oz.oz1; document.getElementById('oz-1').nextElementSibling.innerText = t.oz.oz1v;
+            document.getElementById('oz-2').innerText = t.oz.oz2; document.getElementById('oz-2').nextElementSibling.innerText = t.oz.oz2v;
+            document.getElementById('oz-3').innerText = t.oz.oz3; document.getElementById('oz-3').nextElementSibling.innerText = t.oz.oz3v;
+            document.getElementById('oz-4').innerText = t.oz.oz4; document.getElementById('oz-4').nextElementSibling.innerText = t.oz.oz4v;
+            document.getElementById('oz-5').innerText = t.oz.oz5; document.getElementById('oz-5').nextElementSibling.innerText = t.oz.oz5v;
+
+            document.getElementById('phil-head-title').childNodes[2].nodeValue = " " + t.phil.title;
+            document.getElementById('phil-head-sub').innerText = t.phil.sub;
+            document.getElementById('phil-theory-head').innerText = t.phil.theoryHead;
+            document.getElementById('phil-theory-body').innerText = t.phil.theoryBody;
+            document.getElementById('ad-slider-lbl').innerText = t.phil.adLbl;
+            document.getElementById('pie-slider-lbl').innerText = t.phil.pieLbl;
+            document.getElementById('phil-u-lbl').innerText = t.phil.uLbl;
+            document.getElementById('phil-pi-lbl').innerText = t.phil.piLbl;
+
+            document.getElementById('assign-head-title').childNodes[2].nodeValue = " " + t.assign.headTitle;
+            document.getElementById('task1-title').innerText = t.assign.t1Title;
+            document.getElementById('task1-desc').innerText = t.assign.t1Desc;
+            document.getElementById('t1-qa').innerText = t.assign.t1qa;
+            document.getElementById('t1-qb').innerText = t.assign.t1qb;
+            document.getElementById('t1-qc').innerText = t.assign.t1qc;
+            document.getElementById('t1-qd').innerText = t.assign.t1qd;
+            document.getElementById('t1-chart-lbl').innerText = t.assign.t1ChartLbl;
+
+            document.getElementById('task2-title').innerText = t.assign.t2Title;
+            document.getElementById('task2-desc').innerText = t.assign.t2Desc;
+            document.getElementById('t2-qa').innerText = t.assign.t2qa;
+            document.getElementById('t2-qb').innerText = t.assign.t2qb;
+            document.getElementById('btn-check-t1').innerText = t.assign.checkBtn;
+            document.getElementById('btn-check-t2').innerText = t.assign.checkBtn;
+
+            document.getElementById('footer-text').innerText = t.footer;
+
+            updateRegionUI();
+        }
+
+        function setRegion(region) {
+            currentRegion = region;
+            document.getElementById('region-us-btn').className = region === 'us'
+                ? "px-3 py-1 rounded-lg text-xs font-bold transition-all bg-neoncyan text-black"
+                : "px-3 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
+            document.getElementById('region-kz-btn').className = region === 'kz'
+                ? "px-3 py-1 rounded-lg text-xs font-bold transition-all bg-neoncyan text-black"
+                : "px-3 py-1 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all";
+
+            updateRegionUI();
+        }
+
+        function updateRegionUI() {
+            const data = regionData[currentRegion];
+            const t = i18n[currentLang];
+
+            // Header titles
+            document.getElementById('bls-head-txt').innerText = currentRegion === 'us' ? t.bls.headUS : t.bls.headKZ;
+            document.getElementById('bls-head-sub').innerText = currentRegion === 'us' ? t.bls.subUS : t.bls.subKZ;
+            document.getElementById('bls-total-val').innerText = `~${data.totalPop} M`;
+
+            // Stacked Bar ratios
+            const pTotal = data.totalPop;
+            const empPct = ((data.emp / pTotal) * 100).toFixed(1);
+            const unempPct = ((data.unemp / pTotal) * 100).toFixed(1);
+            const nilfPct = ((data.nilf / pTotal) * 100).toFixed(1);
+            const outsidePct = ((data.outside / pTotal) * 100).toFixed(1);
+
+            document.getElementById('bar-employed').style.width = empPct + "%";
+            document.getElementById('bar-unemployed').style.width = unempPct + "%";
+            document.getElementById('bar-nilf').style.width = nilfPct + "%";
+            document.getElementById('bar-outside').style.width = outsidePct + "%";
+
+            document.getElementById('bar-emp-txt').innerText = `${data.emp}M`;
+            document.getElementById('bar-unemp-txt').innerText = `${data.unemp}M`;
+            document.getElementById('bar-nilf-txt').innerText = `${data.nilf}M`;
+            document.getElementById('bar-outside-txt').innerText = `~${data.outside}M`;
+
+            document.getElementById('val-emp').innerText = `${data.emp} M`;
+            document.getElementById('val-unemp').innerText = `${data.unemp} M`;
+            document.getElementById('val-nilf').innerText = `${data.nilf} M`;
+            document.getElementById('val-outside').innerText = `~${data.outside} M`;
+
+            document.getElementById('bls-note-body').innerText = currentRegion === 'us' ? t.bls.noteBodyUS : t.bls.noteBodyKZ;
+
+            // Simulator
+            document.getElementById('sim-title').childNodes[2].nodeValue = " " + (currentRegion === 'us' ? t.sim.titleUS : t.sim.titleKZ);
+            document.getElementById('sim-desc').innerText = currentRegion === 'us' ? t.sim.descUS : t.sim.descKZ;
+            
+            const slider = document.getElementById('unemp-slider');
+            slider.min = (data.unemp * 0.3).toFixed(1);
+            slider.max = (data.unemp * 2.5).toFixed(1);
+            slider.value = data.unemp;
+            
+            document.getElementById('sim-slider-range').innerHTML = `
+                <span>${(data.unemp * 0.3).toFixed(1)} M</span>
+                <span>${data.unemp.toFixed(1)} M</span>
+                <span>${(data.unemp * 2.5).toFixed(1)} M</span>
+            `;
+
+            // Chart Titles
+            document.getElementById('hist-chart-title').innerText = currentRegion === 'us' ? t.hist.titleUS : t.hist.titleKZ;
+
+            updateLaborSimulator();
+            initHistoricalChart();
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-neoncyan', 'text-neoncyan', 'bg-neoncyan/10');
+                el.classList.add('border-slate-700', 'text-slate-400', 'bg-darkbg/50');
+            });
+
+            document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.classList.remove('border-slate-700', 'text-slate-400', 'bg-darkbg/50');
+            activeBtn.classList.add('border-neoncyan', 'text-neoncyan', 'bg-neoncyan/10');
+        }
+
+        function updateLaborSimulator() {
+            const data = regionData[currentRegion];
+            const uVal = parseFloat(document.getElementById('unemp-slider').value);
+            const totalL = data.laborForce;
+            const populationBase = data.pop16 || data.pop15;
+
+            const uRate = (uVal / totalL) * 100;
+            const lfprRate = (totalL / populationBase) * 100;
+
+            document.getElementById('sim-u-display').innerText = uVal.toFixed(2) + " M";
+            document.getElementById('calc-u-val').innerText = uRate.toFixed(2) + "%";
+            document.getElementById('calc-lfpr-val').innerText = lfprRate.toFixed(2) + "%";
+
+            const empVal = totalL - uVal;
+            const totalPop = data.totalPop;
+
+            const empPct = ((empVal / totalPop) * 100).toFixed(1);
+            const unempPct = ((uVal / totalPop) * 100).toFixed(1);
+
+            document.getElementById('bar-employed').style.width = empPct + "%";
+            document.getElementById('bar-unemployed').style.width = unempPct + "%";
+            document.getElementById('bar-emp-txt').innerText = empVal.toFixed(1) + "M";
+            document.getElementById('bar-unemp-txt').innerText = uVal.toFixed(1) + "M";
+
+            document.getElementById('val-unemp').innerText = uVal.toFixed(2) + " M";
+            document.getElementById('val-emp').innerText = empVal.toFixed(2) + " M";
+        }
+
+        function resetLaborSimulator() {
+            const data = regionData[currentRegion];
+            document.getElementById('unemp-slider').value = data.unemp;
+            updateLaborSimulator();
+        }
+
+        function calculateOkun() {
+            const u = parseFloat(document.getElementById('okun-u-slider').value);
+            const un = parseFloat(document.getElementById('okun-un-slider').value);
+            const gdp = parseFloat(document.getElementById('okun-gdp-slider').value);
+
+            document.getElementById('okun-u-disp').innerText = u.toFixed(1) + "%";
+            document.getElementById('okun-un-disp').innerText = un.toFixed(1) + "%";
+            document.getElementById('okun-gdp-disp').innerText = "$" + gdp + "B";
+
+            const gapPct = -2.0 * (u - un);
+            const lossAbs = (gapPct / 100) * gdp;
+            const actualGdpPct = Math.max(0, 100 + gapPct);
+
+            document.getElementById('okun-gap-pct').innerText = gapPct.toFixed(2) + "%";
+            document.getElementById('okun-loss-abs').innerText = (lossAbs < 0 ? "-" : "") + "$" + Math.abs(lossAbs).toFixed(2) + "B";
+
+            document.getElementById('okun-bar-actual').style.width = Math.min(100, actualGdpPct).toFixed(1) + "%";
+            document.getElementById('okun-bar-loss').style.width = Math.abs(gapPct).toFixed(1) + "%";
+            document.getElementById('okun-timeline-val').innerText = actualGdpPct.toFixed(1) + (currentLang === 'ru' ? "% от Потенциала" : "% of Potential");
+        }
+
+        function initHistoricalChart() {
+            const ctx = document.getElementById('unemploymentHistoryChart').getContext('2d');
+            if (histChart) histChart.destroy();
+
+            const data = regionData[currentRegion];
+
+            histChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.histYears,
+                    datasets: [
+                        {
+                            label: currentLang === 'ru' ? 'Фактическая безработица (%)' : 'Actual Rate (%)',
+                            data: data.histActual,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: currentLang === 'ru' ? 'Естественная норма NAIRU (%)' : 'Natural Rate (%)',
+                            data: data.histNatural,
+                            borderColor: '#00f2fe',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#cbd5e1', font: { family: 'Segoe UI', size: 12 } } } },
+                    scales: {
+                        x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+                        y: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' }, min: 0, max: 16 }
+                    }
+                }
+            });
+        }
+
+        function initMoneySupplyChart() {
+            const ctx = document.getElementById('moneySupplyChart').getContext('2d');
+            if (msChart) msChart.destroy();
+
+            msChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: currentLang === 'ru' ? 'Спрос на деньги (MD)' : 'Money Demand (MD)',
+                            data: [
+                                {x: 1.0, y: 5.0}, {x: 2.0, y: 2.5}, {x: 3.0, y: 1.67}, {x: 4.0, y: 1.25},
+                                {x: 5.0, y: 1.0}, {x: 6.0, y: 0.83}, {x: 7.0, y: 0.71}, {x: 8.0, y: 0.63}
+                            ],
+                            borderColor: '#00f2fe',
+                            borderWidth: 3,
+                            fill: false,
+                            tension: 0.4,
+                            pointRadius: 0
+                        },
+                        {
+                            label: currentLang === 'ru' ? 'Предложение денег (MS)' : 'Money Supply (MS)',
+                            data: [{x: 4.0, y: 0}, {x: 4.0, y: 6.0}],
+                            borderColor: '#ef4444',
+                            borderWidth: 3,
+                            showLine: true,
+                            fill: false,
+                            pointRadius: 0
+                        },
+                        {
+                            label: currentLang === 'ru' ? 'Равновесие' : 'Equilibrium',
+                            data: [{x: 4.0, y: 1.25}],
+                            backgroundColor: '#ff007f',
+                            borderColor: '#ffffff',
+                            borderWidth: 2,
+                            pointRadius: 7
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: { legend: { labels: { color: '#cbd5e1' } } },
+                    scales: {
+                        x: { type: 'linear', title: { display: true, text: 'Quantity of Money', color: '#94a3b8' }, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' }, min: 0, max: 9 },
+                        y: { title: { display: true, text: 'Value of Money (1/P)', color: '#00f2fe' }, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' }, min: 0, max: 6 }
+                    }
+                }
+            });
+        }
+
+        function updateInflationChart() {
+            const msVal = parseFloat(document.getElementById('ms-slider').value);
+            const valueOfMoney = (2.0 / msVal).toFixed(2);
+            const priceLevel = (msVal / 2.0).toFixed(2);
+
+            document.getElementById('val-money-disp').innerText = valueOfMoney;
+            document.getElementById('price-lvl-disp').innerText = priceLevel;
+
+            if (msChart) {
+                msChart.data.datasets[1].data = [{x: msVal, y: 0}, {x: msVal, y: 6.0}];
+                msChart.data.datasets[2].data = [{x: msVal, y: 5.0 / msVal}];
+                msChart.update('none');
+            }
+        }
+
+        function updatePhillipsChart() {
+            const adLevel = parseInt(document.getElementById('ad-slider').value);
+            const pieVal = parseFloat(document.getElementById('pie-slider').value);
+
+            const uVal = 7.0 - (adLevel * 0.8);
+            const piVal = pieVal + (12.0 / uVal - 2.4);
+
+            document.getElementById('ad-state-disp').innerText = adLevel > 3 ? (currentLang === 'ru'?'Высокий AD':'High AD') : (currentLang === 'ru'?'Низкий AD':'Low AD');
+            document.getElementById('pie-val-disp').innerText = pieVal.toFixed(1) + "%";
+            document.getElementById('phil-u-val').innerText = uVal.toFixed(1) + "%";
+            document.getElementById('phil-pi-val').innerText = piVal.toFixed(1) + "%";
+
+            const ctx = document.getElementById('phillipsChart').getContext('2d');
+
+            const srpcPoints = [];
+            for (let x = 1.5; x <= 8.5; x += 0.2) {
+                srpcPoints.push({ x: x, y: pieVal + (12.0 / x - 2.4) });
+            }
+
+            if (philChart) {
+                philChart.data.datasets[0].data = srpcPoints;
+                philChart.data.datasets[2].data = [{x: uVal, y: piVal}];
+                philChart.update('none');
+            } else {
+                philChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'SRPC (Short-Run Curve)',
+                                data: srpcPoints,
+                                borderColor: '#a855f7',
+                                borderWidth: 3,
+                                tension: 0.4,
+                                fill: false,
+                                pointRadius: 0
+                            },
+                            {
+                                label: 'LRPC (Long-Run at un=5.0%)',
+                                data: [{x: 5.0, y: 0}, {x: 5.0, y: 10}],
+                                borderColor: '#10b981',
+                                borderWidth: 2,
+                                borderDash: [6, 6],
+                                showLine: true,
+                                pointRadius: 0
+                            },
+                            {
+                                label: currentLang === 'ru' ? 'Текущее состояние' : 'Current Point',
+                                data: [{x: uVal, y: piVal}],
+                                backgroundColor: '#ff007f',
+                                borderColor: '#ffffff',
+                                borderWidth: 2,
+                                pointRadius: 8
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: false,
+                        plugins: { legend: { labels: { color: '#cbd5e1' } } },
+                        scales: {
+                            x: { type: 'linear', title: { display: true, text: 'Unemployment Rate (u %)', color: '#94a3b8' }, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' }, min: 1, max: 9 },
+                            y: { title: { display: true, text: 'Inflation Rate (π %)', color: '#94a3b8' }, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' }, min: 0, max: 10 }
+                        }
+                    }
+                });
+            }
+        }
+
+        function initTask1Graph() {
+            const ctx = document.getElementById('task1Chart').getContext('2d');
+            if (task1Chart) task1Chart.destroy();
+
+            task1Chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['M × V (Money Supply × Velocity)', 'P × Y (Nominal GDP)'],
+                    datasets: [{
+                        label: '$ Value',
+                        data: [10000, 10000],
+                        backgroundColor: ['#00f2fe', '#10b981'],
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: '#cbd5e1', font: { size: 10 } }, grid: { display: false } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' }, min: 0, max: 15000 }
+                    }
+                }
+            });
+        }
+
+        function updateTask1Graph() {
+            const p = parseFloat(document.getElementById('ans-t1-p').value) || 2;
+            const v = parseFloat(document.getElementById('ans-t1-v').value) || 20;
+            const nomgdp = parseFloat(document.getElementById('ans-t1-nomgdp').value) || 10000;
+
+            const mv = 500 * v;
+            const py = p * 5000;
+
+            if (task1Chart) {
+                task1Chart.data.datasets[0].data = [mv, nomgdp > 0 ? nomgdp : py];
+                task1Chart.update('none');
+            }
+        }
+
+        function checkTask1Full() {
+            const p = parseFloat(document.getElementById('ans-t1-p').value);
+            const v = parseFloat(document.getElementById('ans-t1-v').value);
+            const nomgdp = parseFloat(document.getElementById('ans-t1-nomgdp').value);
+            const mstable = parseFloat(document.getElementById('ans-t1-mstable').value);
+            const m10 = parseFloat(document.getElementById('ans-t1-m10').value);
+            const fb = document.getElementById('t1-feedback');
+
+            fb.classList.remove('hidden', 'bg-red-900/50', 'text-red-300', 'bg-emerald-900/50', 'text-emerald-300');
+
+            if (p === 2 && v === 20 && Math.abs(nomgdp - 10500) < 10 && Math.abs(mstable - 525) < 5 && Math.abs(m10 - 577.5) < 5) {
+                fb.classList.add('bg-emerald-900/50', 'text-emerald-300');
+                fb.innerHTML = currentLang === 'ru'
+                    ? "✓ Великолепно! Всё правильно: a) P=2, V=20; b) Nom GDP = $10,500; c) M = $525; d) M = $577.5."
+                    : "✓ Excellent! All correct: a) P=2, V=20; b) Nom GDP = $10,500; c) M = $525; d) M = $577.5.";
+            } else {
+                fb.classList.add('bg-red-900/50', 'text-red-300');
+                fb.innerHTML = currentLang === 'ru'
+                    ? "✗ Проверьте решения. Подсказки: P=10000/5000=2; V=10000/500=20; Nom GDP=+5% ($10500); M_stable=$10500/20=$525; M_10% = 525 * 1.10 = $577.5."
+                    : "✗ Check your answers. Hints: P=2, V=20; Nom GDP=$10,500; M_stable=$525; M_10%=$577.5.";
+            }
+            updateTask1Graph();
+        }
+
+        function checkTask2Full() {
+            const l = parseFloat(document.getElementById('ans-t2-l').value);
+            const u = parseFloat(document.getElementById('ans-t2-u').value);
+            const loss = parseFloat(document.getElementById('ans-t2-loss').value);
+            const fb = document.getElementById('t2-feedback');
+
+            fb.classList.remove('hidden', 'bg-red-900/50', 'text-red-300', 'bg-emerald-900/50', 'text-emerald-300');
+
+            if (Math.abs(l - 1833) < 5 && Math.abs(u - 12.9) < 0.3 && Math.abs(loss - 116.2) < 0.5) {
+                fb.classList.add('bg-emerald-900/50', 'text-emerald-300');
+                fb.innerHTML = currentLang === 'ru'
+                    ? "✓ Верно! Рабочая сила L = 1833, u = 12.9%, Потеря ВВП = $116.2 млрд."
+                    : "✓ Correct! Labor Force L = 1833, u = 12.9%, GDP Loss = $116.2B.";
+            } else {
+                fb.classList.add('bg-red-900/50', 'text-red-300');
+                fb.innerHTML = currentLang === 'ru'
+                    ? "✗ Ошибка. Подсказка: L = 3412 - 1579 = 1833; u = (237 / 1833) × 100 = 12.9%; Потеря = 2 × (12% - 5%) × $830 млрд = $116.2 млрд."
+                    : "✗ Incorrect. Hint: L = 3412 - 1579 = 1833; u = 12.9%; Loss = 2 × 7% × $830B = $116.2B.";
+            }
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            initHistoricalChart();
+            initMoneySupplyChart();
+            updateInflationChart();
+            updatePhillipsChart();
+            initTask1Graph();
+            calculateOkun();
+            updateLaborSimulator();
+        };
+    </script>
+</body>
+</html>

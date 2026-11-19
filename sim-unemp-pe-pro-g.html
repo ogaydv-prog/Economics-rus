@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Макроэкономика: Симулятор безработицы | AlmaU 2026</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0b0f19',
+                        cardbg: '#151c2c',
+                        cardborder: '#2a364f',
+                        neoncyan: '#00f2fe',
+                        neonemerald: '#10b981',
+                        neonred: '#ef4444',
+                        neonblue: '#3b82f6',
+                        neonamber: '#f59e0b'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #0b0f19;
+            color: #e2e8f0;
+        }
+
+        .vintage-container {
+            background: #1e293b;
+            border: 1px solid #334155;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.4);
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #f8fafc;
+        }
+
+        .vintage-range {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #0f172a;
+            outline: none;
+            border: 1px solid #475569;
+        }
+
+        .vintage-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 32px;
+            border-radius: 3px;
+            background: linear-gradient(180deg, #f1f5f9 0%, #94a3b8 45%, #475569 50%, #64748b 100%);
+            cursor: pointer;
+            border: 1px solid #0f172a;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .vintage-range.frictional::-webkit-slider-thumb {
+            background: linear-gradient(90deg, #cbd5e1 0%, #cbd5e1 35%, #2563eb 35%, #2563eb 65%, #cbd5e1 65%, #cbd5e1 100%);
+        }
+        .vintage-range.structural::-webkit-slider-thumb {
+            background: linear-gradient(90deg, #cbd5e1 0%, #cbd5e1 35%, #16a34a 35%, #16a34a 65%, #cbd5e1 65%, #cbd5e1 100%);
+        }
+        .vintage-range.cyclical::-webkit-slider-thumb {
+            background: linear-gradient(90deg, #cbd5e1 0%, #cbd5e1 35%, #dc2626 35%, #dc2626 65%, #cbd5e1 65%, #cbd5e1 100%);
+        }
+        .vintage-range.outside::-webkit-slider-thumb {
+            background: linear-gradient(90deg, #cbd5e1 0%, #cbd5e1 35%, #582c2b 35%, #582c2b 65%, #cbd5e1 65%, #cbd5e1 100%);
+        }
+
+        .tab-btn.active {
+            background-color: #00f2fe;
+            color: #0b0f19;
+            font-weight: 700;
+            box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+        }
+
+        .brown-outside-block {
+            background: repeating-linear-gradient(
+                45deg,
+                #4a2c2a,
+                #4a2c2a 10px,
+                #2d1918 10px,
+                #2d1918 20px
+            );
+        }
+
+        .flip-card {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 0.75rem;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <header class="border-b border-cardborder bg-cardbg/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full border border-neoncyan/50 p-1 bg-white/5 flex items-center justify-center">
+                    <img src="almau.jpg" alt="AlmaU" class="w-full h-full object-contain rounded-full" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden');">
+                    <span class="hidden text-[10px] font-black text-neoncyan">AlmaU</span>
+                </div>
+                <div>
+                    <h1 class="text-lg font-black bg-gradient-to-r from-neoncyan to-neonblue bg-clip-text text-transparent">
+                        <span data-i18n="title">Макроэкономика: Симулятор безработицы</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">AlmaU • School of Digital Technologies and Economics</p>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-center gap-3 max-w-full">
+                <div class="flex bg-darkbg p-1 rounded-xl border border-cardborder text-xs max-w-full overflow-x-auto" role="tablist" aria-label="Разделы симулятора">
+                    <button type="button" id="tab1-btn" role="tab" aria-controls="tab1" aria-selected="true" onclick="switchTab('tab1')" class="tab-btn active px-3 py-1.5 rounded-lg transition-all whitespace-nowrap" data-i18n="tab1">1. NAIRU Вектор</button>
+                    <button type="button" id="tab2-btn" role="tab" aria-controls="tab2" aria-selected="false" onclick="switchTab('tab2')" class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 transition-all whitespace-nowrap" data-i18n="tab2">2. Состав населения (BLS)</button>
+                    <button type="button" id="tab3-btn" role="tab" aria-controls="tab3" aria-selected="false" onclick="switchTab('tab3')" class="tab-btn px-3 py-1.5 rounded-lg text-slate-400 transition-all whitespace-nowrap" data-i18n="tab3">3. Причины безработицы & Wmin</button>
+                </div>
+
+                <div class="flex bg-slate-800 p-0.5 rounded-lg border border-slate-600 font-mono text-xs">
+                    <button type="button" id="lang-ru" onclick="setLanguage('ru')" class="px-2 py-1 rounded bg-neoncyan text-black font-bold">RU</button>
+                    <button type="button" id="lang-en" onclick="setLanguage('en')" class="px-2 py-1 rounded text-slate-300">EN</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+        
+        <!-- ==================== ВКЛАДКА 1: NAIRU ВЕКТОР ==================== -->
+        <div id="tab1" class="space-y-6" role="tabpanel" aria-labelledby="tab1-btn">
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i data-lucide="sliders" class="text-neoncyan"></i>
+                    <span data-i18n="nru_header">Естественный уровень безработицы (NAIRU) и циклическая безработица</span>
+                </h2>
+                <p class="text-xs text-slate-400 mt-1" data-i18n="nru_sub">
+                    Фрикционная (uf) и структурная (us) компоненты формируют естественную норму. Отдельный показатель uc показывает только циклическую безработицу — отклонение от естественной нормы.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-6">
+                    
+                    <div class="lg:col-span-5 bg-darkbg p-5 rounded-xl border border-cardborder space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300" data-i18n="controls_title">Регуляторы компонентов</h3>
+
+                        <div class="vintage-container space-y-1">
+                            <div class="flex justify-between items-center text-xs font-bold">
+                                <span class="text-blue-400 flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                                    <span data-i18n="uf_label">Фрикционная (uf)</span>
+                                </span>
+                                <span id="val-uf" class="font-mono text-sm text-white">2.0%</span>
+                            </div>
+                            <input type="range" id="slider-uf" min="0.5" max="4.0" step="0.1" value="2.0" class="vintage-range frictional" aria-label="Фрикционная безработица" oninput="updateNAIRUVector()">
+                            <p class="text-[10px] text-slate-400" data-i18n="uf_desc">Добровольный поиск работы, выпускники.</p>
+                        </div>
+
+                        <div class="vintage-container space-y-1">
+                            <div class="flex justify-between items-center text-xs font-bold">
+                                <span class="text-emerald-400 flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                                    <span data-i18n="us_label">Структурная (us)</span>
+                                </span>
+                                <span id="val-us" class="font-mono text-sm text-white">3.0%</span>
+                            </div>
+                            <input type="range" id="slider-us" min="0.5" max="4.0" step="0.1" value="3.0" class="vintage-range structural" aria-label="Структурная безработица" oninput="updateNAIRUVector()">
+                            <p class="text-[10px] text-slate-400" data-i18n="us_desc">Сдвиги в технологиях, несоответствие навыков.</p>
+                        </div>
+
+                        <div class="vintage-container space-y-1">
+                            <div class="flex justify-between items-center text-xs font-bold">
+                                <span class="text-red-400 flex items-center gap-1.5">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                                    <span data-i18n="uc_label">Циклическая (uc)</span>
+                                </span>
+                                <span id="val-uc" class="font-mono text-sm text-white">0.0%</span>
+                            </div>
+                            <input type="range" id="slider-uc" min="0.0" max="8.0" step="0.1" value="0.0" class="vintage-range cyclical" aria-label="Циклическая безработица" oninput="updateNAIRUVector()">
+                            <p class="text-[10px] text-slate-400" data-i18n="uc_desc">Дополнительная безработица, вызванная спадом экономики.</p>
+                        </div>
+
+                        <div class="p-3 bg-slate-900 rounded-lg border border-slate-700 text-xs font-mono space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400" data-i18n="nru_total">Естественная норма (NAIRU):</span>
+                                <span id="total-nairu" class="text-neoncyan font-bold">5.0%</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400" data-i18n="u_total">Циклическая безработица / разрыв (uc):</span>
+                                <span id="total-u" class="text-neonred font-bold">0.0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-300 shadow-xl flex flex-col justify-between text-slate-900">
+                        <div class="space-y-6">
+                            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-600" data-i18n="vector_title">Составная векторная полоса безработицы (% от рабочей силы L)</h3>
+                            
+                            <div class="space-y-2">
+                                <div class="w-full h-14 rounded-xl border-2 border-slate-400 bg-slate-100 flex overflow-hidden shadow-inner font-mono text-xs font-bold relative">
+                                    <div id="vec-uf" class="bg-blue-600 text-white flex items-center justify-center transition-all duration-300 overflow-hidden" style="width: 12.5%;" title="Фрикционная">
+                                        uf: 2.0%
+                                    </div>
+                                    <div id="vec-us" class="bg-emerald-600 text-white flex items-center justify-center border-r-4 border-yellow-400 transition-all duration-300 overflow-hidden" style="width: 18.75%;" title="Структурная">
+                                        us: 3.0%
+                                    </div>
+                                    <div id="vec-uc" class="bg-red-500 text-white flex items-center justify-center transition-all duration-300 overflow-hidden" style="width: 0%;" title="Циклическая">
+                                        
+                                    </div>
+                                </div>
+
+                                <div class="flex justify-between text-[11px] font-mono text-slate-600 pt-1">
+                                    <span>0%</span>
+                                    <span class="text-blue-700 font-bold" id="mark-nairu">Желтый разделитель: Граница NAIRU (5.0%)</span>
+                                    <span class="text-red-600 font-bold" id="mark-total">Циклическая безработица uc = 0.0%</span>
+                                </div>
+                            </div>
+
+                            <div class="p-4 bg-slate-100 rounded-lg border border-slate-300 text-xs text-slate-700 leading-relaxed" data-i18n="vector_desc">
+                                Жёлтый разделитель показывает естественную норму un = uf + us. Красный показатель справа отражает только циклическую безработицу (разрыв) uc = u − un. Поэтому при uc = 0 он остаётся равным 0,0% при любых значениях uf и us. Это не официальный общий уровень безработицы.
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ==================== ВКЛАДКА 2: СОСТАВ НАСЕЛЕНИЯ (BLS) ==================== -->
+        <div id="tab2" class="space-y-6 hidden" role="tabpanel" aria-labelledby="tab2-btn">
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between md:items-center gap-2 mb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i data-lucide="users" class="text-neoncyan"></i>
+                            <span data-i18n="bls_header">Состав населения США: BLS и внешняя группа (октябрь 2026)</span>
+                        </h2>
+                        <p class="text-xs text-slate-400" data-i18n="bls_sub">
+                            E, U и NILF — данные BLS; внешняя группа рассчитана как остаток до общей численности 343,0 млн.
+                        </p>
+                    </div>
+
+                    <div class="bg-darkbg px-4 py-2 rounded-xl border border-neoncyan/40 text-xs font-mono">
+                        <span data-i18n="u_rate_label">Уровень безработицы (u):</span>
+                        <span id="calc-u-rate" class="text-neonred font-extrabold text-sm ml-1">4.14%</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center mt-6">
+                    
+                    <div class="lg:col-span-5 bg-darkbg p-5 rounded-xl border border-cardborder space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300" data-i18n="bls_controls">Управление категориями (млн чел.)</h3>
+
+                        <div class="vintage-container space-y-1">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span class="text-emerald-400" data-i18n="e_group">1. Занятые (E)</span>
+                                <span id="val-bls-e" class="font-mono text-white">163.6M</span>
+                            </div>
+                            <input type="range" id="slider-bls-e" min="120" max="200" step="0.001" value="163.615" class="vintage-range structural" aria-label="Занятые" oninput="updateBLS()">
+                        </div>
+
+                        <div class="vintage-container space-y-1">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span class="text-red-400" data-i18n="u_group">2. Безработные (U)</span>
+                                <span id="val-bls-u" class="font-mono text-white">7.1M</span>
+                            </div>
+                            <input type="range" id="slider-bls-u" min="2" max="25" step="0.001" value="7.068" class="vintage-range cyclical" aria-label="Безработные" oninput="updateBLS()">
+                        </div>
+
+                        <div class="vintage-container space-y-1">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span class="text-blue-400" data-i18n="nilf_group">3. Вне рабочей силы (NILF)</span>
+                                <span id="val-bls-nilf" class="font-mono text-white">105.0M</span>
+                            </div>
+                            <input type="range" id="slider-bls-nilf" min="70" max="140" step="0.001" value="104.999" class="vintage-range frictional" aria-label="Вне рабочей силы" oninput="updateBLS()">
+                            <p class="text-[10px] text-slate-400" data-i18n="nilf_desc">Лица 16+, которые не работают и не относятся к безработным по определению BLS.</p>
+                        </div>
+
+                        <div class="vintage-container space-y-1">
+                            <div class="flex justify-between text-xs font-bold">
+                                <span class="text-amber-500" data-i18n="out_group">4. Вне обследуемой совокупности BLS</span>
+                                <span id="val-bls-outside" class="font-mono text-white">67.3M</span>
+                            </div>
+                            <input type="range" id="slider-bls-outside" min="40" max="90" step="0.001" value="67.318" class="vintage-range outside" aria-label="Вне обследуемой совокупности BLS" oninput="updateBLS()">
+                            <p class="text-[10px] text-slate-400" data-i18n="out_desc">Дети до 16 лет, военнослужащие на действительной службе и институционализированное население.</p>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-slate-300 shadow-xl flex flex-col items-center justify-between min-h-[440px]">
+                        <div class="w-full max-w-md flex items-center justify-center gap-6 my-auto">
+                            
+                            <div class="w-40 h-[320px] rounded-xl overflow-hidden border-2 border-slate-600 bg-slate-100 flex flex-col justify-start shadow-2xl">
+                                <div id="bar-e" class="bg-emerald-500 text-black text-[11px] font-mono font-bold flex items-center justify-center border-b border-emerald-600 transition-all duration-300" style="height: 47.7%;">
+                                    163.6M
+                                </div>
+                                <div id="bar-u" class="bg-red-500 text-white text-[10px] font-mono font-bold flex items-center justify-center border-b border-red-300 transition-all duration-300" style="height: 2.1%;">
+                                    7.1M
+                                </div>
+                                <div id="bar-nilf" class="bg-blue-600 text-white text-[11px] font-mono font-bold flex items-center justify-center border-b border-blue-400 transition-all duration-300" style="height: 30.6%;">
+                                    105.0M
+                                </div>
+                                <div id="bar-outside" class="brown-outside-block text-white font-mono font-black flex items-center justify-center transition-all duration-300 shadow-inner border-t border-amber-900/50" style="height: 19.6%;">
+                                    <span class="text-white text-xs font-black tracking-wide drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.9)]">67.3M</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 h-[320px]">
+                                <svg class="h-full w-8 text-slate-800 stroke-current" viewBox="0 0 50 300" fill="none" preserveAspectRatio="none">
+                                    <path d="M 10 5 C 25 5, 25 140, 40 150 C 25 160, 25 295, 10 295" stroke-width="4" stroke-linecap="round" fill="none"/>
+                                </svg>
+                                
+                                <div class="font-mono text-slate-900">
+                                    <span class="text-[11px] uppercase text-slate-500 block font-bold" data-i18n="pop_label">Всё население США:</span>
+                                    <div id="bracket-total" class="text-3xl font-black text-blue-950">343.0 M</div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="w-full mt-4 p-3 bg-slate-100 rounded-lg border border-slate-300 font-mono text-xs text-slate-700 flex flex-wrap justify-around items-center gap-2">
+                            <span class="font-bold text-slate-900" data-i18n="formula_title">Формулы расчёта:</span>
+                            <div>L = E + U = <span id="calc-lf" class="font-bold text-slate-900">170.7M</span></div>
+                            <div>u = (U / L) × 100% = <span id="formula-u" class="font-bold text-red-600">4.14%</span></div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ==================== ВКЛАДКА 3: ПРИЧИНЫ БЕЗРАБОТИЦЫ & Wmin ==================== -->
+        <div id="tab3" class="space-y-6 hidden" role="tabpanel" aria-labelledby="tab3-btn">
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i data-lucide="scale" class="text-neoncyan"></i>
+                        <span data-i18n="tab3_header">Причины безработицы & Симулятор минимальной заработной платы (Wmin)</span>
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1" data-i18n="tab3_sub">
+                        Теоретический анализ причин и модель равновесия рынка труда при Wmin.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    
+                    <div class="lg:col-span-4 bg-darkbg p-5 rounded-xl border border-cardborder space-y-4 text-white">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-300" data-i18n="wmin_control">Регулятор минимальной зарплаты</h3>
+
+                        <div class="vintage-container space-y-2">
+                            <div class="flex justify-between items-center text-xs font-bold">
+                                <span class="text-red-400 flex items-center gap-1">
+                                    <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+                                    <span data-i18n="wmin_slider">Ставка Wmin ($/час)</span>
+                                </span>
+                                <span id="val-wmin" class="font-mono text-base text-red-400 font-extrabold">$7.25</span>
+                            </div>
+                            <input type="range" id="slider-wmin" min="2.0" max="10.0" step="0.25" value="7.25" class="vintage-range cyclical" aria-label="Минимальная ставка заработной платы" oninput="updateLabourMarket()">
+                        </div>
+
+                        <div id="market-status-box" class="p-3 rounded-lg border text-xs font-mono space-y-1">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400" data-i18n="we_label">Условная равновесная ставка (We):</span>
+                                <span class="font-bold" data-i18n="we_value">$5.00 / час</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400" data-i18n="gap_label">Избыток / Дефицит:</span>
+                                <span id="val-gap" class="font-bold text-red-400">+4.5 M (Избыток / Безработица)</span>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t border-slate-700">
+                            <h4 class="text-xs font-bold text-slate-300" data-i18n="stat_title">Примеры установленных ставок (10 ноября 2026):</h4>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-[11px] font-mono text-left text-slate-300 border-collapse">
+                                    <thead>
+                                        <tr class="border-b border-slate-700 font-bold bg-slate-900">
+                                            <th class="p-1" data-i18n="th_country">Страна</th>
+                                            <th class="p-1" data-i18n="th_rate">Ставка и период</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="country-wmin-table" class="divide-y divide-slate-800">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-8 bg-white p-5 rounded-xl border border-slate-300 shadow-xl flex flex-col justify-between text-slate-900">
+                        <div class="h-[360px] w-full relative">
+                            <canvas id="laborChart"></canvas>
+                        </div>
+                        <div class="mt-3 p-3 rounded-lg bg-slate-100 border border-slate-300 text-xs text-slate-700" data-i18n="labor_note">
+                            Это условная учебная модель с We = $5,00. Зелёная линия — предложение труда Ls, синяя — спрос Ld. При Wmin &gt; We красный треугольник показывает избыток труда. Ниже We минимальная ставка не связывает рынок; синий треугольник показывает лишь гипотетический дефицит при принудительно фиксированной зарплате W.
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="bg-darkbg p-5 rounded-xl border border-cardborder space-y-4">
+                    <h3 class="text-sm font-bold text-neoncyan flex items-center gap-2">
+                        <i data-lucide="book-open" class="w-4 h-4"></i>
+                        <span data-i18n="reasons_title">4 фундаментальные причины безработицы (по Манкью)</span>
+                    </h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                        <div class="p-3 bg-cardbg rounded-lg border border-cardborder space-y-1 min-h-[160px]">
+                            <div class="font-bold text-neonblue" data-i18n="r1_title">1. Поиск работы & Гос. политика</div>
+                            <p class="text-slate-400 text-[11px]" data-i18n="r1_desc">Временной лаг при подборе вакансий. Биржи труда и программы переобучения снижают фрикционную безработицу.</p>
+                        </div>
+
+                        <div class="p-3 bg-cardbg rounded-lg border border-cardborder space-y-1 min-h-[160px]">
+                            <div class="font-bold text-neonemerald" data-i18n="r2_title">2. Пособия по безработице</div>
+                            <p class="text-slate-400 text-[11px]" data-i18n="r2_desc">Защищают доходы, но могут удлинять период поиска работы, снижая интенсивность откликов.</p>
+                        </div>
+
+                        <div class="p-3 bg-cardbg rounded-lg border border-cardborder space-y-1 min-h-[160px]">
+                            <div class="font-bold text-neonred" data-i18n="r3_title">3. Закон Wmin & Профсоюзы</div>
+                            <p class="text-slate-400 text-[11px]" data-i18n="r3_desc">Установление зарплаты выше равновесной ($W > W_e$) через закон или коллективные переговоры создает избыток предложения.</p>
+                        </div>
+
+                        <div class="flip-card h-[160px]" role="button" tabindex="0" aria-label="Показать детали эффективной зарплаты" onclick="this.classList.toggle('flipped')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.classList.toggle('flipped');}">
+                            <div class="flip-card-inner">
+                                <div class="flip-card-front p-3 bg-cardbg border border-neonamber/50 flex flex-col justify-between">
+                                    <div>
+                                        <div class="font-bold text-neonamber flex items-center justify-between" data-i18n="r4_title">
+                                            4. Эффективная зарплата
+                                            <i data-lucide="rotate-cw" class="w-3.5 h-3.5 text-neonamber"></i>
+                                        </div>
+                                        <p class="text-slate-400 text-[11px] mt-1" data-i18n="r4_desc">Нажмите на карточку, чтобы перевернуть и увидеть 4 микроэкономические причины переплаты работодателями.</p>
+                                    </div>
+                                    <span class="text-[9px] text-neonamber font-mono" data-i18n="flip_hint">↻ Кликните для детализации</span>
+                                </div>
+                                <div class="flip-card-back p-3 bg-slate-900 border border-neoncyan flex flex-col justify-between">
+                                    <div class="space-y-1 text-[10px] text-slate-300">
+                                        <div class="font-bold text-neoncyan" data-i18n="flip_head">Детализация Efficient Wages:</div>
+                                        <div class="leading-tight" data-i18n="eff_p1">• <strong>Здоровье:</strong> лучше питание и тонус</div>
+                                        <div class="leading-tight" data-i18n="eff_p2">• <strong>Текучесть:</strong> сокращение потерь на найм</div>
+                                        <div class="leading-tight" data-i18n="eff_p3">• <strong>Усердие:</strong> страх увольнения за отлынивание</div>
+                                        <div class="leading-tight" data-i18n="eff_p4">• <strong>Качество:</strong> отбор лучших спецов</div>
+                                    </div>
+                                    <span class="text-[9px] text-slate-500 font-mono" data-i18n="flip_back_hint">↻ Нажмите для возврата</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="border-t border-cardborder bg-cardbg/50 py-3 text-center text-xs text-slate-400">
+        AlmaU • School of Digital Technologies and Economics • Principles of Economics © 2026
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        let currentLang = 'ru';
+
+        const countryData = {
+            ru: [
+                { c: "Австралия", r: "A$26,44 / час" },
+                { c: "Люксембург", r: "€16,0192 / час (18+, неквалиф.)" },
+                { c: "Великобритания", r: "£12,71 / час (21+)" },
+                { c: "Германия", r: "€13,90 / час" },
+                { c: "Канада (Онтарио)", r: "C$17,95 / час" },
+                { c: "США (федеральная)", r: "$7,25 / час" },
+                { c: "США (штаты/города)", r: "Различается; применяется более высокая" },
+                { c: "Казахстан", r: "₸85 000 / месяц" }
+            ],
+            en: [
+                { c: "Australia", r: "A$26.44 / hour" },
+                { c: "Luxembourg", r: "€16.0192 / hour (18+, unskilled)" },
+                { c: "United Kingdom", r: "£12.71 / hour (21+)" },
+                { c: "Germany", r: "€13.90 / hour" },
+                { c: "Canada (Ontario)", r: "C$17.95 / hour" },
+                { c: "USA (federal)", r: "$7.25 / hour" },
+                { c: "USA (states/cities)", r: "Varies; higher applicable rate governs" },
+                { c: "Kazakhstan", r: "₸85,000 / month" }
+            ]
+        };
+
+        const translations = {
+            ru: {
+                title: "Макроэкономика: Симулятор безработицы",
+                tab1: "1. NAIRU Вектор",
+                tab2: "2. Состав населения (BLS)",
+                tab3: "3. Причины безработицы & Wmin",
+                nru_header: "Естественный уровень безработицы (NAIRU) и циклическая безработица",
+                nru_sub: "Фрикционная (uf) и структурная (us) компоненты формируют естественную норму. Отдельный показатель uc показывает только циклическую безработицу — отклонение от естественной нормы.",
+                controls_title: "Регуляторы компонентов",
+                uf_label: "Фрикционная (uf)",
+                uf_desc: "Добровольный поиск работы, выпускники.",
+                us_label: "Структурная (us)",
+                us_desc: "Сдвиги в технологиях, несоответствие навыков.",
+                uc_label: "Циклическая (uc)",
+                uc_desc: "Дополнительная безработица, вызванная спадом экономики.",
+                nru_total: "Естественная норма (NAIRU):",
+                u_total: "Циклическая безработица / разрыв (uc):",
+                vector_title: "Составная векторная полоса безработицы (% от рабочей силы L)",
+                vector_desc: "Жёлтый разделитель показывает естественную норму un = uf + us. Красный показатель справа отражает только циклическую безработицу (разрыв) uc = u − un. Поэтому при uc = 0 он остаётся равным 0,0% при любых значениях uf и us. Это не официальный общий уровень безработицы.",
+                mark_nairu_prefix: "Желтый разделитель: Граница NAIRU",
+                mark_total_prefix: "Циклическая безработица uc =",
+                bls_header: "Состав населения США: BLS и внешняя группа (октябрь 2026)",
+                bls_sub: "E, U и NILF — данные BLS; внешняя группа рассчитана как остаток до общей численности 343,0 млн.",
+                u_rate_label: "Уровень безработицы (u):",
+                bls_controls: "Управление категориями (млн чел.)",
+                e_group: "1. Занятые (E)",
+                u_group: "2. Безработные (U)",
+                nilf_group: "3. Вне рабочей силы (NILF)",
+                nilf_desc: "Лица 16+, которые не работают и не относятся к безработным по определению BLS.",
+                out_group: "4. Вне обследуемой совокупности BLS",
+                out_desc: "Дети до 16 лет, военнослужащие на действительной службе и институционализированное население.",
+                pop_label: "Всё население США:",
+                formula_title: "Формулы расчёта:",
+                tab3_header: "Причины безработицы & Симулятор минимальной заработной платы (Wmin)",
+                tab3_sub: "Теоретический анализ причин и условная модель рынка труда при Wmin.",
+                wmin_control: "Регулятор минимальной зарплаты",
+                wmin_slider: "Ставка Wmin ($/час)",
+                we_label: "Условная равновесная ставка (We):",
+                we_value: "$5.00 / час",
+                gap_label: "Избыток / Дефицит:",
+                stat_title: "Примеры установленных ставок (10 ноября 2026):",
+                th_country: "Страна",
+                th_rate: "Ставка и период",
+                labor_note: "Это условная учебная модель с We = $5,00. Зелёная линия — предложение труда Ls, синяя — спрос Ld. При Wmin > We красный треугольник показывает избыток труда. Ниже We минимальная ставка не связывает рынок; синий треугольник показывает лишь гипотетический дефицит при принудительно фиксированной зарплате W.",
+                reasons_title: "4 фундаментальные причины безработицы (по Манкью)",
+                r1_title: "1. Поиск работы & Гос. политика",
+                r1_desc: "Временной лаг при подборе вакансий. Биржи труда и программы переобучения снижают фрикционную безработицу.",
+                r2_title: "2. Пособия по безработице",
+                r2_desc: "Защищают доходы, но могут удлинять период поиска работы, снижая интенсивность откликов.",
+                r3_title: "3. Закон Wmin & Профсоюзы",
+                r3_desc: "Установление зарплаты выше равновесной (W > We) через закон или коллективные переговоры создает избыток предложения.",
+                r4_title: "4. Эффективная зарплата",
+                r4_desc: "Нажмите на карточку, чтобы перевернуть и увидеть 4 микроэкономические причины переплаты работодателями.",
+                flip_hint: "↻ Кликните для детализации",
+                flip_head: "Детализация Efficient Wages:",
+                eff_p1: "• Здоровье: лучше питание и тонус",
+                eff_p2: "• Текучесть: сокращение потерь на найм",
+                eff_p3: "• Усердие: страх увольнения за отлынивание",
+                eff_p4: "• Качество: отбор лучших спецов",
+                flip_back_hint: "↻ Нажмите для возврата",
+                chart_ld: "Спрос на труд (Ld)",
+                chart_ls: "Предложение труда (Ls)",
+                chart_y_axis: "Ставка зарплаты ($/час)",
+                chart_x_axis: "Количество труда (млн чел.)"
+            },
+            en: {
+                title: "Macroeconomics: Unemployment Simulator",
+                tab1: "1. NAIRU Vector",
+                tab2: "2. Population Structure (BLS)",
+                tab3: "3. Causes of Unemployment & Wmin",
+                nru_header: "Natural Rate of Unemployment (NAIRU) & Cyclical Component",
+                nru_sub: "Frictional (uf) and structural (us) components form the natural rate. The separate uc indicator shows cyclical unemployment only—the deviation from the natural rate.",
+                controls_title: "Component Regulators",
+                uf_label: "Frictional (uf)",
+                uf_desc: "Voluntary search, graduates.",
+                us_label: "Structural (us)",
+                us_desc: "Technological shifts & skill mismatch.",
+                uc_label: "Cyclical (uc)",
+                uc_desc: "Additional unemployment caused by an economic downturn.",
+                nru_total: "Natural Rate (NAIRU):",
+                u_total: "Cyclical Unemployment / Gap (uc):",
+                vector_title: "Composite Vector Unemployment Bar (% of Labor Force L)",
+                vector_desc: "The yellow divider marks the natural rate un = uf + us. The red indicator on the right shows cyclical unemployment (the gap) only: uc = u − un. Therefore, when uc = 0, it remains 0.0% for any uf and us values. It is not the official total unemployment rate.",
+                mark_nairu_prefix: "Yellow Divider: NAIRU Benchmark",
+                mark_total_prefix: "Cyclical Unemployment uc =",
+                bls_header: "U.S. Population: BLS Data and an External Group (October 2026)",
+                bls_sub: "E, U and NILF are BLS data; the external group is the residual to an approximate total population of 343.0M.",
+                u_rate_label: "Unemployment Rate (u):",
+                bls_controls: "Category Controls (Million People)",
+                e_group: "1. Employed (E)",
+                u_group: "2. Unemployed (U)",
+                nilf_group: "3. Not in Labor Force (NILF)",
+                nilf_desc: "People 16+ who are neither employed nor unemployed under the BLS definition.",
+                out_group: "4. Outside the BLS Survey Universe",
+                out_desc: "Children under 16, active-duty military personnel and the institutionalized population.",
+                pop_label: "Total U.S. Population:",
+                formula_title: "Calculation Formulas:",
+                tab3_header: "Causes of Unemployment & Minimum Wage Simulator (Wmin)",
+                tab3_sub: "Theoretical cause analysis and a stylized labor-market model under Wmin.",
+                wmin_control: "Minimum Wage Regulator",
+                wmin_slider: "Wmin Rate ($/hour)",
+                we_label: "Stylized Equilibrium Rate (We):",
+                we_value: "$5.00 / hour",
+                gap_label: "Surplus / Shortage:",
+                stat_title: "Examples of Statutory Rates (November 10, 2026):",
+                th_country: "Country",
+                th_rate: "Rate and period",
+                labor_note: "This is a stylized teaching model with We = $5.00. The green line is labor supply Ls; the blue line is labor demand Ld. When Wmin > We, the red triangle shows labor surplus. Below We the minimum wage is nonbinding; the blue triangle shows only a hypothetical shortage if wage W were forcibly fixed there.",
+                reasons_title: "4 Fundamental Causes of Unemployment (Mankiw)",
+                r1_title: "1. Job Search & Public Policy",
+                r1_desc: "Time lags in matching. Employment agencies and retraining programs reduce frictional unemployment.",
+                r2_title: "2. Unemployment Insurance",
+                r2_desc: "Protects income but can lengthen search duration by reducing application intensity.",
+                r3_title: "3. Wmin Laws & Unions",
+                r3_desc: "Wages set above equilibrium (W > We) via legislation or collective bargaining create labor surplus.",
+                r4_title: "4. Efficiency Wages",
+                r4_desc: "Click card to flip and view 4 microeconomic reasons for firm overpayment.",
+                flip_hint: "↻ Click for details",
+                flip_head: "Efficient Wages Breakdown:",
+                eff_p1: "• Health: better nutrition and vigor",
+                eff_p2: "• Turnover: reduced hiring losses",
+                eff_p3: "• Effort: fear of dismissal for shirking",
+                eff_p4: "• Quality: attracting top applicants",
+                flip_back_hint: "↻ Click to return",
+                chart_ld: "Labor Demand (Ld)",
+                chart_ls: "Labor Supply (Ls)",
+                chart_y_axis: "Wage Rate ($/hour)",
+                chart_x_axis: "Labor Quantity (M people)"
+            }
+        };
+
+        function renderCountryTable() {
+            const tbody = document.getElementById('country-wmin-table');
+            tbody.innerHTML = '';
+            countryData[currentLang].forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="p-1 font-bold">${item.c}</td><td class="p-1">${item.r}</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+            document.getElementById('lang-ru').className = lang === 'ru' ? 'px-2 py-1 rounded bg-neoncyan text-black font-bold' : 'px-2 py-1 rounded text-slate-300';
+            document.getElementById('lang-en').className = lang === 'en' ? 'px-2 py-1 rounded bg-neoncyan text-black font-bold' : 'px-2 py-1 rounded text-slate-300';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
+            });
+
+            renderCountryTable();
+            updateNAIRUVector();
+            updateBLS();
+            updateLabourMarket();
+
+            if (laborChart) {
+                const t = translations[currentLang];
+                laborChart.data.datasets[0].label = t.chart_ld;
+                laborChart.data.datasets[1].label = t.chart_ls;
+                laborChart.options.scales.y.title.text = t.chart_y_axis;
+                laborChart.options.scales.x.title.text = t.chart_x_axis;
+                laborChart.update();
+            }
+        }
+
+        function switchTab(tabId) {
+            ['tab1', 'tab2', 'tab3'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+                document.getElementById(id + '-btn').classList.remove('active');
+                document.getElementById(id + '-btn').setAttribute('aria-selected', 'false');
+            });
+            document.getElementById(tabId).classList.remove('hidden');
+            document.getElementById(tabId + '-btn').classList.add('active');
+            document.getElementById(tabId + '-btn').setAttribute('aria-selected', 'true');
+
+            // Chart.js cannot reliably measure a canvas inside display:none.
+            // Build or resize the chart only after its tab becomes visible.
+            if (tabId === 'tab3') {
+                requestAnimationFrame(() => {
+                    if (!laborChart) {
+                        initLaborChart();
+                    } else {
+                        laborChart.resize();
+                    }
+                    updateLabourMarket();
+                });
+            }
+        }
+
+        function updateNAIRUVector() {
+            const uf = parseFloat(document.getElementById('slider-uf').value);
+            const us = parseFloat(document.getElementById('slider-us').value);
+            const uc = parseFloat(document.getElementById('slider-uc').value);
+
+            document.getElementById('val-uf').innerText = uf.toFixed(1) + '%';
+            document.getElementById('val-us').innerText = us.toFixed(1) + '%';
+            document.getElementById('val-uc').innerText = uc.toFixed(1) + '%';
+
+            const nairu = uf + us;
+            // Этот индикатор намеренно показывает только циклический разрыв.
+            // Официальный общий уровень безработицы здесь не выводится.
+            const totalU = uc;
+
+            document.getElementById('total-nairu').innerText = nairu.toFixed(1) + '%';
+            document.getElementById('total-u').innerText = totalU.toFixed(1) + '%';
+
+            // 4 + 4 + 8 = 16 is the largest possible sum allowed by the sliders.
+            const maxScale = 16.0;
+            document.getElementById('vec-uf').style.width = ((uf / maxScale) * 100) + '%';
+            document.getElementById('vec-uf').innerText = uf >= 1.5 ? `uf: ${uf.toFixed(1)}%` : '';
+
+            document.getElementById('vec-us').style.width = ((us / maxScale) * 100) + '%';
+            document.getElementById('vec-us').innerText = us >= 1.5 ? `us: ${us.toFixed(1)}%` : '';
+
+            document.getElementById('vec-uc').style.width = ((uc / maxScale) * 100) + '%';
+            document.getElementById('vec-uc').innerText = uc >= 1.5 ? `uc: ${uc.toFixed(1)}%` : '';
+
+            const t = translations[currentLang];
+            document.getElementById('mark-nairu').innerText = `${t.mark_nairu_prefix} (${nairu.toFixed(1)}%)`;
+            document.getElementById('mark-total').innerText = `${t.mark_total_prefix} ${totalU.toFixed(1)}%`;
+        }
+
+        function updateBLS() {
+            const e = parseFloat(document.getElementById('slider-bls-e').value);
+            const u = parseFloat(document.getElementById('slider-bls-u').value);
+            const nilf = parseFloat(document.getElementById('slider-bls-nilf').value);
+            const outside = parseFloat(document.getElementById('slider-bls-outside').value);
+
+            document.getElementById('val-bls-e').innerText = e.toFixed(1) + 'M';
+            document.getElementById('val-bls-u').innerText = u.toFixed(1) + 'M';
+            document.getElementById('val-bls-nilf').innerText = nilf.toFixed(1) + 'M';
+            document.getElementById('val-bls-outside').innerText = outside.toFixed(1) + 'M';
+
+            const totalPop = e + u + nilf + outside;
+            const laborForce = e + u;
+            const uRate = (u / laborForce) * 100;
+
+            document.getElementById('bracket-total').innerText = totalPop.toFixed(1) + ' M';
+            document.getElementById('calc-lf').innerText = laborForce.toFixed(1) + 'M';
+            document.getElementById('calc-u-rate').innerText = uRate.toFixed(2) + '%';
+            document.getElementById('formula-u').innerText = uRate.toFixed(2) + '%';
+
+            document.getElementById('bar-e').style.height = ((e / totalPop) * 100) + '%';
+            document.getElementById('bar-e').innerText = e.toFixed(1) + 'M';
+
+            document.getElementById('bar-u').style.height = ((u / totalPop) * 100) + '%';
+            document.getElementById('bar-u').innerText = u.toFixed(1) + 'M';
+
+            document.getElementById('bar-nilf').style.height = ((nilf / totalPop) * 100) + '%';
+            document.getElementById('bar-nilf').innerText = nilf.toFixed(1) + 'M';
+
+            document.getElementById('bar-outside').style.height = ((outside / totalPop) * 100) + '%';
+            document.getElementById('bar-outside').innerHTML = `<span class="text-white text-xs font-black tracking-wide drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.9)]">${outside.toFixed(1)}M</span>`;
+        }
+
+        // =========================================================================
+        // ВКЛАДКА 3: ЧИСЛОВАЯ МОДЕЛЬ РЫНКА ТРУДА И ЗАМКНУТЫЕ ТРЕУГОЛЬНИКИ
+        // Ls: W = L; Ld: W = 10 - L; условное равновесие: (L, W) = (5, 5).
+        // =========================================================================
+        let laborChart = null;
+
+        function initLaborChart() {
+            const ctx = document.getElementById('laborChart').getContext('2d');
+            const t = translations[currentLang];
+            laborChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: t.chart_ld,
+                            data: [{ x: 0, y: 10 }, { x: 10, y: 0 }],
+                            parsing: false,
+                            borderColor: '#2563eb',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            tension: 0,
+                            fill: false
+                        },
+                        {
+                            label: t.chart_ls,
+                            data: [{ x: 0, y: 0 }, { x: 10, y: 10 }],
+                            parsing: false,
+                            borderColor: '#16a34a',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            tension: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: { display: true, text: t.chart_y_axis, color: '#475569' },
+                            min: 0,
+                            max: 11,
+                            grid: { color: '#e2e8f0' },
+                            ticks: { color: '#334155', callback: v => '$' + v }
+                        },
+                        x: {
+                            type: 'linear',
+                            title: { display: true, text: t.chart_x_axis, color: '#475569' },
+                            min: 0,
+                            max: 10,
+                            grid: { display: false },
+                            ticks: { color: '#334155', stepSize: 2 }
+                        }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#0f172a' } }
+                    }
+                },
+                plugins: [{
+                    id: 'laborMarketTriangles',
+
+                    // Draw the area first, so both economic curves remain crisp and visible.
+                    beforeDatasetsDraw: (chart) => {
+                        const wmin = parseFloat(document.getElementById('slider-wmin').value);
+                        const we = 5.0;
+                        if (wmin === we) return;
+
+                        const yScale = chart.scales.y;
+                        const xScale = chart.scales.x;
+                        const yPos = yScale.getPixelForValue(wmin);
+                        const yWe = yScale.getPixelForValue(we);
+                        const xWe = xScale.getPixelForValue(5);
+                        const qDemand = Math.max(0, 10 - wmin);
+                        const qSupply = wmin;
+                        const xDemand = xScale.getPixelForValue(qDemand);
+                        const xSupply = xScale.getPixelForValue(qSupply);
+
+                        const ctx = chart.ctx;
+                        ctx.save();
+                        ctx.beginPath();
+                        ctx.rect(
+                            chart.chartArea.left,
+                            chart.chartArea.top,
+                            chart.chartArea.right - chart.chartArea.left,
+                            chart.chartArea.bottom - chart.chartArea.top
+                        );
+                        ctx.clip();
+
+                        ctx.fillStyle = wmin > we
+                            ? 'rgba(239, 68, 68, 0.28)'
+                            : 'rgba(37, 99, 235, 0.28)';
+                        ctx.beginPath();
+                        ctx.moveTo(xWe, yWe);
+                        ctx.lineTo(xDemand, yPos);
+                        ctx.lineTo(xSupply, yPos);
+                        ctx.closePath();
+                        ctx.fill();
+                        ctx.restore();
+                    },
+
+                    // Draw the wage line, guides and markers above the datasets.
+                    afterDatasetsDraw: (chart) => {
+                        const wmin = parseFloat(document.getElementById('slider-wmin').value);
+                        const we = 5.0;
+                        const yScale = chart.scales.y;
+                        const xScale = chart.scales.x;
+                        const yPos = yScale.getPixelForValue(wmin);
+                        const yWe = yScale.getPixelForValue(we);
+                        const xWe = xScale.getPixelForValue(5);
+                        const qDemand = Math.max(0, 10 - wmin);
+                        const qSupply = wmin;
+                        const xDemand = xScale.getPixelForValue(qDemand);
+                        const xSupply = xScale.getPixelForValue(qSupply);
+                        const ctx = chart.ctx;
+                        ctx.save();
+
+                        // Красная линия Wmin
+                        ctx.beginPath();
+                        ctx.lineWidth = 3;
+                        ctx.strokeStyle = '#dc2626';
+                        ctx.moveTo(chart.chartArea.left, yPos);
+                        ctx.lineTo(chart.chartArea.right, yPos);
+                        ctx.stroke();
+
+                        ctx.fillStyle = '#dc2626';
+                        ctx.font = 'bold 12px monospace';
+                        ctx.fillText(`Wmin = $${wmin.toFixed(2)}`, chart.chartArea.left + 10, yPos - 8);
+
+                        if (wmin !== we) {
+                            ctx.setLineDash([4, 4]);
+                            ctx.strokeStyle = '#64748b';
+                            ctx.lineWidth = 1;
+                            ctx.beginPath();
+                            ctx.moveTo(xDemand, yPos);
+                            ctx.lineTo(xDemand, chart.chartArea.bottom);
+                            ctx.stroke();
+                            ctx.beginPath();
+                            ctx.moveTo(xSupply, yPos);
+                            ctx.lineTo(xSupply, chart.chartArea.bottom);
+                            ctx.stroke();
+
+                            ctx.setLineDash([]);
+                            ctx.font = 'bold 11px monospace';
+                            ctx.textAlign = 'center';
+                            ctx.fillStyle = wmin > we ? '#991b1b' : '#1d4ed8';
+                            ctx.fillText(
+                                `ΔL = ${Math.abs(qSupply - qDemand).toFixed(1)} M`,
+                                (xDemand + xSupply) / 2,
+                                wmin > we ? yPos + 17 : yPos - 8
+                            );
+                        }
+
+                        // Intersections and equilibrium point.
+                        const drawPoint = (x, y, color, radius = 4) => {
+                            ctx.beginPath();
+                            ctx.fillStyle = color;
+                            ctx.arc(x, y, radius, 0, Math.PI * 2);
+                            ctx.fill();
+                        };
+                        drawPoint(xDemand, yPos, '#2563eb');
+                        drawPoint(xSupply, yPos, '#16a34a');
+                        drawPoint(xWe, yWe, '#0f172a', 4.5);
+
+                        ctx.restore();
+                    }
+                }]
+            });
+        }
+
+        function updateLabourMarket() {
+            const wmin = parseFloat(document.getElementById('slider-wmin').value);
+            document.getElementById('val-wmin').innerText = '$' + wmin.toFixed(2);
+
+            const we = 5.0;
+            const gapBox = document.getElementById('market-status-box');
+            const gapVal = document.getElementById('val-gap');
+
+            if (wmin > we) {
+                const ld = 10 - wmin;
+                const ls = wmin;
+                const surplus = (ls - ld).toFixed(1);
+                gapVal.innerText = `+${surplus} M (${currentLang === 'ru' ? 'Избыток / Безработица' : 'Surplus / Unemployment'})`;
+                gapVal.className = 'font-bold text-red-400';
+                gapBox.className = 'p-3 rounded-lg border border-red-500/40 bg-red-950/30 text-xs font-mono space-y-1';
+            } else if (wmin < we) {
+                const deficit = ((we - wmin) * 2).toFixed(1);
+                gapVal.innerText = currentLang === 'ru'
+                    ? `Wmin не связывает; гипотетический дефицит ${deficit} M`
+                    : `Wmin nonbinding; hypothetical shortage ${deficit} M`;
+                gapVal.className = 'font-bold text-blue-400';
+                gapBox.className = 'p-3 rounded-lg border border-blue-500/40 bg-blue-950/30 text-xs font-mono space-y-1';
+            } else {
+                gapVal.innerText = `0.0 M (${currentLang === 'ru' ? 'Равновесие' : 'Equilibrium'})`;
+                gapVal.className = 'font-bold text-white';
+                gapBox.className = 'p-3 rounded-lg border border-slate-700 bg-slate-900 text-xs font-mono space-y-1';
+            }
+
+            if (laborChart) laborChart.update();
+        }
+
+        window.onload = () => {
+            renderCountryTable();
+            updateNAIRUVector();
+            updateBLS();
+            updateLabourMarket();
+        };
+    </script>
+</body>
+</html>

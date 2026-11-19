@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анализ мировой инфляции | AlmaU</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0b0f19',
+                        cardbg: '#151c2c',
+                        cardborder: '#2a364f',
+                        neoncyan: '#00f2fe',
+                        neonmagenta: '#ff007f',
+                        neonemerald: '#10b981',
+                        neonamber: '#f59e0b',
+                        neonred: '#ef4444',
+                        neonpurple: '#a855f7'
+                    },
+                    fontFamily: {
+                        sans: ['Segoe UI', 'Helvetica Neue', 'Arial', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0b0f19;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+        /* 3D Flip Card Styles */
+        .perspective { perspective: 1000px; }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: left;
+            transition: transform 0.6s ease-in-out;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+            top: 0;
+            left: 0;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #2a364f; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f2fe; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-neoncyan selection:text-black">
+
+    <!-- HEADER BLOCK -->
+    <header class="border-b border-cardborder bg-cardbg/95 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+                <!-- Logo & Titles -->
+                <div class="flex items-center gap-4 text-center md:text-left">
+                    <div class="w-14 h-14 rounded-full border-2 border-neoncyan/50 p-1 bg-white/5 flex items-center justify-center shrink-0">
+                        <img src="almau.jpg" alt="AlmaU Logo" class="w-full h-full object-contain rounded-full" onerror="this.onerror=null; this.src='https://via.placeholder.com/60?text=AlmaU';">
+                    </div>
+                    <div>
+                        <h1 id="main-title" class="text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-neoncyan via-blue-400 to-neonpurple bg-clip-text text-transparent">
+                            Анализ мировой инфляции
+                        </h1>
+                        <p id="sub-title" class="text-xs text-slate-300 mt-1 font-semibold flex items-center justify-center md:justify-start gap-2 flex-wrap">
+                            <span id="sub-principles">Принципы экономики</span>
+                            <span class="text-neoncyan font-bold">•</span>
+                            <span>Economics | Macroeconomics</span>
+                            <span class="text-neoncyan font-bold">•</span>
+                            <span id="sub-school" class="text-slate-200 font-bold">AlmaU | Школа цифровых технологий и экономики</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Controls: Language Switcher -->
+                <div class="flex items-center gap-3">
+                    <div class="bg-darkbg p-1 rounded-xl border border-cardborder flex items-center shadow-inner">
+                        <button id="lang-ru-btn" onclick="setLanguage('ru')" class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-neoncyan text-black shadow-lg">
+                            RU
+                        </button>
+                        <button id="lang-en-btn" onclick="setLanguage('en')" class="px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all duration-200">
+                            EN
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Tabs Bar -->
+            <nav class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-6 border-b border-cardborder/50 pb-2">
+                <button onclick="switchTab('ranking')" id="tab-btn-ranking" class="tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-bold text-sm transition-all border-neoncyan text-neoncyan bg-neoncyan/10">
+                    <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                    <span id="tab-label-ranking">1. Глобальный рейтинг (2026)</span>
+                </button>
+                <button onclick="switchTab('history')" id="tab-btn-history" class="tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-bold text-sm transition-all border-slate-700 text-slate-400 bg-darkbg/50 hover:text-slate-200">
+                    <i data-lucide="line-chart" class="w-4 h-4"></i>
+                    <span id="tab-label-history">2. Исторические тренды (6 стран)</span>
+                </button>
+                <button onclick="switchTab('hyper')" id="tab-btn-hyper" class="tab-btn flex items-center justify-center gap-2 px-4 py-3 rounded-xl border font-bold text-sm transition-all border-slate-700 text-slate-400 bg-darkbg/50 hover:text-slate-200">
+                    <i data-lucide="flame" class="w-4 h-4"></i>
+                    <span id="tab-label-hyper">3. История гиперинфляции</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow w-full">
+
+        <!-- ==================== TAB 1: RANKING ==================== -->
+        <section id="tab-content-ranking" class="tab-content space-y-8">
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2" id="t1-title">
+                        <i data-lucide="globe" class="text-neoncyan"></i>
+                        Сравнение уровня инфляции по странам мира (2026)
+                    </h2>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- High Inflation Block (Top 30) -->
+                    <div class="bg-darkbg p-5 rounded-2xl border border-neonred/30 space-y-4">
+                        <div class="flex justify-between items-center border-b border-cardborder pb-3">
+                            <h3 class="text-base font-bold text-neonred flex items-center gap-2" id="t1-high-title">
+                                <i data-lucide="trending-up"></i> Топ-30: Высокая инфляция (%)
+                            </h3>
+                            <span class="text-xs font-mono bg-neonred/20 text-neonred px-2.5 py-1 rounded-md font-bold">2026 DATA</span>
+                        </div>
+                        <div class="h-[650px] overflow-y-auto pr-2">
+                            <div id="high-bar-container" class="space-y-2 font-mono text-xs"></div>
+                        </div>
+                    </div>
+
+                    <!-- Low Inflation Block (Top 30 Lowest) -->
+                    <div class="bg-darkbg p-5 rounded-2xl border border-neonemerald/30 space-y-4">
+                        <div class="flex justify-between items-center border-b border-cardborder pb-3">
+                            <h3 class="text-base font-bold text-neonemerald flex items-center gap-2" id="t1-low-title">
+                                <i data-lucide="trending-down"></i> Топ-30: Минимальная инфляция / Дефляция (%)
+                            </h3>
+                            <span class="text-xs font-mono bg-neonemerald/20 text-neonemerald px-2.5 py-1 rounded-md font-bold">2026 DATA</span>
+                        </div>
+                        <div class="h-[650px] overflow-y-auto pr-2">
+                            <div id="low-bar-container" class="space-y-2 font-mono text-xs"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: HISTORY (6 WHITE CARDS WITH FLIP) ==================== -->
+        <section id="tab-content-history" class="tab-content hidden space-y-8">
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2" id="t2-title">
+                        <i data-lucide="history" class="text-neonpurple"></i>
+                        Сравнительная история инфляции (6 ключевых экономик)
+                    </h2>
+                    <p class="text-xs text-slate-300 mt-1" id="t2-sub">
+                        Нажмите на любую карточку для переворота (3D Flip) и чтения экономического анализа.
+                    </p>
+                </div>
+
+                <!-- Grid of 6 White Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                    <!-- Card 1: Kazakhstan -->
+                    <div class="flip-card perspective h-[420px] cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front bg-white text-slate-900 p-5 shadow-2xl flex flex-col justify-between border border-slate-200">
+                                <div>
+                                    <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2 mb-1">
+                                        🇰🇿 <span id="c1-title">Казахстан (1991–2026)</span>
+                                    </h3>
+                                    <p class="text-[11px] text-slate-500 font-medium" id="c1-sub">От гиперинфляции 90-х к таргетированию</p>
+                                </div>
+                                <div class="h-56 w-full my-auto">
+                                    <canvas id="chartKZ"></canvas>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px] text-slate-400 border-t border-slate-100 pt-2">
+                                    <span>Макс: <strong class="text-red-600 font-bold">2960.8% (1992)</strong></span>
+                                    <span class="text-neoncyan font-bold text-[10px] flex items-center gap-1">
+                                        <i data-lucide="rotate-cw" class="w-3 h-3"></i> <span id="flip-hint-1">Нажми для разбора</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flip-card-back bg-slate-900 text-slate-100 p-6 border border-cardborder flex flex-col justify-between shadow-2xl">
+                                <div>
+                                    <h4 class="font-bold text-neoncyan text-sm mb-3 flex items-center gap-2">
+                                        <i data-lucide="info"></i> <span id="c1-back-t">Экономический разбор: Казахстан</span>
+                                    </h4>
+                                    <div class="text-xs space-y-2 text-slate-300 leading-relaxed overflow-y-auto max-h-[300px] pr-1" id="c1-back-b">
+                                        <p>• <strong>1991–1994:</strong> Распад СССР, либерализация цен и гиперинфляция. Пик в 1992 г. — 2960.8%.</p>
+                                        <p>• <strong>1995–1998:</strong> Введение тенге (1993) и жесткая монетарная политика снизили инфляцию до 7.1% в 1998 г.</p>
+                                        <p>• <strong>2015:</strong> Переход к свободно плавающему курсу тенге подскочил до 14.6% в 2016 г.</p>
+                                        <p>• <strong>2022–2023:</strong> Геополитические шоки и разрыв логистики подняли инфляцию до 15.0–14.5%.</p>
+                                        <p>• <strong>2026:</strong> Постепенное замедление до 9.2% на фоне жестких ставок Нацбанка РК.</p>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-400 border-t border-slate-800 pt-2 text-center" id="back-flip-txt-1">
+                                    Нажмите, чтобы вернуться к графику
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 2: USA -->
+                    <div class="flip-card perspective h-[420px] cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front bg-white text-slate-900 p-5 shadow-2xl flex flex-col justify-between border border-slate-200">
+                                <div>
+                                    <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2 mb-1">
+                                        🇺🇸 <span id="c2-title">США (1970–2026)</span>
+                                    </h3>
+                                    <p class="text-[11px] text-slate-500 font-medium" id="c2-sub">Нефтяные шоки 70-х и пандемия</p>
+                                </div>
+                                <div class="h-56 w-full my-auto">
+                                    <canvas id="chartUS"></canvas>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px] text-slate-400 border-t border-slate-100 pt-2">
+                                    <span>Макс: <strong class="text-red-600 font-bold">13.5% (1980)</strong></span>
+                                    <span class="text-neoncyan font-bold text-[10px] flex items-center gap-1">
+                                        <i data-lucide="rotate-cw" class="w-3 h-3"></i> <span id="flip-hint-2">Нажми для разбора</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flip-card-back bg-slate-900 text-slate-100 p-6 border border-cardborder flex flex-col justify-between shadow-2xl">
+                                <div>
+                                    <h4 class="font-bold text-neoncyan text-sm mb-3 flex items-center gap-2">
+                                        <i data-lucide="info"></i> <span id="c2-back-t">Экономический разбор: США</span>
+                                    </h4>
+                                    <div class="text-xs space-y-2 text-slate-300 leading-relaxed overflow-y-auto max-h-[300px] pr-1" id="c2-back-b">
+                                        <p>• <strong>1973–1980:</strong> Великая инфляция. Нефтяное эмбарго ОПЕК и мягкая политика ФРС подбросили инфляцию до 13.5%.</p>
+                                        <p>• <strong>1981:</strong> Пол Волкер (глава ФРС) поднял ключевую ставку до 20%, вызвав рецессию, но победив инфляцию.</p>
+                                        <p>• <strong>2009:</strong> Великая рецессия принесла краткосрочную дефляцию (-0.4%).</p>
+                                        <p>• <strong>2021–2022:</strong> Стимулы в пандемию и сбои в цепочках поставок дали пик 9.1% (июнь 2022).</p>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-400 border-t border-slate-800 pt-2 text-center" id="back-flip-txt-2">
+                                    Нажмите, чтобы вернуться к графику
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 3: United Kingdom -->
+                    <div class="flip-card perspective h-[420px] cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front bg-white text-slate-900 p-5 shadow-2xl flex flex-col justify-between border border-slate-200">
+                                <div>
+                                    <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2 mb-1">
+                                        🇬🇧 <span id="c3-title">Великобритания (1970–2026)</span>
+                                    </h3>
+                                    <p class="text-[11px] text-slate-500 font-medium" id="c3-sub">Стагфляция 70-х и энергетический кризис</p>
+                                </div>
+                                <div class="h-56 w-full my-auto">
+                                    <canvas id="chartUK"></canvas>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px] text-slate-400 border-t border-slate-100 pt-2">
+                                    <span>Макс: <strong class="text-red-600 font-bold">24.2% (1975)</strong></span>
+                                    <span class="text-neoncyan font-bold text-[10px] flex items-center gap-1">
+                                        <i data-lucide="rotate-cw" class="w-3 h-3"></i> <span id="flip-hint-3">Нажми для разбора</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flip-card-back bg-slate-900 text-slate-100 p-6 border border-cardborder flex flex-col justify-between shadow-2xl">
+                                <div>
+                                    <h4 class="font-bold text-neoncyan text-sm mb-3 flex items-center gap-2">
+                                        <i data-lucide="info"></i> <span id="c3-back-t">Экономический разбор: Великобритания</span>
+                                    </h4>
+                                    <div class="text-xs space-y-2 text-slate-300 leading-relaxed overflow-y-auto max-h-[300px] pr-1" id="c3-back-b">
+                                        <p>• <strong>1975:</strong> Пик 24.2%. Рост цен на нефть и мощный рост зарплат под давлением профсоюзов.</p>
+                                        <p>• <strong>1980-е:</strong> Реформы Маргарет Тэтчер снизили инфляцию ценой высокой безработицы.</p>
+                                        <p>• <strong>1997:</strong> Банк Англии получил независимость, установив цель по инфляции в 2%.</p>
+                                        <p>• <strong>2022:</strong> Пик 11.1% (октябрь 2022) из-за взлета цен на газ в Европе.</p>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-400 border-t border-slate-800 pt-2 text-center" id="back-flip-txt-3">
+                                    Нажмите, чтобы вернуться к графику
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 4: Euro Area / Germany -->
+                    <div class="flip-card perspective h-[420px] cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front bg-white text-slate-900 p-5 shadow-2xl flex flex-col justify-between border border-slate-200">
+                                <div>
+                                    <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2 mb-1">
+                                        🇪🇺 <span id="c4-title">Еврозона (1970–2026)</span>
+                                    </h3>
+                                    <p class="text-[11px] text-slate-500 font-medium" id="c4-sub">Стабильность Бундесбанка и шок 2022</p>
+                                </div>
+                                <div class="h-56 w-full my-auto">
+                                    <canvas id="chartEU"></canvas>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px] text-slate-400 border-t border-slate-100 pt-2">
+                                    <span>Макс: <strong class="text-red-600 font-bold">10.6% (2022)</strong></span>
+                                    <span class="text-neoncyan font-bold text-[10px] flex items-center gap-1">
+                                        <i data-lucide="rotate-cw" class="w-3 h-3"></i> <span id="flip-hint-4">Нажми для разбора</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flip-card-back bg-slate-900 text-slate-100 p-6 border border-cardborder flex flex-col justify-between shadow-2xl">
+                                <div>
+                                    <h4 class="font-bold text-neoncyan text-sm mb-3 flex items-center gap-2">
+                                        <i data-lucide="info"></i> <span id="c4-back-t">Экономический разбор: Еврозона</span>
+                                    </h4>
+                                    <div class="text-xs space-y-2 text-slate-300 leading-relaxed overflow-y-auto max-h-[300px] pr-1" id="c4-back-b">
+                                        <p>• <strong>1970–1998:</strong> Данные Германии (ФРГ) служат бенчмарком благодаря жесткой поддержке немецкой марки.</p>
+                                        <p>• <strong>1999:</strong> Создание ЕЦБ и введение евро. Длительный период низкой инфляции (~2%).</p>
+                                        <p>• <strong>2015–2020:</strong> Угроза дефляции, ЕЦБ ввел отрицательные процентные ставки.</p>
+                                        <p>• <strong>2022:</strong> Абсолютный рекорд инфляции в истории Еврозоны (10.6%) из-за энергокризиса.</p>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-400 border-t border-slate-800 pt-2 text-center" id="back-flip-txt-4">
+                                    Нажмите, чтобы вернуться к графику
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 5: Japan -->
+                    <div class="flip-card perspective h-[420px] cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front bg-white text-slate-900 p-5 shadow-2xl flex flex-col justify-between border border-slate-200">
+                                <div>
+                                    <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2 mb-1">
+                                        🇯🇵 <span id="c5-title">Япония (1970–2026)</span>
+                                    </h3>
+                                    <p class="text-[11px] text-slate-500 font-medium" id="c5-sub">«Потерянные десятилетия» и дефляция</p>
+                                </div>
+                                <div class="h-56 w-full my-auto">
+                                    <canvas id="chartJP"></canvas>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px] text-slate-400 border-t border-slate-100 pt-2">
+                                    <span>Макс: <strong class="text-red-600 font-bold">23.2% (1974)</strong></span>
+                                    <span class="text-neoncyan font-bold text-[10px] flex items-center gap-1">
+                                        <i data-lucide="rotate-cw" class="w-3 h-3"></i> <span id="flip-hint-5">Нажми для разбора</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flip-card-back bg-slate-900 text-slate-100 p-6 border border-cardborder flex flex-col justify-between shadow-2xl">
+                                <div>
+                                    <h4 class="font-bold text-neoncyan text-sm mb-3 flex items-center gap-2">
+                                        <i data-lucide="info"></i> <span id="c5-back-t">Экономический разбор: Япония</span>
+                                    </h4>
+                                    <div class="text-xs space-y-2 text-slate-300 leading-relaxed overflow-y-auto max-h-[300px] pr-1" id="c5-back-b">
+                                        <p>• <strong>1974:</strong> Нефтяной шок подкинул инфляцию до 23.2%.</p>
+                                        <p>• <strong>1990–2020:</strong> Схлопывание финансового пузыря привело к 30 годам стагнации и дефляции («потерянные десятилетия»).</p>
+                                        <p>• <strong>2023–2026:</strong> Возврат умеренной инфляции (2–3%) благодаря удорожанию импорта и ослаблению иены.</p>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-400 border-t border-slate-800 pt-2 text-center" id="back-flip-txt-5">
+                                    Нажмите, чтобы вернуться к графику
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Card 6: Argentina -->
+                    <div class="flip-card perspective h-[420px] cursor-pointer" onclick="toggleFlip(this)">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front bg-white text-slate-900 p-5 shadow-2xl flex flex-col justify-between border border-slate-200">
+                                <div>
+                                    <h3 class="font-extrabold text-base text-slate-900 flex items-center gap-2 mb-1">
+                                        🇦🇷 <span id="c6-title">Аргентина (1970–2026)</span>
+                                    </h3>
+                                    <p class="text-[11px] text-slate-500 font-medium" id="c6-sub">Хроническая гиперинфляция и дефолты</p>
+                                </div>
+                                <div class="h-56 w-full my-auto">
+                                    <canvas id="chartAR"></canvas>
+                                </div>
+                                <div class="flex justify-between items-center text-[11px] text-slate-400 border-t border-slate-100 pt-2">
+                                    <span>Макс: <strong class="text-red-600 font-bold">3079% (1989)</strong></span>
+                                    <span class="text-neoncyan font-bold text-[10px] flex items-center gap-1">
+                                        <i data-lucide="rotate-cw" class="w-3 h-3"></i> <span id="flip-hint-6">Нажми для разбора</span>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flip-card-back bg-slate-900 text-slate-100 p-6 border border-cardborder flex flex-col justify-between shadow-2xl">
+                                <div>
+                                    <h4 class="font-bold text-neoncyan text-sm mb-3 flex items-center gap-2">
+                                        <i data-lucide="info"></i> <span id="c6-back-t">Экономический разбор: Аргентина</span>
+                                    </h4>
+                                    <div class="text-xs space-y-2 text-slate-300 leading-relaxed overflow-y-auto max-h-[300px] pr-1" id="c6-back-b">
+                                        <p>• <strong>1989–1990:</strong> Гиперинфляция превысила 3000% в год из-за печатания денег для покрытия госдолга.</p>
+                                        <p>• <strong>1991–2001:</strong> План привязки песо к доллару (1:1) временно остановил инфляцию, но закончился дефолтом 2001 г.</p>
+                                        <p>• <strong>2023–2024:</strong> Новая волна инфляции превысила 200% в год.</p>
+                                        <p>• <strong>2025–2026:</strong> Шоковая терапия Хавьера Милея привела к резкому снижению инфляции.</p>
+                                    </div>
+                                </div>
+                                <div class="text-[10px] text-slate-400 border-t border-slate-800 pt-2 text-center" id="back-flip-txt-6">
+                                    Нажмите, чтобы вернуться к графику
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: HYPERINFLATION CASES ==================== -->
+        <section id="tab-content-hyper" class="tab-content hidden space-y-8">
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-6 shadow-xl space-y-8">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2" id="t3-title">
+                        <i data-lucide="flame" class="text-neonred"></i>
+                        Величайшие катастрофы гиперинфляции в истории
+                    </h2>
+                    <p class="text-xs text-slate-300 mt-1" id="t3-sub">
+                        Подробный разбор кейсов Веймарской Германии (1923) и Зимбабве (2008).
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    <!-- Germany Case -->
+                    <div class="bg-darkbg border border-neonamber/30 rounded-2xl p-6 space-y-4 flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3 border-b border-cardborder pb-3">
+                                <span class="text-3xl">🇩🇪</span>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white" id="g-title">Веймарская Германия (1923)</h3>
+                                    <p class="text-xs text-neonamber font-mono" id="g-sub">Пиковая инфляция: 29 500% в месяц (цены удваивались каждые 3.7 дня)</p>
+                                </div>
+                            </div>
+                            <div class="space-y-3 text-xs text-slate-200 leading-relaxed">
+                                <p id="g-p1">
+                                    <strong>Причины:</strong> Огромные репарации после Первой мировой войны и оккупация Рурского региона французскими войсками. Правительство Германии решило выплачивать пособия бастующим рабочим с помощью неуправляемой эмиссии марки.
+                                </p>
+                                <p id="g-p2">
+                                    <strong>Интересные факты:</strong>
+                                </p>
+                                <ul class="list-disc list-inside space-y-1 text-slate-300 pl-2 font-mono text-[11px]" id="g-facts">
+                                    <li>Буханка хлеба в Берлине в ноябре 1923 года стоила 428 миллиардов марок.</li>
+                                    <li>Деньги были дешевле дров: ими топили печи и оклеивали стены вместо обоев.</li>
+                                    <li>Рабочим платили зарплату 2 раза в день и давали перерывы, чтобы сразу потратить деньги до их обесценения.</li>
+                                </ul>
+                                <p id="g-p3" class="pt-2 border-t border-cardborder">
+                                    <strong>Как остановили:</strong> В ноябре 1923 года была проведена реформа — введена <em>Rentenmark</em> (рентная марка), обеспеченная землей и промышленной недвижимостью, по курсу 1 трлн старых марок за 1 новую.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Germany White Chart Card -->
+                        <div class="bg-white rounded-xl p-4 shadow-xl border border-slate-200 text-slate-900 space-y-2 mt-4">
+                            <div class="flex justify-between items-center text-xs border-b border-slate-100 pb-1">
+                                <span class="font-bold text-slate-800" id="g-chart-t">Динамика инфляции и стабилизация (1919–1924)</span>
+                                <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">Rentenmark (1923)</span>
+                            </div>
+                            <div class="h-44 w-full">
+                                <canvas id="chartGermanyHyper"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Zimbabwe Case -->
+                    <div class="bg-darkbg border border-neonred/30 rounded-2xl p-6 space-y-4 flex flex-col justify-between">
+                        <div class="space-y-4">
+                            <div class="flex items-center gap-3 border-b border-cardborder pb-3">
+                                <span class="text-3xl">🇿🇼</span>
+                                <div>
+                                    <h3 class="text-lg font-bold text-white" id="z-title">Зимбабве (2008)</h3>
+                                    <p class="text-xs text-neonred font-mono" id="z-sub">Пиковая инфляция: 79.6 миллиардов % в месяц (ноябрь 2008)</p>
+                                </div>
+                            </div>
+                            <div class="space-y-3 text-xs text-slate-200 leading-relaxed">
+                                <p id="z-p1">
+                                    <strong>Причины:</strong> Разрушительная земельная реформа 2000-х годов привела к падению сельхозпроизводства. Резервный банк Зимбабве начал ничем не обеспеченную печать денег для покрытия дефицита бюджета и армии.
+                                </p>
+                                <p id="z-p2">
+                                    <strong>Интересные факты:</strong>
+                                </p>
+                                <ul class="list-disc list-inside space-y-1 text-slate-300 pl-2 font-mono text-[11px]" id="z-facts">
+                                    <li>Была отпечатана банкнота номиналом 100 ТРИЛЛИОНОВ зимбабвийских долларов (100,000,000,000,000 ZWD).</li>
+                                    <li>Цены в магазинах менялись несколько раз в час. Рулон туалетной бумаги стоил дороже, чем купюра, из которой он сделан.</li>
+                                    <li>Автобусный билет покупали утром, потому что к вечеру он стоил в 2 раза дороже.</li>
+                                </ul>
+                                <p id="z-p3" class="pt-2 border-t border-cardborder">
+                                    <strong>Как остановили:</strong> В начале 2009 года правительство полностью отказалось от национальной валюты и официально перешло на расчеты в долларах США и южноафриканских рандах (долларизация).
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Zimbabwe White Chart Card -->
+                        <div class="bg-white rounded-xl p-4 shadow-xl border border-slate-200 text-slate-900 space-y-2 mt-4">
+                            <div class="flex justify-between items-center text-xs border-b border-slate-100 pb-1">
+                                <span class="font-bold text-slate-800" id="z-chart-t">Взлет гиперинфляции и долларизация (2000–2009)</span>
+                                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded">USD Adopted (2009)</span>
+                            </div>
+                            <div class="h-44 w-full">
+                                <canvas id="chartZimbabweHyper"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-cardborder bg-cardbg/50 py-4 text-center text-xs text-slate-400 font-semibold">
+        <div class="max-w-7xl mx-auto px-4" id="footer-text">
+            AlmaU • School of Digital Technologies and Economics • Macroeconomics © 2026
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let currentLang = 'ru';
+
+        // High & Low Inflation Datasets (30 Countries each)
+        const inflationHighData = [
+            { c: "Венесуэла / Venezuela", v: 254.9 },
+            { c: "Аргентина / Argentina", v: 219.9 },
+            { c: "Судан / Sudan", v: 138.8 },
+            { c: "Зимбабве / Zimbabwe", v: 104.7 },
+            { c: "Южный Судан / South Sudan", v: 91.4 },
+            { c: "Иран / Iran", v: 42.2 },
+            { c: "Турция / Turkey", v: 34.9 },
+            { c: "Бурунди / Burundi", v: 34.1 },
+            { c: "Гаити / Haiti", v: 28.6 },
+            { c: "Малави / Malawi", v: 28.4 },
+            { c: "Нигерия / Nigeria", v: 24.1 },
+            { c: "Египет / Egypt", v: 22.3 },
+            { c: "Ангола / Angola", v: 19.8 },
+            { c: "Сьерра-Леоне / Sierra Leone", v: 18.5 },
+            { c: "Куба / Cuba", v: 16.9 },
+            { c: "Пакистан / Pakistan", v: 14.2 },
+            { c: "Замбия / Zambia", v: 13.5 },
+            { c: "Гана / Ghana", v: 12.8 },
+            { c: "Эфиопия / Ethiopia", v: 12.1 },
+            { c: "Лаос / Laos", v: 11.5 },
+            { c: "Казахстан / Kazakhstan", v: 9.2, highlighted: true },
+            { c: "Бангладеш / Bangladesh", v: 8.9 },
+            { c: "Мьянма / Myanmar", v: 8.5 },
+            { c: "Колумбия / Colombia", v: 6.8 },
+            { c: "Румыния / Romania", v: 5.9 },
+            { c: "Сербия / Serbia", v: 5.2 },
+            { c: "Украина / Ukraine", v: 5.1 },
+            { c: "Россия / Russia", v: 5.0 },
+            { c: "Бразилия / Brazil", v: 4.5 },
+            { c: "Мексика / Mexico", v: 4.2 }
+        ];
+
+        const inflationLowData = [
+            { c: "Афганистан / Afghanistan", v: -6.6 },
+            { c: "Китай / China", v: 0.8 },
+            { c: "Таиланд / Thailand", v: 1.1 },
+            { c: "Швейцария / Switzerland", v: 1.2 },
+            { c: "Бруней / Brunei", v: 1.3 },
+            { c: "Коста-Рика / Costa Rica", v: 1.4 },
+            { c: "Панама / Panama", v: 1.5 },
+            { c: "Сингапур / Singapore", v: 1.6 },
+            { c: "Италия / Italy", v: 1.7 },
+            { c: "Япония / Japan", v: 1.8 },
+            { c: "Франция / France", v: 1.9 },
+            { c: "Германия / Germany", v: 2.0 },
+            { c: "Южная Корея / S. Korea", v: 2.0 },
+            { c: "Дания / Denmark", v: 2.1 },
+            { c: "Финляндия / Finland", v: 2.1 },
+            { c: "Канада / Canada", v: 2.2 },
+            { c: "Нидерланды / Netherlands", v: 2.2 },
+            { c: "Португалия / Portugal", v: 2.3 },
+            { c: "Испания / Spain", v: 2.3 },
+            { c: "Швеция / Sweden", v: 2.4 },
+            { c: "США / USA", v: 2.5 },
+            { c: "Великобритания / UK", v: 2.5 },
+            { c: "Австралия / Australia", v: 2.6 },
+            { c: "Новая Зеландия / N. Zealand", v: 2.6 },
+            { c: "Норвегия / Norway", v: 2.7 },
+            { c: "Индонезия / Indonesia", v: 2.8 },
+            { c: "Малайзия / Malaysia", v: 2.8 },
+            { c: "Филиппины / Philippines", v: 2.9 },
+            { c: "Индия / India", v: 3.1 },
+            { c: "Вьетнам / Vietnam", v: 3.2 }
+        ];
+
+        // 3D Flip Handler
+        function toggleFlip(cardElement) {
+            cardElement.classList.toggle('flipped');
+        }
+
+        // Render Bar Charts
+        function renderRankingBars() {
+            const highContainer = document.getElementById('high-bar-container');
+            const lowContainer = document.getElementById('low-bar-container');
+
+            highContainer.innerHTML = '';
+            lowContainer.innerHTML = '';
+
+            const maxHigh = inflationHighData[0].v;
+
+            inflationHighData.forEach((item, idx) => {
+                const width = Math.max(8, (item.v / maxHigh) * 100);
+                const isKZ = item.highlighted;
+                
+                const opacity = Math.max(0.35, 1 - (idx * 0.025));
+
+                const row = document.createElement('div');
+                row.className = `flex items-center gap-2 ${isKZ ? 'bg-cyan-950/80 p-1.5 rounded-lg border border-neoncyan animate-pulse' : ''}`;
+                row.innerHTML = `
+                    <span class="w-5 text-right font-bold ${isKZ ? 'text-neoncyan' : 'text-slate-400'}">${idx + 1}.</span>
+                    <span class="w-44 truncate ${isKZ ? 'font-extrabold text-neoncyan' : 'text-slate-200'}">${item.c}</span>
+                    <div class="flex-grow bg-slate-900 h-4 rounded-full overflow-hidden border border-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" style="width: ${width}%; background-color: ${isKZ ? '#00f2fe' : `rgba(239, 68, 68, ${opacity})`};"></div>
+                    </div>
+                    <span class="w-16 text-right font-bold ${isKZ ? 'text-neoncyan font-mono text-sm' : 'text-neonred'}">${item.v}%</span>
+                `;
+                highContainer.appendChild(row);
+            });
+
+            inflationLowData.forEach((item, idx) => {
+                const width = item.v < 0 ? 10 : Math.max(5, (item.v / 4.0) * 100);
+                const opacity = Math.max(0.4, 1 - (idx * 0.02));
+
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-2';
+                row.innerHTML = `
+                    <span class="w-5 text-right font-bold text-slate-400">${idx + 1}.</span>
+                    <span class="w-44 truncate text-slate-200">${item.c}</span>
+                    <div class="flex-grow bg-slate-900 h-4 rounded-full overflow-hidden border border-slate-800">
+                        <div class="h-full rounded-full transition-all duration-500" style="width: ${width}%; background-color: rgba(16, 185, 129, ${opacity});"></div>
+                    </div>
+                    <span class="w-16 text-right font-bold text-neonemerald">${item.v}%</span>
+                `;
+                lowContainer.appendChild(row);
+            });
+        }
+
+        // Language Dictionary
+        const i18n = {
+            ru: {
+                mainTitle: "Анализ мировой инфляции",
+                subPrinciples: "Принципы экономики",
+                subSchool: "AlmaU | Школа цифровых технологий и экономики",
+                tabs: {
+                    ranking: "1. Глобальный рейтинг (2026)",
+                    history: "2. Исторические тренды (6 стран)",
+                    hyper: "3. История гиперинфляции"
+                },
+                t1Title: "Сравнение уровня инфляции по странам мира (2026)",
+                t1HighTitle: "Топ-30: Высокая инфляция (%)",
+                t1LowTitle: "Топ-30: Минимальная инфляция / Дефляция (%)",
+                t2Title: "Сравнительная история инфляции (6 ключевых экономик)",
+                t2Sub: "Нажмите на любую карточку для переворота (3D Flip) и чтения экономического анализа.",
+                t3Title: "Величайшие катастрофы гиперинфляции в истории",
+                t3Sub: "Подробный разбор кейсов Веймарской Германии (1923) и Зимбабве (2008).",
+                
+                // Cards Front
+                c1Title: "Казахстан (1991–2026)", c1Sub: "От гиперинфляции 90-х к таргетированию",
+                c2Title: "США (1970–2026)", c2Sub: "Нефтяные шоки 70-х и пандемия",
+                c3Title: "Великобритания (1970–2026)", c3Sub: "Стагфляция 70-х и энергетический кризис",
+                c4Title: "Еврозона (1970–2026)", c4Sub: "Стабильность Бундесбанка и шок 2022",
+                c5Title: "Япония (1970–2026)", c5Sub: "«Потерянные десятилетия» и дефляция",
+                c6Title: "Аргентина (1970–2026)", c6Sub: "Хроническая гиперинфляция и дефолты",
+
+                flipHint: "Нажми для разбора",
+                backFlipTxt: "Нажмите, чтобы вернуться к графику",
+
+                // Cards Back
+                c1BackT: "Экономический разбор: Казахстан",
+                c1BackB: "<p>• <strong>1991–1994:</strong> Распад СССР, либерализация цен и гиперинфляция. Пик в 1992 г. — 2960.8%.</p><p>• <strong>1995–1998:</strong> Введение тенге (1993) и жесткая монетарная политика снизили инфляцию до 7.1% в 1998 г.</p><p>• <strong>2015:</strong> Переход к свободно плавающему курсу тенге подскочил до 14.6% в 2016 г.</p><p>• <strong>2022–2023:</strong> Геополитические шоки и разрыв логистики подняли инфляцию до 15.0–14.5%.</p><p>• <strong>2026:</strong> Замедление до 9.2% на фоне жестких ставок Нацбанка РК.</p>",
+
+                c2BackT: "Экономический разбор: США",
+                c2BackB: "<p>• <strong>1973–1980:</strong> Великая инфляция. Нефтяное эмбарго ОПЕК и мягкая политика ФРС подбросили инфляцию до 13.5%.</p><p>• <strong>1981:</strong> Пол Волкер (глава ФРС) поднял ключевую ставку до 20%, вызвав рецессию, но победив инфляцию.</p><p>• <strong>2009:</strong> Великая рецессия принесла краткосрочную дефляцию (-0.4%).</p><p>• <strong>2021–2022:</strong> Стимулы в пандемию и сбои поставок дали пик 9.1% (июнь 2022).</p>",
+
+                c3BackT: "Экономический разбор: Великобритания",
+                c3BackB: "<p>• <strong>1975:</strong> Пик 24.2%. Рост цен на нефть и мощный рост зарплат под давлением профсоюзов.</p><p>• <strong>1980-е:</strong> Реформы Маргарет Тэтчер снизили инфляцию ценой высокой безработицы.</p><p>• <strong>1997:</strong> Банк Англии получил независимость с целью по инфляции 2%.</p><p>• <strong>2022:</strong> Пик 11.1% из-за взлета цен на газ в Европе.</p>",
+
+                c4BackT: "Экономический разбор: Еврозона",
+                c4BackB: "<p>• <strong>1970–1998:</strong> Данные Германии служат бенчмарком благодаря жесткой поддержке немецкой марки.</p><p>• <strong>1999:</strong> Создание ЕЦБ и введение евро. Период низкой инфляции (~2%).</p><p>• <strong>2015–2020:</strong> Угроза дефляции, ЕЦБ ввел отрицательные процентные ставки.</p><p>• <strong>2022:</strong> Рекорд инфляции в истории Еврозоны (10.6%) из-за энергокризиса.</p>",
+
+                c5BackT: "Экономический разбор: Япония",
+                c5BackB: "<p>• <strong>1974:</strong> Нефтяной шок подкинул инфляцию до 23.2%.</p><p>• <strong>1990–2020:</strong> Схлопывание финансового пузыря привело к 30 годам дефляции («потерянные десятилетия»).</p><p>• <strong>2023–2026:</strong> Возврат умеренной инфляции (2–3%) из-за удорожания импорта и ослабления иены.</p>",
+
+                c6BackT: "Экономический разбор: Аргентина",
+                c6BackB: "<p>• <strong>1989–1990:</strong> Гиперинфляция превысила 3000% в год из-за печатания денег для покрытия госдолга.</p><p>• <strong>1991–2001:</strong> Привязка песо к доллару временно остановила инфляцию, но закончилась дефолтом 2001 г.</p><p>• <strong>2023–2024:</strong> Новая волна инфляции превысила 200% в год.</p><p>• <strong>2025–2026:</strong> Шоковая терапия Хавьера Милея привела к резкому снижению инфляции.</p>",
+
+                // Hyperinflation
+                gTitle: "Веймарская Германия (1923)",
+                gSub: "Пиковая инфляция: 29 500% в месяц (цены удваивались каждые 3.7 дня)",
+                gP1: "<strong>Причины:</strong> Огромные репарации после Первой мировой войны и оккупация Рурского региона французскими войсками. Правительство Германии решило выплачивать пособия бастующим рабочим с помощью неуправляемой эмиссии марки.",
+                gP2: "<strong>Интересные факты:</strong>",
+                gFacts: "<li>Буханка хлеба в Берлине в ноябре 1923 года стоила 428 миллиардов марок.</li><li>Деньги были дешевле дров: ими топили печи и оклеивали стены вместо обоев.</li><li>Рабочим платили зарплату 2 раза в день и давали перерывы, чтобы сразу потратить деньги до их обесценения.</li>",
+                gP3: "<strong>Как остановили:</strong> В ноябре 1923 года была проведена реформа — введена <em>Rentenmark</em> (рентная марка), обеспеченная землей и промышленной недвижимостью, по курсу 1 трлн старых марок за 1 новую.",
+                gChartT: "Динамика инфляции и стабилизация (1919–1924)",
+
+                zTitle: "Зимбабве (2008)",
+                zSub: "Пиковая инфляция: 79.6 миллиардов % в месяц (ноябрь 2008)",
+                zP1: "<strong>Причины:</strong> Разрушительная земельная реформа 2000-х годов привела к падению сельхозпроизводства. Резервный банк Зимбабве начал ничем не обеспеченную печать денег для покрытия дефицита бюджета и армии.",
+                zP2: "<strong>Интересные факты:</strong>",
+                zFacts: "<li>Была отпечатана банкнота номиналом 100 ТРИЛЛИОНОВ зимбабвийских долларов (100,000,000,000,000 ZWD).</li><li>Цены в магазинах менялись несколько раз в час. Рулон туалетной бумаги стоил дороже, чем купюра, из которой он сделан.</li><li>Автобусный билет покупали утром, потому что к вечеру он стоил в 2 раза дороже.</li>",
+                zP3: "<strong>Как остановили:</strong> В начале 2009 года правительство полностью отказалось от национальной валюты и официально перешло на расчеты в долларах США и южноафриканских рандах (долларизация).",
+                zChartT: "Взлет гиперинфляции и долларизация (2000–2009)",
+
+                footer: "AlmaU • School of Digital Technologies and Economics • Macroeconomics © 2026"
+            },
+            en: {
+                mainTitle: "Global Inflation Analysis",
+                subPrinciples: "Principles of Economics",
+                subSchool: "AlmaU | School of Digital Technologies and Economics",
+                tabs: {
+                    ranking: "1. Global Ranking (2026)",
+                    history: "2. Historical Trends (6 Countries)",
+                    hyper: "3. Hyperinflation Cases"
+                },
+                t1Title: "Global Inflation Rate Comparison by Country (2026)",
+                t1HighTitle: "Top-30: Highest Inflation (%)",
+                t1LowTitle: "Top-30: Lowest Inflation / Deflation (%)",
+                t2Title: "Comparative Inflation History (6 Key Economies)",
+                t2Sub: "Click on any card to flip (3D Flip) and read detailed economic milestone analysis.",
+                t3Title: "Greatest Hyperinflation Disasters in History",
+                t3Sub: "Detailed case studies of Weimar Germany (1923) and Zimbabwe (2008).",
+                
+                // Cards Front
+                c1Title: "Kazakhstan (1991–2026)", c1Sub: "From 90s hyperinflation to targeting",
+                c2Title: "USA (1970–2026)", c2Sub: "70s Oil shocks and pandemic spike",
+                c3Title: "United Kingdom (1970–2026)", c3Sub: "70s stagflation and energy crisis",
+                c4Title: "Euro Area (1970–2026)", c4Sub: "Bundesbank stability and 2022 shock",
+                c5Title: "Japan (1970–2026)", c5Sub: "'Lost Decades' and chronic deflation",
+                c6Title: "Argentina (1970–2026)", c6Sub: "Chronic hyperinflation and defaults",
+
+                flipHint: "Click to analyze",
+                backFlipTxt: "Click to flip back to chart",
+
+                // Cards Back
+                c1BackT: "Economic Analysis: Kazakhstan",
+                c1BackB: "<p>• <strong>1991–1994:</strong> USSR collapse, price liberalization & hyperinflation. Peak in 1992 — 2960.8%.</p><p>• <strong>1995–1998:</strong> Tenge introduction (1993) & tight monetary policy stabilized inflation to 7.1% by 1998.</p><p>• <strong>2015:</strong> Transition to floating rate caused 14.6% spike in 2016.</p><p>• <strong>2022–2023:</strong> Geopolitical shocks & supply chain shifts pushed inflation to 15.0–14.5%.</p><p>• <strong>2026:</strong> Slowdown to 9.2% due to National Bank tight monetary stance.</p>",
+
+                c2BackT: "Economic Analysis: USA",
+                c2BackB: "<p>• <strong>1973–1980:</strong> Great Inflation. OPEC oil embargo & loose Fed policy pushed inflation to 13.5%.</p><p>• <strong>1981:</strong> Paul Volcker raised rates to 20%, triggering recession but taming inflation.</p><p>• <strong>2009:</strong> Great Recession caused brief deflation (-0.4%).</p><p>• <strong>2021–2022:</strong> Pandemic stimulus & supply bottlenecks caused 9.1% peak (June 2022).</p>",
+
+                c3BackT: "Economic Analysis: United Kingdom",
+                c3BackB: "<p>• <strong>1975:</strong> Peak at 24.2%. Oil shock & aggressive wage demands by trade unions.</p><p>• <strong>1980s:</strong> Margaret Thatcher's reforms curbed inflation at high unemployment cost.</p><p>• <strong>1997:</strong> Bank of England gained independence with 2% target.</p><p>• <strong>2022:</strong> Peak 11.1% driven by European natural gas shock.</p>",
+
+                c4BackT: "Economic Analysis: Euro Area",
+                c4BackB: "<p>• <strong>1970–1998:</strong> German Bundesbank data serves as benchmark due to strong Deutsche Mark.</p><p>• <strong>1999:</strong> ECB creation & Euro introduction. Era of low inflation (~2%).</p><p>• <strong>2015–2020:</strong> Deflation risk led ECB to negative interest rates.</p><p>• <strong>2022:</strong> All-time high Eurozone inflation (10.6%) due to energy crisis.</p>",
+
+                c5BackT: "Economic Analysis: Japan",
+                c5BackB: "<p>• <strong>1974:</strong> Oil shock spiked inflation to 23.2%.</p><p>• <strong>1990–2020:</strong> Asset bubble collapse led to 30 years of stagnation & deflation ('Lost Decades').</p><p>• <strong>2023–2026:</strong> Return of moderate inflation (2–3%) driven by import costs & weak Yen.</p>",
+
+                c6BackT: "Economic Analysis: Argentina",
+                c6BackB: "<p>• <strong>1989–1990:</strong> Hyperinflation exceeded 3000% annually due to money printing for debt.</p><p>• <strong>1991–2001:</strong> Peso-Dollar peg (1:1) temporarily stopped inflation, ending in 2001 default.</p><p>• <strong>2023–2024:</strong> New hyperinflation wave exceeded 200% per year.</p><p>• <strong>2025–2026:</strong> Javier Milei's shock therapy led to sharp disinflation.</p>",
+
+                // Hyperinflation
+                gTitle: "Weimar Germany (1923)",
+                gSub: "Peak Inflation: 29,500% per month (prices doubled every 3.7 days)",
+                gP1: "<strong>Causes:</strong> Massive WWI reparations and French occupation of the Ruhr region. The German government printed money to pay striking workers.",
+                gP2: "<strong>Key Facts:</strong>",
+                gFacts: "<li>A loaf of bread in Berlin cost 428 billion marks in November 1923.</li><li>Money was cheaper than firewood; people burned cash in stoves or used it as wallpaper.</li><li>Workers were paid twice daily and given breaks to spend cash before it devalued.</li>",
+                gP3: "<strong>How It Ended:</strong> In November 1923, the <em>Rentenmark</em> was introduced, backed by land/industrial assets, at a rate of 1 trillion old marks to 1 new mark.",
+                gChartT: "Inflation Dynamics & Stabilization (1919–1924)",
+
+                zTitle: "Zimbabwe (2008)",
+                zSub: "Peak Inflation: 79.6 Billion % per month (November 2008)",
+                zP1: "<strong>Causes:</strong> Destructive land reforms in 2000s caused agricultural collapse. Reserve Bank printed money rapidly to fund government and military deficits.",
+                zP2: "<strong>Key Facts:</strong>",
+                zFacts: "<li>A 100 TRILLION Zimbabwean dollar banknote was printed (100,000,000,000,000 ZWD).</li><li>Store prices changed multiple times an hour. Toilet paper cost more than the bill itself.</li><li>Bus tickets were bought in the morning because evening prices doubled.</li>",
+                zP3: "<strong>How It Ended:</strong> In early 2009, the government abandoned its currency and officially dollarized (using US Dollars and SA Rand).",
+                zChartT: "Hyperinflation Surge & Dollarization (2000–2009)",
+
+                footer: "AlmaU • School of Digital Technologies and Economics • Macroeconomics © 2026"
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const t = i18n[lang];
+
+            document.getElementById('lang-ru-btn').className = lang === 'ru' 
+                ? "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-neoncyan text-black shadow-lg"
+                : "px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all duration-200";
+            document.getElementById('lang-en-btn').className = lang === 'en' 
+                ? "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-neoncyan text-black shadow-lg"
+                : "px-4 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white transition-all duration-200";
+
+            document.getElementById('main-title').innerText = t.mainTitle;
+            document.getElementById('sub-principles').innerText = t.subPrinciples;
+            document.getElementById('sub-school').innerText = t.subSchool;
+
+            document.getElementById('tab-label-ranking').innerText = t.tabs.ranking;
+            document.getElementById('tab-label-history').innerText = t.tabs.history;
+            document.getElementById('tab-label-hyper').innerText = t.tabs.hyper;
+
+            document.getElementById('t1-title').childNodes[2].nodeValue = " " + t.t1Title;
+            document.getElementById('t1-high-title').childNodes[2].nodeValue = " " + t.t1HighTitle;
+            document.getElementById('t1-low-title').childNodes[2].nodeValue = " " + t.t1LowTitle;
+
+            document.getElementById('t2-title').childNodes[2].nodeValue = " " + t.t2Title;
+            document.getElementById('t2-sub').innerText = t.t2Sub;
+
+            document.getElementById('t3-title').childNodes[2].nodeValue = " " + t.t3Title;
+            document.getElementById('t3-sub').innerText = t.t3Sub;
+
+            // Card Fronts
+            document.getElementById('c1-title').innerText = t.c1Title; document.getElementById('c1-sub').innerText = t.c1Sub;
+            document.getElementById('c2-title').innerText = t.c2Title; document.getElementById('c2-sub').innerText = t.c2Sub;
+            document.getElementById('c3-title').innerText = t.c3Title; document.getElementById('c3-sub').innerText = t.c3Sub;
+            document.getElementById('c4-title').innerText = t.c4Title; document.getElementById('c4-sub').innerText = t.c4Sub;
+            document.getElementById('c5-title').innerText = t.c5Title; document.getElementById('c5-sub').innerText = t.c5Sub;
+            document.getElementById('c6-title').innerText = t.c6Title; document.getElementById('c6-sub').innerText = t.c6Sub;
+
+            for(let i=1; i<=6; i++) {
+                document.getElementById(`flip-hint-${i}`).innerText = t.flipHint;
+                document.getElementById(`back-flip-txt-${i}`).innerText = t.backFlipTxt;
+            }
+
+            // Card Backs
+            document.getElementById('c1-back-t').innerText = t.c1BackT; document.getElementById('c1-back-b').innerHTML = t.c1BackB;
+            document.getElementById('c2-back-t').innerText = t.c2BackT; document.getElementById('c2-back-b').innerHTML = t.c2BackB;
+            document.getElementById('c3-back-t').innerText = t.c3BackT; document.getElementById('c3-back-b').innerHTML = t.c3BackB;
+            document.getElementById('c4-back-t').innerText = t.c4BackT; document.getElementById('c4-back-b').innerHTML = t.c4BackB;
+            document.getElementById('c5-back-t').innerText = t.c5BackT; document.getElementById('c5-back-b').innerHTML = t.c5BackB;
+            document.getElementById('c6-back-t').innerText = t.c6BackT; document.getElementById('c6-back-b').innerHTML = t.c6BackB;
+
+            // Hyperinflation
+            document.getElementById('g-title').innerText = t.gTitle; document.getElementById('g-sub').innerText = t.gSub;
+            document.getElementById('g-p1').innerHTML = t.gP1; document.getElementById('g-p2').innerHTML = t.gP2;
+            document.getElementById('g-facts').innerHTML = t.gFacts; document.getElementById('g-p3').innerHTML = t.gP3;
+            document.getElementById('g-chart-t').innerText = t.gChartT;
+
+            document.getElementById('z-title').innerText = t.zTitle; document.getElementById('z-sub').innerText = t.zSub;
+            document.getElementById('z-p1').innerHTML = t.zP1; document.getElementById('z-p2').innerHTML = t.zP2;
+            document.getElementById('z-facts').innerHTML = t.zFacts; document.getElementById('z-p3').innerHTML = t.zP3;
+            document.getElementById('z-chart-t').innerText = t.zChartT;
+
+            document.getElementById('footer-text').innerText = t.footer;
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-neoncyan', 'text-neoncyan', 'bg-neoncyan/10');
+                el.classList.add('border-slate-700', 'text-slate-400', 'bg-darkbg/50');
+            });
+
+            document.getElementById(`tab-content-${tabId}`).classList.remove('hidden');
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.classList.remove('border-slate-700', 'text-slate-400', 'bg-darkbg/50');
+            activeBtn.classList.add('border-neoncyan', 'text-neoncyan', 'bg-neoncyan/10');
+        }
+
+        // Charts Initialization (6 Economies + 2 Hyperinflation Charts)
+        function initCharts() {
+            const chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } },
+                    y: { grid: { color: '#f1f5f9' }, ticks: { color: '#64748b', font: { size: 9 } } }
+                }
+            };
+
+            // 1. Kazakhstan (1991–2026)
+            const kzYears = ['91', '92', '93', '94', '95', '96', '97', '98', '99', '00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26'];
+            const kzData = [105, 2960.8, 1662.3, 1402.0, 176.4, 39.2, 17.4, 7.1, 8.3, 13.2, 8.4, 6.0, 6.4, 7.0, 7.4, 8.6, 10.8, 17.2, 7.3, 7.1, 8.4, 5.1, 5.8, 6.6, 6.8, 14.6, 7.5, 6.0, 5.3, 6.8, 8.0, 15.0, 14.5, 8.7, 11.4, 9.2];
+
+            new Chart(document.getElementById('chartKZ').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: kzYears,
+                    datasets: [{
+                        data: kzData,
+                        borderColor: '#0284c7',
+                        backgroundColor: 'rgba(2, 132, 199, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.2,
+                        pointRadius: 1.5
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // 2. USA (1970–2026)
+            const usYears = ['70', '74', '79', '80', '85', '90', '95', '00', '08', '09', '15', '20', '22', '26'];
+            const usData = [5.7, 11.0, 11.3, 13.5, 3.6, 5.4, 2.8, 3.4, 3.8, -0.4, 0.1, 1.2, 8.0, 2.5];
+
+            new Chart(document.getElementById('chartUS').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: usYears,
+                    datasets: [{
+                        data: usData,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // 3. UK (1970–2026)
+            const ukYears = ['70', '75', '80', '85', '90', '95', '00', '08', '15', '22', '26'];
+            const ukData = [6.4, 24.2, 18.0, 6.1, 9.5, 3.4, 1.2, 3.6, 0.0, 9.1, 2.5];
+
+            new Chart(document.getElementById('chartUK').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ukYears,
+                    datasets: [{
+                        data: ukData,
+                        borderColor: '#9333ea',
+                        backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // 4. Eurozone / Germany (1970–2026)
+            const euYears = ['70', '73', '81', '90', '99', '08', '15', '22', '26'];
+            const euData = [3.4, 7.1, 6.3, 2.7, 1.1, 3.3, 0.2, 8.4, 2.0];
+
+            new Chart(document.getElementById('chartEU').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: euYears,
+                    datasets: [{
+                        data: euData,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // 5. Japan (1970–2026)
+            const jpYears = ['70', '74', '80', '90', '98', '09', '15', '22', '26'];
+            const jpData = [7.7, 23.2, 7.8, 3.1, -0.6, -1.3, 0.8, 2.5, 1.8];
+
+            new Chart(document.getElementById('chartJP').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: jpYears,
+                    datasets: [{
+                        data: jpData,
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // 6. Argentina (1970–2026)
+            const arYears = ['75', '85', '89', '95', '01', '15', '20', '23', '26'];
+            const arData = [183, 672, 3079, 3.4, -1.1, 26.5, 42.0, 211.4, 32.5];
+
+            new Chart(document.getElementById('chartAR').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: arYears,
+                    datasets: [{
+                        data: arData,
+                        borderColor: '#d97706',
+                        backgroundColor: 'rgba(217, 119, 6, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2
+                    }]
+                },
+                options: chartOptions
+            });
+
+            // HYPERINFLATION CHART 1: Germany (1919 - 1924)
+            new Chart(document.getElementById('chartGermanyHyper').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['1919', '1920', '1921', '1922', 'Нояб 1923 (Пик)', '1924 (Реформа)'],
+                    datasets: [{
+                        label: 'Индекс цен (Ноябрь 1923 = 100 млрд)',
+                        data: [1, 10, 35, 1500, 100000000, 1.8],
+                        borderColor: '#d97706',
+                        backgroundColor: 'rgba(217, 119, 6, 0.15)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.2,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#d97706'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#475569', font: { size: 9, weight: 'bold' } } },
+                        y: { type: 'logarithmic', grid: { color: '#f1f5f9' }, ticks: { color: '#64748b', font: { size: 8 } } }
+                    }
+                }
+            });
+
+            // HYPERINFLATION CHART 2: Zimbabwe (2000 - 2009)
+            new Chart(document.getElementById('chartZimbabweHyper').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: ['2000', '2004', '2006', '2007', 'Нояб 2008 (Пик)', '2009 (USD)'],
+                    datasets: [{
+                        label: 'Инфляция в месяц (%)',
+                        data: [55, 350, 1000, 24000, 79600000000, 0.0],
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.15)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.2,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#ef4444'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#475569', font: { size: 9, weight: 'bold' } } },
+                        y: { type: 'logarithmic', grid: { color: '#f1f5f9' }, ticks: { color: '#64748b', font: { size: 8 } } }
+                    }
+                }
+            });
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            renderRankingBars();
+            initCharts();
+        };
+    </script>
+</body>
+</html>
