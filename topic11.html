@@ -62,7 +62,7 @@
         header {
             text-align: center;
             margin-top: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         h1 {
@@ -90,8 +90,8 @@
             width: 100%;
             justify-content: center;
             align-items: center;
-            margin: 10px 0;
-            padding: 20px 0 30px 0;
+            margin: auto 0;
+            padding: 20px 0 40px 0;
         }
 
         /* Размеры обычной карточки (185x300px) */
@@ -237,114 +237,11 @@
             box-shadow: 0 0 12px rgba(245, 158, 11, 0.9);
         }
 
-        /* ======================================================== */
-        /* ГАЛЕРЕЯ ИСТОРИЧЕСКИХ АРТЕФАКТОВ ГИПЕРИНФЛЯЦИИ            */
-        /* ======================================================== */
-        .gallery-section {
-            width: 100%;
-            max-width: 1200px;
-            margin-top: 10px;
-            margin-bottom: 25px;
-            padding-top: 25px;
-            border-top: 1px solid #e2e8f0;
-            text-align: center;
-        }
-
-        .gallery-title {
-            font-size: 18px;
-            font-weight: 700;
-            color: #001e50;
-            margin-bottom: 6px;
-        }
-
-        .gallery-subtitle {
-            font-size: 13.5px;
-            color: #64748b;
-            margin-bottom: 18px;
-        }
-
-        .artifacts-grid {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 18px;
-        }
-
-        .artifact-card {
-            width: 265px;
-            background: #ffffff;
-            border: 2px solid #001e50;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 4px 12px rgba(0, 30, 80, 0.08);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: zoom-in;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .artifact-card:hover {
-            transform: translateY(-7px) scale(1.03);
-            border: 3px solid #78350f;
-            box-shadow: 0 12px 26px rgba(180, 83, 9, 0.35), 0 0 12px rgba(245, 158, 11, 0.45);
-        }
-
-        .artifact-card img {
-            width: 100%;
-            height: 165px;
-            object-fit: cover;
-            display: block;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .artifact-caption {
-            padding: 9px 10px;
-            font-size: 12.5px;
-            font-weight: 600;
-            color: #001e50;
-            background: #f8fafc;
-        }
-
-        /* Модальное окно (Лайтбокс) для увеличения фото */
-        .lightbox {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            inset: 0;
-            background-color: rgba(0, 15, 40, 0.88);
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            padding: 20px;
-            cursor: zoom-out;
-        }
-
-        .lightbox.active {
-            display: flex;
-        }
-
-        .lightbox img {
-            max-width: 92%;
-            max-height: 80vh;
-            border: 3px solid #f59e0b;
-            border-radius: 8px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-            background: #fff;
-        }
-
-        .lightbox-caption {
-            color: #ffffff;
-            font-size: 15px;
-            font-weight: 600;
-            margin-top: 14px;
-            text-align: center;
-        }
-
         footer {
             margin-top: auto;
             font-size: 14px;
             color: #718096;
-            padding-top: 25px;
+            padding-top: 30px;
             padding-bottom: 20px;
             text-align: center;
             line-height: 1.6;
@@ -381,7 +278,7 @@
 
             header {
                 margin-top: 5px;
-                margin-bottom: 10px;
+                margin-bottom: 15px;
             }
 
             h1 {
@@ -393,7 +290,7 @@
             }
 
             .grid-container {
-                margin: 5px 0;
+                margin: 10px 0;
                 padding-bottom: 20px;
                 gap: 14px;
             }
@@ -416,20 +313,6 @@
             .doc-btn {
                 font-size: 9px;
                 padding: 6px 4px;
-            }
-
-            .artifact-card {
-                width: 46%;
-                min-width: 150px;
-            }
-
-            .artifact-card img {
-                height: 115px;
-            }
-
-            .artifact-caption {
-                font-size: 11px;
-                padding: 7px 6px;
             }
         }
     </style>
@@ -502,21 +385,10 @@
 
     </main>
 
-    <!-- Исторические иллюстрации гиперинфляции -->
-    <section class="gallery-section">
-        <h2 class="gallery-title">Исторические кейсы гиперинфляции</h2>
-        <p class="gallery-subtitle">Нажмите на иллюстрацию, чтобы увеличить и рассмотреть детали</p>
-        
-        <div class="artifacts-grid">
-            <div class="artifact-card" onclick="openLightbox('hiper-ger1.jpg', 'Веймарская республика (Германия, 1923) — обесценивание рейхсмарки')">
-                <img src="hiper-ger1.jpg" alt="Гиперинфляция в Германии 1" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/hiper-ger1.jpg'">
-                <div class="artifact-caption">Германия (1923) — Кейс 1</div>
-            </div>
+    <footer>
+        <p>Разработано для студентов IT-направлений (SE, DS, IS, PM) AlmaU 2026 | Курс: Экономика</p>
+        <p>© Almaty Management University | Школа цифровых технологий и экономики</p>
+    </footer>
 
-            <div class="artifact-card" onclick="openLightbox('hiper-ger2.jpg', 'Веймарская республика (Германия, 1923) — гиперинфляция в быту')">
-                <img src="hiper-ger2.jpg" alt="Гиперинфляция в Германии 2" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/hiper-ger2.jpg'">
-                <div class="artifact-caption">Германия (1923) — Кейс 2</div>
-            </div>
-
-            <div class="artifact-card" onclick="openLightbox('hiper-zim1.jpg', 'Зимбабве (2008) — банкноты сверхвысоких номиналов')">
-                <img src="hiper-zim1.jpg" alt="Гиперинфляция в Зимбабве 1" onerror="this.
+</body>
+</html>
