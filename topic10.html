@@ -23,25 +23,22 @@
             position: relative;
         }
 
-        /* Навигационная панель */
-        .top-nav {
-            width: 100%;
-            max-width: 1450px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 25px;
-            margin-bottom: -10px;
+        /* Логотип прижат в левый верхний угол экрана */
+        .top-left-logo {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 58px;
+            height: 58px;
+            object-fit: contain;
             z-index: 10;
         }
 
-        .top-left-logo {
-            width: 55px;
-            height: 55px;
-            object-fit: contain;
-        }
-
+        /* Кнопка возврата прижата в правый верхний угол экрана */
         .back-button {
+            position: absolute;
+            top: 22px;
+            right: 20px;
             text-decoration: none;
             background-color: #001e50;
             color: white;
@@ -51,6 +48,7 @@
             font-size: 14px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
+            z-index: 10;
         }
 
         .back-button:hover {
@@ -63,6 +61,7 @@
             text-align: center;
             margin-top: 15px;
             margin-bottom: 25px;
+            padding: 0 180px;
         }
 
         h1 {
@@ -70,7 +69,6 @@
             font-weight: 700;
             color: #001e50;
             margin-bottom: 8px;
-            margin-top: 10px;
         }
 
         .subtitle {
@@ -130,13 +128,14 @@
         }
 
         /* ======================================================== */
-        /* 3D FLIP CARD СТИЛИ ДЛЯ ЧТЕНИЯ C ДВУМЯ ДОКУМЕНТАМИ */
+        /* 3D FLIP CARD СТИЛИ ДЛЯ ЧТЕНИЯ С ДВУМЯ ДОКУМЕНТАМИ */
         /* ======================================================== */
         .flip-card {
             width: 185px;
             height: 300px;
             perspective: 1000px;
             flex-shrink: 0;
+            cursor: pointer;
         }
 
         .flip-card-inner {
@@ -152,7 +151,8 @@
             background: #001e50;
         }
 
-        .flip-card:hover .flip-card-inner {
+        .flip-card:hover .flip-card-inner,
+        .flip-card.flipped .flip-card-inner {
             transform: rotateY(180deg);
             border: 3px solid #f59e0b;
             box-shadow: 0 14px 30px rgba(245, 158, 11, 0.35), inset 0 0 12px rgba(245, 158, 11, 0.15);
@@ -193,6 +193,12 @@
             padding: 16px 10px;
             gap: 12px;
             z-index: 1;
+            pointer-events: none;
+        }
+
+        .flip-card:hover .flip-card-back,
+        .flip-card.flipped .flip-card-back {
+            pointer-events: auto;
         }
 
         .flip-card-back h3 {
@@ -246,7 +252,7 @@
             line-height: 1.6;
         }
 
-        /* Мобильная адаптация */
+        /* Адаптивность для планшетов и средних экранов */
         @media (max-width: 1250px) {
             .grid-container {
                 flex-wrap: wrap;
@@ -254,29 +260,32 @@
             }
         }
 
+        /* Адаптивность для смартфонов */
         @media (max-width: 768px) {
             body {
-                padding: 10px 15px;
-            }
-
-            .top-nav {
-                margin-top: 5px;
-                margin-bottom: 15px;
+                padding: 14px 12px;
             }
 
             .top-left-logo {
-                width: 48px;
-                height: 48px;
+                position: static;
+                display: block;
+                margin: 0 auto 10px auto;
+                width: 52px;
+                height: 52px;
             }
 
             .back-button {
-                padding: 7px 13px;
-                font-size: 12px;
+                position: static;
+                display: inline-block;
+                margin: 0 auto 16px auto;
+                padding: 8px 16px;
+                font-size: 13px;
             }
 
             header {
-                margin-top: 5px;
-                margin-bottom: 15px;
+                margin-top: 0;
+                margin-bottom: 20px;
+                padding: 0 8px;
             }
 
             h1 {
@@ -285,16 +294,27 @@
 
             .subtitle {
                 font-size: 13px;
+                line-height: 1.4;
             }
 
             .grid-container {
-                margin: 10px 0;
-                padding-bottom: 20px;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(140px, 165px));
+                justify-content: center;
+                gap: 14px;
+                margin: 8px 0;
+                padding: 10px 0 25px 0;
             }
 
             .card, .flip-card {
-                width: 155px;
-                height: 250px;
+                width: 100%;
+                height: auto;
+                aspect-ratio: 185 / 300;
+            }
+
+            .flip-card-back {
+                padding: 10px 6px;
+                gap: 8px;
             }
 
             .flip-card-back h3 {
@@ -305,16 +325,21 @@
                 font-size: 9.5px;
                 padding: 8px 4px;
             }
+
+            footer {
+                font-size: 12px;
+                padding-top: 20px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Навигация: Логотип и кнопка возврата -->
-    <div class="top-nav">
-        <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/almau.jpg'">
-        <a href="topics.html" class="back-button">← К темам курса</a>
-    </div>
+    <!-- Логотип AlmaU в левом верхнем углу экрана -->
+    <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/almau.jpg';">
+
+    <!-- Кнопка возврата в правом верхнем углу -->
+    <a href="topics.html" class="back-button">← К темам курса</a>
 
     <header>
         <h1>Тема 10: Совокупный спрос и совокупное предложение (AD-AS)</h1>
@@ -328,38 +353,38 @@
         
         <!-- 1. Конспект лекции -->
         <a href="sim-lecture10.html" class="card" title="Конспект лекции">
-            <img src="pic-lecture10-rus.png" alt="Конспект лекции" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-lecture10-rus.png'">
+            <img src="pic-lecture10-rus.png" alt="Конспект лекции" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-lecture10-rus.png';">
         </a>
 
         <!-- 2. Презентация Piktochart -->
         <a href="https://create.piktochart.com/output/06fcc4c94dbf-macroeconomics-2025part-2" target="_blank" rel="noopener noreferrer" class="card" title="Презентация">
-            <img src="pic-preza10-rus.png" alt="Презентация" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-preza10-rus.png'">
+            <img src="pic-preza10-rus.png" alt="Презентация" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-preza10-rus.png';">
         </a>
 
         <!-- 3. Симулятор MPC / Предельная склонность к потреблению -->
         <a href="sim-mpc-pi-lct-pe.html" class="card" title="Симулятор MPC">
-            <img src="pic-sim-mpc-rus.png" alt="Симулятор MPC" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-sim-mpc-rus.png'">
+            <img src="pic-sim-mpc-rus.png" alt="Симулятор MPC" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-sim-mpc-rus.png';">
         </a>
 
         <!-- 4. Симулятор Модели AD-AS -->
         <a href="sim-ad-as-pro.html" class="card" title="Симулятор AD-AS">
-            <img src="pic-sim-ad-as-rus.png" alt="Симулятор AD-AS" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-sim-ad-as-rus.png'">
+            <img src="pic-sim-ad-as-rus.png" alt="Симулятор AD-AS" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-sim-ad-as-rus.png';">
         </a>
 
         <!-- 5. 3D-Flip карточка для 2 документов Google Docs -->
-        <div class="flip-card">
+        <div class="flip-card" onclick="this.classList.toggle('flipped')">
             <div class="flip-card-inner">
                 <!-- Лицевая сторона -->
                 <div class="flip-card-front">
-                    <img src="pic-reading10-rus.png" alt="Материалы для чтения" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-reading10-rus.png'">
+                    <img src="pic-reading10-rus.png" alt="Материалы для чтения" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-reading10-rus.png';">
                 </div>
                 <!-- Обратная сторона с 2 кнопками -->
                 <div class="flip-card-back">
                     <h3>Материалы для чтения</h3>
-                    <a href="https://docs.google.com/document/d/1lpO1hm7Bbg7P14aTHbdyr_M3lxr-F3y_/edit?usp=sharing&ouid=109725301150629205728&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer" class="doc-btn">
+                    <a href="https://docs.google.com/document/d/1lpO1hm7Bbg7P14aTHbdyr_M3lxr-F3y_/edit?usp=sharing&ouid=109725301150629205728&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer" class="doc-btn" onclick="event.stopPropagation()">
                         📖 Документ 1 (Основной)
                     </a>
-                    <a href="https://docs.google.com/document/d/1OXU2wsKNVgGT2NT-kP9lQvtHAGn6QEjt/edit?usp=sharing&ouid=109725301150629205728&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer" class="doc-btn">
+                    <a href="https://docs.google.com/document/d/1OXU2wsKNVgGT2NT-kP9lQvtHAGn6QEjt/edit?usp=sharing&ouid=109725301150629205728&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer" class="doc-btn" onclick="event.stopPropagation()">
                         📖 Документ 2 (Дополнительный)
                     </a>
                 </div>
@@ -368,7 +393,7 @@
 
         <!-- 6. Видеолекция -->
         <a href="https://www.youtube.com/watch?v=rQFgfC4qktw" target="_blank" rel="noopener noreferrer" class="card" title="Видеолекция">
-            <img src="pic-video10-rus.png" alt="Видеолекция" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-video10-rus.png'">
+            <img src="pic-video10-rus.png" alt="Видеолекция" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-video10-rus.png';">
         </a>
 
     </main>
