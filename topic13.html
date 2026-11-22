@@ -23,25 +23,22 @@
             position: relative;
         }
 
-        /* Навигационная панель */
-        .top-nav {
-            width: 100%;
-            max-width: 1450px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 25px;
-            margin-bottom: -10px;
+        /* Логотип прижат в левый верхний угол экрана */
+        .top-left-logo {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 58px;
+            height: 58px;
+            object-fit: contain;
             z-index: 10;
         }
 
-        .top-left-logo {
-            width: 55px;
-            height: 55px;
-            object-fit: contain;
-        }
-
+        /* Кнопка возврата прижата в правый верхний угол экрана */
         .back-button {
+            position: absolute;
+            top: 22px;
+            right: 20px;
             text-decoration: none;
             background-color: #001e50;
             color: white;
@@ -51,6 +48,7 @@
             font-size: 14px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
+            z-index: 10;
         }
 
         .back-button:hover {
@@ -63,6 +61,7 @@
             text-align: center;
             margin-top: 15px;
             margin-bottom: 25px;
+            padding: 0 180px;
         }
 
         h1 {
@@ -70,7 +69,6 @@
             font-weight: 700;
             color: #001e50;
             margin-bottom: 8px;
-            margin-top: 10px;
         }
 
         .subtitle {
@@ -207,6 +205,12 @@
             padding: 16px 10px;
             gap: 12px;
             z-index: 1;
+            pointer-events: none;
+        }
+
+        .flip-card:hover .flip-card-back,
+        .flip-card.flipped .flip-card-back {
+            pointer-events: auto;
         }
 
         .flip-card-back h3 {
@@ -271,27 +275,29 @@
         /* Мобильная адаптация под смартфоны */
         @media (max-width: 768px) {
             body {
-                padding: 10px 15px;
-            }
-
-            .top-nav {
-                margin-top: 5px;
-                margin-bottom: 15px;
+                padding: 14px 12px;
             }
 
             .top-left-logo {
-                width: 48px;
-                height: 48px;
+                position: static;
+                display: block;
+                margin: 0 auto 10px auto;
+                width: 52px;
+                height: 52px;
             }
 
             .back-button {
-                padding: 7px 13px;
-                font-size: 12px;
+                position: static;
+                display: inline-block;
+                margin: 0 auto 16px auto;
+                padding: 8px 16px;
+                font-size: 13px;
             }
 
             header {
-                margin-top: 5px;
-                margin-bottom: 15px;
+                margin-top: 0;
+                margin-bottom: 20px;
+                padding: 0 8px;
             }
 
             h1 {
@@ -300,17 +306,32 @@
 
             .subtitle {
                 font-size: 13px;
+                line-height: 1.4;
             }
 
             .grid-container {
-                margin: 10px 0;
-                padding-bottom: 20px;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(140px, 165px));
+                justify-content: center;
                 gap: 14px;
+                margin: 8px 0;
+                padding: 10px 0 25px 0;
             }
 
             .card, .flip-card {
-                width: 155px;
-                height: 250px;
+                width: 100%;
+                height: auto;
+                aspect-ratio: 185 / 300;
+            }
+
+            .flip-card:hover .flip-card-inner,
+            .flip-card.flipped .flip-card-inner {
+                transform: rotateY(180deg);
+            }
+
+            .flip-card-back {
+                padding: 10px 6px;
+                gap: 8px;
             }
 
             .flip-card-back h3 {
@@ -321,16 +342,21 @@
                 font-size: 9.5px;
                 padding: 8px 4px;
             }
+
+            footer {
+                font-size: 12px;
+                padding-top: 20px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- Навигация: Логотип и кнопка возврата -->
-    <div class="top-nav">
-        <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/almau.jpg'">
-        <a href="topics.html" class="back-button">← К темам курса</a>
-    </div>
+    <!-- Логотип AlmaU в левом верхнем углу экрана -->
+    <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/almau.jpg';">
+
+    <!-- Кнопка возврата в правом верхнем углу -->
+    <a href="topics.html" class="back-button">← К темам курса</a>
 
     <header>
         <h1>Тема 13: Фискальная и монетарная политика</h1>
@@ -344,27 +370,27 @@
         
         <!-- 1. Конспект лекции -->
         <a href="lecture13.html" class="card" title="Конспект лекции 13">
-            <img src="pic-lecture13-rus.png" alt="Конспект лекции" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-lecture13-rus.png'">
+            <img src="pic-lecture13-rus.png" alt="Конспект лекции" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-lecture13-rus.png';">
         </a>
 
         <!-- 2. Презентация Canva -->
         <a href="https://canva.link/az4f7wowge88c75" target="_blank" rel="noopener noreferrer" class="card" title="Презентация">
-            <img src="pic-preza13-rus.png" alt="Презентация" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-preza13-rus.png'">
+            <img src="pic-preza13-rus.png" alt="Презентация" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-preza13-rus.png';">
         </a>
 
         <!-- 3. Симулятор фискальной политики -->
         <a href="sim-tax-flow.html" class="card" title="Симулятор: Фискальная политика">
-            <img src="pic-sim-fiscal-rus.png" alt="Симулятор: Фискальная политика" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-sim-fiscal-rus.png'">
+            <img src="pic-sim-fiscal-rus.png" alt="Симулятор: Фискальная политика" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-sim-fiscal-rus.png';">
         </a>
 
         <!-- 4. Симулятор монетарной политики -->
         <a href="sim-monetary-policy-pro1.html" class="card" title="Симулятор: Монетарная политика">
-            <img src="pic-sim-monetary-rus.png" alt="Симулятор: Монетарная политика" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-sim-monetary-rus.png'">
+            <img src="pic-sim-monetary-rus.png" alt="Симулятор: Монетарная политика" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-sim-monetary-rus.png';">
         </a>
 
         <!-- 5. Материалы для чтения (Google Docs) -->
         <a href="https://docs.google.com/document/d/1pcW0c-fP6Zm5tbGQxktt0Ok5WqDaZMHT/edit?usp=sharing&ouid=109725301150629205728&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer" class="card" title="Материалы для чтения">
-            <img src="pic-reading13-rus.png" alt="Материалы для чтения" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-reading13-rus.png'">
+            <img src="pic-reading13-rus.png" alt="Материалы для чтения" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-reading13-rus.png';">
         </a>
 
         <!-- 6. 3D-Flip карточка для 2 видеолекций -->
@@ -372,7 +398,7 @@
             <div class="flip-card-inner">
                 <!-- Лицевая сторона -->
                 <div class="flip-card-front">
-                    <img src="pic-video13-rus.png" alt="Видеолекции" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-video13-rus.png'">
+                    <img src="pic-video13-rus.png" alt="Видеолекции" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-video13-rus.png';">
                 </div>
                 <!-- Обратная сторона с 2 кнопками -->
                 <div class="flip-card-back">
