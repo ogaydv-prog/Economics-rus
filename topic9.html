@@ -23,25 +23,22 @@
             position: relative;
         }
 
-        /* Навигационная панель */
-        .top-nav {
-            width: 100%;
-            max-width: 1450px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 25px;
-            margin-bottom: -10px;
+        /* Логотип прижат в левый верхний угол экрана */
+        .top-left-logo {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 58px;
+            height: 58px;
+            object-fit: contain;
             z-index: 10;
         }
 
-        .top-left-logo {
-            width: 55px;
-            height: 55px;
-            object-fit: contain;
-        }
-
+        /* Кнопка возврата прижата в правый верхний угол экрана */
         .back-button {
+            position: absolute;
+            top: 22px;
+            right: 20px;
             text-decoration: none;
             background-color: #001e50;
             color: white;
@@ -51,6 +48,7 @@
             font-size: 14px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
+            z-index: 10;
         }
 
         .back-button:hover {
@@ -63,6 +61,7 @@
             text-align: center;
             margin-top: 15px;
             margin-bottom: 25px;
+            padding: 0 180px;
         }
 
         h1 {
@@ -70,7 +69,6 @@
             font-weight: 700;
             color: #001e50;
             margin-bottom: 8px;
-            margin-top: 10px;
         }
 
         .subtitle {
@@ -139,7 +137,7 @@
             line-height: 1.6;
         }
 
-        /* Мобильная адаптация */
+        /* Адаптивность для планшетов и средних экранов */
         @media (max-width: 1250px) {
             .grid-container {
                 flex-wrap: wrap;
@@ -147,29 +145,32 @@
             }
         }
 
+        /* Адаптивность для смартфонов */
         @media (max-width: 768px) {
             body {
-                padding: 10px 15px;
-            }
-
-            .top-nav {
-                margin-top: 5px;
-                margin-bottom: 15px;
+                padding: 14px 12px;
             }
 
             .top-left-logo {
-                width: 48px;
-                height: 48px;
+                position: static;
+                display: block;
+                margin: 0 auto 10px auto;
+                width: 52px;
+                height: 52px;
             }
 
             .back-button {
-                padding: 7px 13px;
-                font-size: 12px;
+                position: static;
+                display: inline-block;
+                margin: 0 auto 16px auto;
+                padding: 8px 16px;
+                font-size: 13px;
             }
 
             header {
-                margin-top: 5px;
-                margin-bottom: 15px;
+                margin-top: 0;
+                margin-bottom: 20px;
+                padding: 0 8px;
             }
 
             h1 {
@@ -178,27 +179,38 @@
 
             .subtitle {
                 font-size: 13px;
+                line-height: 1.4;
             }
 
             .grid-container {
-                margin: 10px 0;
-                padding-bottom: 20px;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(140px, 165px));
+                justify-content: center;
+                gap: 14px;
+                margin: 8px 0;
+                padding: 10px 0 25px 0;
             }
 
             .card {
-                width: 155px;
-                height: 250px;
+                width: 100%;
+                height: auto;
+                aspect-ratio: 185 / 300;
+            }
+
+            footer {
+                font-size: 12px;
+                padding-top: 20px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Навигация: Логотип и кнопка возврата -->
-    <div class="top-nav">
-        <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/almau.jpg'">
-        <a href="topics.html" class="back-button">← К темам курса</a>
-    </div>
+    <!-- Логотип AlmaU в левом верхнем углу экрана -->
+    <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/almau.jpg';">
+
+    <!-- Кнопка возврата в правом верхнем углу -->
+    <a href="topics.html" class="back-button">← К темам курса</a>
 
     <header>
         <h1>Тема 9: Измерение стоимости жизни</h1>
@@ -211,32 +223,32 @@
     <main class="grid-container">
         <!-- 1. Конспект лекции -->
         <a href="cpi-lecture9-pro-pe.html" class="card" title="Конспект лекции">
-            <img src="pic-lecture9-ru.png" alt="Конспект лекции" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-lecture9-ru.png'">
+            <img src="pic-lecture9-ru.png" alt="Конспект лекции" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-lecture9-ru.png';">
         </a>
 
         <!-- 2. Презентация Canva -->
         <a href="https://canva.link/sqo0h6oo8x0mp9c" target="_blank" rel="noopener noreferrer" class="card" title="Презентация">
-            <img src="pic-preza9-rus.png" alt="Презентация" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-preza9-rus.png'">
+            <img src="pic-preza9-rus.png" alt="Презентация" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-preza9-rus.png';">
         </a>
 
         <!-- 3. Симулятор ИПЦ / CPI -->
         <a href="sim-cpi-pe.html" class="card" title="Симулятор ИПЦ">
-            <img src="pic-cpi-rus.png" alt="Симулятор ИПЦ" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-cpi-rus.png'">
+            <img src="pic-cpi-rus.png" alt="Симулятор ИПЦ" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-cpi-rus.png';">
         </a>
 
         <!-- 4. Симулятор Альтернативных Индексов (Биг-Мак и др.) -->
         <a href="sim-big-mc-pe-pro.html" class="card" title="Альтернативные индексы инфляции">
-            <img src="pic-big-mc-ru.png" alt="Альтернативные индексы инфляции" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-big-mc-ru.png'">
+            <img src="pic-big-mc-ru.png" alt="Альтернативные индексы инфляции" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-big-mc-ru.png';">
         </a>
 
         <!-- 5. Лабораторная работа (При нажатии открывает PDF) -->
         <a href="https://static1.squarespace.com/static/53e438aae4b08bfde27ada2b/t/56e8d090b09f9515320473db/1458098539861/hungry-planet.pdf" target="_blank" rel="noopener noreferrer" class="card" title="Лабораторная работа: Hungry Planet">
-            <img src="pic-cpi-task-rus.png" alt="Лабораторная работа" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-cpi-task-rus.png'">
+            <img src="pic-cpi-task-rus.png" alt="Лабораторная работа" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-cpi-task-rus.png';">
         </a>
 
         <!-- 6. Видеолекция -->
         <a href="https://www.youtube.com/watch?v=jWAineywlO8&list=PLGssI1JnCp5uK8oP_5_DFfOO0-f1gwXw9&index=51" target="_blank" rel="noopener noreferrer" class="card" title="Видеолекция">
-            <img src="pic-video9-ru.png" alt="Видеолекция" onerror="this.src='https://ogaydv-prog.github.io/economics-rus/pic-video9-ru.png'">
+            <img src="pic-video9-ru.png" alt="Видеолекция" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/pic-video9-ru.png';">
         </a>
     </main>
 
