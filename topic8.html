@@ -23,25 +23,22 @@
             position: relative;
         }
 
-        /* Единая шапка навигации */
-        .top-nav {
-            width: 100%;
-            max-width: 1450px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 30px; /* Опускает логотип и кнопку ровно на уровень названия Тема 8 */
-            margin-bottom: -15px; /* Сближает с заголовком */
+        /* Логотип прижат в левый верхний угол экрана */
+        .top-left-logo {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            width: 58px;
+            height: 58px;
+            object-fit: contain;
             z-index: 10;
         }
 
-        .top-left-logo {
-            width: 55px;
-            height: 55px;
-            object-fit: contain;
-        }
-
+        /* Кнопка возврата прижата в правый верхний угол экрана */
         .back-button {
+            position: absolute;
+            top: 22px;
+            right: 20px;
             text-decoration: none;
             background-color: #001e50;
             color: white;
@@ -51,6 +48,7 @@
             font-size: 14px;
             transition: all 0.3s ease;
             box-shadow: 0 4px 10px rgba(0, 30, 80, 0.15);
+            z-index: 10;
         }
 
         .back-button:hover {
@@ -63,6 +61,7 @@
             text-align: center;
             margin-top: 15px;
             margin-bottom: 30px;
+            padding: 0 180px;
         }
 
         h1 {
@@ -70,7 +69,6 @@
             font-weight: 700;
             color: #001e50;
             margin-bottom: 8px;
-            margin-top: 15px;
         }
 
         .subtitle {
@@ -90,6 +88,7 @@
             width: 100%;
             justify-content: center;
             align-items: center;
+            margin: auto 0;
             padding-bottom: 40px;
         }
 
@@ -144,7 +143,8 @@
             transform-style: preserve-3d;
         }
 
-        .flip-card:hover .flip-card-inner {
+        .flip-card:hover .flip-card-inner,
+        .flip-card.flipped .flip-card-inner {
             transform: rotateY(180deg);
         }
 
@@ -219,7 +219,7 @@
             line-height: 1.6;
         }
 
-        /* Адаптивность для мобильных устройств */
+        /* Адаптивность для планшетов и средних экранов */
         @media (max-width: 1250px) {
             .grid-container {
                 flex-wrap: wrap;
@@ -227,55 +227,85 @@
             }
         }
 
+        /* Адаптивность для смартфонов */
         @media (max-width: 768px) {
             body {
-                padding: 10px 15px;
-            }
-
-            .top-nav {
-                flex-direction: flex-row;
-                margin-top: 0;
-                margin-bottom: 10px;
+                padding: 14px 12px;
             }
 
             .top-left-logo {
-                width: 48px;
-                height: 48px;
+                position: static;
+                display: block;
+                margin: 0 auto 10px auto;
+                width: 52px;
+                height: 52px;
             }
 
             .back-button {
-                padding: 6px 12px;
-                font-size: 12px;
+                position: static;
+                display: inline-block;
+                margin: 0 auto 16px auto;
+                padding: 8px 16px;
+                font-size: 13px;
             }
 
             header {
-                margin-top: 5px;
+                margin-top: 0;
                 margin-bottom: 20px;
+                padding: 0 8px;
             }
 
             h1 {
                 font-size: 22px;
             }
 
+            .subtitle {
+                font-size: 13px;
+                line-height: 1.4;
+            }
+
+            .grid-container {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(140px, 165px));
+                justify-content: center;
+                gap: 14px;
+                padding-bottom: 25px;
+            }
+
             .card {
-                width: 155px;
-                height: 250px;
+                width: 100%;
+                height: auto;
+                aspect-ratio: 185 / 300;
+            }
+
+            .flip-card-back {
+                padding: 10px 6px;
+                gap: 8px;
+            }
+
+            .flip-card-back h4 {
+                font-size: 10.5px;
             }
 
             .video-btn {
-                font-size: 10px;
-                padding: 7px 5px;
+                font-size: 9.5px;
+                padding: 7px 4px;
+            }
+
+            footer {
+                font-size: 12px;
+                padding-top: 20px;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Навигация: Логотип и кнопка возврата на одном уровне -->
-    <div class="top-nav">
-        <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo">
-        <a href="topics.html" class="back-button">← К темам курса</a>
-    </div>
+    <!-- Логотип AlmaU в левом верхнем углу экрана -->
+    <img src="almau.jpg" alt="AlmaU Logo" class="top-left-logo" onerror="this.onerror=null; this.src='https://ogaydv-prog.github.io/economics-rus/almau.jpg';">
+
+    <!-- Кнопка возврата в правом верхнем углу -->
+    <a href="topics.html" class="back-button">← К темам курса</a>
 
     <header>
         <h1>Тема 8: Принципы макроэкономики и измерение ВВП</h1>
@@ -312,20 +342,20 @@
         </a>
 
         <!-- 6. Видеоматериалы (3D-Flip карточка) -->
-        <div class="card flip-card" title="Видеолекции">
+        <div class="card flip-card" title="Видеолекции" onclick="this.classList.toggle('flipped')">
             <div class="flip-card-inner">
                 <div class="flip-card-front">
                     <img src="pic-video8-rus.png" alt="Видеолекции">
                 </div>
                 <div class="flip-card-back">
                     <h4>🎬 Видеолекции</h4>
-                    <a href="https://www.youtube.com/watch?v=x7VmkFlJj5A&list=PLGssI1JnCp5tLzqscvLuyB7mT7Ij7Y7Qs&index=14" target="_blank" rel="noopener noreferrer" class="video-btn">
+                    <a href="https://www.youtube.com/watch?v=x7VmkFlJj5A&list=PLGssI1JnCp5tLzqscvLuyB7mT7Ij7Y7Qs&index=14" target="_blank" rel="noopener noreferrer" class="video-btn" onclick="event.stopPropagation()">
                         ▶ Номинальный и реальный ВВП
                     </a>
-                    <a href="https://www.youtube.com/watch?v=2wavqvzHAbY&list=PLGssI1JnCp5tLzqscvLuyB7mT7Ij7Y7Qs&index=9" target="_blank" rel="noopener noreferrer" class="video-btn">
+                    <a href="https://www.youtube.com/watch?v=2wavqvzHAbY&list=PLGssI1JnCp5tLzqscvLuyB7mT7Ij7Y7Qs&index=9" target="_blank" rel="noopener noreferrer" class="video-btn" onclick="event.stopPropagation()">
                         ▶ Методы измерения ВВП
                     </a>
-                    <a href="https://www.youtube.com/watch?v=jF4zqA4gYek&list=PLGssI1JnCp5tLzqscvLuyB7mT7Ij7Y7Qs&index=13" target="_blank" rel="noopener noreferrer" class="video-btn">
+                    <a href="https://www.youtube.com/watch?v=jF4zqA4gYek&list=PLGssI1JnCp5tLzqscvLuyB7mT7Ij7Y7Qs&index=13" target="_blank" rel="noopener noreferrer" class="video-btn" onclick="event.stopPropagation()">
                         ▶ Дефлятор ВВП и ИПЦ
                     </a>
                 </div>
