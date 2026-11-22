@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фискальная и монетарная политика | AlmaU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0b0f19',
+                        cardbg: '#151c2c',
+                        cardborder: '#2a364f',
+                        neoncyan: '#00f2fe',
+                        neonemerald: '#10b981',
+                        neonamber: '#f59e0b',
+                        neonred: '#ef4444',
+                        neonpurple: '#a855f7'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #0b0f19; color: #e2e8f0; }
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #2a364f; border-radius: 4px; }
+        .dial-box { background: #080c14; border: 1px solid #334155; border-radius: 10px; padding: 8px 10px 6px; box-shadow: inset 0 2px 6px rgba(0,0,0,.85); }
+        input[type="range"].v-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 8px; border-radius: 4px; background: #1e293b; outline: none; cursor: pointer; display: block; }
+        input[type="range"].v-slider::-webkit-slider-thumb {
+            -webkit-appearance: none; width: 22px; height: 28px; border-radius: 4px; border: 1.5px solid #cbd5e1;
+            background: linear-gradient(90deg, #1e293b 0%, #334155 34%, var(--knob, #ef4444) 38%, var(--knob, #ef4444) 62%, #334155 66%, #1e293b 100%);
+            box-shadow: 0 0 12px var(--knob, #ef4444); cursor: grab;
+        }
+        .ticks { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 5px; padding: 0 3px; }
+        .ticks span { width: 1px; height: 4px; background: #64748b; }
+        .ticks span:nth-child(4n+1) { height: 8px; width: 1.5px; background: #e2e8f0; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+<header class="border-b border-cardborder bg-cardbg/95 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3.5">
+        <div class="flex flex-col md:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3.5 text-center md:text-left">
+                <div class="w-12 h-12 rounded-full border-2 border-slate-500 p-1 bg-white flex items-center justify-center shrink-0 overflow-hidden shadow">
+                    <img src="almau.jpg" alt="AlmaU" class="w-full h-full object-contain rounded-full"
+                         onerror="if(!this.d1){this.d1=1;this.src='almau.jpeg';}else if(!this.d2){this.d2=1;this.src='almau.png';}else{this.onerror=null;this.src='https://via.placeholder.com/60?text=AlmaU';}">
+                </div>
+                <div>
+                    <h1 id="t-main" class="text-lg sm:text-2xl font-extrabold text-white tracking-tight">
+                        Фискальная и монетарная политика государства
+                    </h1>
+                    <p class="text-xs text-slate-300 font-semibold">
+                        <span id="t-sub">Курс «Экономика»</span> • <span class="text-slate-200 font-bold" id="t-school">AlmaU | Школа цифровых технологий и экономики</span>
+                    </p>
+                </div>
+            </div>
+            <div class="bg-darkbg p-1 rounded-xl border border-cardborder flex items-center">
+                <button id="btn-ru" onclick="setLang('ru')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-black">RU</button>
+                <button id="btn-en" onclick="setLang('en')" class="px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-white">EN</button>
+            </div>
+        </div>
+
+        <nav class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+            <button onclick="switchMain('fiscal')" id="mt-fiscal" class="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border-2 font-extrabold text-sm border-neonred text-white bg-neonred/20 shadow-[0_0_18px_rgba(239,68,68,0.25)] transition-all">
+                <i data-lucide="scale" class="w-4 h-4 text-neonred"></i>
+                <span id="t-nav1">1. Фискальная политика: Налоги и Кривая Лаффера</span>
+            </button>
+            <button onclick="switchMain('monetary')" id="mt-monetary" class="flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border-2 font-extrabold text-sm border-slate-700 text-slate-400 bg-darkbg/60 hover:text-white transition-all">
+                <i data-lucide="landmark" class="w-4 h-4"></i>
+                <span id="t-nav2">2. Монетарная политика (актуализация 2026 г.)</span>
+            </button>
+        </nav>
+    </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-6 flex-grow w-full">
+
+    <!-- ==================== 1. FISCAL POLICY ==================== -->
+    <div id="view-fiscal" class="space-y-5">
+        <div class="flex flex-wrap gap-2 bg-darkbg/80 p-1.5 rounded-xl border border-cardborder">
+            <button onclick="switchFisc('taxes')" id="fs-taxes" class="f-btn flex-1 px-4 py-2 rounded-lg font-bold text-xs bg-cardbg text-white border border-slate-600">
+                <span id="t-ft1">1. Роль налогов: Доля в ВВП и бюджетах стран</span>
+            </button>
+            <button onclick="switchFisc('laffer')" id="fs-laffer" class="f-btn flex-1 px-4 py-2 rounded-lg font-bold text-xs text-slate-400 hover:text-white">
+                <span id="t-ft2">2. Концепция и Кривая Артура Лаффера</span>
+            </button>
+        </div>
+
+        <!-- FISCAL 1: 24 COUNTRIES -->
+        <section id="f-taxes" class="f-sec bg-cardbg border border-cardborder rounded-2xl p-5 shadow-xl space-y-5">
+            <div class="flex flex-col md:flex-row justify-between md:items-center gap-3 border-b border-cardborder pb-3">
+                <div>
+                    <h2 class="text-lg font-bold text-white" id="t-taxh">Налоговая нагрузка (% от ВВП) и доля налогов в доходах бюджета (24 страны)</h2>
+                    <p class="text-xs text-slate-300" id="t-taxs">Сравнительный анализ фискальной архитектуры экономик мира (данные МВФ, ОЭСР и Минфина РК)</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="sortTax('gdp')" class="px-3 py-1.5 rounded-lg bg-darkbg border border-neoncyan/40 text-neoncyan text-xs font-bold" id="t-sgdp">Сортировать: Налоги / ВВП ↓</button>
+                    <button onclick="sortTax('bud')" class="px-3 py-1.5 rounded-lg bg-darkbg border border-neonemerald/40 text-neonemerald text-xs font-bold" id="t-sbud">Сортировать: Налоги / Бюджет ↓</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+                <div class="bg-darkbg p-3.5 rounded-xl border border-neonemerald/30"><strong class="text-neonemerald block mb-1" id="t-fn1">1. Фискальная функция</strong><span class="text-slate-300" id="t-fn1d">Формирование доходной части бюджета (в развитых странах налоги дают 75%–92% всех доходов казны).</span></div>
+                <div class="bg-darkbg p-3.5 rounded-xl border border-neoncyan/30"><strong class="text-neoncyan block mb-1" id="t-fn2">2. Регулирующая функция</strong><span class="text-slate-300" id="t-fn2d">Стимулирование инвестиций и МСБ через налоговые льготы либо охлаждение перегрева (встроенные стабилизаторы).</span></div>
+                <div class="bg-darkbg p-3.5 rounded-xl border border-neonpurple/30"><strong class="text-neonpurple block mb-1" id="t-fn3">3. Перераспределительная функция</strong><span class="text-slate-300" id="t-fn3d">Сглаживание неравенства через прогрессивную шкалу подоходного налога и финансирование общественных благ.</span></div>
+            </div>
+
+            <div class="bg-darkbg p-3.5 rounded-xl border border-cardborder h-64"><canvas id="taxChart"></canvas></div>
+
+            <div class="overflow-x-auto max-h-80 overflow-y-auto rounded-xl border border-cardborder">
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead class="sticky top-0 bg-slate-900 text-slate-200 border-b border-neonred/40">
+                        <tr><th class="p-2.5">#</th><th class="p-2.5" id="t-cc">Страна</th><th class="p-2.5 text-neoncyan" id="t-cg">Налоги / ВВП (%)</th><th class="p-2.5 text-neonemerald" id="t-cb">Налоги / Бюджет (%)</th><th class="p-2.5" id="t-cn">Фискальная особенность</th></tr>
+                    </thead>
+                    <tbody id="taxBody" class="divide-y divide-cardborder/50 text-slate-200"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- FISCAL 2: FULL LAFFER CURVE (0% - 70%) WITH SHADED PROJECTION ZONE -->
+        <section id="f-laffer" class="f-sec hidden space-y-5">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <div class="lg:col-span-5 bg-cardbg border border-cardborder rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
+                    <div class="bg-darkbg p-4 rounded-xl border border-neonamber/30 space-y-3">
+                        <div class="flex items-center gap-3.5">
+                            <div class="w-20 h-20 rounded-xl border-2 border-neonamber/60 bg-slate-900 overflow-hidden shrink-0 flex items-center justify-center">
+                                <img src="laffer.jpg" alt="Arthur Laffer" class="w-full h-full object-cover"
+                                     onerror="if(!this.d1){this.d1=1;this.src='laffer.png';}else if(!this.d2){this.d2=1;this.src='Laffer.jpg';}else{this.style.display='none';document.getElementById('lafFb').style.display='flex';}">
+                                <div id="lafFb" style="display:none;" class="flex-col items-center text-center p-1"><span class="text-xs font-bold text-neonamber">Arthur Laffer</span></div>
+                            </div>
+                            <div>
+                                <span class="text-[10px] font-bold uppercase text-neonamber" id="t-lk">Экономика предложения</span>
+                                <h3 class="text-base font-extrabold text-white" id="t-ln">Артур Бетц Лаффер</h3>
+                                <p class="text-[11px] text-slate-300 mt-0.5" id="t-lb">Американский экономист, член Экономического консультативного совета при президенте Р. Рейгане (1981–1989), автор кривой зависимости налоговых поступлений от нагрузки.</p>
+                            </div>
+                        </div>
+                        <a href="https://laffercenter.org/about/arthur-laffer/" target="_blank" rel="noopener noreferrer"
+                           class="w-full py-2 px-3 rounded-lg bg-neonamber/15 hover:bg-neonamber/25 border border-neonamber/40 text-neonamber text-xs font-bold flex items-center justify-center gap-1.5">
+                            <i data-lucide="external-link" class="w-3.5 h-3.5"></i><span id="t-lext">Перейти на сайт The Laffer Center ↗</span>
+                        </a>
+                    </div>
+
+                    <div class="bg-darkbg p-5 rounded-xl border border-cardborder space-y-4">
+                        <div class="flex justify-between items-center">
+                            <label class="text-xs font-extrabold text-white uppercase" id="t-lsl">Налоговая нагрузка (% ВВП):</label>
+                            <span id="laf-badge" class="px-3 py-1 rounded-lg font-mono text-base font-black bg-slate-900 border border-neonred text-neonred">19%</span>
+                        </div>
+                        <div class="dial-box">
+                            <input type="range" id="laf-slider" class="v-slider" style="--knob:#ef4444;" min="0" max="70" step="1" value="19" oninput="updateLaffer()">
+                            <div class="ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                        </div>
+                        <div class="flex justify-between text-[10px] text-slate-400 font-mono">
+                            <span id="t-lmin">0%</span>
+                            <span class="text-neoncyan" id="t-lkz">РК ~19%</span>
+                            <span class="text-neonemerald font-bold" id="t-lopt">35% (Оптимум t*)</span>
+                            <span id="t-lmax">70% (Запрет)</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-darkbg p-4 rounded-xl border border-cardborder space-y-2.5">
+                        <div class="flex justify-between items-center border-b border-cardborder/60 pb-2">
+                            <span class="text-xs text-slate-300 font-semibold" id="t-lrev">Налоговые поступления (T):</span>
+                            <span id="laf-rev" class="text-2xl font-black font-mono text-neonred">79.1 млрд</span>
+                        </div>
+                        <div id="laf-desc" class="text-xs leading-relaxed text-slate-200"></div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 bg-cardbg border border-cardborder rounded-2xl p-5 shadow-xl flex flex-col justify-between space-y-4">
+                    <div class="flex justify-between items-center border-b border-cardborder pb-2.5">
+                        <div>
+                            <h2 class="text-lg font-bold text-white" id="t-lct">Кривая Лаффера: Нагрузка (t) и зона поступлений (T)</h2>
+                            <p class="text-xs text-slate-300" id="t-lcs">Полная дуга от 0% до 70% ВВП: заливка густеет к максимуму (35%) и становится зелёной</p>
+                        </div>
+                        <span class="px-2.5 py-1 rounded bg-slate-800 border border-slate-600 text-slate-200 text-xs font-mono font-bold">t* = 35%</span>
+                    </div>
+
+                    <div class="h-[410px] w-full bg-darkbg p-4 rounded-xl border border-cardborder">
+                        <canvas id="lafferChart"></canvas>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2.5 text-center text-xs">
+                        <div class="p-2 rounded-lg bg-darkbg border border-neonred/40"><strong class="text-neonred block" id="t-z1">0%–31%: Нормальная зона</strong><span class="text-[11px] text-slate-400" id="t-z1d">Заливка краснеет и растёт</span></div>
+                        <div class="p-2 rounded-lg bg-darkbg border border-neonemerald/60"><strong class="text-neonemerald block" id="t-z2">32%–38%: Зелёный оптимум</strong><span class="text-[11px] text-slate-400" id="t-z2d">Максимум доходов (100 млрд)</span></div>
+                        <div class="p-2 rounded-lg bg-darkbg border border-rose-900"><strong class="text-rose-300 block" id="t-z3">39%–70%: Перегрузка</strong><span class="text-[11px] text-slate-400" id="t-z3d">Зона сжимается и бледнеет</span></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Historical Reference -->
+            <div class="bg-cardbg border border-neonamber/40 rounded-2xl p-5 shadow-xl">
+                <div class="flex flex-col md:flex-row justify-between md:items-center gap-3">
+                    <button onclick="document.getElementById('nap-box').classList.toggle('hidden')" class="flex items-center gap-3 text-left">
+                        <div class="w-10 h-10 rounded-xl bg-neonamber/15 border border-neonamber/40 flex items-center justify-center text-neonamber shrink-0"><i data-lucide="scroll-text" class="w-5 h-5"></i></div>
+                        <div>
+                            <span class="text-[10px] font-bold uppercase text-neonamber" id="t-nb">Историческая справка • The Laffer Center</span>
+                            <h3 class="text-base font-extrabold text-white" id="t-nt">Артур Лаффер и история салфетки в ресторане Two Continents (1974 г.)</h3>
+                        </div>
+                    </button>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <a href="https://laffercenter.org/about/arthur-laffer/" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-xl bg-neonamber text-black text-xs font-extrabold">laffercenter.org ↗</a>
+                        <button onclick="document.getElementById('nap-box').classList.toggle('hidden')" class="px-3 py-1.5 rounded-xl bg-darkbg border border-cardborder text-xs font-bold text-neonamber" id="t-ntog">▼ Свернуть / Развернуть</button>
+                    </div>
+                </div>
+                <div id="nap-box" class="mt-4 pt-4 border-t border-cardborder grid grid-cols-1 md:grid-cols-3 gap-4 text-xs text-slate-200 leading-relaxed">
+                    <div class="bg-darkbg p-3.5 rounded-xl border border-cardborder"><strong class="text-neoncyan block mb-1" id="t-np1">1. Ужин в отеле Washington (1974 г.)</strong><span id="t-np1d">В декабре 1974 г. профессор Артур Лаффер обсуждал налоговую политику за ужином в ресторане Two Continents с Дональдом Рамсфелдом, Диком Чейни и журналистом Джудом Ванниски.</span></div>
+                    <div class="bg-darkbg p-3.5 rounded-xl border border-cardborder"><strong class="text-neonemerald block mb-1" id="t-np2">2. Рисунок на бумажной салфетке</strong><span id="t-np2d">На ресторанной салфетке Лаффер показал, что при ставках 0% и 100% доходы бюджета равны нулю. Ванниски сохранил салфетку и в 1975 г. ввёл термин «Кривая Лаффера».</span></div>
+                    <div class="bg-darkbg p-3.5 rounded-xl border border-cardborder"><strong class="text-neonamber block mb-1" id="t-np3">3. Влияние на мировую политику</strong><span id="t-np3d">Эта идея легла в основу экономики предложения, реформ Рональда Рейгана в США и Маргарет Тэтчер в Великобритании, а салфетка хранится в Смитсоновском музее.</span></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ==================== 2. MONETARY POLICY ==================== -->
+    <div id="view-monetary" class="hidden space-y-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 bg-darkbg/80 p-1.5 rounded-xl border border-cardborder">
+            <button onclick="switchMon('s1')" id="ms-s1" class="m-btn px-3 py-2 rounded-lg font-bold text-xs bg-cardbg text-white border border-slate-600 text-left">1. <span id="t-mt1">Создание депозитов и баланс ЦБ</span></button>
+            <button onclick="switchMon('s2')" id="ms-s2" class="m-btn px-3 py-2 rounded-lg font-bold text-xs text-slate-400 hover:text-white text-left">2. <span id="t-mt2">Детерминанты и мультипликатор</span></button>
+            <button onclick="switchMon('s3')" id="ms-s3" class="m-btn px-3 py-2 rounded-lg font-bold text-xs text-slate-400 hover:text-white text-left">3. <span id="t-mt3">Инструменты ДКП и рынок резервов</span></button>
+            <button onclick="switchMon('s4')" id="ms-s4" class="m-btn px-3 py-2 rounded-lg font-bold text-xs text-slate-400 hover:text-white text-left">4. <span id="t-mt4">Цели, ориентиры и Правило Тейлора</span></button>
+        </div>
+
+        <!-- MONETARY 1 -->
+        <section id="m-s1" class="m-sec bg-cardbg border border-cardborder rounded-2xl p-5 shadow-xl space-y-5">
+            <div class="flex justify-between items-center border-b border-cardborder pb-3">
+                <div><h2 class="text-lg font-bold text-white" id="t-s1h">Процесс предложения денег и создание депозитов</h2><p class="text-xs text-slate-300" id="t-s1s">Четыре участника системы и институциональная модель 2026 года</p></div>
+                <span class="px-2.5 py-1 rounded bg-neoncyan/10 border border-neoncyan/40 text-neoncyan text-xs font-mono font-bold">MB = C + R</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+                <div class="bg-darkbg p-3.5 rounded-xl border border-neoncyan/30"><strong class="text-neoncyan block mb-1" id="t-p1">1. Центральный банк</strong><span class="text-slate-300" id="t-p1d">Эмитирует денежную базу (MB), проводит операции на открытом рынке и задаёт процентный коридор.</span></div>
+                <div class="bg-darkbg p-3.5 rounded-xl border border-neonemerald/30"><strong class="text-neonemerald block mb-1" id="t-p2">2. Коммерческие банки</strong><span class="text-slate-300" id="t-p2d">Создают безналичные деньги в момент выдачи кредита («Кредит создаёт депозит»).</span></div>
+                <div class="bg-darkbg p-3.5 rounded-xl border border-neonamber/30"><strong class="text-neonamber block mb-1" id="t-p3">3. Вкладчики (Население)</strong><span class="text-slate-300" id="t-p3d">Задают пропорцию между наличными (C) и депозитами (D), определяя коэффициент c = C/D.</span></div>
+                <div class="bg-darkbg p-3.5 rounded-xl border border-neonpurple/30"><strong class="text-neonpurple block mb-1" id="t-p4">4. Заёмщики</strong><span class="text-slate-300" id="t-p4d">Формируют спрос на кредит в зависимости от процентной ставки и фазы делового цикла.</span></div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-xs text-left border-collapse">
+                    <thead><tr class="bg-darkbg border-b border-neoncyan/40 text-neoncyan"><th class="p-2.5" id="t-tp">Параметр (2026)</th><th class="p-2.5">🇺🇸 ФРС США</th><th class="p-2.5">🇰🇿 Нацбанк РК</th></tr></thead>
+                    <tbody class="divide-y divide-cardborder/60 text-slate-200">
+                        <tr><td class="p-2.5 font-semibold" id="t-r1">Обязательные резервы (MRR)</td><td class="p-2.5 font-mono text-neonamber">0% (с марта 2020 г.)</td><td class="p-2.5 font-mono text-neonemerald">5% по KZT / 15% по FX</td></tr>
+                        <tr><td class="p-2.5 font-semibold" id="t-r2">Операционный режим</td><td class="p-2.5">Ample Reserves (Floor System)</td><td class="p-2.5">Процентный коридор (±1 п.п.)</td></tr>
+                        <tr><td class="p-2.5 font-semibold" id="t-r3">Ключевая ставка</td><td class="p-2.5 font-mono">3.75%–4.00% (IORB 3.90%)</td><td class="p-2.5 font-mono">Базовая ставка 15.75%</td></tr>
+                        <tr><td class="p-2.5 font-semibold" id="t-r4">Ориентир овернайт</td><td class="p-2.5 font-mono text-neoncyan">EFFR = 3.88%</td><td class="p-2.5 font-mono text-neoncyan">TONIA (KASE авто-РЕПО)</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- MONETARY 2 -->
+        <section id="m-s2" class="m-sec hidden bg-cardbg border border-cardborder rounded-2xl p-5 shadow-xl space-y-5">
+            <div class="flex justify-between items-center border-b border-cardborder pb-3">
+                <div><h2 class="text-lg font-bold text-white" id="t-s2h">Детерминанты денежной массы и полный мультипликатор</h2><p class="text-xs text-slate-300" id="t-s2s">Симулятор M = m × MB и роль капитала/ликвидности банков</p></div>
+                <span class="px-2.5 py-1 rounded bg-neoncyan/10 border border-neoncyan/40 text-neoncyan text-xs font-mono font-bold">m = (1 + c) / (rr + e + c)</span>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="bg-darkbg p-4 rounded-xl border border-cardborder space-y-4">
+                    <div><div class="flex justify-between text-xs font-bold mb-1"><span id="t-mmb">Денежная база (MB, трлн ₸):</span><span id="v-mb" class="text-neonamber font-mono">11.5</span></div><div class="dial-box"><input type="range" id="s-mb" class="v-slider" style="--knob:#f59e0b;" min="5" max="25" step="0.5" value="11.5" oninput="updateMult()"><div class="ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
+                    <div><div class="flex justify-between text-xs font-bold mb-1"><span id="t-mrr">Обязательные резервы (rr %):</span><span id="v-rr" class="text-neoncyan font-mono">5.0%</span></div><div class="dial-box"><input type="range" id="s-rr" class="v-slider" style="--knob:#00f2fe;" min="0" max="15" step="0.5" value="5.0" oninput="updateMult()"><div class="ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
+                    <div><div class="flex justify-between text-xs font-bold mb-1"><span id="t-mer">Избыточные резервы (e %):</span><span id="v-er" class="text-neonpurple font-mono">2.5%</span></div><div class="dial-box"><input type="range" id="s-er" class="v-slider" style="--knob:#a855f7;" min="0" max="20" step="0.5" value="2.5" oninput="updateMult()"><div class="ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
+                    <div><div class="flex justify-between text-xs font-bold mb-1"><span id="t-mc">Коэффициент наличности (c %):</span><span id="v-c" class="text-neonemerald font-mono">22.0%</span></div><div class="dial-box"><input type="range" id="s-c" class="v-slider" style="--knob:#10b981;" min="5" max="45" step="1" value="22" oninput="updateMult()"><div class="ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
+                </div>
+                <div class="lg:col-span-2 flex flex-col justify-between space-y-4">
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-darkbg p-3.5 rounded-xl border border-neoncyan/40"><span class="text-[10px] text-slate-400 uppercase font-bold" id="t-rm">Мультипликатор (m)</span><div id="o-m" class="text-xl font-black text-neoncyan font-mono mt-0.5">4.14x</div></div>
+                        <div class="bg-darkbg p-3.5 rounded-xl border border-neonemerald/40"><span class="text-[10px] text-slate-400 uppercase font-bold" id="t-rm2">Денежная масса (M2)</span><div id="o-m2" class="text-xl font-black text-neonemerald font-mono mt-0.5">47.56</div></div>
+                        <div class="bg-darkbg p-3.5 rounded-xl border border-neonamber/40"><span class="text-[10px] text-slate-400 uppercase font-bold" id="t-rd">Депозиты (D)</span><div id="o-d" class="text-xl font-black text-neonamber font-mono mt-0.5">38.98</div></div>
+                    </div>
+                    <div class="h-48 bg-darkbg p-3 rounded-xl border border-cardborder"><canvas id="multChart"></canvas></div>
+                    <div class="p-3 bg-slate-900 border border-neonamber/30 rounded-xl text-xs text-slate-200" id="t-s2w">
+                        <strong>Оговорка 2026 г.:</strong> Обнуление обязательных резервов в США (rr = 0%) не делает мультипликатор бесконечным: кредитование ограничивается достаточностью капитала (CET1), ликвидностью (LCR/NSFR) и спросом заёмщиков.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MONETARY 3: INTERACTIVE RESERVE MARKET -->
+        <section id="m-s3" class="m-sec hidden bg-cardbg border border-cardborder rounded-2xl p-5 shadow-xl space-y-5">
+            <div class="flex flex-col md:flex-row justify-between md:items-center gap-3 border-b border-cardborder pb-3">
+                <div><h2 class="text-lg font-bold text-white" id="t-s3h">Инструменты ДКП и рынок банковских резервов (Rd и Rs)</h2><p class="text-xs text-slate-300" id="t-s3s">Интерактивная модель предложения резервов ФРС США и процентный коридор НБРК</p></div>
+                <div class="bg-darkbg p-1 rounded-xl border border-cardborder flex">
+                    <button onclick="setResMod('fed')" id="b-fed" class="px-3 py-1 rounded-lg text-xs font-bold bg-neoncyan text-black">🇺🇸 ФРС США (Rd &amp; Rs)</button>
+                    <button onclick="setResMod('nbk')" id="b-nbk" class="px-3 py-1 rounded-lg text-xs font-bold text-slate-400">🇰🇿 НБРК (Коридор)</button>
+                </div>
+            </div>
+
+            <div id="fed-rs-ctrl" class="bg-darkbg p-4 rounded-xl border border-neonamber/40 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div class="flex-1 space-y-1.5">
+                    <div class="flex justify-between text-xs font-bold">
+                        <span class="text-neonamber" id="t-rsl">Предложение резервов ФРС (Rs — Операции на открытом рынке / QE / QT):</span>
+                        <span id="v-rs" class="font-mono text-white">65 млрд $ (Обильные резервы)</span>
+                    </div>
+                    <div class="dial-box">
+                        <input type="range" id="s-rs" class="v-slider" style="--knob:#f59e0b;" min="10" max="95" step="1" value="65" oninput="renderRes()">
+                        <div class="ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                    </div>
+                </div>
+                <div class="px-4 py-2 rounded-xl bg-cardbg border border-neoncyan/40 text-center shrink-0">
+                    <span class="text-[10px] text-slate-400 block uppercase" id="t-effr-lbl">Равновесная ставка EFFR</span>
+                    <span id="v-effr" class="text-xl font-black font-mono text-neoncyan">3.90%</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <div class="lg:col-span-2 bg-darkbg p-4 rounded-xl border border-cardborder space-y-3">
+                    <div class="h-72"><canvas id="resChart"></canvas></div>
+                    <div id="res-exp" class="text-xs text-slate-300 bg-cardbg p-3 rounded-lg border border-cardborder leading-relaxed"></div>
+                </div>
+                <div class="space-y-3">
+                    <div class="bg-darkbg p-4 rounded-xl border border-neoncyan/30 space-y-2"><h3 class="text-sm font-bold text-neoncyan" id="res-bt">Ставки коридора ФРС (2026)</h3><ul class="text-xs text-slate-200 space-y-1 font-mono" id="res-bl"></ul></div>
+                    <div class="bg-darkbg p-4 rounded-xl border border-neonpurple/30 space-y-1.5"><h3 class="text-sm font-bold text-neonpurple" id="t-lolr">Кредитор последней инстанции</h3><p class="text-xs text-slate-300" id="t-lolrd">По правилу Бэджгота ЦБ кредитует только платёжеспособные банки под надёжный залог. В РК займы последней инстанции выдаются на 14–90 дней по ставке не ниже базовой.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MONETARY 4 -->
+        <section id="m-s4" class="m-sec hidden grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-5 shadow-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-cardborder pb-2.5"><h2 class="text-base font-bold text-white" id="t-s4t">Калькулятор Правила Тейлора</h2><span class="text-xs font-mono text-neonamber">i = r* + π + 0.5(π − π*) + 0.5(y − y*)</span></div>
+                <div class="space-y-3.5">
+                    <div><div class="flex justify-between text-xs font-bold mb-1"><span id="t-trr">Равновесная реальная ставка (r*):</span><span id="v-tr" class="text-neonemerald font-mono">3.50%</span></div><div class="dial-box"><input type="range" id="s-tr" class="v-slider" style="--knob:#10b981;" min="0.5" max="6" step="0.25" value="3.5" oninput="calcTaylor()"><div class="ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
+                    <div><div class="flex justify-between text-xs font-bold mb-1"><span id="t-trp">Текущая инфляция (π) [Таргет π* = 5.0%]:</span><span id="v-tp" class="text-neoncyan font-mono">9.2%</span></div><div class="dial-box"><input type="range" id="s-tp" class="v-slider" style="--knob:#00f2fe;" min="1" max="18" step="0.2" value="9.2" oninput="calcTaylor()"><div class="ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
+                    <div><div class="flex justify-between text-xs font-bold mb-1"><span id="t-trg">Разрыв выпуска (y − y*):</span><span id="v-tg" class="text-neonred font-mono">+1.0%</span></div><div class="dial-box"><input type="range" id="s-tg" class="v-slider" style="--knob:#ef4444;" min="-5" max="5" step="0.2" value="1.0" oninput="calcTaylor()"><div class="ticks"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div></div></div>
+                </div>
+                <div class="p-3.5 bg-darkbg rounded-xl border border-neonamber/40 flex justify-between items-center">
+                    <div><span class="text-xs text-slate-400 block" id="t-trres">Ставка по Тейлору:</span><span id="o-tr" class="text-2xl font-black text-neonamber font-mono">15.30%</span></div>
+                    <div id="o-trs" class="px-2.5 py-1 rounded text-xs font-bold bg-neonred/20 border border-neonred text-red-300">Факт НБРК 15.75%</div>
+                </div>
+            </div>
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-5 shadow-xl space-y-3 text-xs">
+                <h2 class="text-base font-bold text-white border-b border-cardborder pb-2.5" id="t-s4g">Иерархия целей ДКП и стандарты Базель III / IV</h2>
+                <div class="p-3 bg-darkbg rounded-xl border-l-4 border-neonemerald"><strong class="text-neonemerald block" id="t-g1">Конечные цели</strong><span class="text-slate-300" id="t-g1d">США: Двойной мандат ФРС (занятость + инфляция PCE 2.0%). РК: Ценовая стабильность (среднесрочная инфляция ~5.0%).</span></div>
+                <div class="p-3 bg-darkbg rounded-xl border-l-4 border-neoncyan"><strong class="text-neoncyan block" id="t-g2">Операционные ориентиры</strong><span class="text-slate-300" id="t-g2d">Управление ставкой овернайт (EFFR / TONIA) вместо механического таргетирования денежных агрегатов.</span></div>
+                <div class="p-3 bg-darkbg rounded-xl border-l-4 border-neonpurple"><strong class="text-neonpurple block" id="t-g3">Базель III и «Базель IV» (Output Floor)</strong><span class="text-slate-300" id="t-g3d">Нормативы капитала (CET1), ликвидности (LCR/NSFR ≥ 100%) и предел внутренних моделей (Output Floor 72.5%).</span></div>
+            </div>
+        </section>
+    </div>
+</main>
+
+<footer class="border-t border-cardborder bg-cardbg/50 py-3.5 text-center text-xs text-slate-400 font-semibold" id="t-foot">
+    AlmaU • Школа цифровых технологий и экономики • Курс «Экономика» © 2026
+</footer>
+
+<script>
+let lang = 'ru', taxCh, lafCh, multCh, resCh, resMod = 'fed';
+
+const taxData = [
+    ["Казахстан","Kazakhstan",18.6,72.4,"Трансферты из Нацфонда РК, НДС и КПН","National Fund transfers alongside VAT & CIT"],
+    ["США","United States",27.7,84.5,"Подоходный налог и взносы на соцстрахование","Individual income and payroll taxes"],
+    ["Дания","Denmark",43.4,88.2,"Одна из самых высоких нагрузок в ОЭСР","Among the highest tax-to-GDP ratios in OECD"],
+    ["Франция","France",43.8,85.6,"Высокие соцвзносы и система перераспределения","High social security contributions & welfare"],
+    ["Швеция","Sweden",41.4,86.0,"Высокие прямые налоги и НДС 25%","High direct taxes and 25% VAT"],
+    ["Германия","Germany",38.1,87.3,"Подоходный налог, НДС и соцвзносы","Balanced income tax, VAT & social contributions"],
+    ["Италия","Italy",42.8,86.5,"Высокая налоговая нагрузка в Еврозоне","High fiscal burden in the Eurozone"],
+    ["Испания","Spain",37.3,84.1,"Роль косвенных налогов и соцотчислений","Reliance on indirect taxes & social levies"],
+    ["Великобритания","United Kingdom",35.3,88.9,"Почти 90% доходов бюджета дают налоги","Nearly 90% of budget revenue from taxes"],
+    ["Канада","Canada",34.8,83.7,"Федеральное и провинциальное налогообложение","Federal and provincial taxation mix"],
+    ["Япония","Japan",34.1,85.2,"Потребительский налог 10%, КПН и НДФЛ","10% consumption tax, CIT and income tax"],
+    ["Норвегия","Norway",41.2,68.5,"Высокая доля неналоговых нефтегазовых доходов","Large non-tax petroleum & sovereign fund revenue"],
+    ["Польша","Poland",35.2,84.8,"Высокая доля НДС и акцизов","High share of VAT and excise duties"],
+    ["Австралия","Australia",29.4,86.4,"Подоходный и корпоративный налоги","Income and corporate tax reliance"],
+    ["Южная Корея","South Korea",28.9,81.5,"Умеренная нагрузка при высоком КПН","Moderate burden with strong CIT share"],
+    ["Швейцария","Switzerland",27.2,82.9,"Налоговая конкуренция между кантонами","Tax competition across Swiss cantons"],
+    ["Бразилия","Brazil",32.5,82.1,"Самая высокая нагрузка в Латинской Америке","Highest tax-to-GDP ratio in Latin America"],
+    ["Россия","Russia",26.8,74.2,"НДС, НДПИ и налог на прибыль","VAT, mineral extraction tax & CIT"],
+    ["Турция","Turkey",23.5,83.0,"Высокая доля косвенных налогов (НДС)","Heavy reliance on indirect taxes (VAT)"],
+    ["Китай","China",20.1,78.6,"НДС и налог на прибыль предприятий","VAT and enterprise income tax core"],
+    ["Индия","India",18.1,81.2,"Единый налог GST и подоходный налог","Goods & Services Tax (GST) and income tax"],
+    ["Мексика","Mexico",17.7,79.4,"Самая низкая нагрузка среди стран ОЭСР","Lowest tax-to-GDP ratio in the OECD"],
+    ["Сингапур","Singapore",13.8,76.5,"Низкие ставки КПН (17%) и GST (9%)","Low 17% CIT and 9% GST for capital attraction"],
+    ["ОАЭ","UAE",9.4,36.8,"Нефтяные доходы; КПН 9% введён с 2023 г.","Hydrocarbon revenues; 9% CIT since 2023"]
+];
+
+function paint(el) {
+    const p = ((el.value - el.min) / (el.max - el.min)) * 100;
+    const c = el.style.getPropertyValue('--knob') || '#00f2fe';
+    el.style.background = `linear-gradient(90deg, ${c}88 0%, ${c} ${p}%, #1e293b ${p}%, #1e293b 100%)`;
+}
+
+function switchMain(tab) {
+    document.getElementById('view-fiscal').classList.toggle('hidden', tab !== 'fiscal');
+    document.getElementById('view-monetary').classList.toggle('hidden', tab !== 'monetary');
+    document.getElementById('mt-fiscal').className = tab === 'fiscal'
+        ? "flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border-2 font-extrabold text-sm border-neonred text-white bg-neonred/20 shadow-[0_0_18px_rgba(239,68,68,0.25)] transition-all"
+        : "flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border-2 font-extrabold text-sm border-slate-700 text-slate-400 bg-darkbg/60 hover:text-white transition-all";
+    document.getElementById('mt-monetary').className = tab === 'monetary'
+        ? "flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border-2 font-extrabold text-sm border-neoncyan text-white bg-neoncyan/20 shadow-[0_0_18px_rgba(0,242,254,0.25)] transition-all"
+        : "flex items-center justify-center gap-2.5 px-4 py-3 rounded-xl border-2 font-extrabold text-sm border-slate-700 text-slate-400 bg-darkbg/60 hover:text-white transition-all";
+    if (tab === 'fiscal') { renderTax(); updateLaffer(); }
+    else { updateMult(); renderRes(); calcTaylor(); }
+}
+
+function switchFisc(id) {
+    document.querySelectorAll('.f-sec').forEach(e => e.classList.add('hidden'));
+    document.querySelectorAll('.f-btn').forEach(b => b.className = "f-btn flex-1 px-4 py-2 rounded-lg font-bold text-xs text-slate-400 hover:text-white");
+    document.getElementById('f-' + id).classList.remove('hidden');
+    document.getElementById('fs-' + id).className = "f-btn flex-1 px-4 py-2 rounded-lg font-bold text-xs bg-cardbg text-white border border-slate-600";
+    if (id === 'taxes') renderTax();
+    else { if (lafCh) { lafCh.destroy(); lafCh = null; } updateLaffer(); }
+}
+
+function switchMon(id) {
+    document.querySelectorAll('.m-sec').forEach(e => e.classList.add('hidden'));
+    document.querySelectorAll('.m-btn').forEach(b => b.className = "m-btn px-3 py-2 rounded-lg font-bold text-xs text-slate-400 hover:text-white text-left");
+    document.getElementById('m-' + id).classList.remove('hidden');
+    document.getElementById('ms-' + id).className = "m-btn px-3 py-2 rounded-lg font-bold text-xs bg-cardbg text-white border border-slate-600 text-left";
+    if (id === 's2') updateMult();
+    if (id === 's3') renderRes();
+    if (id === 's4') calcTaylor();
+}
+
+function sortTax(by) {
+    taxData.sort((a, b) => by === 'gdp' ? b[2] - a[2] : b[3] - a[3]);
+    renderTax();
+}
+
+function renderTax() {
+    const i = lang === 'ru' ? 0 : 1, ni = lang === 'ru' ? 4 : 5;
+    document.getElementById('taxBody').innerHTML = taxData.map((r, idx) => `
+        <tr class="${r[1]==='Kazakhstan'?'bg-neoncyan/10 font-bold':'hover:bg-slate-900/60'}">
+            <td class="p-2.5 font-mono text-slate-400">${idx+1}</td>
+            <td class="p-2.5 text-white">${r[i]} ${r[1]==='Kazakhstan'?'🇰🇿':''}</td>
+            <td class="p-2.5 font-mono text-neoncyan">${r[2].toFixed(1)}%</td>
+            <td class="p-2.5 font-mono text-neonemerald">${r[3].toFixed(1)}%</td>
+            <td class="p-2.5 text-slate-300">${r[ni]}</td>
+        </tr>`).join('');
+
+    const ctx = document.getElementById('taxChart').getContext('2d');
+    if (taxCh) taxCh.destroy();
+    taxCh = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: taxData.map(r => r[i]),
+            datasets: [
+                { label: lang==='ru'?'Налоги / ВВП (%)':'Tax / GDP (%)', data: taxData.map(r => r[2]), backgroundColor: '#00f2fe', borderRadius: 3 },
+                { label: lang==='ru'?'Налоги / Бюджет (%)':'Tax / Budget (%)', data: taxData.map(r => r[3]), backgroundColor: '#10b981', borderRadius: 3 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } },
+            scales: { x: { ticks: { color: '#cbd5e1', font: { size: 10 }, maxRotation: 45, minRotation: 45 }, grid: { display: false } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' }, min: 0, max: 100 } }
+        }
+    });
+}
+
+// Полная симметричная кривая Лаффера: от 0% до 70% (оптимум t* = 35%)
+function lafferRev(t) {
+    return Math.max(0, 100 * (1 - Math.pow((t - 35) / 35, 2)));
+}
+
+// Плагин реального закрашивания прямоугольной зоны поступлений (T × t)
+const lafferRectPlugin = {
+    id: 'lafferRectPlugin',
+    beforeDatasetsDraw(chart) {
+        const meta = chart.getDatasetMeta(1);
+        if (!meta || !meta.data || !meta.data[0]) return;
+        const pt = meta.data[0];
+        const x0 = chart.scales.x.getPixelForValue(0);
+        const y0 = chart.scales.y.getPixelForValue(0);
+        const { ctx } = chart;
+
+        ctx.save();
+        ctx.fillStyle = chart.options.plugins.lafferRectColor || 'rgba(239, 68, 68, 0.25)';
+        ctx.fillRect(x0, pt.y, pt.x - x0, y0 - pt.y);
+        ctx.restore();
+    }
+};
+
+function updateLaffer() {
+    const sl = document.getElementById('laf-slider');
+    const t = +sl.value;
+    const rev = lafferRev(t);
+
+    // Близость к максимуму (1.0 в точке t* = 35%, 0.0 на краях 0% и 70%)
+    const proximity = Math.max(0, 1 - Math.abs(t - 35) / 35);
+
+    let strokeClr, fillClr;
+    if (proximity >= 0.90) {
+        strokeClr = '#10b981';
+        fillClr = 'rgba(16, 185, 129, 0.42)';
+    } else {
+        const alpha = (0.10 + proximity * 0.34).toFixed(2);
+        strokeClr = proximity > 0.55 ? '#ef4444' : '#f87171';
+        fillClr = `rgba(239, 68, 68, ${alpha})`;
+    }
+
+    sl.style.setProperty('--knob', strokeClr);
+    paint(sl);
+
+    const b = document.getElementById('laf-badge');
+    b.textContent = t + '%';
+    b.style.color = strokeClr;
+    b.style.borderColor = strokeClr;
+
+    const rv = document.getElementById('laf-rev');
+    rv.textContent = rev.toFixed(1) + (lang === 'ru' ? ' млрд' : ' bln');
+    rv.style.color = strokeClr;
+
+    const desc = document.getElementById('laf-desc');
+    if (t >= 32 && t <= 38) {
+        desc.innerHTML = lang === 'ru'
+            ? `<strong style="color:#10b981">Зелёный оптимум (t* ≈ 35%):</strong> Закрашенная зона поступлений максимальна (<b>${rev.toFixed(1)} млрд</b>). Дальнейшее повышение налогов начнёт сжимать экономику.`
+            : `<strong style="color:#10b981">Green Optimum (t* ≈ 35%):</strong> The shaded revenue area is maximized (<b>${rev.toFixed(1)} bln</b>). Higher taxes will shrink the tax base.`;
+    } else if (t < 32) {
+        desc.innerHTML = lang === 'ru'
+            ? `<strong style="color:#ef4444">Нормальная зона (ниже оптимума):</strong> При нагрузке <b>${t}%</b> (РК ~18.6% ВВП) по мере роста ставки сборы растут и заливка становится насыщеннее (<b>${rev.toFixed(1)} млрд</b>).`
+            : `<strong style="color:#ef4444">Normal Zone (Below Optimum):</strong> At <b>${t}%</b> burden (KZ ~18.6% GDP), rising rates expand collections and deepen the red shading (<b>${rev.toFixed(1)} bln</b>).`;
+    } else {
+        desc.innerHTML = lang === 'ru'
+            ? `<strong style="color:#fca5a5">Зона перегрузки (выше 38%):</strong> Нагрузка <b>${t}%</b> душит деловую активность, бизнес уходит в тень — площадь поступлений сжимается и бледнеет до <b>${rev.toFixed(1)} млрд</b>.`
+            : `<strong style="color:#fca5a5">Over-Taxation Zone (Above 38%):</strong> A <b>${t}%</b> burden suppresses activity and pushes business underground — the shaded area shrinks and fades to <b>${rev.toFixed(1)} bln</b>.`;
+    }
+
+    const pts = [];
+    for (let r = 0; r <= 70; r += 1) {
+        pts.push({ x: lafferRev(r), y: r });
+    }
+    const projBox = [
+        { x: 0, y: 0 },
+        { x: rev, y: 0 },
+        { x: rev, y: t },
+        { x: 0, y: t },
+        { x: 0, y: 0 }
+    ];
+
+    const ctx = document.getElementById('lafferChart').getContext('2d');
+    if (lafCh) {
+        lafCh.options.plugins.lafferRectColor = fillClr;
+        lafCh.data.datasets[0].data = projBox;
+        lafCh.data.datasets[0].borderColor = strokeClr;
+        lafCh.data.datasets[0].backgroundColor = fillClr;
+        lafCh.data.datasets[1].data = [{ x: rev, y: t }];
+        lafCh.data.datasets[1].backgroundColor = strokeClr;
+        lafCh.update('none');
+    } else {
+        lafCh = new Chart(ctx, {
+            type: 'scatter',
+            plugins: [lafferRectPlugin],
+            data: {
+                datasets: [
+                    {
+                        label: lang === 'ru' ? 'Зона поступлений (T × t)' : 'Revenue Projection Area (T × t)',
+                        data: projBox,
+                        showLine: true,
+                        backgroundColor: fillClr,
+                        borderColor: strokeClr,
+                        borderDash: [5, 4],
+                        borderWidth: 2,
+                        pointRadius: 0
+                    },
+                    {
+                        label: lang === 'ru' ? 'Текущая точка (T, t)' : 'Current Point (T, t)',
+                        data: [{ x: rev, y: t }],
+                        backgroundColor: strokeClr,
+                        borderColor: '#ffffff',
+                        borderWidth: 3,
+                        pointRadius: 9
+                    },
+                    {
+                        label: lang === 'ru' ? 'Кривая Лаффера' : 'Laffer Curve',
+                        data: pts,
+                        showLine: true,
+                        borderColor: '#e2e8f0',
+                        borderWidth: 3.5,
+                        pointRadius: 0,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                plugins: {
+                    lafferRectColor: fillClr,
+                    legend: { labels: { color: '#cbd5e1', font: { size: 11 } } }
+                },
+                scales: {
+                    x: {
+                        min: 0,
+                        max: 112,
+                        title: {
+                            display: true,
+                            text: lang === 'ru' ? 'Налоговые поступления в бюджет T (млрд)' : 'Budget Tax Revenue T (bln)',
+                            color: '#10b981',
+                            font: { weight: 'bold' }
+                        },
+                        grid: { color: '#1e293b' },
+                        ticks: { color: '#94a3b8' }
+                    },
+                    y: {
+                        min: 0,
+                        max: 70,
+                        title: {
+                            display: true,
+                            text: lang === 'ru' ? 'Налоговая нагрузка (% от ВВП)' : 'Tax Burden (% of GDP)',
+                            color: '#ef4444',
+                            font: { weight: 'bold' }
+                        },
+                        grid: { color: '#1e293b' },
+                        ticks: { color: '#94a3b8' }
+                    }
+                }
+            }
+        });
+    }
+}
+
+function updateMult() {
+    const sMb = document.getElementById('s-mb'), sRr = document.getElementById('s-rr'), sEr = document.getElementById('s-er'), sC = document.getElementById('s-c');
+    [sMb, sRr, sEr, sC].forEach(paint);
+    const mb = +sMb.value, rr = +sRr.value/100, er = +sEr.value/100, c = +sC.value/100;
+    document.getElementById('v-mb').textContent = mb.toFixed(1);
+    document.getElementById('v-rr').textContent = (rr*100).toFixed(1)+'%';
+    document.getElementById('v-er').textContent = (er*100).toFixed(1)+'%';
+    document.getElementById('v-c').textContent = (c*100).toFixed(1)+'%';
+
+    const m = (1 + c) / Math.max(0.03, rr + er + c), m2 = mb * m, d = m2 / (1 + c), cash = m2 - d;
+    document.getElementById('o-m').textContent = m.toFixed(2) + 'x';
+    document.getElementById('o-m2').textContent = m2.toFixed(2);
+    document.getElementById('o-d').textContent = d.toFixed(2);
+
+    const ctx = document.getElementById('multChart').getContext('2d');
+    if (multCh) multCh.destroy();
+    multCh = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: lang==='ru'?['База (MB)','Наличные (C)','Депозиты (D)','Масса (M2)']:['Base (MB)','Currency (C)','Deposits (D)','Money (M2)'], datasets: [{ data: [mb, cash, d, m2], backgroundColor: ['#f59e0b','#00f2fe','#a855f7','#10b981'], borderRadius: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#cbd5e1', font: { size: 11 } }, grid: { display: false } }, y: { ticks: { color: '#94a3b8' }, grid: { color: '#1e293b' }, beginAtZero: true } } }
+    });
+}
+
+function setResMod(m) {
+    resMod = m;
+    document.getElementById('b-fed').className = m==='fed' ? "px-3 py-1 rounded-lg text-xs font-bold bg-neoncyan text-black" : "px-3 py-1 rounded-lg text-xs font-bold text-slate-400";
+    document.getElementById('b-nbk').className = m==='nbk' ? "px-3 py-1 rounded-lg text-xs font-bold bg-neoncyan text-black" : "px-3 py-1 rounded-lg text-xs font-bold text-slate-400";
+    document.getElementById('fed-rs-ctrl').classList.toggle('hidden', m !== 'fed');
+    renderRes();
+}
+
+function renderRes() {
+    const ctx = document.getElementById('resChart').getContext('2d');
+    if (resCh) resCh.destroy();
+    const ru = lang === 'ru';
+    if (resMod === 'fed') {
+        const slRs = document.getElementById('s-rs');
+        paint(slRs);
+        const rs = +slRs.value;
+
+        let effr = 3.90, regime = ru ? 'Обильные резервы (Пол IORB)' : 'Ample Reserves (IORB Floor)';
+        if (rs <= 20) {
+            effr = 4.00;
+            regime = ru ? 'Дефицит резервов (Потолок Repo)' : 'Scarce Reserves (Repo Ceiling)';
+        } else if (rs < 42) {
+            effr = 4.00 - ((rs - 20) / 22) * 0.10;
+            regime = ru ? 'Промежуточная зона (Наклонный участок)' : 'Intermediate Regime (Sloped Rd)';
+        }
+
+        document.getElementById('v-rs').textContent = `${rs} ${ru ? 'млрд $' : 'bln $'} (${regime})`;
+        document.getElementById('v-effr').textContent = effr.toFixed(2) + '%';
+
+        document.getElementById('res-bt').textContent = ru ? "Ставки коридора ФРС (2026)" : "U.S. Fed Corridor Rates (2026)";
+        document.getElementById('res-bl').innerHTML = `<li>• Standing Repo Ceiling: 4.00%</li><li>• IORB (Reserve Rate): 3.90%</li><li>• EFFR (Market Rate): ${effr.toFixed(2)}%</li><li>• ON RRP Floor: 3.75%</li>`;
+        document.getElementById('res-exp').innerHTML = ru
+            ? `<strong>Зачем нужен ползунок предложения резервов (Rs)?</strong> Сдвигая жёлтую вертикаль <b>Rs</b> влево (изъятие ликвидности / QT), ЦБ переводит рынок в дефицит резервов, и ставка <b>EFFR</b> поднимается к потолку 4.00%. Сдвигая <b>Rs</b> вправо (покупка ГЦБ / QE), ЦБ создаёт «обильные резервы», и ставка <b>EFFR</b> фиксируется на полу <b>IORB = 3.90%</b>.`
+            : `<strong>How the Reserve Supply (Rs) slider works:</strong> Moving the vertical amber line <b>Rs</b> left (liquidity drain / QT) pushes the market into scarce reserves, raising <b>EFFR</b> toward the 4.00% ceiling. Moving <b>Rs</b> right (bond purchases / QE) creates ample reserves, pinning <b>EFFR</b> at the <b>3.90% IORB</b> floor.`;
+
+        resCh = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [
+                    { label: ru?'Спрос на резервы Rd (Потолок 4.00% → Пол IORB 3.90%)':'Reserve Demand Rd (Ceiling 4.00% → IORB Floor 3.90%)', data: [{x:0,y:4.00},{x:20,y:4.00},{x:42,y:3.90},{x:100,y:3.90}], borderColor: '#00f2fe', borderWidth: 3.5, pointRadius: 0 },
+                    { label: ru?'Предложение резервов ЦБ (Rs)':'CB Reserve Supply (Rs)', data: [{x:rs,y:3.65},{x:rs,y:4.15}], borderColor: '#f59e0b', borderWidth: 3.5, pointRadius: 0 },
+                    { label: `EFFR = ${effr.toFixed(2)}%`, data: [{x:rs,y:effr}], backgroundColor: '#10b981', borderColor: '#fff', borderWidth: 2.5, pointRadius: 9, showLine: false },
+                    { label: 'ON RRP Floor (3.75%)', data: [{x:0,y:3.75},{x:100,y:3.75}], borderColor: '#10b981', borderDash: [6,5], borderWidth: 1.5, pointRadius: 0 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } }, scales: { x: { type: 'linear', min: 0, max: 100, title: { display: true, text: ru?'Объём резервов банковской системы (R)':'Quantity of Bank Reserves (R)', color: '#94a3b8' }, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }, y: { min: 3.65, max: 4.15, title: { display: true, text: ru?'Ставка овернайт (%)':'Overnight Rate (%)', color: '#00f2fe' }, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } } } }
+        });
+    } else {
+        document.getElementById('res-bt').textContent = ru ? "Процентный коридор НБРК (2026)" : "NBK Rate Corridor (2026)";
+        document.getElementById('res-bl').innerHTML = `<li>• Потолок (+1 п.п.): 16.75%</li><li>• Базовая ставка НБРК: 15.75%</li><li>• TONIA (KASE): ~15.65%</li><li>• Пол (-1 п.п.): 14.75%</li>`;
+        document.getElementById('res-exp').innerHTML = ru
+            ? `<strong>Процентный коридор НБРК:</strong> Ставка межбанковского рынка TONIA удерживается внутри коридора ±1 п.п. вокруг базовой ставки (15.75%) через операции постоянного доступа по предоставлению и изъятию тенговой ликвидности.`
+            : `<strong>NBK Interest-Rate Corridor:</strong> Overnight interbank rate TONIA is steered inside a ±1 pp corridor around the 15.75% Base Rate via standing liquidity facilities.`;
+        resCh = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan','Mar','Jun','Aug','Oct','Nov 2026'],
+                datasets: [
+                    { label: ru?'Потолок (+1 п.п.)':'Ceiling (+1 pp)', data: [19,19,18,17.75,16.75,16.75], borderColor: '#ef4444', borderDash: [5,5], borderWidth: 2 },
+                    { label: ru?'Базовая ставка НБРК':'NBK Base Rate', data: [18,18,17,16.75,15.75,15.75], borderColor: '#f59e0b', borderWidth: 3 },
+                    { label: 'TONIA', data: [17.85,17.9,16.9,16.65,15.68,15.65], borderColor: '#00f2fe', borderWidth: 2.5 },
+                    { label: ru?'Пол (-1 п.п.)':'Floor (-1 pp)', data: [17,17,16,15.75,14.75,14.75], borderColor: '#10b981', borderDash: [5,5], borderWidth: 2 }
+                ]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#cbd5e1', font: { size: 11 } } } }, scales: { x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } }, y: { min: 14, max: 20, grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } } } }
+        });
+    }
+}
+
+function calcTaylor() {
+    const sR = document.getElementById('s-tr'), sP = document.getElementById('s-tp'), sG = document.getElementById('s-tg');
+    [sR, sP, sG].forEach(paint);
+    const r = +sR.value, pi = +sP.value, g = +sG.value;
+    document.getElementById('v-tr').textContent = r.toFixed(2)+'%';
+    document.getElementById('v-tp').textContent = pi.toFixed(1)+'%';
+    document.getElementById('v-tg').textContent = (g>=0?'+':'')+g.toFixed(1)+'%';
+    const res = r + pi + 0.5*(pi - 5.0) + 0.5*g;
+    document.getElementById('o-tr').textContent = res.toFixed(2)+'%';
+    const diff = 15.75 - res;
+    document.getElementById('o-trs').textContent = (lang==='ru'?'Факт НБРК 15.75% (':'NBK Actual 15.75% (') + (diff>=0?'+':'') + diff.toFixed(2) + (lang==='ru'?' п.п.)':' pp)');
+}
+
+function setLang(l) {
+    lang = l;
+    document.getElementById('btn-ru').className = l==='ru' ? "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-black" : "px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-400";
+    document.getElementById('btn-en').className = l==='en' ? "px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white text-black" : "px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-400";
+    const d = {
+        ru: {
+            "t-main":"Фискальная и монетарная политика государства","t-sub":"Курс «Экономика»","t-school":"AlmaU | Школа цифровых технологий и экономики",
+            "t-nav1":"1. Фискальная политика: Налоги и Кривая Лаффера","t-nav2":"2. Монетарная политика (актуализация 2026 г.)",
+            "t-ft1":"1. Роль налогов: Доля в ВВП и бюджетах стран","t-ft2":"2. Концепция и Кривая Артура Лаффера",
+            "t-taxh":"Налоговая нагрузка (% от ВВП) и доля налогов в доходах бюджета (24 страны)","t-taxs":"Сравнительный анализ фискальной архитектуры экономик мира (данные МВФ, ОЭСР и Минфина РК)",
+            "t-sgdp":"Сортировать: Налоги / ВВП ↓","t-sbud":"Сортировать: Налоги / Бюджет ↓",
+            "t-fn1":"1. Фискальная функция","t-fn1d":"Формирование доходной части бюджета (в развитых странах налоги дают 75%–92% всех доходов казны).",
+            "t-fn2":"2. Регулирующая функция","t-fn2d":"Стимулирование инвестиций и МСБ через налоговые льготы либо охлаждение перегрева (встроенные стабилизаторы).",
+            "t-fn3":"3. Перераспределительная функция","t-fn3d":"Сглаживание неравенства через прогрессивную шкалу подоходного налога и финансирование общественных благ.",
+            "t-cc":"Страна","t-cg":"Налоги / ВВП (%)","t-cb":"Налоги / Бюджет (%)","t-cn":"Фискальная особенность",
+            "t-lk":"Экономика предложения","t-ln":"Артур Бетц Лаффер","t-lb":"Американский экономист, член Экономического консультативного совета при президенте Р. Рейгане (1981–1989), автор кривой зависимости налоговых поступлений от нагрузки.",
+            "t-lext":"Перейти на сайт The Laffer Center ↗","t-lsl":"Налоговая нагрузка (% ВВП):","t-lkz":"РК ~19%","t-lopt":"35% (Оптимум t*)","t-lmax":"70% (Запрет)","t-lrev":"Налоговые поступления (T):",
+            "t-lct":"Кривая Лаффера: Нагрузка (t) и зона поступлений (T)","t-lcs":"Полная дуга от 0% до 70% ВВП: заливка густеет к максимуму (35%) и становится зелёной",
+            "t-z1":"0%–31%: Нормальная зона","t-z1d":"Заливка краснеет и растёт","t-z2":"32%–38%: Зелёный оптимум","t-z2d":"Максимум доходов (100 млрд)","t-z3":"39%–70%: Перегрузка","t-z3d":"Зона сжимается и бледнеет",
+            "t-nb":"Историческая справка • The Laffer Center","t-nt":"Артур Лаффер и история салфетки в ресторане Two Continents (1974 г.)","t-ntog":"▼ Свернуть / Развернуть",
+            "t-np1":"1. Ужин в отеле Washington (1974 г.)","t-np1d":"В декабре 1974 г. профессор Артур Лаффер обсуждал налоговую политику за ужином в ресторане Two Continents с Дональдом Рамсфелдом, Диком Чейни и журналистом Джудом Ванниски.",
+            "t-np2":"2. Рисунок на бумажной салфетке","t-np2d":"На ресторанной салфетке Лаффер показал, что при ставках 0% и 100% доходы бюджета равны нулю. Ванниски сохранил салфетку и в 1975 г. ввёл термин «Кривая Лаффера».",
+            "t-np3":"3. Влияние на мировую политику","t-np3d":"Эта идея легла в основу экономики предложения, реформ Рональда Рейгана в США и Маргарет Тэтчер в Великобритании, а салфетка хранится в Смитсоновском музее.",
+            "t-mt1":"Создание депозитов и баланс ЦБ","t-mt2":"Детерминанты и мультипликатор","t-mt3":"Инструменты ДКП и рынок резервов","t-mt4":"Цели, ориентиры и Правило Тейлора",
+            "t-s1h":"Процесс предложения денег и создание депозитов","t-s1s":"Четыре участника системы и институциональная модель 2026 года",
+            "t-p1":"1. Центральный банк","t-p1d":"Эмитирует денежную базу (MB), проводит операции на открытом рынке и задаёт процентный коридор.",
+            "t-p2":"2. Коммерческие банки","t-p2d":"Создают безналичные деньги в момент выдачи кредита («Кредит создаёт депозит»).","t-p3":"3. Вкладчики (Население)","t-p3d":"Задают пропорцию между наличными (C) и депозитами (D), определяя коэффициент c = C/D.",
+            "t-p4":"4. Заёмщики","t-p4d":"Формируют спрос на кредит в зависимости от процентной ставки и фазы делового цикла.",
+            "t-tp":"Параметр (2026)","t-r1":"Обязательные резервы (MRR)","t-r2":"Операционный режим","t-r3":"Ключевая ставка","t-r4":"Ориентир овернайт",
+            "t-s2h":"Детерминанты денежной массы и полный мультипликатор","t-s2s":"Симулятор M = m × MB и роль капитала/ликвидности банков",
+            "t-mmb":"Денежная база (MB, трлн ₸):","t-mrr":"Обязательные резервы (rr %):","t-mer":"Избыточные резервы (e %):","t-mc":"Коэффициент наличности (c %):",
+            "t-rm":"Мультипликатор (m)","t-rm2":"Денежная масса (M2)","t-rd":"Депозиты (D)",
+            "t-s3h":"Инструменты ДКП и рынок банковских резервов (Rd и Rs)","t-s3s":"Интерактивная модель предложения резервов ФРС США и процентный коридор НБРК",
+            "t-rsl":"Предложение резервов ФРС (Rs — Операции на открытом рынке / QE / QT):","t-effr-lbl":"Равновесная ставка EFFR",
+            "t-lolr":"Кредитор последней инстанции","t-lolrd":"По правилу Бэджгота ЦБ кредитует только платёжеспособные банки под надёжный залог. В РК займы последней инстанции выдаются на 14–90 дней по ставке не ниже базовой.",
+            "t-s4t":"Калькулятор Правила Тейлора","t-trr":"Равновесная реальная ставка (r*):","t-trp":"Текущая инфляция (π) [Таргет π* = 5.0%]:","t-trg":"Разрыв выпуска (y − y*):","t-trres":"Ставка по Тейлору:",
+            "t-s4g":"Иерархия целей ДКП и стандарты Базель III / IV","t-g1":"Конечные цели","t-g1d":"США: Двойной мандат ФРС (занятость + инфляция PCE 2.0%). РК: Ценовая стабильность (среднесрочная инфляция ~5.0%).",
+            "t-g2":"Операционные ориентиры","t-g2d":"Управление ставкой овернайт (EFFR / TONIA) вместо механического таргетирования денежных агрегатов.",
+            "t-g3":"Базель III и «Базель IV» (Output Floor)","t-g3d":"Нормативы капитала (CET1), ликвидности (LCR/NSFR ≥ 100%) и предел внутренних моделей (Output Floor 72.5%).",
+            "t-foot":"AlmaU • Школа цифровых технологий и экономики • Курс «Экономика» © 2026"
+        },
+        en: {
+            "t-main":"Fiscal and Monetary Policy","t-sub":"Economics Course","t-school":"AlmaU | School of Digital Technologies and Economics",
+            "t-nav1":"1. Fiscal Policy: Taxation & Arthur Laffer Curve","t-nav2":"2. Monetary Policy (2026 Update)",
+            "t-ft1":"1. Role of Taxes: Share in GDP & State Budgets","t-ft2":"2. Arthur Laffer Concept & Laffer Curve",
+            "t-taxh":"Tax Burden (% of GDP) & Tax Share in Budget Revenues (24 Countries)","t-taxs":"Comparative fiscal architecture across major economies (IMF, OECD & MinFin RK data)",
+            "t-sgdp":"Sort: Tax / GDP ↓","t-sbud":"Sort: Tax / Budget ↓",
+            "t-fn1":"1. Fiscal Function","t-fn1d":"Generating core state budget revenue (taxes provide 75%–92% of total revenue in advanced economies).",
+            "t-fn2":"2. Regulatory Function","t-fn2d":"Stimulating investment and SMEs via tax incentives or cooling economic overheating (automatic stabilizers).",
+            "t-fn3":"3. Redistributive Function","t-fn3d":"Reducing income inequality via progressive income taxation and funding public goods.",
+            "t-cc":"Country","t-cg":"Tax / GDP (%)","t-cb":"Tax / Budget (%)","t-cn":"Fiscal Feature",
+            "t-lk":"Supply-Side Economics","t-ln":"Arthur Betz Laffer","t-lb":"American economist, member of President Ronald Reagan's Economic Policy Advisory Board (1981–1989), creator of the Laffer Curve.",
+            "t-lext":"Visit The Laffer Center Website ↗","t-lsl":"Tax Burden (% of GDP):","t-lkz":"KZ ~19%","t-lopt":"35% (Optimum t*)","t-lmax":"70% (Limit)","t-lrev":"Government Tax Revenue (T):",
+            "t-lct":"The Laffer Curve: Tax Burden (t) & Revenue Zone (T)","t-lcs":"Full symmetric curve from 0% to 70% of GDP: shading deepens toward 35% and turns green",
+            "t-z1":"0%–31%: Normal Zone","t-z1d":"Shading deepens & expands","t-z2":"32%–38%: Green Optimum","t-z2d":"Maximum receipts (100 bln)","t-z3":"39%–70%: Over-Taxation","t-z3d":"Zone shrinks & fades",
+            "t-nb":"Historical Reference • The Laffer Center","t-nt":"Arthur Laffer & the Two Continents Restaurant Napkin Story (1974)","t-ntog":"▼ Collapse / Expand",
+            "t-np1":"1. Dinner at the Washington Hotel (1974)","t-np1d":"In December 1974, Prof. Arthur Laffer debated tax policy over dinner at Two Continents with Donald Rumsfeld, Dick Cheney, and journalist Jude Wanniski.",
+            "t-np2":"2. Sketching on a Restaurant Napkin","t-np2d":"On a paper napkin, Laffer showed that 0% and 100% tax rates both yield zero revenue. Wanniski kept the napkin and coined 'The Laffer Curve' in 1975.",
+            "t-np3":"3. Global Fiscal Impact","t-np3d":"The concept anchored Supply-Side Economics, President Reagan's U.S. tax cuts, and Margaret Thatcher's U.K. reforms; the napkin resides in the Smithsonian.",
+            "t-mt1":"Deposit Creation & CB Balance Sheet","t-mt2":"Determinants & Money Multiplier","t-mt3":"Policy Tools & Reserve Market","t-mt4":"Goals, Targets & Taylor Rule",
+            "t-s1h":"Money Supply Process & Deposit Creation","t-s1s":"Four players and the 2026 institutional framework",
+            "t-p1":"1. Central Bank","t-p1d":"Issues the monetary base (MB), conducts open-market operations, and sets the interest-rate corridor.",
+            "t-p2":"2. Commercial Banks","t-p2d":"Create deposits simultaneously when granting loans ('Loans Create Deposits').","t-p3":"3. Depositors (The Public)","t-p3d":"Choose the mix between currency (C) and deposits (D), shaping the currency ratio c = C/D.",
+            "t-p4":"4. Borrowers","t-p4d":"Drive credit demand depending on interest rates and the business cycle.",
+            "t-tp":"Parameter (2026)","t-r1":"Reserve Requirements (MRR)","t-r2":"Operating Regime","t-r3":"Policy Rate","t-r4":"Overnight Benchmark",
+            "t-s2h":"Determinants of Money Supply & Full Money Multiplier","t-s2s":"Interactive M = m × MB simulator and bank capital/liquidity constraints",
+            "t-mmb":"Monetary Base (MB, trln ₸):","t-mrr":"Required Reserves (rr %):","t-mer":"Excess Reserves (e %):","t-mc":"Currency Ratio (c %):",
+            "t-rm":"Multiplier (m)","t-rm2":"Money Supply (M2)","t-rd":"Deposits (D)",
+            "t-s3h":"Monetary Policy Tools & The Market for Reserves (Rd & Rs)","t-s3s":"Interactive Fed Reserve Supply model and NBK's Rate Corridor",
+            "t-rsl":"Fed Reserve Supply (Rs — Open Market Operations / QE / QT):","t-effr-lbl":"Equilibrium EFFR Rate",
+            "t-lolr":"Lender of Last Resort","t-lolrd":"Per Walter Bagehot, central banks lend only to solvent banks against good collateral. NBK LOLR loans run 14–90 days at no less than the base rate.",
+            "t-s4t":"Taylor Rule Interactive Calculator","t-trr":"Equilibrium Real Rate (r*):","t-trp":"Current Inflation (π) [Target π* = 5.0%]:","t-trg":"Output Gap (y − y*):","t-trres":"Taylor Rule Rate:",
+            "t-s4g":"Hierarchy of Policy Goals & Basel III / IV Standards","t-g1":"Ultimate Mandates","t-g1d":"U.S.: Fed dual mandate (employment + 2.0% PCE inflation). Kazakhstan: Price stability (~5.0% medium-term inflation).",
+            "t-g2":"Operating Targets","t-g2d":"Steering overnight market rates (EFFR / TONIA) instead of mechanical monetary aggregate targeting.",
+            "t-g3":"Basel III & 'Basel IV' (Output Floor)","t-g3d":"Capital ratios (CET1), liquidity standards (LCR/NSFR ≥ 100%), and the 72.5% output floor.",
+            "t-foot":"AlmaU • School of Digital Technologies and Economics • Economics Course © 2026"
+        }
+    }[l];
+    for (const k in d) { const el = document.getElementById(k); if (el) el.textContent = d[k]; }
+    renderTax();
+    if (lafCh) { lafCh.destroy(); lafCh = null; }
+    updateLaffer();
+    updateMult();
+    renderRes();
+    calcTaylor();
+}
+
+window.onload = function() {
+    lucide.createIcons();
+    renderTax();
+    updateLaffer();
+    updateMult();
+    renderRes();
+    calcTaylor();
+};
+</script>
+</body>
+</html>

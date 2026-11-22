@@ -1,0 +1,1794 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Фискальная политика: Симулятор налогов и бюджета | AlmaU</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #12151c;
+            --bg-panel: #191e28;
+            --bg-card: #1f2532;
+            --border-slate: #2e3646;
+            --border-glow: #424f68;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(56, 189, 248, 0.04) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(168, 85, 247, 0.04) 0%, transparent 45%);
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Neon Gray Panels */
+        .neon-panel {
+            background: linear-gradient(165deg, #1b202b 0%, #151922 100%);
+            border: 1px solid var(--border-slate);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .neon-card {
+            background: linear-gradient(180deg, #212734 0%, #1a1f2a 100%);
+            border: 1px solid #30394b;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .neon-card:hover {
+            border-color: #495772;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.45), 0 0 12px rgba(148, 163, 184, 0.08);
+        }
+
+        /* Vintage Radio-Receiver Tuner Slider */
+        .tuner-housing {
+            background: #0e1117;
+            border: 1px solid #2a3241;
+            border-radius: 8px;
+            padding: 7px 10px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.85), 0 1px 0 rgba(255, 255, 255, 0.04);
+            position: relative;
+        }
+
+        .tuner-scale-ticks {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 4px 3px 4px;
+            opacity: 0.45;
+            pointer-events: none;
+        }
+
+        .tuner-scale-ticks span {
+            width: 1px;
+            height: 4px;
+            background: #94a3b8;
+            display: inline-block;
+        }
+
+        .tuner-scale-ticks span.major {
+            height: 6px;
+            background: #cbd5e1;
+        }
+
+        .tuner-track-wrapper {
+            position: relative;
+            height: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tuner-groove {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: #171c26;
+            border-radius: 999px;
+            border: 1px solid #262e3d;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.9);
+            overflow: hidden;
+        }
+
+        .tuner-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.06s linear;
+        }
+
+        input[type="range"].radio-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 18px;
+            background: transparent;
+            position: relative;
+            z-index: 5;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        input[type="range"].radio-slider:focus {
+            outline: none;
+        }
+
+        /* Metallic / Glowing Radio Dial Knob */
+        input[type="range"].radio-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 18px;
+            border-radius: 4px;
+            background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 48%, #94a3b8 52%, #e2e8f0 100%);
+            border: 1.5px solid #0f172a;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85), 0 0 8px var(--knob-glow, rgba(56, 189, 248, 0.6));
+            cursor: grab;
+            transition: transform 0.1s ease;
+        }
+
+        input[type="range"].radio-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.12);
+        }
+
+        input[type="range"].radio-slider::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            transform: scale(1.05);
+        }
+
+        input[type="range"].radio-slider::-moz-range-thumb {
+            width: 16px;
+            height: 18px;
+            border-radius: 4px;
+            background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 48%, #94a3b8 52%, #e2e8f0 100%);
+            border: 1.5px solid #0f172a;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.85), 0 0 8px var(--knob-glow, rgba(56, 189, 248, 0.6));
+            cursor: grab;
+        }
+
+        /* Custom Scrollbar for Left Panel */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #12151c;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #2e3646;
+            border-radius: 3px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        /* Sankey Ribbon & Node Interactive States */
+        .sankey-ribbon {
+            transition: fill-opacity 0.2s ease, opacity 0.2s ease;
+            cursor: pointer;
+        }
+
+        .sankey-node-rect {
+            transition: filter 0.2s ease, opacity 0.2s ease;
+            cursor: pointer;
+        }
+
+        .sankey-node-rect:hover {
+            filter: brightness(1.18) drop-shadow(0 0 8px rgba(255,255,255,0.22));
+        }
+
+        /* Floating Tooltip */
+        #floatingTooltip {
+            pointer-events: none;
+            transition: opacity 0.14s ease, transform 0.14s ease;
+            backdrop-filter: blur(12px);
+            background: rgba(18, 22, 31, 0.96);
+            border: 1px solid #3f4b61;
+            box-shadow: 0 16px 38px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Top Header Bar -->
+    <header class="border-b border-[#2a3242] bg-[#151922]/95 sticky top-0 z-30 backdrop-blur-md">
+        <div class="max-w-[1680px] mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+            <!-- Brand & Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500/20 to-indigo-500/20 border border-sky-400/30 flex items-center justify-center shadow-inner">
+                    <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 13h2l2-7 4 14 3-9 2 4h5"/>
+                    </svg>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 id="appTitle" class="text-base sm:text-lg font-extrabold tracking-tight text-slate-100">
+                            Фискальная политика: Симулятор налогов и бюджета
+                        </h1>
+                        <span class="hidden md:inline-block text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-800 text-sky-400 border border-slate-700">
+                            3-Stage Sankey
+                        </span>
+                    </div>
+                    <p id="appSubtitle" class="text-xs text-slate-400">
+                        Интерактивное моделирование налоговых ставок, таможенных сборов и распределения государственных расходов (2026)
+                    </p>
+                </div>
+            </div>
+
+            <!-- Controls: Country Tabs + Reset + Language -->
+            <div class="flex flex-wrap items-center gap-2.5">
+                <!-- Country Switcher -->
+                <div class="inline-flex p-1 rounded-xl bg-[#0e1117] border border-[#2c3545]">
+                    <button id="tabKZ" onclick="switchCountry('KZ')"
+                        class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-sm">
+                        <span>🇰🇿</span>
+                        <span id="tabKZText">Казахстан (КГД МФ РК)</span>
+                    </button>
+                    <button id="tabUS" onclick="switchCountry('US')"
+                        class="px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent">
+                        <span>🇺🇸</span>
+                        <span id="tabUSText">США (IRS / U.S. Treasury)</span>
+                    </button>
+                </div>
+
+                <!-- Reset Button -->
+                <button onclick="resetBaseline()"
+                    class="px-3 py-2 rounded-xl bg-[#222836] hover:bg-[#2c3446] text-slate-200 border border-[#364156] text-xs font-semibold transition-all flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    <span id="resetBtnText">Сбросить ставки</span>
+                </button>
+
+                <!-- Language Switcher -->
+                <div class="inline-flex p-1 rounded-xl bg-[#0e1117] border border-[#2c3545]">
+                    <button id="langRU" onclick="switchLang('ru')"
+                        class="px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all bg-slate-700 text-white">
+                        РУС
+                    </button>
+                    <button id="langEN" onclick="switchLang('en')"
+                        class="px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all text-slate-400 hover:text-white">
+                        ENG
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main 2-Column Workspace -->
+    <main class="flex-1 max-w-[1680px] w-full mx-auto p-3 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+        
+        <!-- LEFT PANEL: Radio-Tuner Sliders (~28% -> 3.5/12 cols, using lg:col-span-4 xl:col-span-3) -->
+        <aside class="lg:col-span-4 xl:col-span-3 neon-panel rounded-2xl p-3.5 sm:p-4 flex flex-col gap-4 lg:max-h-[calc(100vh-88px)] lg:overflow-y-auto custom-scroll">
+            
+            <!-- Source Note Banner -->
+            <div class="rounded-xl bg-[#12161f] border border-[#2a3344] px-3 py-2 flex items-center justify-between text-[11px]">
+                <span class="text-slate-400" id="sourceLabel">База данных:</span>
+                <span class="font-bold text-sky-400 mono" id="sourceBadge">КГД МФ РК • НК РК 2026</span>
+            </div>
+
+            <!-- Group A: Top 3 Core Taxes -->
+            <div>
+                <div class="flex items-center justify-between mb-2.5">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_8px_#fbbf24]"></span>
+                        <h2 id="groupATitle" class="text-xs font-extrabold uppercase tracking-wider text-amber-300">
+                            Топ-3 ключевых налога бюджета
+                        </h2>
+                    </div>
+                    <span id="groupAShare" class="text-[11px] font-bold mono text-amber-300/90 bg-amber-500/10 border border-amber-400/25 px-2 py-0.5 rounded-md">
+                        ~61%
+                    </span>
+                </div>
+                <div id="coreSlidersContainer" class="flex flex-col gap-2.5">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="border-t border-[#2b3445]"></div>
+
+            <!-- Group B: Additional Taxes, Customs & Excises -->
+            <div>
+                <div class="flex items-center justify-between mb-2.5">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-sky-400 shadow-[0_0_8px_#38bdf8]"></span>
+                        <h2 id="groupBTitle" class="text-xs font-extrabold uppercase tracking-wider text-slate-300">
+                            Таможня, акцизы и прочие сборы
+                        </h2>
+                    </div>
+                    <span id="groupBShare" class="text-[11px] font-bold mono text-sky-300/90 bg-sky-500/10 border border-sky-400/25 px-2 py-0.5 rounded-md">
+                        ~39%
+                    </span>
+                </div>
+                <div id="otherSlidersContainer" class="flex flex-col gap-2.5">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </aside>
+
+        <!-- RIGHT PANEL: KPI Strip + 3-Stage Sankey Diagram (~72% -> lg:col-span-8 xl:col-span-9) -->
+        <section class="lg:col-span-8 xl:col-span-9 flex flex-col gap-4">
+            
+            <!-- Top KPI Strip (4 Cards) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3">
+                <!-- KPI 1: Total Revenue -->
+                <div class="neon-card rounded-2xl p-3.5">
+                    <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                        <span id="kpiRevLabel">Совокупные доходы</span>
+                        <span class="px-1.5 py-0.5 rounded bg-sky-500/10 text-sky-400 mono text-[10px] font-bold" id="kpiRevDelta">+0.0%</span>
+                    </div>
+                    <div class="text-xl sm:text-2xl font-extrabold text-white mono tracking-tight" id="kpiRevValue">24.80 трлн ₸</div>
+                    <div class="text-[11px] text-slate-500 mt-1" id="kpiRevSub">Базовый прогноз: 24.80 трлн ₸</div>
+                </div>
+
+                <!-- KPI 2: Baseline Expenditure -->
+                <div class="neon-card rounded-2xl p-3.5">
+                    <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                        <span id="kpiExpLabel">Плановые расходы</span>
+                        <span class="px-1.5 py-0.5 rounded bg-indigo-500/10 text-indigo-300 mono text-[10px] font-bold" id="kpiExpTag">ГОСПЛАН</span>
+                    </div>
+                    <div class="text-xl sm:text-2xl font-extrabold text-slate-100 mono tracking-tight" id="kpiExpValue">27.40 трлн ₸</div>
+                    <div class="text-[11px] text-slate-500 mt-1" id="kpiExpSub">Утверждённый бюджет обязательств</div>
+                </div>
+
+                <!-- KPI 3: Fiscal Balance (Surplus / Deficit) -->
+                <div class="neon-card rounded-2xl p-3.5" id="kpiBalanceCard">
+                    <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                        <span id="kpiBalLabel">Сальдо бюджета</span>
+                        <span class="px-1.5 py-0.5 rounded mono text-[10px] font-bold bg-rose-500/15 text-rose-400" id="kpiBalBadge">ДЕФИЦИТ</span>
+                    </div>
+                    <div class="text-xl sm:text-2xl font-extrabold mono tracking-tight text-rose-400" id="kpiBalValue">-2.60 трлн ₸</div>
+                    <div class="text-[11px] text-slate-500 mt-1" id="kpiBalSub">Разница доходов и плановых расходов</div>
+                </div>
+
+                <!-- KPI 4: Effective Tax Burden Index -->
+                <div class="neon-card rounded-2xl p-3.5">
+                    <div class="flex items-center justify-between text-xs text-slate-400 mb-1">
+                        <span id="kpiBurdenLabel">Налоговая нагрузка</span>
+                        <span class="px-1.5 py-0.5 rounded bg-emerald-500/10 text-emerald-400 mono text-[10px] font-bold" id="kpiBurdenStatus">БАЗОВАЯ</span>
+                    </div>
+                    <div class="text-xl sm:text-2xl font-extrabold text-white mono tracking-tight" id="kpiBurdenValue">18.4% ВВП</div>
+                    <div class="text-[11px] text-slate-500 mt-1" id="kpiBurdenSub">Индекс фискального давления: 100.0</div>
+                </div>
+            </div>
+
+            <!-- Main Sankey Canvas Card -->
+            <div class="neon-panel rounded-2xl p-4 sm:p-5 flex flex-col">
+                <!-- Diagram Stage Headers & Legend -->
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-[#2a3344]">
+                    <div>
+                        <h3 id="sankeyMainHeading" class="text-sm sm:text-base font-bold text-slate-100">
+                            Потоки формирования и распределения государственного бюджета
+                        </h3>
+                        <p id="sankeySubHeading" class="text-xs text-slate-400">
+                            Наведите курсор на любой узел или поток для просмотра ставки, суммы и правовой базы
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 text-[11px] text-slate-400">
+                        <span class="inline-flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-sm bg-sky-400"></span>
+                            <span id="legendStage1">1. Налоги и сборы</span>
+                        </span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-sm bg-indigo-400"></span>
+                            <span id="legendStage2">2. Бюджетные фонды</span>
+                        </span>
+                        <span class="inline-flex items-center gap-1.5">
+                            <span class="w-2.5 h-2.5 rounded-sm bg-emerald-400"></span>
+                            <span id="legendStage3">3. Статьи расходов</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Column Stage Titles -->
+                <div class="grid grid-cols-3 text-[11px] font-extrabold uppercase tracking-wider text-slate-400 px-2 mb-1">
+                    <div id="colTitle1" class="text-left">Источники доходов (10)</div>
+                    <div id="colTitle2" class="text-center">Консолидация бюджета</div>
+                    <div id="colTitle3" class="text-right">Направления расходов</div>
+                </div>
+
+                <!-- Responsive SVG Sankey Container -->
+                <div id="sankeyWrapper" class="w-full overflow-x-auto">
+                    <svg id="sankeySvg" class="w-full min-w-[780px] h-[640px] select-none" viewBox="0 0 1160 640" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+                <!-- Economic Policy Note Footer inside Sankey Card -->
+                <div class="mt-3 pt-3 border-t border-[#2a3344] flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 rounded bg-slate-800 text-amber-300 font-semibold border border-slate-700" id="elasticityTag">
+                            Эффект Лаффера учтён
+                        </span>
+                        <span id="elasticityNote">
+                            При чрезмерном повышении ставок налоговая база умеренно сжимается из-за ухода в тень и снижения деловой активности.
+                        </span>
+                    </div>
+                    <div class="text-[11px] text-slate-500 mono">
+                        AlmaU • School of Digital Technologies & Economics
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Interactive Floating Tooltip (used for both Info buttons & Sankey hover) -->
+    <div id="floatingTooltip" class="fixed z-50 hidden max-w-sm rounded-xl p-3.5 text-xs text-slate-200">
+        <div class="flex items-center justify-between gap-2 mb-1.5 pb-1.5 border-b border-slate-700/80">
+            <div class="flex items-center gap-2">
+                <span id="ttColorDot" class="w-3 h-3 rounded-full shrink-0"></span>
+                <span id="ttTitle" class="font-bold text-sm text-white"></span>
+            </div>
+            <span id="ttRateBadge" class="mono font-bold px-2 py-0.5 rounded bg-slate-800 text-sky-300 border border-slate-700"></span>
+        </div>
+        <div id="ttMetrics" class="grid grid-cols-2 gap-2 my-2 bg-[#0e121a] p-2 rounded-lg border border-slate-800 mono text-[11px]"></div>
+        <p id="ttDesc" class="text-slate-300 leading-relaxed text-[11.5px]"></p>
+        <div id="ttLegal" class="mt-2 pt-1.5 border-t border-slate-800 text-[10.5px] text-slate-400 italic"></div>
+    </div>
+
+    <script>
+        // =========================================================================
+        // 1. COMPREHENSIVE BILINGUAL DATASETS (KAZAKHSTAN KGD RK & USA IRS 2026)
+        // =========================================================================
+        const FISCAL_DATA = {
+            KZ: {
+                currencySymbol: 'трлн ₸',
+                currencySymbolEn: 'Tln ₸',
+                gdpBase: 134.8, // Nominal GDP in trillion KZT
+                baselineExpenditure: 27.40, // Consolidated state + National Fund transfers spending (trillion KZT)
+                sourceBadge: { ru: 'КГД МФ РК • НК РК 2026', en: 'SRC MoF RK • Tax Code 2026' },
+                pools: [
+                    {
+                        id: 'rep_budget',
+                        color: '#38bdf8',
+                        name: { ru: 'Республиканский бюджет', en: 'Republican Budget' },
+                        desc: {
+                            ru: 'Центральный фонд государства, аккумулирующий НДС, КПН крупного бизнеса, таможенные пошлины и акцизы для финансирования общенациональных программ.',
+                            en: 'Central state budget consolidating VAT, large corporate tax, customs duties, and excises to fund national programs.'
+                        },
+                        legal: { ru: 'Бюджетный кодекс РК, ст. 49', en: 'Budget Code of RK, Art. 49' }
+                    },
+                    {
+                        id: 'loc_budget',
+                        color: '#818cf8',
+                        name: { ru: 'Местные бюджеты (Акиматы)', en: 'Local Budgets (Regional)' },
+                        desc: {
+                            ru: 'Бюджеты областей и городов республиканского значения (Астана, Алматы, Шымкент), куда зачисляются ИПН, соцналог, имущественные и транспортные налоги.',
+                            en: 'Regional and municipal budgets receiving IIT, social tax, property, land, and vehicle taxes for local infrastructure.'
+                        },
+                        legal: { ru: 'Бюджетный кодекс РК, ст. 50–52', en: 'Budget Code of RK, Art. 50–52' }
+                    },
+                    {
+                        id: 'nat_fund',
+                        color: '#f59e0b',
+                        name: { ru: 'Национальный фонд РК', en: 'National Fund of RK' },
+                        desc: {
+                            ru: 'Суверенный фонд будущих поколений и стабилизации бюджета, формируемый за счёт прямых налогов нефтяного сектора (НДПИ, рентный налог, ЭТП).',
+                            en: 'Sovereign wealth & stabilization fund collecting direct oil-sector levies (MET, rent tax, crude export duty).'
+                        },
+                        legal: { ru: 'Бюджетный кодекс РК, ст. 21', en: 'Budget Code of RK, Art. 21' }
+                    }
+                ],
+                spending: [
+                    {
+                        id: 'sp_social',
+                        color: '#10b981',
+                        share: 0.34,
+                        name: { ru: 'Социальная помощь и пенсии', en: 'Social Welfare & Pensions' },
+                        desc: {
+                            ru: 'Базовые и солидарные пенсии, пособия семьям с детьми, адресная социальная помощь (АСП) и соцвыплаты.',
+                            en: 'State basic and solidarity pensions, family benefits, targeted social assistance, and disability support.'
+                        },
+                        legal: { ru: 'Социальный кодекс РК', en: 'Social Code of RK' }
+                    },
+                    {
+                        id: 'sp_edu',
+                        color: '#3b82f6',
+                        share: 0.22,
+                        name: { ru: 'Образование и наука', en: 'Education & Science' },
+                        desc: {
+                            ru: 'Финансирование школ, грантов высшего образования, стипендий, научных исследований и модернизации кампусов.',
+                            en: 'Public schools, university grants, student scholarships, scientific R&D, and digital education.'
+                        },
+                        legal: { ru: 'Закон РК «Об образовании»', en: 'Law of RK on Education' }
+                    },
+                    {
+                        id: 'sp_health',
+                        color: '#ec4899',
+                        share: 0.14,
+                        name: { ru: 'Здравоохранение (ГОБМП)', en: 'Healthcare System' },
+                        desc: {
+                            ru: 'Гарантированный объём бесплатной медицинской помощи, взносы государства за льготные категории в ФСМС и строительство больниц.',
+                            en: 'Guaranteed free medical care package, state contributions to social health insurance, and hospital modernization.'
+                        },
+                        legal: { ru: 'Кодекс РК «О здоровье народа»', en: 'Code of RK on Public Health' }
+                    },
+                    {
+                        id: 'sp_defense',
+                        color: '#f97316',
+                        share: 0.12,
+                        name: { ru: 'Оборона, ЧС и правопорядок', en: 'Defense & Public Safety' },
+                        desc: {
+                            ru: 'Национальная оборона, пограничная служба, органы внутренних дел, судебная система и предупреждение ЧС.',
+                            en: 'National defense, border security, law enforcement, judiciary, and emergency response services.'
+                        },
+                        legal: { ru: 'Закон РК «Об обороне и ВС»', en: 'Law of RK on Defense' }
+                    },
+                    {
+                        id: 'sp_econ',
+                        color: '#a855f7',
+                        share: 0.18,
+                        name: { ru: 'Реальный сектор, ЖКХ и долг', en: 'Economy, Infrastructure & Debt' },
+                        desc: {
+                            ru: 'Субсидирование АПК и МСБ, транспортная инфраструктура, ЖКХ, энергетика и обслуживание правительственного долга.',
+                            en: 'Agro & SME subsidies, roads and utilities, energy grid development, and sovereign debt service.'
+                        },
+                        legal: { ru: 'Республиканский бюджет 2026', en: 'Republican Budget Law 2026' }
+                    }
+                ],
+                taxes: [
+                    // TOP 3 CORE TAXES
+                    {
+                        id: 'kz_vat',
+                        group: 'core',
+                        color: '#00e5ff',
+                        min: 0, max: 30, step: 0.5, baseline: 16.0,
+                        baseRevenue: 6.70, // ~27% of 24.8 Tln
+                        elasticity: 0.28,
+                        unit: '%',
+                        name: { ru: 'НДС (Налог на добавленную стоимость)', en: 'VAT (Value Added Tax)' },
+                        shortName: { ru: 'НДС (16%)', en: 'VAT (16%)' },
+                        allocation: { rep_budget: 1.0, loc_budget: 0.0, nat_fund: 0.0 },
+                        desc: {
+                            ru: 'Косвенный налог на прирост стоимости товаров, работ и услуг, а также на импорт в РК. Главный источник пополнения Республиканского бюджета по новому Налоговому кодексу 2026 года.',
+                            en: 'Indirect consumption tax levied on value added at each production stage and on imports into Kazakhstan. Primary pillar of the Republican Budget under the 2026 Tax Code.'
+                        },
+                        legal: { ru: 'НК РК 2026 • Ставка 16% (экспорт — 0%)', en: 'Tax Code 2026 • Standard rate 16% (0% exports)' }
+                    },
+                    {
+                        id: 'kz_cit',
+                        group: 'core',
+                        color: '#3b82f6',
+                        min: 5, max: 35, step: 0.5, baseline: 20.0,
+                        baseRevenue: 5.70, // ~23%
+                        elasticity: 0.35,
+                        unit: '%',
+                        name: { ru: 'КПН (Корпоративный подоходный налог)', en: 'CIT (Corporate Income Tax)' },
+                        shortName: { ru: 'КПН', en: 'Corp. Income Tax' },
+                        allocation: { rep_budget: 0.72, loc_budget: 0.13, nat_fund: 0.15 },
+                        desc: {
+                            ru: 'Прямой налог на налогооблагаемый доход юридических лиц. Базовая ставка составляет 20% (дифференцированные ставки для банковского сектора и АПК). КПН от МСБ зачисляется в местные бюджеты.',
+                            en: 'Direct tax on corporate taxable profits. Standard statutory rate is 20% (with differentiated rates for banks and agriculture). SME CIT flows to local budgets.'
+                        },
+                        legal: { ru: 'НК РК • Базовая ставка 20%', en: 'Tax Code RK • Standard rate 20%' }
+                    },
+                    {
+                        id: 'kz_iit',
+                        group: 'core',
+                        color: '#a855f7',
+                        min: 0, max: 25, step: 0.5, baseline: 10.0,
+                        baseRevenue: 2.75, // ~11.1%
+                        elasticity: 0.22,
+                        unit: '%',
+                        name: { ru: 'ИПН (Индивидуальный подоходный налог)', en: 'IIT (Individual Income Tax)' },
+                        shortName: { ru: 'ИПН', en: 'Indiv. Income Tax' },
+                        allocation: { rep_budget: 0.0, loc_budget: 1.0, nat_fund: 0.0 },
+                        desc: {
+                            ru: 'Налог на доходы физических лиц (заработная плата, дивиденды, имущественный доход). Полностью поступает в местные бюджеты регионов, формируя финансовую базу акиматов.',
+                            en: 'Personal income tax on wages, dividends, and capital gains. Allocated 100% to regional and municipal budgets across Kazakhstan.'
+                        },
+                        legal: { ru: 'НК РК • Базовая ставка 10% (прогрессия для сверхдоходов)', en: 'Tax Code RK • 10% base rate' }
+                    },
+                    // GROUP B: 7 ADDITIONAL TAXES, CUSTOMS & EXCISES
+                    {
+                        id: 'kz_met',
+                        group: 'other',
+                        color: '#f59e0b',
+                        min: 0, max: 30, step: 0.5, baseline: 12.0,
+                        baseRevenue: 2.50, // ~10.1%
+                        elasticity: 0.15,
+                        unit: '%',
+                        name: { ru: 'НДПИ и рентный налог на экспорт', en: 'Mineral Extraction & Rent Tax' },
+                        shortName: { ru: 'НДПИ / Недропольз.', en: 'MET & Oil Rent' },
+                        allocation: { rep_budget: 0.22, loc_budget: 0.0, nat_fund: 0.78 },
+                        desc: {
+                            ru: 'Специальные платежи недропользователей за добычу нефти, газа, урана и твёрдых полезных ископаемых. Основная часть направляется в Национальный фонд РК.',
+                            en: 'Subsoil user levies on crude oil, gas, uranium, and solid minerals extraction. Primarily channeled into the National Fund of RK.'
+                        },
+                        legal: { ru: 'НК РК • Раздел «Налогообложение недропользователей»', en: 'Tax Code RK • Subsoil Taxation' }
+                    },
+                    {
+                        id: 'kz_customs',
+                        group: 'other',
+                        color: '#10b981',
+                        min: 0, max: 25, step: 0.5, baseline: 8.5,
+                        baseRevenue: 2.25, // ~9.1%
+                        elasticity: 0.30,
+                        unit: '%',
+                        name: { ru: 'Таможенные пошлины и ЭТП', en: 'Customs Duties & Export Tariff' },
+                        shortName: { ru: 'Тамож. пошлины', en: 'Customs Duties' },
+                        allocation: { rep_budget: 0.75, loc_budget: 0.0, nat_fund: 0.25 },
+                        desc: {
+                            ru: 'Ввозные таможенные пошлины ЕАЭС, таможенные сборы и вывозные таможенные пошлины (ЭТП) на сырую нефть и нефтепродукты, администрируемые КГД МФ РК.',
+                            en: 'EAEU import tariffs, customs clearance fees, and export customs duties (ETP) on crude oil administered by SRC MoF RK.'
+                        },
+                        legal: { ru: 'Таможенный кодекс РК и ЕАЭС', en: 'Customs Code of RK & EAEU' }
+                    },
+                    {
+                        id: 'kz_social',
+                        group: 'other',
+                        color: '#6366f1',
+                        min: 0, max: 20, step: 0.5, baseline: 9.5,
+                        baseRevenue: 1.75, // ~7.1%
+                        elasticity: 0.20,
+                        unit: '%',
+                        name: { ru: 'Социальный налог', en: 'Social Tax (Payroll)' },
+                        shortName: { ru: 'Соц. налог', en: 'Social Tax' },
+                        allocation: { rep_budget: 0.0, loc_budget: 1.0, nat_fund: 0.0 },
+                        desc: {
+                            ru: 'Налог, уплачиваемый работодателями с фонда оплаты труда работников (за вычетом социальных отчислений в ГФСС). Полностью зачисляется в местные бюджеты.',
+                            en: 'Employer-paid payroll tax calculated on employee compensation minus state social insurance contributions. Flows 100% to local budgets.'
+                        },
+                        legal: { ru: 'НК РК • Ставка 9.5% (6% с 2025/26 реформы)', en: 'Tax Code RK • Payroll levy' }
+                    },
+                    {
+                        id: 'kz_excise',
+                        group: 'other',
+                        color: '#ec4899',
+                        min: 0, max: 35, step: 0.5, baseline: 14.0,
+                        baseRevenue: 1.00, // ~4.0%
+                        elasticity: 0.25,
+                        unit: '%',
+                        name: { ru: 'Акцизы (ГСМ, табак, алкоголь)', en: 'Excise Taxes (Fuel, Tobacco, Alcohol)' },
+                        shortName: { ru: 'Акцизы', en: 'Excise Taxes' },
+                        allocation: { rep_budget: 0.65, loc_budget: 0.35, nat_fund: 0.0 },
+                        desc: {
+                            ru: 'Косвенные налоги на подакцизные товары: бензин, дизельное топливо, табачные изделия, алкогольную продукцию и автомобили с большим объёмом двигателя.',
+                            en: 'Indirect taxes on excisable goods: gasoline, diesel fuel, tobacco products, spirits, and high-displacement vehicles.'
+                        },
+                        legal: { ru: 'НК РК • Перечень подакцизных товаров', en: 'Tax Code RK • Excisable Goods' }
+                    },
+                    {
+                        id: 'kz_fees',
+                        group: 'other',
+                        color: '#14b8a6',
+                        min: 0, max: 15, step: 0.5, baseline: 4.0,
+                        baseRevenue: 0.95, // ~3.8%
+                        elasticity: 0.12,
+                        unit: '%',
+                        name: { ru: 'Сборы, госпошлины и плата за эмиссии', en: 'State Fees & Environmental Levies' },
+                        shortName: { ru: 'Сборы и пошлины', en: 'Fees & Eco-Levies' },
+                        allocation: { rep_budget: 0.55, loc_budget: 0.45, nat_fund: 0.0 },
+                        desc: {
+                            ru: 'Регистрационные сборы, лицензионные платежи, плата за негативное воздействие на окружающую среду, пользование водными и лесными ресурсами.',
+                            en: 'Registration and licensing fees, state duties, and payments for environmental emissions and natural resource usage.'
+                        },
+                        legal: { ru: 'НК РК • Раздел «Сборы и платы»', en: 'Tax Code RK • Fees & Payments' }
+                    },
+                    {
+                        id: 'kz_property',
+                        group: 'other',
+                        color: '#f97316',
+                        min: 0, max: 5, step: 0.1, baseline: 1.5,
+                        baseRevenue: 0.70, // ~2.8%
+                        elasticity: 0.08,
+                        unit: '%',
+                        name: { ru: 'Налог на имущество и землю', en: 'Property & Land Taxes' },
+                        shortName: { ru: 'Имущество и земля', en: 'Property & Land' },
+                        allocation: { rep_budget: 0.0, loc_budget: 1.0, nat_fund: 0.0 },
+                        desc: {
+                            ru: 'Имущественный налог для юридических лиц (1.5% от среднегодовой балансовой стоимости), прогрессивный налог на недвижимость физлиц и земельный налог.',
+                            en: 'Corporate property tax (1.5% of book value), progressive residential property tax for individuals, and land tax.'
+                        },
+                        legal: { ru: 'НК РК • Имущественные налоги (100% в регионы)', en: 'Tax Code RK • Local Property Levies' }
+                    },
+                    {
+                        id: 'kz_vehicle',
+                        group: 'other',
+                        color: '#84cc16',
+                        min: 0, max: 10, step: 0.2, baseline: 2.5,
+                        baseRevenue: 0.50, // ~2.0%
+                        elasticity: 0.10,
+                        unit: '%',
+                        name: { ru: 'Налог на транспортные средства', en: 'Vehicle Tax' },
+                        shortName: { ru: 'Транспорт. налог', en: 'Vehicle Tax' },
+                        allocation: { rep_budget: 0.0, loc_budget: 1.0, nat_fund: 0.0 },
+                        desc: {
+                            ru: 'Ежегодный налог, исчисляемый в МРП в зависимости от объёма двигателя, грузоподъёмности или пассажировместимости транспорта. Поступает в местные бюджеты.',
+                            en: 'Annual vehicle tax calculated in Monthly Calculation Indices (MCI) based on engine displacement or payload capacity.'
+                        },
+                        legal: { ru: 'НК РК • Налог на транспорт (шкала в МРП)', en: 'Tax Code RK • Vehicle Tax' }
+                    }
+                ]
+            },
+
+            // =====================================================================
+            // USA DATASET (IRS / U.S. TREASURY FY2026 BASELINE IN $ BILLIONS)
+            // =====================================================================
+            US: {
+                currencySymbol: 'млрд $',
+                currencySymbolEn: '$B',
+                gdpBase: 30400, // Nominal US GDP ~$30.4 Trillion ($30,400B)
+                baselineExpenditure: 6850, // Federal outlays ~$6.85 Trillion ($6,850B)
+                sourceBadge: { ru: 'IRS • U.S. Treasury FY2026', en: 'IRS • U.S. Treasury FY2026' },
+                pools: [
+                    {
+                        id: 'us_general',
+                        color: '#38bdf8',
+                        name: { ru: 'Общий федеральный фонд', en: 'Federal General Fund' },
+                        desc: {
+                            ru: 'Основной счёт Казначейства США (U.S. Treasury), куда поступают подоходные налоги граждан и корпораций, тарифы и доходы ФРС для дискреционных и обязательных программ.',
+                            en: 'Primary U.S. Treasury account receiving individual and corporate income taxes, tariffs, and Fed earnings.'
+                        },
+                        legal: { ru: 'Internal Revenue Code (Title 26 U.S.C.)', en: 'Internal Revenue Code (Title 26 U.S.C.)' }
+                    },
+                    {
+                        id: 'us_trust_ss',
+                        color: '#818cf8',
+                        name: { ru: 'Траст-фонды Social Security и Medicare', en: 'Social Security & Medicare Trust Funds' },
+                        desc: {
+                            ru: 'Целевые трастовые фонды (OASDI и HI), финансируемые исключительно за счёт целевых налогов на фонд оплаты труда (FICA / SECA).',
+                            en: 'Dedicated trust funds (OASDI & Hospital Insurance) financed strictly by earmarked FICA/SECA payroll taxes.'
+                        },
+                        legal: { ru: 'Social Security Act / IRC Chapter 21', en: 'Social Security Act / IRC Chapter 21' }
+                    },
+                    {
+                        id: 'us_special',
+                        color: '#f59e0b',
+                        name: { ru: 'Целевые инфраструктурные и акцизные фонды', en: 'Highway & Special Trust Funds' },
+                        desc: {
+                            ru: 'Федеральный дорожный фонд (Highway Trust Fund), фонд гражданской авиации и фонд страхования от безработицы (FUTA).',
+                            en: 'Federal Highway Trust Fund, Airport & Airway Trust Fund, and Federal Unemployment Trust Fund.'
+                        },
+                        legal: { ru: 'IRC Subtitle D & Chapter 23', en: 'IRC Subtitle D & Chapter 23' }
+                    }
+                ],
+                spending: [
+                    {
+                        id: 'us_sp_ss_med',
+                        color: '#10b981',
+                        share: 0.37,
+                        name: { ru: 'Social Security и Medicare', en: 'Social Security & Medicare' },
+                        desc: {
+                            ru: 'Пенсионное обеспечение пожилых граждан, выплаты по инвалидности (OASDI) и медицинское страхование граждан старше 65 лет.',
+                            en: 'Retirement and disability benefits (OASDI) plus federal health insurance for seniors aged 65+.'
+                        },
+                        legal: { ru: 'Mandatory Outlays • U.S. Treasury', en: 'Mandatory Outlays • U.S. Treasury' }
+                    },
+                    {
+                        id: 'us_sp_medicaid',
+                        color: '#ec4899',
+                        share: 0.19,
+                        name: { ru: 'Medicaid и соцподдержка', en: 'Medicaid & Income Security' },
+                        desc: {
+                            ru: 'Медицинская помощь семьям с низким доходом, продовольственные программы (SNAP), налоговые вычеты EITC и пособия.',
+                            en: 'Low-income healthcare (Medicaid), nutrition assistance (SNAP), refundable tax credits, and unemployment aid.'
+                        },
+                        legal: { ru: 'U.S. Dept. of Health & Human Services', en: 'U.S. Dept. of Health & Human Services' }
+                    },
+                    {
+                        id: 'us_sp_defense',
+                        color: '#f97316',
+                        share: 0.14,
+                        name: { ru: 'Национальная оборона (DoD)', en: 'National Defense (DoD)' },
+                        desc: {
+                            ru: 'Финансирование Вооружённых сил США, оборонных НИОКР, закупок вооружений и программ обеспечения ветеранов.',
+                            en: 'U.S. Armed Forces operations, defense R&D, procurement, and national security programs.'
+                        },
+                        legal: { ru: 'National Defense Authorization Act', en: 'National Defense Authorization Act' }
+                    },
+                    {
+                        id: 'us_sp_interest',
+                        color: '#ef4444',
+                        share: 0.14,
+                        name: { ru: 'Обслуживание госдолга США', en: 'Net Interest on Public Debt' },
+                        desc: {
+                            ru: 'Процентные выплаты держателям казначейских облигаций США (U.S. Treasuries) по федеральному долгу.',
+                            en: 'Interest payments to holders of U.S. Treasury securities on the federal national debt.'
+                        },
+                        legal: { ru: 'U.S. Treasury Debt Service', en: 'U.S. Treasury Debt Service' }
+                    },
+                    {
+                        id: 'us_sp_infra',
+                        color: '#3b82f6',
+                        share: 0.16,
+                        name: { ru: 'Образование, инфраструктура и наука', en: 'Education, Infrastructure & Non-Defense' },
+                        desc: {
+                            ru: 'Федеральные гранты на образование, транспортные магистрали, энергетика, NASA, NIH и поддержка ветеранов.',
+                            en: 'Federal student aid, interstate highways, energy, NASA, NIH research, and veterans’ care.'
+                        },
+                        legal: { ru: 'Discretionary Appropriations', en: 'Discretionary Appropriations' }
+                    }
+                ],
+                taxes: [
+                    // TOP 3 CORE TAXES (USA)
+                    {
+                        id: 'us_iit',
+                        group: 'core',
+                        color: '#00e5ff',
+                        min: 5, max: 45, step: 0.5, baseline: 22.0,
+                        baseRevenue: 2480, // ~48.6% of ~$5,100B
+                        elasticity: 0.26,
+                        unit: '%',
+                        name: { ru: 'Индивидуальный подоходный налог (IRS Form 1040)', en: 'Individual Income Tax (Form 1040)' },
+                        shortName: { ru: 'Подоходный (IIT)', en: 'Individual Income' },
+                        allocation: { us_general: 1.0, us_trust_ss: 0.0, us_special: 0.0 },
+                        desc: {
+                            ru: 'Крупнейший источник доходов федерального бюджета США (~49%). Прогрессивная 7-ступенчатая шкала ставок от 10% до 37% (в модели отображена средневзвешенная предельная ставка 22%).',
+                            en: 'Largest source of U.S. federal revenue (~49%). Progressive 7-bracket structure ranging from 10% to 37% (slider reflects representative 22% marginal rate).'
+                        },
+                        legal: { ru: 'IRC § 1 • Шкала 10%–37%', en: 'IRC § 1 • Brackets 10%–37%' }
+                    },
+                    {
+                        id: 'us_ss_payroll',
+                        group: 'core',
+                        color: '#818cf8',
+                        min: 4, max: 20, step: 0.2, baseline: 12.4,
+                        baseRevenue: 1320, // ~25.9%
+                        elasticity: 0.14,
+                        unit: '%',
+                        name: { ru: 'Взносы Social Security (OASDI Payroll)', en: 'Social Security Payroll Tax (OASDI)' },
+                        shortName: { ru: 'Social Security (12.4%)', en: 'Social Security' },
+                        allocation: { us_general: 0.0, us_trust_ss: 1.0, us_special: 0.0 },
+                        desc: {
+                            ru: 'Целевой налог на фонд оплаты труда (6.2% с работника + 6.2% с работодателя = 12.4%) в пределах предельной годовой базы заработка (Wage Base Cap).',
+                            en: 'Earmarked FICA payroll tax (6.2% employee + 6.2% employer = 12.4%) up to the annual taxable wage base limit.'
+                        },
+                        legal: { ru: 'IRC § 3101(a) & § 3111(a) • 12.4%', en: 'IRC § 3101(a) & § 3111(a) • 12.4%' }
+                    },
+                    {
+                        id: 'us_cit',
+                        group: 'core',
+                        color: '#3b82f6',
+                        min: 5, max: 35, step: 0.5, baseline: 21.0,
+                        baseRevenue: 530, // ~10.4%
+                        elasticity: 0.34,
+                        unit: '%',
+                        name: { ru: 'Корпоративный подоходный налог (Form 1120)', en: 'Corporate Income Tax (Form 1120)' },
+                        shortName: { ru: 'Корп. налог (21%)', en: 'Corporate Tax' },
+                        allocation: { us_general: 1.0, us_trust_ss: 0.0, us_special: 0.0 },
+                        desc: {
+                            ru: 'Федеральный налог на чистую прибыль корпораций США по единой плоской ставке 21%, установленной Законом о налоговых сокращениях и рабочих местах (TCJA).',
+                            en: 'Federal tax on C-corporation net profits levied at a flat 21% statutory rate under the Internal Revenue Code.'
+                        },
+                        legal: { ru: 'IRC § 11 • Плоская ставка 21%', en: 'IRC § 11 • Flat 21% rate' }
+                    },
+                    // GROUP B: 7 ADDITIONAL TAXES, TARIFFS & EXCISES (USA)
+                    {
+                        id: 'us_medicare',
+                        group: 'other',
+                        color: '#a855f7',
+                        min: 1.0, max: 8.0, step: 0.1, baseline: 2.9,
+                        baseRevenue: 390, // ~7.6%
+                        elasticity: 0.12,
+                        unit: '%',
+                        name: { ru: 'Взносы Medicare (Hospital Insurance)', en: 'Medicare Payroll Tax (HI)' },
+                        shortName: { ru: 'Medicare (2.9%)', en: 'Medicare Tax' },
+                        allocation: { us_general: 0.0, us_trust_ss: 1.0, us_special: 0.0 },
+                        desc: {
+                            ru: 'Налог на медицинское страхование пожилых граждан: 1.45% с работника + 1.45% с работодателя (2.9%) без верхнего порога зарплаты (+0.9% для высоких доходов).',
+                            en: 'Hospital Insurance payroll tax: 1.45% employee + 1.45% employer (2.9%) with no wage cap, plus 0.9% surtax for high earners.'
+                        },
+                        legal: { ru: 'IRC § 3101(b) • 2.9% + 0.9%', en: 'IRC § 3101(b) • 2.9% + 0.9%' }
+                    },
+                    {
+                        id: 'us_capgains',
+                        group: 'other',
+                        color: '#06b6d4',
+                        min: 0, max: 30, step: 0.5, baseline: 15.0,
+                        baseRevenue: 115, // ~2.3%
+                        elasticity: 0.38,
+                        unit: '%',
+                        name: { ru: 'Налог на прирост капитала и дивиденды', en: 'Long-Term Capital Gains & Dividends' },
+                        shortName: { ru: 'Прирост капитала', en: 'Capital Gains' },
+                        allocation: { us_general: 1.0, us_trust_ss: 0.0, us_special: 0.0 },
+                        desc: {
+                            ru: 'Льготные ставки на долгосрочный прирост капитала (акции, недвижимость) и квалифицированные дивиденды: 0%, 15% или 20% (+3.8% NIIT).',
+                            en: 'Preferential federal rates on long-term capital gains and qualified dividends: 0%, 15%, or 20% (+3.8% NIIT).'
+                        },
+                        legal: { ru: 'IRC § 1(h) • Ставки 0% / 15% / 20%', en: 'IRC § 1(h) • 0% / 15% / 20%' }
+                    },
+                    {
+                        id: 'us_customs',
+                        group: 'other',
+                        color: '#10b981',
+                        min: 0, max: 25, step: 0.5, baseline: 4.5,
+                        baseRevenue: 95, // ~1.9%
+                        elasticity: 0.32,
+                        unit: '%',
+                        name: { ru: 'Таможенные пошлины и торговые тарифы', en: 'Customs Duties & Import Tariffs' },
+                        shortName: { ru: 'Тарифы и пошлины', en: 'Customs Tariffs' },
+                        allocation: { us_general: 0.85, us_trust_ss: 0.0, us_special: 0.15 },
+                        desc: {
+                            ru: 'Импортные тарифы и таможенные пошлины, взимаемые Таможенно-пограничной службой США (CBP) при ввозе товаров на территорию Соединённых Штатов.',
+                            en: 'Import tariffs and customs duties assessed by U.S. Customs and Border Protection (CBP) on foreign merchandise.'
+                        },
+                        legal: { ru: 'Harmonized Tariff Schedule (HTSUS)', en: 'Harmonized Tariff Schedule (HTSUS)' }
+                    },
+                    {
+                        id: 'us_excise',
+                        group: 'other',
+                        color: '#ec4899',
+                        min: 0, max: 25, step: 0.5, baseline: 8.0,
+                        baseRevenue: 92, // ~1.8%
+                        elasticity: 0.22,
+                        unit: '%',
+                        name: { ru: 'Федеральные акцизы (топливо, авиа, табак)', en: 'Federal Excise Taxes (Fuel, Air, Tobacco)' },
+                        shortName: { ru: 'Фед. акцизы', en: 'Excise Taxes' },
+                        allocation: { us_general: 0.25, us_trust_ss: 0.0, us_special: 0.75 },
+                        desc: {
+                            ru: 'Федеральный акциз на бензин ($0.184/галлон), дизельное топливо, авиабилеты, табак и алкоголь. Основная доля питает дорожный траст-фонд.',
+                            en: 'Federal excise taxes on motor fuels ($0.184/gal), airline tickets, tobacco, and alcohol funding the Highway Trust Fund.'
+                        },
+                        legal: { ru: 'IRC Subtitle D • Form 720', en: 'IRC Subtitle D • Form 720' }
+                    },
+                    {
+                        id: 'us_estate',
+                        group: 'other',
+                        color: '#f59e0b',
+                        min: 0, max: 55, step: 1.0, baseline: 40.0,
+                        baseRevenue: 38, // ~0.7%
+                        elasticity: 0.25,
+                        unit: '%',
+                        name: { ru: 'Налог на наследство и дарение (Estate & Gift)', en: 'Estate & Gift Taxes (Form 706)' },
+                        shortName: { ru: 'Наследство (40%)', en: 'Estate & Gift' },
+                        allocation: { us_general: 1.0, us_trust_ss: 0.0, us_special: 0.0 },
+                        desc: {
+                            ru: 'Федеральный налог на передачу крупного состояния по наследству или в дар сверх базового освобождённого порога. Максимальная ставка — 40%.',
+                            en: 'Federal transfer tax on estates and gifts exceeding the lifetime exemption threshold. Top statutory rate is 40%.'
+                        },
+                        legal: { ru: 'IRC § 2001 • Макс. ставка 40%', en: 'IRC § 2001 • Top rate 40%' }
+                    },
+                    {
+                        id: 'us_futa',
+                        group: 'other',
+                        color: '#14b8a6',
+                        min: 0, max: 6.0, step: 0.1, baseline: 0.6,
+                        baseRevenue: 24, // ~0.5%
+                        elasticity: 0.10,
+                        unit: '%',
+                        name: { ru: 'Налог FUTA (страхование от безработицы)', en: 'FUTA Unemployment Tax (Form 940)' },
+                        shortName: { ru: 'Налог FUTA (0.6%)', en: 'FUTA Payroll' },
+                        allocation: { us_general: 0.0, us_trust_ss: 0.0, us_special: 1.0 },
+                        desc: {
+                            ru: 'Федеральный налог работодателей (эффективная ставка 0.6% с первых $7,000 зарплаты сотрудника) на финансирование пособий по безработице.',
+                            en: 'Federal Unemployment Tax Act employer levy (effective 0.6% on first $7,000 of wages) funding unemployment insurance.'
+                        },
+                        legal: { ru: 'IRC § 3301 • Эффективная ставка 0.6%', en: 'IRC § 3301 • Effective 0.6%' }
+                    },
+                    {
+                        id: 'us_misc',
+                        group: 'other',
+                        color: '#84cc16',
+                        min: 0, max: 10, step: 0.2, baseline: 2.0,
+                        baseRevenue: 36, // ~0.7%
+                        elasticity: 0.08,
+                        unit: '%',
+                        name: { ru: 'Доходы ФРС и федеральные сборы', en: 'Fed Remittances & Misc. Treasury Fees' },
+                        shortName: { ru: 'Доходы ФРС и сборы', en: 'Fed & Misc. Fees' },
+                        allocation: { us_general: 0.80, us_trust_ss: 0.0, us_special: 0.20 },
+                        desc: {
+                            ru: 'Перечисления чистой прибыли Федеральной резервной системы (Federal Reserve) в Казначейство США, патентные, иммиграционные и регуляторные сборы.',
+                            en: 'Federal Reserve earnings remittances to the U.S. Treasury, patent fees, immigration fees, and regulatory fines.'
+                        },
+                        legal: { ru: 'Federal Reserve Act § 7', en: 'Federal Reserve Act § 7' }
+                    }
+                ]
+            }
+        };
+
+        // =========================================================================
+        // 2. APPLICATION STATE & TRANSLATIONS
+        // =========================================================================
+        let currentCountry = 'KZ';
+        let currentLang = 'ru';
+        let currentRates = {}; // Map of tax.id -> current rate
+
+        const UI_TEXT = {
+            ru: {
+                appTitle: 'Фискальная политика: Симулятор налогов и бюджета',
+                appSubtitle: 'Интерактивное моделирование налоговых ставок, таможенных сборов и распределения государственных расходов (2026)',
+                tabKZText: 'Казахстан (КГД МФ РК)',
+                tabUSText: 'США (IRS / U.S. Treasury)',
+                resetBtnText: 'Сбросить ставки',
+                sourceLabel: 'База данных:',
+                groupATitle: 'Топ-3 ключевых налога бюджета',
+                groupBTitle: 'Таможня, акцизы и прочие сборы',
+                kpiRevLabel: 'Совокупные доходы',
+                kpiExpLabel: 'Плановые расходы',
+                kpiExpTag: 'ГОСПЛАН',
+                kpiExpSub: 'Утверждённый бюджет обязательств',
+                kpiBalLabel: 'Сальдо бюджета',
+                kpiBalSub: 'Разница доходов и плановых расходов',
+                kpiBurdenLabel: 'Налоговая нагрузка',
+                sankeyMainHeading: 'Потоки формирования и распределения государственного бюджета',
+                sankeySubHeading: 'Наведите курсор на любой узел или поток для просмотра ставки, суммы и правовой базы',
+                legendStage1: '1. Налоги и сборы',
+                legendStage2: '2. Бюджетные фонды',
+                legendStage3: '3. Статьи расходов',
+                colTitle1: 'Источники доходов (10)',
+                colTitle2: 'Консолидация бюджета',
+                colTitle3: 'Направления расходов',
+                elasticityTag: 'Эффект Лаффера учтён',
+                elasticityNote: 'При чрезмерном повышении ставок налоговая база умеренно сжимается из-за ухода в тень и снижения деловой активности.',
+                surplus: 'ПРОФИЦИТ',
+                deficit: 'ДЕФИЦИТ',
+                balanced: 'СБАЛАНСИРОВАН',
+                burdenLow: 'СТИМУЛИРУЮЩАЯ',
+                burdenBase: 'БАЗОВАЯ',
+                burdenHigh: 'ПОВЫШЕННАЯ',
+                baseForecast: 'Базовый прогноз:',
+                burdenIndex: 'Индекс фискального давления:',
+                gdpSuffix: '% ВВП',
+                ttAmount: 'Сумма потока',
+                ttShare: 'Доля бюджета',
+                ttRate: 'Ставка',
+                ttBaseRate: 'База'
+            },
+            en: {
+                appTitle: 'Fiscal Policy: Tax & Budget Flow Simulator',
+                appSubtitle: 'Interactive simulation of statutory tax rates, customs tariffs, and public expenditure allocation (2026)',
+                tabKZText: 'Kazakhstan (SRC MoF RK)',
+                tabUSText: 'USA (IRS / U.S. Treasury)',
+                resetBtnText: 'Reset to Baseline',
+                sourceLabel: 'Dataset:',
+                groupATitle: 'Top 3 Core Budget Taxes',
+                groupBTitle: 'Customs, Excises & Other Levies',
+                kpiRevLabel: 'Total Budget Revenue',
+                kpiExpLabel: 'Baseline Expenditure',
+                kpiExpTag: 'STATUTORY',
+                kpiExpSub: 'Enacted public spending commitments',
+                kpiBalLabel: 'Fiscal Balance',
+                kpiBalSub: 'Net difference: Revenue minus Outlays',
+                kpiBurdenLabel: 'Effective Tax Burden',
+                sankeyMainHeading: 'Three-Stage Public Revenue Consolidation & Expenditure Flows',
+                sankeySubHeading: 'Hover over any tax node, budget fund, spending block, or flow ribbon for details',
+                legendStage1: '1. Taxes & Customs',
+                legendStage2: '2. Budget Funds',
+                legendStage3: '3. Spending Categories',
+                colTitle1: 'Revenue Sources (10)',
+                colTitle2: 'Budget Consolidation',
+                colTitle3: 'Expenditure Allocation',
+                elasticityTag: 'Laffer Elasticity Active',
+                elasticityNote: 'Sharp rate hikes induce modest tax-base erosion via behavioral response and reduced economic activity.',
+                surplus: 'SURPLUS',
+                deficit: 'DEFICIT',
+                balanced: 'BALANCED',
+                burdenLow: 'EXPANSIONARY',
+                burdenBase: 'BASELINE',
+                burdenHigh: 'CONTRACTIONARY',
+                baseForecast: 'Baseline forecast:',
+                burdenIndex: 'Fiscal pressure index:',
+                gdpSuffix: '% GDP',
+                ttAmount: 'Flow Volume',
+                ttShare: 'Budget Share',
+                ttRate: 'Active Rate',
+                ttBaseRate: 'Base'
+            }
+        };
+
+        // Initialize rates for both countries
+        function initRates() {
+            ['KZ', 'US'].forEach(country => {
+                FISCAL_DATA[country].taxes.forEach(tax => {
+                    currentRates[tax.id] = tax.baseline;
+                });
+            });
+        }
+
+        // Compute simulated revenue for a single tax with mild Laffer behavioral elasticity
+        function computeTaxRevenue(tax) {
+            const rate = currentRates[tax.id];
+            if (rate <= 0 || tax.baseline === 0) return 0;
+            const ratio = rate / tax.baseline;
+            // Mild behavioral elasticity: if rate > baseline, base shrinks slightly; if rate < baseline, base expands slightly
+            const behavioralMultiplier = Math.max(0.35, 1 - tax.elasticity * (ratio - 1) * 0.45);
+            return tax.baseRevenue * ratio * behavioralMultiplier;
+        }
+
+        function formatMoney(val, country) {
+            const unit = currentLang === 'ru' ? FISCAL_DATA[country].currencySymbol : FISCAL_DATA[country].currencySymbolEn;
+            if (country === 'KZ') {
+                return `${val.toFixed(2)} ${unit}`;
+            } else {
+                return currentLang === 'ru' ? `${Math.round(val).toLocaleString('ru-RU')} ${unit}` : `$${Math.round(val).toLocaleString('en-US')}B`;
+            }
+        }
+
+        // =========================================================================
+        // 3. RENDER VINTAGE RADIO-TUNER SLIDERS
+        // =========================================================================
+        function renderSliders() {
+            const data = FISCAL_DATA[currentCountry];
+            const coreContainer = document.getElementById('coreSlidersContainer');
+            const otherContainer = document.getElementById('otherSlidersContainer');
+            coreContainer.innerHTML = '';
+            otherContainer.innerHTML = '';
+
+            data.taxes.forEach(tax => {
+                const rate = currentRates[tax.id];
+                const pct = ((rate - tax.min) / (tax.max - tax.min)) * 100;
+                const rev = computeTaxRevenue(tax);
+
+                const card = document.createElement('div');
+                card.className = 'neon-card rounded-xl p-2.5 transition-all';
+                card.id = `card-${tax.id}`;
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between gap-2 mb-1.5">
+                        <div class="flex items-center gap-1.5 min-w-0">
+                            <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${tax.color}; box-shadow: 0 0 8px ${tax.color};"></span>
+                            <span class="text-xs font-bold text-slate-100 truncate" title="${tax.name[currentLang]}">
+                                ${tax.name[currentLang]}
+                            </span>
+                        </div>
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <span id="rate-val-${tax.id}" class="mono text-xs font-extrabold px-1.5 py-0.5 rounded bg-[#0e1117] border border-[#2d3648]" style="color:${tax.color};">
+                                ${rate.toFixed(tax.step < 0.5 ? 1 : 0)}${tax.unit}
+                            </span>
+                            <button type="button"
+                                class="w-5 h-5 rounded-full bg-[#12161f] hover:bg-slate-700 border border-[#343f54] text-slate-300 hover:text-white text-[11px] font-bold flex items-center justify-center transition-colors"
+                                onmouseenter="showTaxTooltip(event, '${tax.id}')"
+                                onmousemove="moveTooltip(event)"
+                                onmouseleave="hideTooltip()"
+                                onclick="showTaxTooltip(event, '${tax.id}')"
+                                aria-label="Info">
+                                i
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Vintage Radio-Receiver Tuner -->
+                    <div class="tuner-housing">
+                        <div class="tuner-scale-ticks">
+                            <span class="major"></span><span></span><span></span><span></span>
+                            <span class="major"></span><span></span><span></span><span></span>
+                            <span class="major"></span><span></span><span></span><span></span>
+                            <span class="major"></span>
+                        </div>
+                        <div class="tuner-track-wrapper">
+                            <div class="tuner-groove">
+                                <div id="fill-${tax.id}" class="tuner-fill" style="width:${pct}%; background: linear-gradient(90deg, ${tax.color}99, ${tax.color}); box-shadow: 0 0 10px ${tax.color};"></div>
+                            </div>
+                            <input type="range"
+                                class="radio-slider"
+                                style="--knob-glow: ${tax.color}99;"
+                                min="${tax.min}"
+                                max="${tax.max}"
+                                step="${tax.step}"
+                                value="${rate}"
+                                oninput="onSliderInput('${tax.id}', this.value)">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mt-1.5 text-[10.5px] text-slate-400 mono">
+                        <span id="rev-sub-${tax.id}">${formatMoney(rev, currentCountry)}</span>
+                        <span id="share-sub-${tax.id}" class="text-slate-400">0.0%</span>
+                    </div>
+                `;
+
+                if (tax.group === 'core') {
+                    coreContainer.appendChild(card);
+                } else {
+                    otherContainer.appendChild(card);
+                }
+            });
+        }
+
+        function onSliderInput(taxId, rawValue) {
+            const data = FISCAL_DATA[currentCountry];
+            const tax = data.taxes.find(t => t.id === taxId);
+            if (!tax) return;
+
+            const val = parseFloat(rawValue);
+            currentRates[taxId] = val;
+
+            // Update slider visual bar & numeric badge immediately
+            const pct = ((val - tax.min) / (tax.max - tax.min)) * 100;
+            const fillEl = document.getElementById(`fill-${taxId}`);
+            const rateEl = document.getElementById(`rate-val-${taxId}`);
+            if (fillEl) fillEl.style.width = `${pct}%`;
+            if (rateEl) rateEl.textContent = `${val.toFixed(tax.step < 0.5 ? 1 : 0)}${tax.unit}`;
+
+            updateSimulation();
+        }
+
+        // =========================================================================
+        // 4. UPDATE KPIS & RENDER 3-STAGE SANKEY DIAGRAM
+        // =========================================================================
+        function updateSimulation() {
+            const data = FISCAL_DATA[currentCountry];
+            const t = UI_TEXT[currentLang];
+
+            // 1. Calculate revenues for all 10 sources
+            const taxResults = data.taxes.map(tax => {
+                const rev = computeTaxRevenue(tax);
+                return { ...tax, rev };
+            });
+
+            const totalRev = taxResults.reduce((acc, item) => acc + item.rev, 0);
+            const baselineRev = data.taxes.reduce((acc, item) => acc + item.baseRevenue, 0);
+
+            // Update per-slider revenue & share readouts
+            let coreRevSum = 0;
+            let otherRevSum = 0;
+            taxResults.forEach(item => {
+                const sharePct = totalRev > 0 ? (item.rev / totalRev) * 100 : 0;
+                if (item.group === 'core') coreRevSum += item.rev;
+                else otherRevSum += item.rev;
+
+                const revEl = document.getElementById(`rev-sub-${item.id}`);
+                const shareEl = document.getElementById(`share-sub-${item.id}`);
+                if (revEl) revEl.textContent = formatMoney(item.rev, currentCountry);
+                if (shareEl) shareEl.textContent = `${sharePct.toFixed(1)}%`;
+            });
+
+            const coreSharePct = totalRev > 0 ? (coreRevSum / totalRev) * 100 : 0;
+            const otherSharePct = totalRev > 0 ? (otherRevSum / totalRev) * 100 : 0;
+            document.getElementById('groupAShare').textContent = `${coreSharePct.toFixed(1)}%`;
+            document.getElementById('groupBShare').textContent = `${otherSharePct.toFixed(1)}%`;
+
+            // 2. Update Top 4 KPI Cards
+            const revDeltaPct = ((totalRev - baselineRev) / baselineRev) * 100;
+            const deltaSign = revDeltaPct >= 0 ? '+' : '';
+            const deltaEl = document.getElementById('kpiRevDelta');
+            deltaEl.textContent = `${deltaSign}${revDeltaPct.toFixed(1)}%`;
+            deltaEl.className = `px-1.5 py-0.5 rounded mono text-[10px] font-bold ${
+                revDeltaPct > 0.2 ? 'bg-emerald-500/15 text-emerald-400' :
+                revDeltaPct < -0.2 ? 'bg-rose-500/15 text-rose-400' :
+                'bg-sky-500/10 text-sky-400'
+            }`;
+
+            document.getElementById('kpiRevValue').textContent = formatMoney(totalRev, currentCountry);
+            document.getElementById('kpiRevSub').textContent = `${t.baseForecast} ${formatMoney(baselineRev, currentCountry)}`;
+
+            const expVal = data.baselineExpenditure;
+            document.getElementById('kpiExpValue').textContent = formatMoney(expVal, currentCountry);
+
+            // Balance = Total Revenue - Baseline Expenditure
+            const balance = totalRev - expVal;
+            const balValEl = document.getElementById('kpiBalValue');
+            const balBadgeEl = document.getElementById('kpiBalBadge');
+            const balSign = balance > 0 ? '+' : '';
+            balValEl.textContent = `${balSign}${formatMoney(balance, currentCountry)}`;
+
+            if (balance > 0.05) {
+                balValEl.className = 'text-xl sm:text-2xl font-extrabold mono tracking-tight text-emerald-400';
+                balBadgeEl.textContent = t.surplus;
+                balBadgeEl.className = 'px-1.5 py-0.5 rounded mono text-[10px] font-bold bg-emerald-500/15 text-emerald-400';
+            } else if (balance < -0.05) {
+                balValEl.className = 'text-xl sm:text-2xl font-extrabold mono tracking-tight text-rose-400';
+                balBadgeEl.textContent = t.deficit;
+                balBadgeEl.className = 'px-1.5 py-0.5 rounded mono text-[10px] font-bold bg-rose-500/15 text-rose-400';
+            } else {
+                balValEl.className = 'text-xl sm:text-2xl font-extrabold mono tracking-tight text-sky-400';
+                balBadgeEl.textContent = t.balanced;
+                balBadgeEl.className = 'px-1.5 py-0.5 rounded mono text-[10px] font-bold bg-sky-500/15 text-sky-400';
+            }
+
+            // Tax Burden (% of GDP)
+            const burdenPct = (totalRev / data.gdpBase) * 100;
+            const burdenIndex = (totalRev / baselineRev) * 100;
+            document.getElementById('kpiBurdenValue').textContent = `${burdenPct.toFixed(1)}${t.gdpSuffix}`;
+            document.getElementById('kpiBurdenSub').textContent = `${t.burdenIndex} ${burdenIndex.toFixed(1)}`;
+
+            const burdenStatusEl = document.getElementById('kpiBurdenStatus');
+            if (burdenIndex > 103) {
+                burdenStatusEl.textContent = t.burdenHigh;
+                burdenStatusEl.className = 'px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-300 mono text-[10px] font-bold';
+            } else if (burdenIndex < 97) {
+                burdenStatusEl.textContent = t.burdenLow;
+                burdenStatusEl.className = 'px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 mono text-[10px] font-bold';
+            } else {
+                burdenStatusEl.textContent = t.burdenBase;
+                burdenStatusEl.className = 'px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-400 mono text-[10px] font-bold';
+            }
+
+            // 3. Draw 3-Stage Sankey Diagram
+            drawSankey(taxResults, totalRev);
+        }
+
+        function drawSankey(taxResults, totalRev) {
+            const svg = document.getElementById('sankeySvg');
+            const data = FISCAL_DATA[currentCountry];
+            const safeTotal = Math.max(totalRev, 0.001);
+
+            const W = 1160;
+            const H = 640;
+            const padTop = 18;
+            const padBottom = 18;
+            const usableH = H - padTop - padBottom;
+
+            const col1X = 185; // Left nodes right edge
+            const nodeW = 22;
+            const col2X = 569; // Middle nodes left edge
+            const col3X = 953; // Right nodes left edge
+
+            // --- STAGE 1 NODES (10 Taxes) ---
+            const gap1 = 10;
+            const availH1 = usableH - gap1 * (taxResults.length - 1);
+            let y1 = padTop;
+            const stage1Nodes = taxResults.map(tax => {
+                const rawH = (tax.rev / safeTotal) * availH1;
+                const h = Math.max(14, rawH); // Minimum height so labels remain crisp
+                const node = {
+                    ...tax,
+                    x: col1X - nodeW,
+                    y: y1,
+                    w: nodeW,
+                    h: h,
+                    outOffset: 0
+                };
+                y1 += h + gap1;
+                return node;
+            });
+
+            // Normalize Stage 1 total vertical height if min-heights expanded it
+            const actualEnd1 = y1 - gap1;
+            const scale1 = usableH / (actualEnd1 - padTop);
+            let curY1 = padTop;
+            stage1Nodes.forEach(n => {
+                n.y = curY1;
+                n.h = n.h * scale1;
+                curY1 += n.h + gap1 * scale1;
+            });
+
+            // --- STAGE 2 NODES (3 Budget Pools) ---
+            const poolTotals = {};
+            data.pools.forEach(p => poolTotals[p.id] = 0);
+            stage1Nodes.forEach(tax => {
+                data.pools.forEach(p => {
+                    const share = tax.allocation[p.id] || 0;
+                    poolTotals[p.id] += tax.rev * share;
+                });
+            });
+
+            const gap2 = 28;
+            const availH2 = usableH - gap2 * (data.pools.length - 1);
+            let y2 = padTop;
+            const stage2Nodes = data.pools.map(p => {
+                const val = poolTotals[p.id];
+                const h = Math.max(36, (val / safeTotal) * availH2);
+                const node = {
+                    ...p,
+                    val,
+                    x: col2X,
+                    y: y2,
+                    w: nodeW,
+                    h,
+                    inOffset: 0,
+                    outOffset: 0
+                };
+                y2 += h + gap2;
+                return node;
+            });
+
+            const actualEnd2 = y2 - gap2;
+            const scale2 = usableH / (actualEnd2 - padTop);
+            let curY2 = padTop;
+            stage2Nodes.forEach(n => {
+                n.y = curY2;
+                n.h = n.h * scale2;
+                curY2 += n.h + gap2 * scale2;
+            });
+
+            // --- STAGE 3 NODES (5 Spending Categories) ---
+            const gap3 = 20;
+            const availH3 = usableH - gap3 * (data.spending.length - 1);
+            let y3 = padTop;
+            const stage3Nodes = data.spending.map(sp => {
+                const val = safeTotal * sp.share;
+                const h = Math.max(30, (val / safeTotal) * availH3);
+                const node = {
+                    ...sp,
+                    val,
+                    x: col3X,
+                    y: y3,
+                    w: nodeW,
+                    h,
+                    inOffset: 0
+                };
+                y3 += h + gap3;
+                return node;
+            });
+
+            const actualEnd3 = y3 - gap3;
+            const scale3 = usableH / (actualEnd3 - padTop);
+            let curY3 = padTop;
+            stage3Nodes.forEach(n => {
+                n.y = curY3;
+                n.h = n.h * scale3;
+                curY3 += n.h + gap3 * scale3;
+            });
+
+            // --- BUILD SVG MARKUP ---
+            let defsHtml = `<defs>`;
+            let ribbonsHtml = `<g id="ribbonsLayer">`;
+            let nodesHtml = `<g id="nodesLayer">`;
+
+            let linkIdx = 0;
+
+            // Links: Stage 1 -> Stage 2
+            stage1Nodes.forEach(sNode => {
+                data.pools.forEach(p => {
+                    const allocShare = sNode.allocation[p.id] || 0;
+                    if (allocShare <= 0) return;
+
+                    const tNode = stage2Nodes.find(n => n.id === p.id);
+                    const flowVal = sNode.rev * allocShare;
+
+                    const sThick = (allocShare) * sNode.h;
+                    const tThick = tNode.val > 0 ? (flowVal / tNode.val) * tNode.h : 0;
+
+                    const sy0 = sNode.y + sNode.outOffset;
+                    const sy1 = sy0 + sThick;
+                    sNode.outOffset += sThick;
+
+                    const ty0 = tNode.y + tNode.inOffset;
+                    const ty1 = ty0 + tThick;
+                    tNode.inOffset += tThick;
+
+                    const gradId = `grad_12_${linkIdx++}`;
+                    defsHtml += `
+                        <linearGradient id="${gradId}" gradientUnits="userSpaceOnUse" x1="${sNode.x + sNode.w}" y1="0" x2="${tNode.x}" y2="0">
+                            <stop offset="0%" stop-color="${sNode.color}" stop-opacity="0.58"/>
+                            <stop offset="100%" stop-color="${tNode.color}" stop-opacity="0.45"/>
+                        </linearGradient>
+                    `;
+
+                    const pathD = buildRibbonPath(sNode.x + sNode.w, sy0, sy1, tNode.x, ty0, ty1);
+                    const shareOfTotal = ((flowVal / safeTotal) * 100).toFixed(1);
+
+                    ribbonsHtml += `
+                        <path d="${pathD}"
+                            fill="url(#${gradId})"
+                            class="sankey-ribbon"
+                            data-source="${sNode.id}"
+                            data-target="${tNode.id}"
+                            onmouseenter="highlightRibbon(event, this, '${escapeAttr(sNode.name[currentLang])} → ${escapeAttr(tNode.name[currentLang])}', '${formatMoney(flowVal, currentCountry)}', '${shareOfTotal}%', '${sNode.color}', '${escapeAttr(sNode.desc[currentLang])}', '${escapeAttr(sNode.legal[currentLang])}')"
+                            onmousemove="moveTooltip(event)"
+                            onmouseleave="resetHighlight()">
+                        </path>
+                    `;
+                });
+            });
+
+            // Links: Stage 2 -> Stage 3
+            stage2Nodes.forEach(pNode => {
+                stage3Nodes.forEach(spNode => {
+                    const flowVal = pNode.val * spNode.share;
+                    if (flowVal <= 0) return;
+
+                    const sThick = spNode.share * pNode.h;
+                    const tThick = spNode.val > 0 ? (flowVal / spNode.val) * spNode.h : 0;
+
+                    const sy0 = pNode.y + pNode.outOffset;
+                    const sy1 = sy0 + sThick;
+                    pNode.outOffset += sThick;
+
+                    const ty0 = spNode.y + spNode.inOffset;
+                    const ty1 = ty0 + tThick;
+                    spNode.inOffset += tThick;
+
+                    const gradId = `grad_23_${linkIdx++}`;
+                    defsHtml += `
+                        <linearGradient id="${gradId}" gradientUnits="userSpaceOnUse" x1="${pNode.x + pNode.w}" y1="0" x2="${spNode.x}" y2="0">
+                            <stop offset="0%" stop-color="${pNode.color}" stop-opacity="0.50"/>
+                            <stop offset="100%" stop-color="${spNode.color}" stop-opacity="0.55"/>
+                        </linearGradient>
+                    `;
+
+                    const pathD = buildRibbonPath(pNode.x + pNode.w, sy0, sy1, spNode.x, ty0, ty1);
+                    const shareOfTotal = ((flowVal / safeTotal) * 100).toFixed(1);
+
+                    ribbonsHtml += `
+                        <path d="${pathD}"
+                            fill="url(#${gradId})"
+                            class="sankey-ribbon"
+                            data-source="${pNode.id}"
+                            data-target="${spNode.id}"
+                            onmouseenter="highlightRibbon(event, this, '${escapeAttr(pNode.name[currentLang])} → ${escapeAttr(spNode.name[currentLang])}', '${formatMoney(flowVal, currentCountry)}', '${shareOfTotal}%', '${spNode.color}', '${escapeAttr(spNode.desc[currentLang])}', '${escapeAttr(spNode.legal[currentLang])}')"
+                            onmousemove="moveTooltip(event)"
+                            onmouseleave="resetHighlight()">
+                        </path>
+                    `;
+                });
+            });
+
+            defsHtml += `</defs>`;
+            ribbonsHtml += `</g>`;
+
+            // Draw Stage 1 Nodes + Left Labels
+            stage1Nodes.forEach(n => {
+                const sharePct = ((n.rev / safeTotal) * 100).toFixed(1);
+                const midY = n.y + n.h / 2;
+                const rateStr = `${currentRates[n.id].toFixed(n.step < 0.5 ? 1 : 0)}${n.unit}`;
+
+                nodesHtml += `
+                    <g class="sankey-node-group"
+                        onmouseenter="highlightNode(event, '${n.id}', '${escapeAttr(n.name[currentLang])}', '${formatMoney(n.rev, currentCountry)}', '${sharePct}%', '${rateStr}', '${n.color}', '${escapeAttr(n.desc[currentLang])}', '${escapeAttr(n.legal[currentLang])}')"
+                        onmousemove="moveTooltip(event)"
+                        onmouseleave="resetHighlight()">
+                        <rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="4"
+                            fill="${n.color}" stroke="#0f172a" stroke-width="1.2" class="sankey-node-rect"/>
+                        <text x="${n.x - 10}" y="${midY - 3}" text-anchor="end" fill="#f1f5f9" font-size="11.5" font-weight="700">
+                            ${n.shortName[currentLang]}
+                        </text>
+                        <text x="${n.x - 10}" y="${midY + 11}" text-anchor="end" fill="#94a3b8" font-size="10.5" class="mono">
+                            ${formatMoney(n.rev, currentCountry)} (${sharePct}%)
+                        </text>
+                    </g>
+                `;
+            });
+
+            // Draw Stage 2 Nodes + Center Pill Labels
+            stage2Nodes.forEach(n => {
+                const sharePct = ((n.val / safeTotal) * 100).toFixed(1);
+                const midY = n.y + n.h / 2;
+
+                nodesHtml += `
+                    <g class="sankey-node-group"
+                        onmouseenter="highlightNode(event, '${n.id}', '${escapeAttr(n.name[currentLang])}', '${formatMoney(n.val, currentCountry)}', '${sharePct}%', 'Pool', '${n.color}', '${escapeAttr(n.desc[currentLang])}', '${escapeAttr(n.legal[currentLang])}')"
+                        onmousemove="moveTooltip(event)"
+                        onmouseleave="resetHighlight()">
+                        <rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="5"
+                            fill="${n.color}" stroke="#0f172a" stroke-width="1.5" class="sankey-node-rect"/>
+                        <rect x="${n.x - 95}" y="${midY - 21}" width="212" height="42" rx="8"
+                            fill="#121620" fill-opacity="0.92" stroke="${n.color}" stroke-opacity="0.65" stroke-width="1.2"/>
+                        <text x="${n.x + 11}" y="${midY - 4}" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">
+                            ${n.name[currentLang]}
+                        </text>
+                        <text x="${n.x + 11}" y="${midY + 12}" text-anchor="middle" fill="${n.color}" font-size="11" font-weight="700" class="mono">
+                            ${formatMoney(n.val, currentCountry)} • ${sharePct}%
+                        </text>
+                    </g>
+                `;
+            });
+
+            // Draw Stage 3 Nodes + Right Labels
+            stage3Nodes.forEach(n => {
+                const sharePct = (n.share * 100).toFixed(0);
+                const midY = n.y + n.h / 2;
+
+                nodesHtml += `
+                    <g class="sankey-node-group"
+                        onmouseenter="highlightNode(event, '${n.id}', '${escapeAttr(n.name[currentLang])}', '${formatMoney(n.val, currentCountry)}', '${sharePct}%', '${sharePct}%', '${n.color}', '${escapeAttr(n.desc[currentLang])}', '${escapeAttr(n.legal[currentLang])}')"
+                        onmousemove="moveTooltip(event)"
+                        onmouseleave="resetHighlight()">
+                        <rect x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="4"
+                            fill="${n.color}" stroke="#0f172a" stroke-width="1.2" class="sankey-node-rect"/>
+                        <text x="${n.x + n.w + 10}" y="${midY - 3}" text-anchor="start" fill="#f1f5f9" font-size="11.5" font-weight="700">
+                            ${n.name[currentLang]}
+                        </text>
+                        <text x="${n.x + n.w + 10}" y="${midY + 11}" text-anchor="start" fill="#94a3b8" font-size="10.5" class="mono">
+                            ${formatMoney(n.val, currentCountry)} (${sharePct}%)
+                        </text>
+                    </g>
+                `;
+            });
+
+            nodesHtml += `</g>`;
+            svg.innerHTML = defsHtml + ribbonsHtml + nodesHtml;
+        }
+
+        function buildRibbonPath(x0, y0Top, y0Bot, x1, y1Top, y1Bot) {
+            const curvature = 0.5;
+            const xi = x0 + (x1 - x0) * curvature;
+            return `
+                M ${x0} ${y0Top}
+                C ${xi} ${y0Top}, ${xi} ${y1Top}, ${x1} ${y1Top}
+                L ${x1} ${y1Bot}
+                C ${xi} ${y1Bot}, ${xi} ${y0Bot}, ${x0} ${y0Bot}
+                Z
+            `;
+        }
+
+        function escapeAttr(str) {
+            return String(str).replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        // =========================================================================
+        // 5. INTERACTIVE HIGHLIGHTING & FLOATING TOOLTIP
+        // =========================================================================
+        function highlightNode(e, nodeId, title, amount, share, rateBadge, color, desc, legal) {
+            document.querySelectorAll('.sankey-ribbon').forEach(r => {
+                const isConnected = r.dataset.source === nodeId || r.dataset.target === nodeId;
+                r.style.opacity = isConnected ? '1' : '0.16';
+            });
+            showTooltipContent(e, title, amount, share, rateBadge, color, desc, legal);
+        }
+
+        function highlightRibbon(e, el, title, amount, share, color, desc, legal) {
+            document.querySelectorAll('.sankey-ribbon').forEach(r => {
+                r.style.opacity = (r === el) ? '1' : '0.18';
+            });
+            showTooltipContent(e, title, amount, share, share, color, desc, legal);
+        }
+
+        function resetHighlight() {
+            document.querySelectorAll('.sankey-ribbon').forEach(r => {
+                r.style.opacity = '1';
+            });
+            hideTooltip();
+        }
+
+        function showTaxTooltip(e, taxId) {
+            const data = FISCAL_DATA[currentCountry];
+            const tax = data.taxes.find(t => t.id === taxId);
+            if (!tax) return;
+
+            const rev = computeTaxRevenue(tax);
+            const totalRev = data.taxes.reduce((acc, item) => acc + computeTaxRevenue(item), 0);
+            const sharePct = totalRev > 0 ? ((rev / totalRev) * 100).toFixed(1) + '%' : '0.0%';
+            const rateStr = `${currentRates[tax.id].toFixed(tax.step < 0.5 ? 1 : 0)}${tax.unit}`;
+
+            showTooltipContent(
+                e,
+                tax.name[currentLang],
+                formatMoney(rev, currentCountry),
+                sharePct,
+                rateStr,
+                tax.color,
+                tax.desc[currentLang],
+                tax.legal[currentLang]
+            );
+        }
+
+        function showTooltipContent(e, title, amount, share, rateBadge, color, desc, legal) {
+            const tt = document.getElementById('floatingTooltip');
+            const t = UI_TEXT[currentLang];
+
+            document.getElementById('ttColorDot').style.backgroundColor = color;
+            document.getElementById('ttColorDot').style.boxShadow = `0 0 8px ${color}`;
+            document.getElementById('ttTitle').textContent = title;
+            document.getElementById('ttRateBadge').textContent = rateBadge;
+
+            document.getElementById('ttMetrics').innerHTML = `
+                <div>
+                    <div class="text-slate-500 text-[10px]">${t.ttAmount}</div>
+                    <div class="text-white font-bold">${amount}</div>
+                </div>
+                <div>
+                    <div class="text-slate-500 text-[10px]">${t.ttShare}</div>
+                    <div class="font-bold" style="color:${color}">${share}</div>
+                </div>
+            `;
+
+            document.getElementById('ttDesc').textContent = desc;
+            document.getElementById('ttLegal').textContent = legal;
+
+            tt.classList.remove('hidden');
+            moveTooltip(e);
+        }
+
+        function moveTooltip(e) {
+            const tt = document.getElementById('floatingTooltip');
+            if (tt.classList.contains('hidden')) return;
+
+            const offset = 16;
+            const ttRect = tt.getBoundingClientRect();
+            let left = e.clientX + offset;
+            let top = e.clientY + offset;
+
+            if (left + ttRect.width > window.innerWidth - 12) {
+                left = e.clientX - ttRect.width - offset;
+            }
+            if (top + ttRect.height > window.innerHeight - 12) {
+                top = e.clientY - ttRect.height - offset;
+            }
+
+            tt.style.left = `${Math.max(10, left)}px`;
+            tt.style.top = `${Math.max(10, top)}px`;
+        }
+
+        function hideTooltip() {
+            document.getElementById('floatingTooltip').classList.add('hidden');
+        }
+
+        // =========================================================================
+        // 6. COUNTRY SWITCHER, LANGUAGE SWITCHER & RESET
+        // =========================================================================
+        function switchCountry(country) {
+            currentCountry = country;
+
+            const tabKZ = document.getElementById('tabKZ');
+            const tabUS = document.getElementById('tabUS');
+
+            if (country === 'KZ') {
+                tabKZ.className = 'px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-sm';
+                tabUS.className = 'px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent';
+            } else {
+                tabUS.className = 'px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 bg-sky-500/20 text-sky-300 border border-sky-400/40 shadow-sm';
+                tabKZ.className = 'px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent';
+            }
+
+            applyTranslations();
+            renderSliders();
+            updateSimulation();
+        }
+
+        function switchLang(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+
+            const btnRU = document.getElementById('langRU');
+            const btnEN = document.getElementById('langEN');
+
+            if (lang === 'ru') {
+                btnRU.className = 'px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all bg-slate-700 text-white';
+                btnEN.className = 'px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all text-slate-400 hover:text-white';
+            } else {
+                btnEN.className = 'px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all bg-slate-700 text-white';
+                btnRU.className = 'px-2.5 py-1 rounded-lg text-xs font-extrabold transition-all text-slate-400 hover:text-white';
+            }
+
+            applyTranslations();
+            renderSliders();
+            updateSimulation();
+        }
+
+        function applyTranslations() {
+            const t = UI_TEXT[currentLang];
+            const data = FISCAL_DATA[currentCountry];
+
+            document.getElementById('appTitle').textContent = t.appTitle;
+            document.getElementById('appSubtitle').textContent = t.appSubtitle;
+            document.getElementById('tabKZText').textContent = t.tabKZText;
+            document.getElementById('tabUSText').textContent = t.tabUSText;
+            document.getElementById('resetBtnText').textContent = t.resetBtnText;
+            document.getElementById('sourceLabel').textContent = t.sourceLabel;
+            document.getElementById('sourceBadge').textContent = data.sourceBadge[currentLang];
+
+            document.getElementById('groupATitle').textContent = t.groupATitle;
+            document.getElementById('groupBTitle').textContent = t.groupBTitle;
+
+            document.getElementById('kpiRevLabel').textContent = t.kpiRevLabel;
+            document.getElementById('kpiExpLabel').textContent = t.kpiExpLabel;
+            document.getElementById('kpiExpTag').textContent = t.kpiExpTag;
+            document.getElementById('kpiExpSub').textContent = t.kpiExpSub;
+            document.getElementById('kpiBalLabel').textContent = t.kpiBalLabel;
+            document.getElementById('kpiBalSub').textContent = t.kpiBalSub;
+            document.getElementById('kpiBurdenLabel').textContent = t.kpiBurdenLabel;
+
+            document.getElementById('sankeyMainHeading').textContent = t.sankeyMainHeading;
+            document.getElementById('sankeySubHeading').textContent = t.sankeySubHeading;
+            document.getElementById('legendStage1').textContent = t.legendStage1;
+            document.getElementById('legendStage2').textContent = t.legendStage2;
+            document.getElementById('legendStage3').textContent = t.legendStage3;
+            document.getElementById('colTitle1').textContent = t.colTitle1;
+            document.getElementById('colTitle2').textContent = t.colTitle2;
+            document.getElementById('colTitle3').textContent = t.colTitle3;
+
+            document.getElementById('elasticityTag').textContent = t.elasticityTag;
+            document.getElementById('elasticityNote').textContent = t.elasticityNote;
+        }
+
+        function resetBaseline() {
+            FISCAL_DATA[currentCountry].taxes.forEach(tax => {
+                currentRates[tax.id] = tax.baseline;
+            });
+            renderSliders();
+            updateSimulation();
+        }
+
+        // Boot
+        window.addEventListener('DOMContentLoaded', () => {
+            initRates();
+            applyTranslations();
+            renderSliders();
+            updateSimulation();
+        });
+    </script>
+</body>
+</html>

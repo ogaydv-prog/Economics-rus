@@ -1,0 +1,2342 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Монетарная политика, Правило Тейлора и Создание депозитов | AlmaU 2026</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-obsidian: #0d1117;
+            --bg-vault: #141a23;
+            --bg-tuner: #1a222d;
+            --bg-recess: #090d12;
+            --gold-accent: #eab308;
+            --border-vault: rgba(234, 179, 8, 0.35);
+            --border-steel: rgba(148, 163, 184, 0.22);
+            --text-ivory: #f8fafc;
+            --text-slate: #94a3b8;
+            --stream-teal: #14b8a6;
+            --stream-cobalt: #3b82f6;
+            --stream-gold: #f59e0b;
+            --stream-violet: #8b5cf6;
+            --stream-coral: #f43f5e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-obsidian);
+            background-image:
+                radial-gradient(circle at 15% 10%, rgba(20, 184, 166, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 85% 5%, rgba(234, 179, 8, 0.08) 0%, transparent 45%);
+            color: var(--text-ivory);
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 22px;
+        }
+
+        /* Верхняя банковская шапка */
+        .vault-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(180deg, #192230 0%, #11161f 100%);
+            border: 1px solid var(--border-vault);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 15px 22px;
+            margin-bottom: 16px;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .crest-block {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* Контейнер под логотип AlmaU */
+        .almau-logo-frame {
+            background: #ffffff;
+            border: 1.5px solid #fbbf24;
+            box-shadow: 0 4px 16px rgba(234, 179, 8, 0.28);
+            border-radius: 10px;
+            padding: 5px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 52px;
+            min-width: 96px;
+            overflow: hidden;
+        }
+
+        .almau-logo-frame img {
+            max-height: 42px;
+            max-width: 135px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        .almau-logo-fallback {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-weight: 800;
+            font-size: 16px;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+        }
+
+        .title-stack h1 {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.25;
+            letter-spacing: 0.35px;
+            background: linear-gradient(180deg, #ffffff 0%, #fde68a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 2px 14px rgba(234, 179, 8, 0.15);
+        }
+
+        .title-stack p {
+            font-size: 12.8px;
+            color: var(--text-slate);
+            margin-top: 4px;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        /* Отдельные выпуклые 3D-кнопки вкладок */
+        .tabs-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .region-tab {
+            border: 1px solid rgba(255, 255, 255, 0.16);
+            border-radius: 10px;
+            padding: 9px 14px;
+            font-size: 12.8px;
+            font-weight: 700;
+            color: #e2e8f0;
+            background: linear-gradient(180deg, #242f40 0%, #151c27 100%);
+            box-shadow:
+                0 4px 0 #090d12,
+                0 6px 14px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18);
+            cursor: pointer;
+            transition: all 0.18s ease;
+            position: relative;
+            top: 0;
+        }
+
+        .region-tab:hover {
+            transform: translateY(-1px);
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+
+        .region-tab:active {
+            top: 2px;
+            box-shadow: 0 2px 0 #090d12, 0 3px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Казахстан — зелёненький */
+        .region-tab[data-region="kz"] {
+            border-bottom: 2px solid #10b981;
+        }
+        .region-tab[data-region="kz"].active {
+            background: linear-gradient(180deg, #10b981 0%, #047857 100%);
+            border-color: #6ee7b7;
+            color: #ffffff;
+            box-shadow:
+                0 4px 0 #064e3b,
+                0 0 18px rgba(16, 185, 129, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        /* США — красный */
+        .region-tab[data-region="us"] {
+            border-bottom: 2px solid #ef4444;
+        }
+        .region-tab[data-region="us"].active {
+            background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%);
+            border-color: #fca5a5;
+            color: #ffffff;
+            box-shadow:
+                0 4px 0 #7f1d1d,
+                0 0 18px rgba(239, 68, 68, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        /* Еврозона — синий */
+        .region-tab[data-region="eu"] {
+            border-bottom: 2px solid #3b82f6;
+        }
+        .region-tab[data-region="eu"].active {
+            background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+            border-color: #93c5fd;
+            color: #ffffff;
+            box-shadow:
+                0 4px 0 #1e3a8a,
+                0 0 18px rgba(59, 130, 246, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        /* Мировые кейсы — фиолетовый */
+        .region-tab[data-region="global"] {
+            border-bottom: 2px solid #8b5cf6;
+        }
+        .region-tab[data-region="global"].active {
+            background: linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%);
+            border-color: #c4b5fd;
+            color: #ffffff;
+            box-shadow:
+                0 4px 0 #4c1d95,
+                0 0 18px rgba(139, 92, 246, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        /* Модель создания депозитов — бирюзовый */
+        .region-tab[data-region="deposit_lab"] {
+            border-bottom: 2px solid #14b8a6;
+        }
+        .region-tab[data-region="deposit_lab"].active {
+            background: linear-gradient(180deg, #14b8a6 0%, #0f766e 100%);
+            border-color: #5eead4;
+            color: #ffffff;
+            box-shadow:
+                0 4px 0 #115e59,
+                0 0 18px rgba(20, 184, 166, 0.55),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        .pill-switch {
+            display: inline-flex;
+            background: var(--bg-recess);
+            padding: 4px;
+            border-radius: 10px;
+            border: 1px solid var(--border-steel);
+            gap: 2px;
+        }
+
+        .lang-tab {
+            border: none;
+            background: transparent;
+            color: var(--text-slate);
+            padding: 6px 10px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .lang-tab.active {
+            background: #273244;
+            color: #ffffff;
+        }
+
+        .btn-reset {
+            background: linear-gradient(180deg, #242f40 0%, #151c27 100%);
+            border: 1px solid var(--border-vault);
+            box-shadow: 0 3px 0 #090d12, inset 0 1px 0 rgba(255, 255, 255, 0.14);
+            color: #fde68a;
+            padding: 8px 13px;
+            border-radius: 9px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .btn-reset:hover {
+            background: #78350f;
+            color: #ffffff;
+        }
+
+        /* Полоса макроиндикаторов */
+        .metrics-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .metric-tile {
+            background: var(--bg-vault);
+            border: 1px solid var(--border-steel);
+            border-left: 3px solid var(--gold-accent);
+            border-radius: 11px;
+            padding: 12px 16px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.32);
+        }
+
+        .metric-lbl {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: var(--text-slate);
+            font-weight: 700;
+        }
+
+        .metric-val {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-size: 23px;
+            font-weight: 700;
+            margin: 4px 0 2px;
+        }
+
+        .metric-sub {
+            font-size: 11.5px;
+            color: var(--text-slate);
+        }
+
+        /* Пирамида целей монетарной политики */
+        .pyramid-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .pyramid-card {
+            background: var(--bg-vault);
+            border: 1px solid var(--border-steel);
+            border-radius: 12px;
+            padding: 13px 16px;
+        }
+
+        .step-tag {
+            display: inline-block;
+            font-size: 10.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            padding: 2px 8px;
+            border-radius: 5px;
+            margin-bottom: 6px;
+        }
+
+        .pyramid-card h3 {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-size: 15.5px;
+            color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .pyramid-card p {
+            font-size: 12.5px;
+            color: var(--text-slate);
+            line-height: 1.45;
+        }
+
+        /* Основной рабочий блок: Слева винтажные радио-регуляторы (365px) + Справа визуализация */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 365px 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .radio-deck {
+            background: linear-gradient(180deg, #18202c 0%, #121720 100%);
+            border: 1px solid var(--border-vault);
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.45);
+        }
+
+        .deck-section-title {
+            font-size: 11.5px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #fbbf24;
+            padding: 6px 10px;
+            background: rgba(234, 179, 8, 0.1);
+            border-left: 3px solid #eab308;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tuner-module {
+            background: var(--bg-tuner);
+            border: 1px solid rgba(148, 163, 184, 0.24);
+            border-radius: 11px;
+            padding: 10px 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+            transition: border-color 0.2s ease;
+        }
+
+        .tuner-module:hover {
+            border-color: var(--gold-accent);
+        }
+
+        .tuner-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .tuner-name-box {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+
+        .jewel-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .tuner-label {
+            font-size: 12.8px;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+
+        .help-circle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #273244;
+            border: 1px solid #64748b;
+            color: #e2e8f0;
+            font-size: 10.5px;
+            font-weight: 800;
+            cursor: help;
+            position: relative;
+        }
+
+        .help-circle:hover .help-bubble {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .help-bubble {
+            position: absolute;
+            left: -8px;
+            top: 22px;
+            width: 265px;
+            background: #080b10;
+            color: #f8fafc;
+            border: 1px solid var(--gold-accent);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 11.8px;
+            font-weight: 400;
+            line-height: 1.45;
+            z-index: 150;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-4px);
+            transition: all 0.2s ease;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85);
+            pointer-events: none;
+        }
+
+        .freq-display {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 13px;
+            font-weight: 800;
+            background: var(--bg-recess);
+            padding: 3px 9px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            white-space: nowrap;
+        }
+
+        /* КЛАССИЧЕСКИЙ ПОЛЗУНОК В СТИЛЕ СТАРОГО РАДИОПРИЁМНИКА С ВЕРТИКАЛЬНОЙ ЦВЕТНОЙ ПОЛОСКОЙ ПОСЕРЕДИНЕ */
+        .vintage-dial-housing {
+            background: #0b0f15;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 8px 10px 6px;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.85);
+            position: relative;
+        }
+
+        input[type="range"].vintage-radio-knob {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #1e293b;
+            outline: none;
+            cursor: pointer;
+            display: block;
+        }
+
+        input[type="range"].vintage-radio-knob::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1.5px solid #cbd5e1;
+            background: linear-gradient(
+                90deg,
+                #1e293b 0%,
+                #334155 34%,
+                var(--knob-stripe, #eab308) 38%,
+                var(--knob-stripe, #eab308) 62%,
+                #334155 66%,
+                #1e293b 100%
+            );
+            box-shadow:
+                0 0 12px var(--knob-stripe, #eab308),
+                0 3px 6px rgba(0, 0, 0, 0.9),
+                inset 0 1px 0 rgba(255, 255, 255, 0.45);
+            cursor: grab;
+            transition: transform 0.14s ease, box-shadow 0.14s ease;
+        }
+
+        input[type="range"].vintage-radio-knob::-webkit-slider-thumb:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 16px var(--knob-stripe, #eab308), 0 4px 8px rgba(0, 0, 0, 0.95);
+        }
+
+        input[type="range"].vintage-radio-knob::-moz-range-thumb {
+            width: 22px;
+            height: 28px;
+            border-radius: 4px;
+            border: 1.5px solid #cbd5e1;
+            background: linear-gradient(
+                90deg,
+                #1e293b 0%,
+                #334155 34%,
+                var(--knob-stripe, #eab308) 38%,
+                var(--knob-stripe, #eab308) 62%,
+                #334155 66%,
+                #1e293b 100%
+            );
+            box-shadow: 0 0 12px var(--knob-stripe, #eab308);
+            cursor: grab;
+        }
+
+        .dial-graduations {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 6px;
+            padding: 0 4px;
+        }
+
+        .dial-graduations span {
+            width: 1px;
+            height: 4px;
+            background: #64748b;
+        }
+
+        .dial-graduations span:nth-child(4n+1) {
+            height: 8px;
+            width: 1.5px;
+            background: #e2e8f0;
+        }
+
+        .tuner-bounds {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10.5px;
+            color: var(--text-slate);
+            margin-top: 4px;
+        }
+
+        /* Правая колонка */
+        .right-stage {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-box {
+            background: var(--bg-vault);
+            border: 1px solid var(--border-steel);
+            border-radius: 14px;
+            padding: 18px 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .sankey-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            padding-bottom: 10px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid var(--border-steel);
+            font-size: 11.8px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: #fde68a;
+        }
+
+        .sankey-columns div:nth-child(2) { text-align: center; }
+        .sankey-columns div:nth-child(3) { text-align: right; }
+
+        svg#moneyFlowSvg {
+            width: 100%;
+            height: 390px;
+            display: block;
+            overflow: visible;
+        }
+
+        .stream-path {
+            fill: none;
+            stroke-opacity: 0.48;
+            transition: stroke-opacity 0.2s ease;
+            cursor: pointer;
+        }
+
+        .stream-path:hover {
+            stroke-opacity: 0.92;
+        }
+
+        .vault-node {
+            rx: 5;
+            ry: 5;
+            stroke: rgba(255, 255, 255, 0.3);
+            stroke-width: 1;
+        }
+
+        .svg-title {
+            font-size: 12px;
+            font-weight: 700;
+            fill: #f8fafc;
+        }
+
+        .svg-sub {
+            font-size: 10.8px;
+            font-weight: 600;
+            fill: #94a3b8;
+        }
+
+        /* Двухколоночный аналитический блок */
+        .analytics-split {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 16px;
+        }
+
+        .box-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-steel);
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .box-heading h2 {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-size: 16.5px;
+            color: #ffffff;
+        }
+
+        .math-badge {
+            font-family: 'Consolas', monospace;
+            font-size: 11.5px;
+            background: var(--bg-recess);
+            border: 1px solid var(--border-vault);
+            color: #fbbf24;
+            padding: 3px 9px;
+            border-radius: 6px;
+        }
+
+        /* Калькулятор Правила Тейлора с винтажными цветными радио-ползунками */
+        .taylor-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .taylor-input-card {
+            background: var(--bg-tuner);
+            border: 1px solid var(--border-steel);
+            border-radius: 10px;
+            padding: 9px 10px;
+            transition: border-color 0.2s ease;
+        }
+
+        .taylor-input-card:hover {
+            border-color: var(--gold-accent);
+        }
+
+        .taylor-card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 7px;
+            gap: 4px;
+        }
+
+        .taylor-lbl-wrap {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11.2px;
+            color: #e2e8f0;
+            font-weight: 700;
+        }
+
+        .taylor-input-card .t-val {
+            font-family: 'Consolas', monospace;
+            font-size: 13px;
+            font-weight: 800;
+            background: var(--bg-recess);
+            padding: 2px 6px;
+            border-radius: 5px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+        }
+
+        .taylor-verdict {
+            background: var(--bg-recess);
+            border: 1px solid var(--border-vault);
+            border-radius: 10px;
+            padding: 11px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .taylor-res-num {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: #fbbf24;
+        }
+
+        .stance-pill {
+            font-size: 12px;
+            font-weight: 700;
+            padding: 5px 11px;
+            border-radius: 7px;
+        }
+
+        /* Кривая доходности ГЦБ */
+        svg#yieldCurveSvg {
+            width: 100%;
+            height: 195px;
+            display: block;
+        }
+
+        /* Отдельная вкладка: Модель создания депозитов */
+        .hidden-view {
+            display: none !important;
+        }
+
+        .dep-lab-grid {
+            display: grid;
+            grid-template-columns: 365px 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .dep-summary-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .dep-stat {
+            background: var(--bg-tuner);
+            border: 1px solid var(--border-steel);
+            border-radius: 10px;
+            padding: 11px 14px;
+        }
+
+        .dep-stat span {
+            display: block;
+            font-size: 11px;
+            color: var(--text-slate);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .dep-stat strong {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-size: 20px;
+            color: #ffffff;
+            margin-top: 3px;
+            display: block;
+        }
+
+        .dep-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12.5px;
+        }
+
+        .dep-table th {
+            text-align: left;
+            padding: 9px 10px;
+            background: var(--bg-recess);
+            color: #fde68a;
+            font-weight: 700;
+            border-bottom: 1px solid var(--border-vault);
+        }
+
+        .dep-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+            color: #e2e8f0;
+        }
+
+        .progress-bar-cell {
+            height: 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .formula-explain-box {
+            margin-top: 14px;
+            background: var(--bg-recess);
+            border: 1px solid rgba(20, 184, 166, 0.35);
+            border-radius: 10px;
+            padding: 13px 16px;
+            font-size: 12.8px;
+            color: #cbd5e1;
+            line-height: 1.55;
+        }
+
+        /* Раздел Базель III / IV */
+        .basel-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+        }
+
+        .basel-item {
+            background: var(--bg-tuner);
+            border: 1px solid var(--border-steel);
+            border-top: 2px solid var(--stream-teal);
+            border-radius: 10px;
+            padding: 13px 15px;
+        }
+
+        .basel-kicker {
+            font-size: 10.5px;
+            font-weight: 800;
+            color: #2dd4bf;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .basel-item h4 {
+            font-family: 'Playfair Display', 'Georgia', serif;
+            font-size: 14.5px;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        .basel-item p {
+            font-size: 12.3px;
+            color: var(--text-slate);
+            line-height: 1.45;
+        }
+
+        .cursor-tip {
+            position: fixed;
+            background: #080b10;
+            border: 1px solid var(--gold-accent);
+            color: #f8fafc;
+            padding: 9px 13px;
+            border-radius: 8px;
+            font-size: 12px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.12s ease;
+            z-index: 999;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.85);
+            max-width: 310px;
+        }
+
+        footer {
+            margin-top: 16px;
+            text-align: center;
+            font-size: 12.5px;
+            color: var(--text-slate);
+        }
+
+        @media (max-width: 1180px) {
+            .main-grid, .dep-lab-grid { grid-template-columns: 1fr; }
+            .analytics-split { grid-template-columns: 1fr; }
+            .metrics-row, .basel-cards, .dep-summary-cards { grid-template-columns: repeat(2, 1fr); }
+            .pyramid-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 640px) {
+            .metrics-row, .basel-cards, .taylor-grid, .dep-summary-cards { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="vault-header">
+        <div class="crest-block">
+            <div class="almau-logo-frame" title="Almaty Management University">
+                <img src="almau.jpeg"
+                     alt="AlmaU Logo"
+                     onerror="if(!this.dataset.t1){this.dataset.t1=1;this.src='AlmaU.jpeg';}else if(!this.dataset.t2){this.dataset.t2=1;this.src='almau.jpg';}else if(!this.dataset.t3){this.dataset.t3=1;this.src='almau.png';}else{this.style.display='none';document.getElementById('almauFallback').style.display='block';}">
+                <span id="almauFallback" class="almau-logo-fallback" style="display:none;">AlmaU</span>
+            </div>
+            <div class="title-stack">
+                <h1 id="uiTitle">Монетарная политика, Правило Тейлора и Создание депозитов</h1>
+                <p id="uiSubtitle">Интерактивный симулятор центрального банка (НБРК / ФРС США / ЕЦБ / Модель создания депозитов)</p>
+            </div>
+        </div>
+
+        <div class="nav-controls">
+            <div class="tabs-row">
+                <button type="button" class="region-tab active" data-region="kz" id="tabKz">🇰🇿 Казахстан (НБРК)</button>
+                <button type="button" class="region-tab" data-region="us" id="tabUs">🇺🇸 США (ФРС)</button>
+                <button type="button" class="region-tab" data-region="eu" id="tabEu">🇪🇺 Еврозона (ЕЦБ)</button>
+                <button type="button" class="region-tab" data-region="global" id="tabGl">🌐 Мировые кейсы</button>
+                <button type="button" class="region-tab" data-region="deposit_lab" id="tabDep">🏦 Модель создания депозитов</button>
+            </div>
+
+            <div class="pill-switch">
+                <button type="button" class="lang-tab active" data-lang="ru">РУС</button>
+                <button type="button" class="lang-tab" data-lang="en">ENG</button>
+            </div>
+
+            <button type="button" class="btn-reset" id="btnReset">↺ Сбросить</button>
+        </div>
+    </header>
+
+    <!-- ================= ВИД 1: РЕГИОНЫ МОНЕТАРНОЙ ПОЛИТИКИ (РК / США / ЕС / МИР) ================= -->
+    <div id="policyMainView">
+        <section class="metrics-row">
+            <div class="metric-tile">
+                <div class="metric-lbl" id="k1Lbl">Базовая / Ключевая ставка</div>
+                <div class="metric-val" id="k1Val" style="color: #fbbf24;">15.75%</div>
+                <div class="metric-sub" id="k1Sub">Ориентир денежного рынка</div>
+            </div>
+            <div class="metric-tile">
+                <div class="metric-lbl" id="k2Lbl">Полный мультипликатор (m)</div>
+                <div class="metric-val" id="k2Val" style="color: #2dd4bf;">4.36x</div>
+                <div class="metric-sub" id="k2Sub">m = (1 + c) / (rr + e + c)</div>
+            </div>
+            <div class="metric-tile">
+                <div class="metric-lbl" id="k3Lbl">Денежная масса (M2)</div>
+                <div class="metric-val" id="k3Val" style="color: #60a5fa;">50.11 трлн ₸</div>
+                <div class="metric-sub" id="k3Sub">Денежная база M0 × Мультипликатор</div>
+            </div>
+            <div class="metric-tile">
+                <div class="metric-lbl" id="k4Lbl">Инфляция: Факт / Таргет</div>
+                <div class="metric-val" id="k4Val" style="color: #fb7185;">9.2% → 5.0%</div>
+                <div class="metric-sub" id="k4Sub">Актуальные данные НБРК (nationalbank.kz)</div>
+            </div>
+        </section>
+
+        <!-- Пирамида целей ДКП -->
+        <section class="pyramid-grid" id="pyramidContainer"></section>
+
+        <!-- Основная зона -->
+        <main class="main-grid">
+            <aside class="radio-deck" id="radioDeck"></aside>
+
+            <div class="right-stage">
+                <section class="panel-box">
+                    <div class="sankey-columns">
+                        <div id="col1Lbl">I. Денежная база (M0) и Ликвидность</div>
+                        <div id="col2Lbl">II. Банковская система и Канал ставок</div>
+                        <div id="col3Lbl">III. Агрегаты денежной массы (M2)</div>
+                    </div>
+                    <svg id="moneyFlowSvg" viewBox="0 0 920 390" preserveAspectRatio="none"></svg>
+                </section>
+
+                <div class="analytics-split">
+                    <!-- Калькулятор Правила Тейлора с винтажными цветными радио-ползунками -->
+                    <section class="panel-box">
+                        <div class="box-heading">
+                            <h2 id="taylorTitle">Калькулятор Правила Тейлора</h2>
+                            <span class="math-badge">i = r* + π + 0.5(π - π*) + 0.5(y - y*)</span>
+                        </div>
+
+                        <div class="taylor-grid">
+                            <!-- Нейтральная r* — ЗЕЛЁНАЯ (#10b981) -->
+                            <div class="taylor-input-card">
+                                <div class="taylor-card-top">
+                                    <span class="taylor-lbl-wrap">
+                                        <span class="jewel-dot" style="background:#10b981; box-shadow:0 0 7px #10b981;"></span>
+                                        <span id="lblRStar">Нейтральная r*</span>
+                                    </span>
+                                    <span class="t-val" id="valRStar" style="color:#10b981;">3.50%</span>
+                                </div>
+                                <div class="vintage-dial-housing">
+                                    <input type="range" class="vintage-radio-knob taylor-knob" id="inpRStar"
+                                           data-color="#10b981" min="0.5" max="6.0" step="0.25" value="3.5"
+                                           style="--knob-stripe:#10b981;">
+                                    <div class="dial-graduations"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                                </div>
+                            </div>
+
+                            <!-- Инфляция π — СИНЯЯ (#3b82f6) -->
+                            <div class="taylor-input-card">
+                                <div class="taylor-card-top">
+                                    <span class="taylor-lbl-wrap">
+                                        <span class="jewel-dot" style="background:#3b82f6; box-shadow:0 0 7px #3b82f6;"></span>
+                                        <span id="lblPi">Инфляция π</span>
+                                    </span>
+                                    <span class="t-val" id="valPi" style="color:#3b82f6;">9.2%</span>
+                                </div>
+                                <div class="vintage-dial-housing">
+                                    <input type="range" class="vintage-radio-knob taylor-knob" id="inpPi"
+                                           data-color="#3b82f6" min="0.0" max="18.0" step="0.2" value="9.2"
+                                           style="--knob-stripe:#3b82f6;">
+                                    <div class="dial-graduations"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                                </div>
+                            </div>
+
+                            <!-- Разрыв ВВП (y-y*) — КРАСНЫЙ (#ef4444) -->
+                            <div class="taylor-input-card">
+                                <div class="taylor-card-top">
+                                    <span class="taylor-lbl-wrap">
+                                        <span class="jewel-dot" style="background:#ef4444; box-shadow:0 0 7px #ef4444;"></span>
+                                        <span id="lblGap">Разрыв ВВП (y-y*)</span>
+                                    </span>
+                                    <span class="t-val" id="valGap" style="color:#ef4444;">+1.0%</span>
+                                </div>
+                                <div class="vintage-dial-housing">
+                                    <input type="range" class="vintage-radio-knob taylor-knob" id="inpGap"
+                                           data-color="#ef4444" min="-5.0" max="5.0" step="0.2" value="1.0"
+                                           style="--knob-stripe:#ef4444;">
+                                    <div class="dial-graduations"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="taylor-verdict">
+                            <div>
+                                <div style="font-size: 11px; color: #94a3b8; text-transform: uppercase; font-weight: 700;" id="lblTaylorEq">Равновесная ставка по Тейлору:</div>
+                                <div class="taylor-res-num" id="valTaylorRes">15.30%</div>
+                            </div>
+                            <div id="taylorStanceBadge" class="stance-pill"></div>
+                        </div>
+                    </section>
+
+                    <!-- Кривая доходности ГЦБ -->
+                    <section class="panel-box">
+                        <div class="box-heading">
+                            <h2 id="yieldTitle">Кривая доходности ГЦБ МФ РК</h2>
+                            <span class="math-badge" id="yieldSpreadBadge">10Y–3M: -1.4%</span>
+                        </div>
+                        <svg id="yieldCurveSvg" viewBox="0 0 380 195"></svg>
+                    </section>
+                </div>
+            </div>
+        </main>
+
+        <!-- Пруденциальное регулирование Базель III / IV -->
+        <section class="panel-box">
+            <div class="box-heading">
+                <h2 id="baselTitle">Пруденциальное регулирование и стандарты Базель III / IV</h2>
+                <span style="font-size: 12px; color: #94a3b8;" id="baselSub">Нормативы достаточности капитала, ликвидности и надзора</span>
+            </div>
+            <div class="basel-cards" id="baselContainer"></div>
+        </section>
+    </div>
+
+    <!-- ================= ВИД 2: ОТДЕЛЬНАЯ ВКЛАДКА «МОДЕЛЬ СОЗДАНИЯ ДЕПОЗИТОВ» ================= -->
+    <div id="depositLabView" class="hidden-view">
+        <div class="dep-lab-grid">
+            <aside class="radio-deck" id="depSlidersDeck"></aside>
+
+            <section class="panel-box">
+                <div class="box-heading">
+                    <h2 id="depLabTitle">Интерактивная модель депозитного расширения (Денежный мультипликатор)</h2>
+                    <span class="math-badge">m = (1 + c) / (rr + e + c)</span>
+                </div>
+
+                <div class="dep-summary-cards">
+                    <div class="dep-stat">
+                        <span id="ds1Lbl">Первичный вклад (D₀)</span>
+                        <strong id="ds1Val" style="color: #fbbf24;">1 000</strong>
+                    </div>
+                    <div class="dep-stat">
+                        <span id="ds2Lbl">Мультипликатор депозитов (mD)</span>
+                        <strong id="ds2Val" style="color: #38bdf8;">3.57x</strong>
+                    </div>
+                    <div class="dep-stat">
+                        <span id="ds3Lbl">Полный мультипликатор (m)</span>
+                        <strong id="ds3Val" style="color: #2dd4bf;">4.36x</strong>
+                    </div>
+                    <div class="dep-stat">
+                        <span id="ds4Lbl">Итого создано денег (ΔM)</span>
+                        <strong id="ds4Val" style="color: #34d399;">4 357</strong>
+                    </div>
+                </div>
+
+                <table class="dep-table">
+                    <thead>
+                        <tr>
+                            <th id="thRound">Этап / Коммерческий банк</th>
+                            <th id="thDep">Новый депозит (Dᵢ)</th>
+                            <th id="thRes">Обяз. резервы (rr)</th>
+                            <th id="thExc">Избыт. резервы (e)</th>
+                            <th id="thCash">Утечка в нал. (c)</th>
+                            <th id="thLoan">Выданный кредит</th>
+                            <th id="thCum">Накопленные депозиты</th>
+                        </tr>
+                    </thead>
+                    <tbody id="roundsBody"></tbody>
+                </table>
+
+                <div class="formula-explain-box" id="formulaExplainBox"></div>
+            </section>
+        </div>
+    </div>
+
+    <div class="cursor-tip" id="cursorTip"></div>
+
+    <footer id="uiFooter">
+        Разработано для курса «Монетарная экономика» и «Макроэкономика» | AlmaU 2026
+    </footer>
+
+    <script>
+        const DATA_MODELS = {
+            kz: {
+                unitRu: "трлн ₸",
+                unitEn: "trln ₸",
+                baseM0: 11.5,
+                piTarget: 5.0,
+                defaultTaylor: { rStar: 3.5, pi: 9.2, gap: 1.0 },
+                inflationText: { ru: "9.2% → Цель 5.0%", en: "9.2% → Target 5.0%" },
+                inflationNote: { ru: "Актуальные данные НБРК (nationalbank.kz)", en: "Current NBK data (nationalbank.kz)" },
+                yieldTitle: { ru: "Кривая доходности ГЦБ МФ РК", en: "Yield Curve: Gov. Securities of MinFin RK" },
+                longBondBase: 13.6,
+                colors: {
+                    cash: "#f59e0b",
+                    reserves: "#3b82f6",
+                    credit: "#14b8a6",
+                    steril: "#8b5cf6"
+                },
+                goals: [
+                    {
+                        step: { ru: "1. Стратегическая цель", en: "1. Strategic Goal" },
+                        color: "#10b981",
+                        title: { ru: "Ценовая стабильность (Таргет 5,0%)", en: "Price Stability (5.0% Target)" },
+                        desc: {
+                            ru: "Обеспечение стабильности цен в Республике Казахстан и снижение годовой инфляции с текущих 9,2% до среднесрочной цели 5,0% при свободно плавающем курсе тенге.",
+                            en: "Ensuring price stability in Kazakhstan and bringing annual inflation from 9.2% toward the 5.0% medium-term target under a free-floating tenge."
+                        }
+                    },
+                    {
+                        step: { ru: "2. Промежуточная цель", en: "2. Intermediate Target" },
+                        color: "#3b82f6",
+                        title: { ru: "Кривая ГЦБ МФ РК и инфляционные ожидания", en: "MinFin RK Yield Curve & Expectations" },
+                        desc: {
+                            ru: "Трансляция базовой ставки в доходность государственных ценных бумаг (ГЦБ МФ РК), депозитные и кредитные ставки БВУ и дедолларизация экономики.",
+                            en: "Transmitting the base rate into MinFin RK government securities yields, commercial bank deposit/lending rates, and de-dollarization."
+                        }
+                    },
+                    {
+                        step: { ru: "3. Операционная цель", en: "3. Operational Target" },
+                        color: "#f59e0b",
+                        title: { ru: "Ставка TONIA внутри коридора ±1 п.п.", en: "TONIA Rate within ±1 pp Corridor" },
+                        desc: {
+                            ru: "Удержание однодневной ставки денежного рынка TONIA вблизи базовой ставки НБРК с помощью операций РЕПО, краткосрочных нот НБРК и постоянных механизмов.",
+                            en: "Keeping the overnight money market rate TONIA close to the NBK base rate via REPO operations, short-term NBK notes, and standing facilities."
+                        }
+                    }
+                ],
+                controls: [
+                    {
+                        id: "rate", group: "policy", color: "#14b8a6",
+                        name: { ru: "Базовая ставка НБРК", en: "NBK Base Rate" },
+                        val: 15.75, min: 8, max: 22, step: 0.25, unit: "%",
+                        desc: {
+                            ru: "Ключевой инструмент ДКП Казахстана (коридор ±1 п.п.). Определяет стоимость тенговой ликвидности, ставку TONIA и доходность нот НБРК.",
+                            en: "Primary monetary policy instrument of Kazakhstan (±1 pp corridor). Sets tenge liquidity cost, TONIA rate, and NBK note yields."
+                        }
+                    },
+                    {
+                        id: "rr", group: "policy", color: "#3b82f6",
+                        name: { ru: "Норма обязательных резервов (rr)", en: "Required Reserve Ratio (rr)" },
+                        val: 4.0, min: 1, max: 15, step: 0.5, unit: "%",
+                        desc: {
+                            ru: "Минимальные резервные требования НБРК (дифференцированы: 2–4% по тенговым обязательствам и до 10–15% по валютным обязательствам БВУ).",
+                            en: "NBK minimum reserve requirements (differentiated: 2–4% for tenge liabilities and up to 10–15% for FX liabilities)."
+                        }
+                    },
+                    {
+                        id: "er", group: "policy", color: "#06b6d4",
+                        name: { ru: "Избыточные резервы банков (e)", en: "Excess Reserve Ratio (e)" },
+                        val: 2.0, min: 0, max: 12, step: 0.5, unit: "%",
+                        desc: {
+                            ru: "Свободная ликвидность БВУ на корсчетах и депозитах в НБРК сверх обязательных резервов (rr). Рост e сжимает мультипликатор.",
+                            en: "Commercial bank liquidity held at the NBK above required reserves (rr). Higher excess reserves compress the money multiplier."
+                        }
+                    },
+                    {
+                        id: "cash_ratio", group: "mult", color: "#f59e0b",
+                        name: { ru: "Коэффициент наличности (c = C/D)", en: "Currency-to-Deposit Ratio (c)" },
+                        val: 22, min: 5, max: 50, step: 1, unit: "%",
+                        desc: {
+                            ru: "Отношение наличных тенге вне банков к депозитам БВУ. Развитие QR-платежей снижает c и повышает мультипликатор.",
+                            en: "Ratio of cash outside banks to commercial bank deposits. Digital/QR payment adoption lowers c and boosts the money multiplier."
+                        }
+                    },
+                    {
+                        id: "omo", group: "mult", color: "#8b5cf6",
+                        name: { ru: "Ноты НБРК и РЕПО (Стерилизация)", en: "NBK Notes & REPO Operations" },
+                        val: 100, min: 50, max: 150, step: 5, unit: "% M0",
+                        desc: {
+                            ru: "Операции открытого рынка: выпуск краткосрочных нот НБРК и депозитные аукционы для связывания избыточной тенговой ликвидности.",
+                            en: "Open market operations: short-term NBK notes and deposit auctions absorbing structural tenge liquidity surplus."
+                        }
+                    }
+                ],
+                basel: [
+                    {
+                        tag: "КАПИТАЛ БВУ (АРРФР / НБРК)",
+                        title: { ru: "Базель III в РК: k1 ≥ 7,5%, k2 ≥ 10%", en: "Basel III in RK: k1 ≥ 7.5%, k2 ≥ 10%" },
+                        desc: {
+                            ru: "АРРФР устанавливает норматив базового капитала k1 не ниже 7,5% (с консервационным буфером) и собственного капитала k2 от 10% до 12% для системно значимых банков.",
+                            en: "ARDFM enforces minimum Tier 1 capital k1 ≥ 7.5% (with conservation buffer) and total capital k2 at 10%–12% for systemically important banks."
+                        }
+                    },
+                    {
+                        tag: "ЛИКВИДНОСТЬ (LCR / NSFR)",
+                        title: { ru: "Покрытие оттока и фондирование", en: "Liquidity Coverage & Net Stable Funding" },
+                        desc: {
+                            ru: "Норматив LCR ≥ 100% обязывает банки держать портфель высоколиквидных активов (ГЦБ МФ РК и ноты НБРК) на 30 дней стресса, а NSFR ≥ 100% балансирует фондирование.",
+                            en: "LCR ≥ 100% mandates high-quality liquid assets (MinFin RK bonds & NBK notes) for a 30-day stress window; NSFR ≥ 100% aligns long-term funding."
+                        }
+                    },
+                    {
+                        tag: "ЗАЩИТА ЗАЁМЩИКОВ (КДН)",
+                        title: { ru: "Ограничение долговой нагрузки (КДН ≤ 50%)", en: "Debt-to-Income Limit (DTI ≤ 50%)" },
+                        desc: {
+                            ru: "Макропруденциальный барьер АРРФР: ежемесячные платежи гражданина по всем кредитам не должны превышать 50% официального дохода.",
+                            en: "ARDFM macroprudential cap: monthly debt service cannot exceed 50% of verified income, paired with elevated risk weights on consumer loans."
+                        }
+                    },
+                    {
+                        tag: "ПЕРЕХОД К БАЗЕЛЬ IV",
+                        title: { ru: "Новые стандарты оценки рисков (2025–2027)", en: "Basel IV Risk Standards (2025–2027)" },
+                        desc: {
+                            ru: "Поэтапное внедрение стандартов Базель IV в банковском секторе Казахстана: детализированная шкала риск-весов по ипотеке, МСБ и операционному риску.",
+                            en: "Phased adoption of Basel IV across Kazakhstan's banking sector: granular risk weights for mortgages, SME lending, and operational risk."
+                        }
+                    }
+                ]
+            },
+
+            us: {
+                unitRu: "трлн $",
+                unitEn: "trln $",
+                baseM0: 5.45,
+                piTarget: 2.0,
+                defaultTaylor: { rStar: 1.0, pi: 2.8, gap: 0.4 },
+                inflationText: { ru: "2.8% → Цель 2.0%", en: "2.8% → Target 2.0%" },
+                inflationNote: { ru: "Двойной мандат ФРС (PCE 2% + занятость)", en: "Fed Dual Mandate (2% PCE + Max Employment)" },
+                yieldTitle: { ru: "Кривая доходности U.S. Treasuries", en: "U.S. Treasury Yield Curve" },
+                longBondBase: 4.30,
+                colors: { cash: "#f59e0b", reserves: "#3b82f6", credit: "#14b8a6", steril: "#8b5cf6" },
+                goals: [
+                    {
+                        step: { ru: "1. Стратегическая цель", en: "1. Strategic Goal" },
+                        color: "#ef4444",
+                        title: { ru: "Двойной мандат ФРС (Dual Mandate)", en: "Federal Reserve Dual Mandate" },
+                        desc: {
+                            ru: "Максимальная устойчивая занятость и ценовая стабильность — долгосрочная инфляция по индексу PCE на уровне 2,0%.",
+                            en: "Maximum sustainable employment and stable prices defined as 2.0% long-run PCE inflation."
+                        }
+                    },
+                    {
+                        step: { ru: "2. Промежуточная цель", en: "2. Intermediate Target" },
+                        color: "#3b82f6",
+                        title: { ru: "Доходность U.S. Treasuries и финансовые условия", en: "U.S. Treasury Yields & Financial Conditions" },
+                        desc: {
+                            ru: "Воздействие на кривую доходности казначейских облигаций США, ставки ипотеки, корпоративный долг и управление балансом ФРС через QT.",
+                            en: "Steering U.S. Treasury yields, mortgage rates, corporate credit spreads, and Fed balance sheet runoff (QT)."
+                        }
+                    },
+                    {
+                        step: { ru: "3. Операционная цель", en: "3. Operational Target" },
+                        color: "#f59e0b",
+                        title: { ru: "Ставка Federal Funds в диапазоне 3.75%–4.00%", en: "Fed Funds Target Range 3.75%–4.00%" },
+                        desc: {
+                            ru: "Удержание эффективной ставки EFFR (3,88%) в режиме «обильных резервов» через ставку IORB и механизм обратного РЕПО (ON RRP).",
+                            en: "Steering Effective Fed Funds Rate (3.88%) in an Ample Reserves regime via Interest on Reserve Balances (IORB) and ON RRP."
+                        }
+                    }
+                ],
+                controls: [
+                    {
+                        id: "rate", group: "policy", color: "#14b8a6",
+                        name: { ru: "Ставка ФРС (Fed Funds Upper)", en: "Fed Funds Target Rate" },
+                        val: 4.00, min: 0.25, max: 7.0, step: 0.25, unit: "%",
+                        desc: {
+                            ru: "Верхняя граница целевого диапазона FOMC (3,75%–4,00%). Базовый ориентир мировой долларовой ликвидности.",
+                            en: "Upper bound of the FOMC target range (3.75%–4.00%). Global benchmark cost of USD liquidity."
+                        }
+                    },
+                    {
+                        id: "rr", group: "policy", color: "#3b82f6",
+                        name: { ru: "Обязательные резервы ФРС (rr)", en: "Required Reserve Ratio (rr)" },
+                        val: 0.0, min: 0, max: 12, step: 0.5, unit: "%",
+                        desc: {
+                            ru: "С марта 2020 г. ФРС установила норму обязательных резервов на уровне 0%.",
+                            en: "Since March 2020, the Federal Reserve set statutory reserve requirements at 0%."
+                        }
+                    },
+                    {
+                        id: "er", group: "policy", color: "#06b6d4",
+                        name: { ru: "Избыточные резервы в ФРС (e / IORB)", en: "Excess Reserves at Fed (e / IORB)" },
+                        val: 11.0, min: 1, max: 25, step: 0.5, unit: "%",
+                        desc: {
+                            ru: "В системе «обильных резервов» банки США держат ~11% избыточных резервов на счетах ФРС, получая процент IORB.",
+                            en: "Under the Ample Reserves regime, U.S. banks hold ~11% excess reserves at the Fed to earn IORB interest."
+                        }
+                    },
+                    {
+                        id: "cash_ratio", group: "mult", color: "#f59e0b",
+                        name: { ru: "Наличность вне банков (c = C/D)", en: "Currency-to-Deposit Ratio (c)" },
+                        val: 14, min: 5, max: 35, step: 1, unit: "%",
+                        desc: {
+                            ru: "Отношение наличных долларов в обращении (включая международный спрос на USD) к депозитам коммерческих банков США.",
+                            en: "Ratio of physical USD currency in circulation (including global demand) to U.S. commercial bank deposits."
+                        }
+                    },
+                    {
+                        id: "omo", group: "mult", color: "#8b5cf6",
+                        name: { ru: "Баланс ФРС (QE / QT Операции)", en: "Fed Balance Sheet (QE / QT)" },
+                        val: 100, min: 60, max: 160, step: 5, unit: "% M0",
+                        desc: {
+                            ru: "Покупка казначейских бумаг U.S. Treasuries и ипотечных облигаций MBS (QE) либо сокращение портфеля ФРС (QT).",
+                            en: "Purchases of U.S. Treasuries and agency MBS (QE) or balance sheet runoff (QT)."
+                        }
+                    }
+                ],
+                basel: [
+                    {
+                        tag: "КАПИТАЛ G-SIB",
+                        title: { ru: "Надбавки для глобальных банков США", en: "U.S. G-SIB Capital Surcharges" },
+                        desc: {
+                            ru: "Крупнейшие банки США (JPMorgan, Bank of America, Citigroup) обязаны поддерживать базовый капитал CET1 на уровне 10%–13,5%.",
+                            en: "Major U.S. banks (JPMorgan, BofA, Citigroup) must maintain 10%–13.5% CET1 capital including G-SIB surcharges."
+                        }
+                    },
+                    {
+                        tag: "СТРЕСС-ТЕСТЫ ФРС (CCAR)",
+                        title: { ru: "Стресс-буфер капитала (SCB)", en: "Fed Stress Tests & Stress Capital Buffer" },
+                        desc: {
+                            ru: "ФРС ежегодно проверяет устойчивость банков к сценарию глубокой рецессии и назначает индивидуальный буфер стрессового капитала (SCB).",
+                            en: "The Fed runs annual severe recession stress tests to calibrate each bank's Stress Capital Buffer (SCB)."
+                        }
+                    },
+                    {
+                        tag: "БАЗЕЛЬ III ENDGAME",
+                        title: { ru: "Американская версия Базель IV", en: "Basel III Endgame Implementation" },
+                        desc: {
+                            ru: "Пакет реформ «Basel III Endgame» унифицирует оценку рыночного и операционного риска для банков США с активами свыше $100 млрд.",
+                            en: "Basel III Endgame standardizes market and operational risk rules for U.S. banking organizations with over $100B in assets."
+                        }
+                    },
+                    {
+                        tag: "СТРАХОВАНИЕ ВКЛАДОВ FDIC",
+                        title: { ru: "Гарантия $250,000 и Discount Window", en: "FDIC $250k Coverage & Discount Window" },
+                        desc: {
+                            ru: "Корпорация FDIC страхует вклады до $250 тыс., а экстренную ликвидность банки получают через дисконтное окно ФРС под залог Treasuries.",
+                            en: "FDIC insures deposits up to $250,000, while emergency liquidity is backstopped via the Fed's Discount Window."
+                        }
+                    }
+                ]
+            },
+
+            eu: {
+                unitRu: "трлн €",
+                unitEn: "trln €",
+                baseM0: 3.95,
+                piTarget: 2.0,
+                defaultTaylor: { rStar: 0.75, pi: 2.1, gap: -0.2 },
+                inflationText: { ru: "2.1% → Цель 2.0%", en: "2.1% → Target 2.0%" },
+                inflationNote: { ru: "Симметричный таргет ЕЦБ по HICP", en: "ECB symmetric 2.0% HICP target" },
+                yieldTitle: { ru: "Кривая доходности гособлигаций Еврозоны", en: "Eurozone Sovereign Yield Curve (AAA)" },
+                longBondBase: 2.60,
+                colors: { cash: "#f59e0b", reserves: "#3b82f6", credit: "#14b8a6", steril: "#8b5cf6" },
+                goals: [
+                    {
+                        step: { ru: "1. Стратегическая цель", en: "1. Strategic Goal" },
+                        color: "#3b82f6",
+                        title: { ru: "Ценовая стабильность (Симметричные 2,0%)", en: "Price Stability (Symmetric 2.0%)" },
+                        desc: {
+                            ru: "Главный мандат ЕЦБ — поддержание годовой инфляции в Еврозоне на уровне 2,0% в среднесрочной перспективе.",
+                            en: "Primary ECB mandate: maintaining Eurozone inflation at a symmetric 2.0% medium-term target."
+                        }
+                    },
+                    {
+                        step: { ru: "2. Промежуточная цель", en: "2. Intermediate Target" },
+                        color: "#14b8a6",
+                        title: { ru: "Денежный агрегат M3 и единство трансмиссии", en: "Broad Money M3 & Transmission Protection" },
+                        desc: {
+                            ru: "Контроль денежной массы M3, банковского кредитования и недопущение фрагментации суверенных облигаций стран ЕС (инструмент TPI).",
+                            en: "Monitoring M3 money supply, bank lending, and preventing sovereign yield fragmentation across Eurozone states (TPI)."
+                        }
+                    },
+                    {
+                        step: { ru: "3. Операционная цель", en: "3. Operational Target" },
+                        color: "#f59e0b",
+                        title: { ru: "Ставка €STR вблизи Deposit Facility (2.50%)", en: "€STR Rate near Deposit Facility (2.50%)" },
+                        desc: {
+                            ru: "Управление ставкой овернайт €STR через депозитную ставку ЕЦБ (2,50%), ставку MRO (2,65%) и ставку маржинального кредитования (2,90%).",
+                            en: "Steering €STR overnight rate via Deposit Facility (2.50%), Main Refinancing (2.65%), and Marginal Lending (2.90%) rates."
+                        }
+                    }
+                ],
+                controls: [
+                    {
+                        id: "rate", group: "policy", color: "#14b8a6",
+                        name: { ru: "Депозитная ставка ЕЦБ (Deposit Facility)", en: "ECB Deposit Facility Rate" },
+                        val: 2.50, min: -0.5, max: 5.5, step: 0.25, unit: "%",
+                        desc: {
+                            ru: "Основная ставка ЕЦБ, определяющая доходность избыточных резервов банков в Евросистеме.",
+                            en: "Primary ECB policy rate setting remuneration on excess bank reserves in the Eurosystem."
+                        }
+                    },
+                    {
+                        id: "rr", group: "policy", color: "#3b82f6",
+                        name: { ru: "Обязательные резервы Евросистемы (rr)", en: "Eurosystem Minimum Reserves (rr)" },
+                        val: 1.0, min: 0.5, max: 10, step: 0.5, unit: "%",
+                        desc: {
+                            ru: "ЕЦБ устанавливает норму минимальных резервов на уровне 1% от клиентских депозитов сроком до 2 лет.",
+                            en: "ECB sets minimum reserve requirements at 1% of customer deposits up to 2 years maturity."
+                        }
+                    },
+                    {
+                        id: "er", group: "policy", color: "#06b6d4",
+                        name: { ru: "Избыточные резервы банков ЕС (e)", en: "Eurosystem Excess Reserves (e)" },
+                        val: 7.5, min: 0.5, max: 20, step: 0.5, unit: "%",
+                        desc: {
+                            ru: "Избыточная ликвидность банков Еврозоны на депозитной линии ЕЦБ (Deposit Facility).",
+                            en: "Excess liquidity held by Eurozone banks in the ECB Deposit Facility."
+                        }
+                    },
+                    {
+                        id: "cash_ratio", group: "mult", color: "#f59e0b",
+                        name: { ru: "Доля наличных евро (c = C/D)", en: "Euro Currency-to-Deposit Ratio (c)" },
+                        val: 12, min: 4, max: 30, step: 1, unit: "%",
+                        desc: {
+                            ru: "Отношение наличных банкнот евро в обращении к безналичным депозитам в кредитных организациях Еврозоны.",
+                            en: "Ratio of physical euro banknotes in circulation to commercial bank deposits across the Eurozone."
+                        }
+                    },
+                    {
+                        id: "omo", group: "mult", color: "#8b5cf6",
+                        name: { ru: "Портфель APP / PEPP и операции LTRO", en: "APP / PEPP Portfolio & LTRO Ops" },
+                        val: 100, min: 60, max: 150, step: 5, unit: "% M0",
+                        desc: {
+                            ru: "Управление портфелями выкупленных гособлигаций Еврозоны (APP и PEPP) и целевыми операциями рефинансирования.",
+                            en: "Managing Eurozone sovereign bond purchase portfolios (APP & PEPP) and targeted refinancing operations."
+                        }
+                    }
+                ],
+                basel: [
+                    {
+                        tag: "ЕДИНЫЙ НАДЗОР (SSM)",
+                        title: { ru: "Единый надзорный механизм ЕЦБ", en: "ECB Single Supervisory Mechanism" },
+                        desc: {
+                            ru: "ЕЦБ напрямую контролирует более 110 системно значимых банков Еврозоны через процесс SREP, назначая надбавки к капиталу Pillar 2.",
+                            en: "The ECB directly supervises 110+ significant Eurozone banks via SREP, setting bank-specific Pillar 2 capital add-ons."
+                        }
+                    },
+                    {
+                        tag: "РЕГЛАМЕНТ CRR III (БАЗЕЛЬ IV)",
+                        title: { ru: "Нижний предел моделей (Output Floor 72,5%)", en: "Basel IV Output Floor (72.5%)" },
+                        desc: {
+                            ru: "Европейский пакет CRR III внедряет стандарты Базель IV, ограничивая занижение риск-весов по внутренним моделям банков планкой 72,5%.",
+                            en: "EU CRR III implements Basel IV, capping internal model risk-weight reductions at a 72.5% standardized Output Floor."
+                        }
+                    },
+                    {
+                        tag: "БУФЕРЫ КАПИТАЛА",
+                        title: { ru: "Контрциклический буфер (CCyB)", en: "Countercyclical Capital Buffer (CCyB)" },
+                        desc: {
+                            ru: "Национальные регуляторы стран Еврозоны накапливают контрциклический буфер (0,5%–2,5%) на подъёме кредитного цикла.",
+                            en: "National authorities build up the Countercyclical Capital Buffer (0.5%–2.5%) during credit booms and release it in downturns."
+                        }
+                    },
+                    {
+                        tag: "ЦИФРОВАЯ УСТОЙЧИВОСТЬ (DORA)",
+                        title: { ru: "Киберустойчивость и климатические тесты", en: "DORA Cyber Resilience & Climate Stress" },
+                        desc: {
+                            ru: "ЕЦБ проводит регулярные климатические стресс-тесты банков и контролирует соблюдение регламента DORA.",
+                            en: "The ECB conducts climate stress tests and enforces the Digital Operational Resilience Act (DORA) across financial institutions."
+                        }
+                    }
+                ]
+            },
+
+            global: {
+                unitRu: "индекс",
+                unitEn: "index",
+                baseM0: 10.0,
+                piTarget: 2.0,
+                defaultTaylor: { rStar: 1.5, pi: 2.3, gap: 0.0 },
+                inflationText: { ru: "2.0%–2.5% (Таргеты)", en: "2.0%–2.5% (Targets)" },
+                inflationNote: { ru: "Новая Зеландия, Канада, Британия, Китай", en: "New Zealand, Canada, UK, China" },
+                yieldTitle: { ru: "Кривая гос. облигаций (Gilts / CGB)", en: "Sovereign Yield Curve (Gilts / CGB)" },
+                longBondBase: 4.10,
+                colors: { cash: "#f59e0b", reserves: "#3b82f6", credit: "#14b8a6", steril: "#8b5cf6" },
+                goals: [
+                    {
+                        step: { ru: "🇳🇿 🇨🇦 🇦🇺 Пионеры таргетирования", en: "🇳🇿 🇨🇦 🇦🇺 Inflation Targeting Pioneers" },
+                        color: "#8b5cf6",
+                        title: { ru: "Новая Зеландия (1990), Канада (1991), Австралия", en: "New Zealand (1990), Canada (1991), Australia" },
+                        desc: {
+                            ru: "Резервный банк Новой Зеландии первым в мире ввёл инфляционное таргетирование (1–3%) с персональной ответственностью главы ЦБ.",
+                            en: "RBNZ pioneered inflation targeting in 1990 (1–3% band) with Governor accountability. Bank of Canada and RBA target 2% and 2–3%."
+                        }
+                    },
+                    {
+                        step: { ru: "🇬🇧 Банк Англии (Floor System)", en: "🇬🇧 Bank of England (Floor System)" },
+                        color: "#3b82f6",
+                        title: { ru: "Система «единого пола» (Bank Rate → SONIA)", en: "Single-Tier Floor System (Bank Rate → SONIA)" },
+                        desc: {
+                            ru: "Банк Англии начисляет единую ключевую ставку (Bank Rate) на все резервы коммерческих банков, обеспечивая трансляцию в SONIA.",
+                            en: "The Bank of England remunerates all commercial bank reserves at Bank Rate, ensuring immediate pass-through to SONIA."
+                        }
+                    },
+                    {
+                        step: { ru: "🇨🇳 Народный банк Китая (НБК)", en: "🇨🇳 People's Bank of China (PBoC)" },
+                        color: "#f59e0b",
+                        title: { ru: "Многоцелевая модель + Ставки LPR и RRR", en: "Multi-Goal Model + LPR & RRR Tools" },
+                        desc: {
+                            ru: "НБК сочетает ценовую стабильность, рост ВВП и курс юаня, используя 7-дневное обратное РЕПО, ставки LPR и изменение нормы резервов (RRR).",
+                            en: "PBoC balances price stability, GDP growth, and RMB stability via 7-day reverse REPO, Loan Prime Rates (LPR), and active RRR cuts."
+                        }
+                    }
+                ],
+                controls: [
+                    {
+                        id: "rate", group: "policy", color: "#14b8a6",
+                        name: { ru: "Ключевая ставка (BoE / BoC / LPR)", en: "Policy Rate (BoE / BoC / LPR)" },
+                        val: 4.25, min: 1.0, max: 8.0, step: 0.25, unit: "%",
+                        desc: {
+                            ru: "Сравнительный ориентир: ставка Банка Англии / Банка Канады (~3,75–4,50%) и кредитная ставка Китая LPR (3,10%–3,60%).",
+                            en: "Comparative benchmark: BoE / BoC policy rates (~3.75–4.50%) and China's Loan Prime Rate (3.10%–3.60%)."
+                        }
+                    },
+                    {
+                        id: "rr", group: "policy", color: "#3b82f6",
+                        name: { ru: "Обязательные резервы (RRR Китая ~6.5%)", en: "Required Reserves (China RRR ~6.5%)" },
+                        val: 6.5, min: 0, max: 15, step: 0.5, unit: "%",
+                        desc: {
+                            ru: "В Великобритании и Канаде обязательные резервы равны 0%, тогда как НБК Китая активно снижает RRR для вливания ликвидности.",
+                            en: "UK and Canada maintain 0% reserve requirements, while China's PBoC actively cuts RRR to inject long-term liquidity."
+                        }
+                    },
+                    {
+                        id: "er", group: "policy", color: "#06b6d4",
+                        name: { ru: "Избыточные резервы банков (e)", en: "Excess Reserve Ratio (e)" },
+                        val: 3.5, min: 0, max: 15, step: 0.5, unit: "%",
+                        desc: {
+                            ru: "Добровольные резервы коммерческих банков на расчётных счетах в центральном банке сверх обязательного норматива.",
+                            en: "Voluntary reserves held by commercial banks at the central bank above statutory requirements."
+                        }
+                    },
+                    {
+                        id: "cash_ratio", group: "mult", color: "#f59e0b",
+                        name: { ru: "Наличность к депозитам (c = C/D)", en: "Currency-to-Deposit Ratio (c)" },
+                        val: 10, min: 2, max: 30, step: 1, unit: "%",
+                        desc: {
+                            ru: "В Китае (Alipay / WeChat Pay), Великобритании и Канаде доля наличных минимальна, что ускоряет безналичный мультипликатор.",
+                            en: "In China (Alipay / WeChat Pay), UK, and Canada, low cash usage accelerates electronic deposit creation."
+                        }
+                    },
+                    {
+                        id: "omo", group: "mult", color: "#8b5cf6",
+                        name: { ru: "Целевые кредитные окна (MLF / FLS)", en: "Targeted Lending Facilities (MLF / FLS)" },
+                        val: 110, min: 70, max: 160, step: 5, unit: "% M0",
+                        desc: {
+                            ru: "Структурное рефинансирование: среднесрочное кредитование НБК (MLF) и схемы фондирования Банка Англии.",
+                            en: "Structural refinancing: PBoC's Medium-term Lending Facility (MLF) and BoE funding schemes."
+                        }
+                    }
+                ],
+                basel: [
+                    {
+                        tag: "🇬🇧 ВЕЛИКОБРИТАНИЯ (PRA)",
+                        title: { ru: "Кольцевание розничных банков (Ring-fencing)", en: "UK Bank Ring-Fencing & Basel 3.1" },
+                        desc: {
+                            ru: "Крупные британские банки обязаны юридически отделять розничные депозиты населения от операций инвестиционного банкинга.",
+                            en: "Major UK banks must legally ring-fence everyday retail deposits from high-risk investment banking operations."
+                        }
+                    },
+                    {
+                        tag: "🇨🇦 КАНАДА (OSFI)",
+                        title: { ru: "Буфер внутренней стабильности (DSB 3,5%)", en: "Canada's OSFI Domestic Stability Buffer" },
+                        desc: {
+                            ru: "Канадский регулятор OSFI сочетает строгий лимит левериджа и буфер DSB (3,5%).",
+                            en: "Canada's OSFI enforces strict leverage caps and a 3.5% Domestic Stability Buffer, keeping Canadian banks resilient."
+                        }
+                    },
+                    {
+                        tag: "🇳🇿 🇦🇺 НОВАЯ ЗЕЛАНДИЯ И АВСТРАЛИЯ",
+                        title: { ru: "Макропруденциальные лимиты ипотеки (LVR)", en: "Macroprudential LVR Mortgage Caps" },
+                        desc: {
+                            ru: "РБНЗ и APRA ограничивают долю ипотечного кредита к стоимости залога (LVR), сдерживая перегрев рынка жилья.",
+                            en: "RBNZ and APRA enforce Loan-to-Value Ratio (LVR) speed limits to prevent residential housing bubbles."
+                        }
+                    },
+                    {
+                        tag: "🇨🇳 КИТАЙ (NFRA / НБК)",
+                        title: { ru: "Буферы TLAC и надзор за мегабанками", en: "TLAC Buffers & Mega-Bank Supervision" },
+                        desc: {
+                            ru: "Крупнейшие банки Китая соблюдают глобальные требования Базель III и буферы общей способности поглощения убытков (TLAC).",
+                            en: "China's largest state banks comply with global Basel III capital rules and Total Loss-Absorbing Capacity (TLAC) buffers."
+                        }
+                    }
+                ]
+            }
+        };
+
+        let depLabState = { d0: 1000, rr: 4.0, er: 2.0, c: 22.0 };
+        let curRegion = "kz";
+        let curLang = "ru";
+        let stateVals = {};
+
+        function initRegion(region) {
+            if (region === "deposit_lab") {
+                depLabState = { d0: 1000, rr: 4.0, er: 2.0, c: 22.0 };
+                return;
+            }
+            stateVals = {};
+            const cfg = DATA_MODELS[region];
+            cfg.controls.forEach(c => {
+                stateVals[c.id] = c.val;
+            });
+
+            const inpR = document.getElementById("inpRStar");
+            const inpP = document.getElementById("inpPi");
+            const inpG = document.getElementById("inpGap");
+
+            inpR.value = cfg.defaultTaylor.rStar;
+            inpP.value = cfg.defaultTaylor.pi;
+            inpG.value = cfg.defaultTaylor.gap;
+
+            paintDialTrack(inpR);
+            paintDialTrack(inpP);
+            paintDialTrack(inpG);
+        }
+
+        initRegion("kz");
+
+        function switchMainView(region) {
+            const policyView = document.getElementById("policyMainView");
+            const depView = document.getElementById("depositLabView");
+
+            if (region === "deposit_lab") {
+                policyView.classList.add("hidden-view");
+                depView.classList.remove("hidden-view");
+                renderDepositLabSliders();
+                updateDepositLab();
+            } else {
+                depView.classList.add("hidden-view");
+                policyView.classList.remove("hidden-view");
+                renderPyramid();
+                renderRadioDeck();
+                renderBaselCards();
+                updateAllAnalytics();
+            }
+        }
+
+        function renderPyramid() {
+            const box = document.getElementById("pyramidContainer");
+            const goals = DATA_MODELS[curRegion].goals;
+            box.innerHTML = goals.map(g => `
+                <div class="pyramid-card">
+                    <span class="step-tag" style="background:${g.color}22; color:${g.color}; border:1px solid ${g.color}66;">
+                        ${g.step[curLang]}
+                    </span>
+                    <h3>${g.title[curLang]}</h3>
+                    <p>${g.desc[curLang]}</p>
+                </div>
+            `).join("");
+        }
+
+        function renderRadioDeck() {
+            const deck = document.getElementById("radioDeck");
+            const cfg = DATA_MODELS[curRegion];
+            const ticksHtml = `<div class="dial-graduations">${"<span></span>".repeat(13)}</div>`;
+
+            const sec1 = curLang === "ru" ? "ИНСТРУМЕНТЫ И РЕЗЕРВЫ ЦБ" : "CB INSTRUMENTS & RESERVES";
+            const sec2 = curLang === "ru" ? "НАЛИЧНОСТЬ И ОПЕРАЦИИ РЫНКА" : "CASH RATIO & MARKET OPS";
+
+            let html = `<div class="deck-section-title"><span>${sec1}</span><span>📻</span></div>`;
+            cfg.controls.filter(c => c.group === "policy").forEach(c => {
+                html += createVintageTuner(c, stateVals[c.id], ticksHtml);
+            });
+
+            html += `<div class="deck-section-title" style="margin-top:4px;"><span>${sec2}</span><span>∑</span></div>`;
+            cfg.controls.filter(c => c.group === "mult").forEach(c => {
+                html += createVintageTuner(c, stateVals[c.id], ticksHtml);
+            });
+
+            deck.innerHTML = html;
+
+            deck.querySelectorAll("input.vintage-radio-knob").forEach(inp => {
+                paintDialTrack(inp);
+                inp.addEventListener("input", e => {
+                    const id = e.target.dataset.id;
+                    const val = parseFloat(e.target.value);
+                    stateVals[id] = val;
+                    document.getElementById(`freq_${id}`).textContent = `${val}${e.target.dataset.unit}`;
+                    paintDialTrack(e.target);
+                    updateAllAnalytics();
+                });
+            });
+        }
+
+        function createVintageTuner(c, val, ticksHtml) {
+            return `
+                <div class="tuner-module">
+                    <div class="tuner-top">
+                        <div class="tuner-name-box">
+                            <span class="jewel-dot" style="background:${c.color}; box-shadow:0 0 8px ${c.color};"></span>
+                            <span class="tuner-label">${c.name[curLang]}</span>
+                            <span class="help-circle">i
+                                <div class="help-bubble">${c.desc[curLang]}</div>
+                            </span>
+                        </div>
+                        <span class="freq-display" id="freq_${c.id}" style="color:${c.color};">${val}${c.unit}</span>
+                    </div>
+                    <div class="vintage-dial-housing">
+                        <input type="range" class="vintage-radio-knob"
+                               data-id="${c.id}" data-unit="${c.unit}" data-color="${c.color}"
+                               min="${c.min}" max="${c.max}" step="${c.step}" value="${val}"
+                               style="--knob-stripe:${c.color};">
+                        ${ticksHtml}
+                    </div>
+                    <div class="tuner-bounds">
+                        <span>${c.min}${c.unit}</span>
+                        <span>${curLang === "ru" ? "Шкала настройки" : "Tuner Scale"}</span>
+                        <span>${c.max}${c.unit}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function paintDialTrack(inp) {
+            const min = parseFloat(inp.min);
+            const max = parseFloat(inp.max);
+            const val = parseFloat(inp.value);
+            const color = inp.dataset.color;
+            const pct = ((val - min) / (max - min)) * 100;
+            inp.style.background = `linear-gradient(90deg, ${color}88 0%, ${color} ${pct}%, #1e293b ${pct}%, #1e293b 100%)`;
+        }
+
+        function renderBaselCards() {
+            const box = document.getElementById("baselContainer");
+            const list = DATA_MODELS[curRegion].basel;
+            box.innerHTML = list.map(b => `
+                <div class="basel-item">
+                    <span class="basel-kicker">${b.tag}</span>
+                    <h4>${b.title[curLang]}</h4>
+                    <p>${b.desc[curLang]}</p>
+                </div>
+            `).join("");
+        }
+
+        function updateAllAnalytics() {
+            const cfg = DATA_MODELS[curRegion];
+            const unit = curLang === "ru" ? cfg.unitRu : cfg.unitEn;
+
+            const rate = stateVals["rate"];
+            const rr = stateVals["rr"] / 100;
+            const er = stateVals["er"] / 100;
+            const c = stateVals["cash_ratio"] / 100;
+            const omoMult = stateVals["omo"] / 100;
+
+            const effectiveM0 = cfg.baseM0 * omoMult;
+            const multiplier = (1 + c) / Math.max(0.03, rr + er + c);
+            const m2 = effectiveM0 * multiplier;
+
+            document.getElementById("k1Val").textContent = `${rate.toFixed(2)}%`;
+            document.getElementById("k2Val").textContent = `${multiplier.toFixed(2)}x`;
+            document.getElementById("k3Val").textContent = `${m2.toFixed(2)} ${unit}`;
+            document.getElementById("k4Val").textContent = cfg.inflationText[curLang];
+            document.getElementById("k4Sub").textContent = cfg.inflationNote[curLang];
+
+            drawMoneySankey(effectiveM0, m2, rr, er, c, unit, cfg.colors);
+            updateTaylorRule(rate, cfg.piTarget);
+            drawYieldCurve(rate, cfg.longBondBase);
+        }
+
+        function updateTaylorRule(actualRate, piTarget) {
+            const rStar = parseFloat(document.getElementById("inpRStar").value);
+            const pi = parseFloat(document.getElementById("inpPi").value);
+            const gap = parseFloat(document.getElementById("inpGap").value);
+
+            document.getElementById("valRStar").textContent = `${rStar.toFixed(2)}%`;
+            document.getElementById("valPi").textContent = `${pi.toFixed(1)}%`;
+            document.getElementById("valGap").textContent = `${gap >= 0 ? "+" : ""}${gap.toFixed(1)}%`;
+
+            const taylorRate = rStar + pi + 0.5 * (pi - piTarget) + 0.5 * gap;
+            document.getElementById("valTaylorRes").textContent = `${taylorRate.toFixed(2)}%`;
+
+            const diff = actualRate - taylorRate;
+            const badge = document.getElementById("taylorStanceBadge");
+
+            if (diff > 0.35) {
+                badge.style.background = "rgba(239, 68, 68, 0.16)";
+                badge.style.border = "1px solid #ef4444";
+                badge.style.color = "#fca5a5";
+                badge.textContent = curLang === "ru"
+                    ? `Жёсткая ДКП (+${diff.toFixed(2)} п.п. выше Тейлора)`
+                    : `Tight Policy (+${diff.toFixed(2)} pp above Taylor)`;
+            } else if (diff < -0.35) {
+                badge.style.background = "rgba(16, 185, 129, 0.16)";
+                badge.style.border = "1px solid #10b981";
+                badge.style.color = "#6ee7b7";
+                badge.textContent = curLang === "ru"
+                    ? `Мягкая ДКП (${diff.toFixed(2)} п.п. ниже Тейлора)`
+                    : `Accommodative (${diff.toFixed(2)} pp below Taylor)`;
+            } else {
+                badge.style.background = "rgba(234, 179, 8, 0.16)";
+                badge.style.border = "1px solid #eab308";
+                badge.style.color = "#fde047";
+                badge.textContent = curLang === "ru"
+                    ? `Нейтральная ДКП (вблизи равновесия)`
+                    : `Neutral Stance (near equilibrium)`;
+            }
+        }
+
+        function drawYieldCurve(shortRate, longBase) {
+            const svg = document.getElementById("yieldCurveSvg");
+            const y3m = shortRate;
+            const y1y = shortRate * 0.85 + longBase * 0.15;
+            const y3y = shortRate * 0.55 + longBase * 0.45;
+            const y5y = shortRate * 0.35 + longBase * 0.65;
+            const y10y = shortRate * 0.20 + longBase * 0.80;
+
+            const points = [
+                { lbl: "3M", val: y3m, x: 40 },
+                { lbl: "1Y", val: y1y, x: 115 },
+                { lbl: "3Y", val: y3y, x: 190 },
+                { lbl: "5Y", val: y5y, x: 265 },
+                { lbl: "10Y", val: y10y, x: 340 }
+            ];
+
+            const spread = y10y - y3m;
+            const spreadEl = document.getElementById("yieldSpreadBadge");
+            spreadEl.textContent = `10Y–3M: ${spread >= 0 ? "+" : ""}${spread.toFixed(2)}%`;
+            spreadEl.style.color = spread < 0 ? "#fb7185" : "#2dd4bf";
+
+            const maxY = Math.max(...points.map(p => p.val), 18) + 2;
+            const minY = Math.max(0, Math.min(...points.map(p => p.val)) - 2);
+            const mapY = v => 152 - ((v - minY) / Math.max(1, maxY - minY)) * 120;
+
+            const coords = points.map(p => ({ ...p, py: mapY(p.val) }));
+            const poly = coords.map(c => `${c.x},${c.py}`).join(" ");
+            const area = `40,152 ${poly} 340,152`;
+            const lineColor = spread < 0 ? "#fb7185" : "#14b8a6";
+
+            let svgMarkup = `
+                <defs>
+                    <linearGradient id="ycGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="${lineColor}" stop-opacity="0.35"/>
+                        <stop offset="100%" stop-color="${lineColor}" stop-opacity="0.0"/>
+                    </linearGradient>
+                </defs>
+                <line x1="30" y1="152" x2="355" y2="152" stroke="#334155" stroke-width="1"/>
+                <polygon points="${area}" fill="url(#ycGrad)"></polygon>
+                <polyline fill="none" stroke="${lineColor}" stroke-width="3" points="${poly}"></polyline>
+            `;
+
+            coords.forEach(c => {
+                svgMarkup += `
+                    <circle cx="${c.x}" cy="${c.py}" r="4.5" fill="#0d1117" stroke="${lineColor}" stroke-width="2.5"></circle>
+                    <text x="${c.x}" y="${c.py - 9}" text-anchor="middle" fill="#f8fafc" font-size="11" font-weight="700">${c.val.toFixed(1)}%</text>
+                    <text x="${c.x}" y="172" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">${c.lbl}</text>
+                `;
+            });
+
+            svg.innerHTML = svgMarkup;
+        }
+
+        function drawMoneySankey(m0, m2, rr, er, c, unit, colors) {
+            const svg = document.getElementById("moneyFlowSvg");
+            const H = 390;
+            const pad = 18;
+            const usable = H - pad * 2;
+
+            const cashPart = m2 * (c / (1 + c));
+            const depositsTotal = m2 - cashPart;
+            const totalResRatio = rr + er;
+            const reservesPart = Math.min(depositsTotal * 0.4, m0 * (totalResRatio / Math.max(0.03, totalResRatio + c)));
+            const creditCreated = Math.max(0.5, depositsTotal - reservesPart);
+
+            const col1 = [
+                {
+                    name: curLang === "ru" ? "Наличные в обращении (M0)" : "Currency in Circulation (M0)",
+                    val: cashPart, color: colors.cash
+                },
+                {
+                    name: curLang === "ru" ? "Резервы БВУ в ЦБ (rr + e)" : "Bank Reserves at CB (rr + e)",
+                    val: Math.max(0.4, m0 - cashPart), color: colors.reserves
+                }
+            ];
+
+            const col2 = [
+                {
+                    name: curLang === "ru" ? "Кредитный мультипликатор БВУ" : "Bank Credit Creation Channel",
+                    val: creditCreated, color: colors.credit
+                },
+                {
+                    name: curLang === "ru" ? "Резервы в ЦБ (Обяз. + Избыт.)" : "CB Reserves (Required + Excess)",
+                    val: Math.max(0.4, reservesPart), color: colors.reserves
+                },
+                {
+                    name: curLang === "ru" ? "Внебанковский наличный оборот" : "Non-Bank Cash Circulation",
+                    val: cashPart, color: colors.cash
+                }
+            ];
+
+            const col3 = [
+                {
+                    name: curLang === "ru" ? "Безналичные депозиты (M1/M2)" : "Bank Deposits (M1 / M2)",
+                    val: depositsTotal, color: colors.credit
+                },
+                {
+                    name: curLang === "ru" ? "Наличная денежная масса (M0)" : "Cash Money Supply (M0)",
+                    val: cashPart, color: colors.cash
+                },
+                {
+                    name: curLang === "ru" ? "Стерилизовано в резервах / нотах" : "Sterilized in Reserves / Notes",
+                    val: Math.max(0.4, reservesPart), color: colors.steril
+                }
+            ];
+
+            const span = m2 + reservesPart;
+
+            function place(nodes, gap) {
+                const sc = (usable - gap * (nodes.length - 1)) / span;
+                let y = pad;
+                nodes.forEach(n => {
+                    n.y = y;
+                    n.h = Math.max(22, n.val * sc);
+                    y += n.h + gap;
+                });
+            }
+
+            place(col1, 30);
+            place(col2, 22);
+            place(col3, 22);
+
+            const x1 = 12, w1 = 18;
+            const x2 = 440, w2 = 20;
+            const x3 = 735, w3 = 18;
+
+            let html = "";
+
+            const links12 = [
+                { a: col1[0], b: col2[2], v: cashPart, clr: colors.cash },
+                { a: col1[1], b: col2[0], v: creditCreated, clr: colors.credit },
+                { a: col1[1], b: col2[1], v: reservesPart, clr: colors.reserves }
+            ];
+
+            links12.forEach(l => {
+                const d = bezier(x1 + w1, l.a.y + l.a.h / 2, x2, l.b.y + l.b.h / 2);
+                const tip = `${l.a.name} → ${l.b.name}: <b>${l.v.toFixed(2)} ${unit}</b>`;
+                html += `<path class="stream-path" d="${d}" stroke="${l.clr}" stroke-width="${Math.max(6, l.b.h * 0.72)}" data-tip="${tip}"></path>`;
+            });
+
+            const links23 = [
+                { a: col2[0], b: col3[0], v: depositsTotal, clr: colors.credit },
+                { a: col2[2], b: col3[1], v: cashPart, clr: colors.cash },
+                { a: col2[1], b: col3[2], v: reservesPart, clr: colors.steril }
+            ];
+
+            links23.forEach(l => {
+                const d = bezier(x2 + w2, l.a.y + l.a.h / 2, x3, l.b.y + l.b.h / 2);
+                const tip = `${l.a.name} → ${l.b.name}: <b>${l.v.toFixed(2)} ${unit}</b>`;
+                html += `<path class="stream-path" d="${d}" stroke="${l.clr}" stroke-width="${Math.max(6, l.b.h * 0.72)}" data-tip="${tip}"></path>`;
+            });
+
+            col1.forEach(n => {
+                html += `
+                    <rect class="vault-node" x="${x1}" y="${n.y}" width="${w1}" height="${n.h}" fill="${n.color}"></rect>
+                    <text class="svg-title" x="${x1 + w1 + 9}" y="${n.y + n.h / 2 - 2}">${n.name}</text>
+                    <text class="svg-sub" x="${x1 + w1 + 9}" y="${n.y + n.h / 2 + 12}">${n.val.toFixed(2)} ${unit}</text>
+                `;
+            });
+
+            col2.forEach(n => {
+                html += `
+                    <rect class="vault-node" x="${x2}" y="${n.y}" width="${w2}" height="${n.h}" fill="${n.color}"></rect>
+                    <rect x="${x2 - 96}" y="${n.y + n.h / 2 - 18}" width="212" height="36" rx="7" fill="#090d12" fill-opacity="0.93" stroke="${n.color}" stroke-width="1.2"></rect>
+                    <text class="svg-title" text-anchor="middle" x="${x2 + w2 / 2}" y="${n.y + n.h / 2 - 2}">${n.name}</text>
+                    <text class="svg-sub" text-anchor="middle" x="${x2 + w2 / 2}" y="${n.y + n.h / 2 + 12}">${n.val.toFixed(2)} ${unit}</text>
+                `;
+            });
+
+            col3.forEach(n => {
+                html += `
+                    <rect class="vault-node" x="${x3}" y="${n.y}" width="${w3}" height="${n.h}" fill="${n.color}"></rect>
+                    <text class="svg-title" x="${x3 + w3 + 9}" y="${n.y + n.h / 2 - 2}">${n.name}</text>
+                    <text class="svg-sub" x="${x3 + w3 + 9}" y="${n.y + n.h / 2 + 12}">${n.val.toFixed(2)} ${unit}</text>
+                `;
+            });
+
+            svg.innerHTML = html;
+
+            const tip = document.getElementById("cursorTip");
+            svg.querySelectorAll(".stream-path").forEach(p => {
+                p.addEventListener("mousemove", e => {
+                    tip.innerHTML = p.getAttribute("data-tip");
+                    tip.style.opacity = "1";
+                    tip.style.left = `${e.clientX + 14}px`;
+                    tip.style.top = `${e.clientY + 14}px`;
+                });
+                p.addEventListener("mouseleave", () => {
+                    tip.style.opacity = "0";
+                });
+            });
+        }
+
+        function bezier(x1, y1, x2, y2) {
+            const cx = (x1 + x2) / 2;
+            return `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
+        }
+
+        /* ================= ОТДЕЛЬНАЯ ВКЛАДКА: МОДЕЛЬ СОЗДАНИЯ ДЕПОЗИТОВ ================= */
+        function renderDepositLabSliders() {
+            const deck = document.getElementById("depSlidersDeck");
+            const ticksHtml = `<div class="dial-graduations">${"<span></span>".repeat(13)}</div>`;
+
+            const items = [
+                {
+                    id: "d0", color: "#fbbf24",
+                    name: { ru: "Первичный вклад (D₀)", en: "Initial Bank Deposit (D₀)" },
+                    val: depLabState.d0, min: 100, max: 10000, step: 100, unit: " у.е.",
+                    desc: {
+                        ru: "Первоначальный безналичный или наличный депозит, поступивший в первый коммерческий банк (Банк 1) и запускающий процесс мультипликации.",
+                        en: "Initial deposit entering Bank 1 that initiates the deposit expansion process across the banking system."
+                    }
+                },
+                {
+                    id: "rr", color: "#3b82f6",
+                    name: { ru: "Норма обязательных резервов (rr)", en: "Required Reserve Ratio (rr)" },
+                    val: depLabState.rr, min: 0.5, max: 25, step: 0.5, unit: "%",
+                    desc: {
+                        ru: "Доля привлечённых депозитов, которую банк обязан заморозить в центральном банке (МРТ НБРК).",
+                        en: "Fraction of deposits that banks are legally required to hold as reserves at the central bank."
+                    }
+                },
+                {
+                    id: "er", color: "#06b6d4",
+                    name: { ru: "Избыточные резервы банков (e)", en: "Excess Reserve Ratio (e)" },
+                    val: depLabState.er, min: 0, max: 20, step: 0.5, unit: "%",
+                    desc: {
+                        ru: "Доля депозитов, которую банки добровольно оставляют в резервах сверх нормы rr (подушка ликвидности или осторожность при кредитовании).",
+                        en: "Fraction of deposits banks voluntarily hold above rr as a liquidity buffer or due to credit risk caution."
+                    }
+                },
+                {
+                    id: "c", color: "#14b8a6",
+                    name: { ru: "Коэффициент наличности (c = C/D)", en: "Currency-to-Deposit Ratio (c)" },
+                    val: depLabState.c, min: 0, max: 50, step: 1, unit: "%",
+                    desc: {
+                        ru: "Доля средств, которую заёмщики и вкладчики снимают наличными и не возвращают обратно на банковские счета.",
+                        en: "Fraction of funds withdrawn as physical cash by the public rather than redeposited into banks."
+                    }
+                }
+            ];
+
+            const headerText = curLang === "ru" ? "ПАРАМЕТРЫ ДЕПОЗИТНОГО МУЛЬТИПЛИКАТОРА" : "DEPOSIT MULTIPLIER PARAMETERS";
+            let html = `<div class="deck-section-title"><span>${headerText}</span><span>🏦</span></div>`;
+            items.forEach(item => {
+                html += createVintageTuner(item, item.val, ticksHtml);
+            });
+
+            deck.innerHTML = html;
+
+            deck.querySelectorAll("input.vintage-radio-knob").forEach(inp => {
+                paintDialTrack(inp);
+                inp.addEventListener("input", e => {
+                    const id = e.target.dataset.id;
+                    const val = parseFloat(e.target.value);
+                    depLabState[id] = val;
+                    document.getElementById(`freq_${id}`).textContent = `${val}${e.target.dataset.unit}`;
+                    paintDialTrack(e.target);
+                    updateDepositLab();
+                });
+            });
+        }
+
+        function updateDepositLab() {
+            const d0 = depLabState.d0;
+            const rr = depLabState.rr / 100;
+            const er = depLabState.er / 100;
+            const c = depLabState.c / 100;
+
+            const totalReserveFrac = Math.min(0.95, rr + er);
+            const redepositFrac = 1 / (1 + c);
+            const cashLeakFrac = c / (1 + c);
+
+            const stepFactor = (1 - totalReserveFrac) * redepositFrac;
+            const totalDeposits = d0 / Math.max(0.02, 1 - stepFactor);
+            const depositMultiplier = totalDeposits / d0;
+            const fullMoneyMultiplier = (1 + c) / Math.max(0.03, rr + er + c);
+            const totalMoneyCreated = totalDeposits * (1 + c);
+
+            document.getElementById("ds1Val").textContent = d0.toLocaleString("ru-RU");
+            document.getElementById("ds2Val").textContent = `${depositMultiplier.toFixed(2)}x`;
+            document.getElementById("ds3Val").textContent = `${fullMoneyMultiplier.toFixed(2)}x`;
+            document.getElementById("ds4Val").textContent = Math.round(totalMoneyCreated).toLocaleString("ru-RU");
+
+            const tbody = document.getElementById("roundsBody");
+            let curDep = d0;
+            let cumDep = 0;
+            let html = "";
+
+            const stageNames = curLang === "ru"
+                ? [
+                    "Банк 1 (Первичный вклад)",
+                    "Банк 2 (2-й раунд кредитования)",
+                    "Банк 3 (3-й раунд кредитования)",
+                    "Банк 4 (4-й раунд кредитования)",
+                    "Банк 5 (5-й раунд кредитования)",
+                    "Остальные банки (Раунды 6 … ∞)"
+                  ]
+                : [
+                    "Bank 1 (Initial Deposit)",
+                    "Bank 2 (Round 2 Lending)",
+                    "Bank 3 (Round 3 Lending)",
+                    "Bank 4 (Round 4 Lending)",
+                    "Bank 5 (Round 5 Lending)",
+                    "Remaining Banks (Rounds 6 … ∞)"
+                  ];
+
+            for (let i = 0; i < 5; i++) {
+                const reqRes = curDep * rr;
+                const excRes = curDep * er;
+                const loanIssued = curDep * (1 - totalReserveFrac);
+                const cashOut = loanIssued * cashLeakFrac;
+                const nextDep = loanIssued * redepositFrac;
+
+                cumDep += curDep;
+                const barW = Math.max(5, Math.round((curDep / d0) * 75));
+
+                html += `
+                    <tr>
+                        <td><strong>${stageNames[i]}</strong></td>
+                        <td><span class="progress-bar-cell" style="width:${barW}px; background:linear-gradient(90deg,#fbbf24,#14b8a6);"></span>${curDep.toFixed(1)}</td>
+                        <td style="color:#60a5fa;">${reqRes.toFixed(1)}</td>
+                        <td style="color:#22d3ee;">${excRes.toFixed(1)}</td>
+                        <td style="color:#fbbf24;">${cashOut.toFixed(1)}</td>
+                        <td style="color:#2dd4bf;">${loanIssued.toFixed(1)}</td>
+                        <td><strong>${cumDep.toFixed(1)}</strong></td>
+                    </tr>
+                `;
+                curDep = nextDep;
+            }
+
+            const remDeposits = Math.max(0, totalDeposits - cumDep);
+            const remReq = remDeposits * rr;
+            const remExc = remDeposits * er;
+            const remLoan = remDeposits * (1 - totalReserveFrac);
+            const remCash = remLoan * cashLeakFrac;
+
+            html += `
+                <tr style="background: rgba(20, 184, 166, 0.1);">
+                    <td><strong>${stageNames[5]}</strong></td>
+                    <td>${remDeposits.toFixed(1)}</td>
+                    <td style="color:#60a5fa;">${remReq.toFixed(1)}</td>
+                    <td style="color:#22d3ee;">${remExc.toFixed(1)}</td>
+                    <td style="color:#fbbf24;">${remCash.toFixed(1)}</td>
+                    <td style="color:#2dd4bf;">${remLoan.toFixed(1)}</td>
+                    <td style="color:#34d399; font-weight:800;">${totalDeposits.toFixed(1)} (${depositMultiplier.toFixed(2)}x)</td>
+                </tr>
+            `;
+
+            tbody.innerHTML = html;
+
+            const explainEl = document.getElementById("formulaExplainBox");
+            if (curLang === "ru") {
+                explainEl.innerHTML = `
+                    <strong>Экономический смысл расчёта:</strong> Из первичного вклада <b>${d0.toLocaleString("ru-RU")}</b> коммерческий банк удерживает <b>${(rr*100).toFixed(1)}%</b> в обязательных резервах и <b>${(er*100).toFixed(1)}%</b> в избыточных резервах. Оставшиеся <b>${((1 - totalReserveFrac)*100).toFixed(1)}%</b> выдаются в виде кредитов. Из выданных средств часть оседает у населения в наличных (коэффициент <i>c</i> = ${(c*100).toFixed(0)}%), а остальное возвращается на счета следующих банков. В результате полная денежная масса увеличивается с коэффициентом <b>m = (1 + c) / (rr + e + c) = ${fullMoneyMultiplier.toFixed(2)}x</b>.
+                `;
+            } else {
+                explainEl.innerHTML = `
+                    <strong>Economic Interpretation:</strong> From an initial deposit of <b>${d0.toLocaleString("en-US")}</b>, Bank 1 holds <b>${(rr*100).toFixed(1)}%</b> in required reserves and <b>${(er*100).toFixed(1)}%</b> in excess reserves, lending out the remaining <b>${((1 - totalReserveFrac)*100).toFixed(1)}%</b>. Part of those loans leaks into physical currency (<i>c</i> = ${(c*100).toFixed(0)}%), while the rest is redeposited into subsequent banks, yielding a full money multiplier of <b>m = (1 + c) / (rr + e + c) = ${fullMoneyMultiplier.toFixed(2)}x</b>.
+                `;
+            }
+        }
+
+        function applyTranslations() {
+            const cfg = curRegion !== "deposit_lab" ? DATA_MODELS[curRegion] : DATA_MODELS.kz;
+            const dict = {
+                ru: {
+                    uiTitle: "Монетарная политика, Правило Тейлора и Создание депозитов",
+                    uiSubtitle: "Интерактивный симулятор центрального банка (НБРК / ФРС США / ЕЦБ / Модель создания депозитов)",
+                    tabKz: "🇰🇿 Казахстан (НБРК)",
+                    tabUs: "🇺🇸 США (ФРС)",
+                    tabEu: "🇪🇺 Еврозона (ЕЦБ)",
+                    tabGl: "🌐 Мировые кейсы",
+                    tabDep: "🏦 Модель создания депозитов",
+                    btnReset: "↺ Сбросить",
+                    k1Lbl: "Базовая / Ключевая ставка",
+                    k1Sub: "Ориентир денежного рынка",
+                    k2Lbl: "Полный мультипликатор (m)",
+                    k2Sub: "m = (1 + c) / (rr + e + c)",
+                    k3Lbl: "Денежная масса (M2)",
+                    k3Sub: "Денежная база M0 × Мультипликатор",
+                    k4Lbl: "Инфляция: Факт / Таргет",
+                    col1Lbl: "I. Денежная база (M0) и Ликвидность",
+                    col2Lbl: "II. Банковская система и Канал ставок",
+                    col3Lbl: "III. Агрегаты денежной массы (M2)",
+                    taylorTitle: "Калькулятор Правила Тейлора",
+                    lblRStar: "Нейтральная r*",
+                    lblPi: "Инфляция π",
+                    lblGap: "Разрыв ВВП (y-y*)",
+                    lblTaylorEq: "Равновесная ставка по Тейлору:",
+                    yieldTitle: cfg.yieldTitle.ru,
+                    baselTitle: "Пруденциальное регулирование и стандарты Базель III / IV",
+                    baselSub: "Нормативы достаточности капитала, ликвидности и надзора",
+                    depLabTitle: "Интерактивная модель депозитного расширения (Денежный мультипликатор)",
+                    ds1Lbl: "Первичный вклад (D₀)",
+                    ds2Lbl: "Мультипликатор депозитов (mD)",
+                    ds3Lbl: "Полный мультипликатор (m)",
+                    ds4Lbl: "Итого создано денег (ΔM)",
+                    thRound: "Этап / Коммерческий банк",
+                    thDep: "Новый депозит (Dᵢ)",
+                    thRes: "Обяз. резервы (rr)",
+                    thExc: "Избыт. резервы (e)",
+                    thCash: "Утечка в нал. (c)",
+                    thLoan: "Выданный кредит",
+                    thCum: "Накопленные депозиты",
+                    uiFooter: "Разработано для курса «Монетарная экономика» и «Макроэкономика» | AlmaU 2026"
+                },
+                en: {
+                    uiTitle: "Monetary Policy, Taylor Rule & Deposit Creation",
+                    uiSubtitle: "Interactive Central Banking Simulator (NBK / Federal Reserve / ECB / Deposit Creation Lab)",
+                    tabKz: "🇰🇿 Kazakhstan (NBK)",
+                    tabUs: "🇺🇸 USA (Fed)",
+                    tabEu: "🇪🇺 Eurozone (ECB)",
+                    tabGl: "🌐 Global Cases",
+                    tabDep: "🏦 Deposit Creation Model",
+                    btnReset: "↺ Reset",
+                    k1Lbl: "Base / Policy Interest Rate",
+                    k1Sub: "Money market operational benchmark",
+                    k2Lbl: "Full Money Multiplier (m)",
+                    k2Sub: "m = (1 + c) / (rr + e + c)",
+                    k3Lbl: "Broad Money Supply (M2)",
+                    k3Sub: "Monetary Base M0 × Multiplier",
+                    k4Lbl: "Inflation: Actual / Target",
+                    col1Lbl: "I. Monetary Base (M0) & Liquidity",
+                    col2Lbl: "II. Banking System & Rate Channel",
+                    col3Lbl: "III. Broad Money Aggregates (M2)",
+                    taylorTitle: "Taylor Rule Calculator",
+                    lblRStar: "Neutral r*",
+                    lblPi: "Inflation π",
+                    lblGap: "Output Gap (y-y*)",
+                    lblTaylorEq: "Taylor Equilibrium Rate:",
+                    yieldTitle: cfg.yieldTitle.en,
+                    baselTitle: "Prudential Regulation & Basel III / IV Standards",
+                    baselSub: "Capital adequacy, liquidity coverage, and supervisory buffers",
+                    depLabTitle: "Interactive Deposit Expansion Model (Money Multiplier)",
+                    ds1Lbl: "Initial Deposit (D₀)",
+                    ds2Lbl: "Deposit Multiplier (mD)",
+                    ds3Lbl: "Full Money Multiplier (m)",
+                    ds4Lbl: "Total Money Created (ΔM)",
+                    thRound: "Stage / Commercial Bank",
+                    thDep: "New Deposit (Dᵢ)",
+                    thRes: "Req. Reserves (rr)",
+                    thExc: "Excess Reserves (e)",
+                    thCash: "Cash Leakage (c)",
+                    thLoan: "New Loan Issued",
+                    thCum: "Cumulative Deposits",
+                    uiFooter: "Developed for Monetary Economics & Macroeconomics | AlmaU 2026"
+                }
+            }[curLang];
+
+            Object.keys(dict).forEach(k => {
+                const el = document.getElementById(k);
+                if (el) el.textContent = dict[k];
+            });
+        }
+
+        // Слушатели событий
+        document.querySelectorAll(".region-tab").forEach(btn => {
+            btn.addEventListener("click", () => {
+                curRegion = btn.dataset.region;
+                document.querySelectorAll(".region-tab").forEach(b => b.classList.toggle("active", b === btn));
+                initRegion(curRegion);
+                applyTranslations();
+                switchMainView(curRegion);
+            });
+        });
+
+        document.querySelectorAll(".lang-tab").forEach(btn => {
+            btn.addEventListener("click", () => {
+                curLang = btn.dataset.lang;
+                document.querySelectorAll(".lang-tab").forEach(b => b.classList.toggle("active", b === btn));
+                applyTranslations();
+                switchMainView(curRegion);
+            });
+        });
+
+        document.querySelectorAll(".taylor-knob").forEach(inp => {
+            paintDialTrack(inp);
+            inp.addEventListener("input", e => {
+                paintDialTrack(e.target);
+                updateAllAnalytics();
+            });
+        });
+
+        document.getElementById("btnReset").addEventListener("click", () => {
+            initRegion(curRegion);
+            switchMainView(curRegion);
+        });
+
+        // Первичный запуск
+        applyTranslations();
+        switchMainView("kz");
+    </script>
+</body>
+</html>
