@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standard Trade Model Simulator | AlmaU SDTE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: 'IBM Plex Sans', sans-serif;
+            background-color: #0b1120;
+            color: #e2e8f0;
+        }
+        .serif-title {
+            font-family: 'Cormorant Garamond', Georgia, serif;
+        }
+        .mono-num {
+            font-family: 'IBM Plex Mono', monospace;
+        }
+
+        /* Строгий винтажный ползунок с центральной риской */
+        .vintage-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            outline: none;
+            cursor: pointer;
+            --accent: #dc2626;
+        }
+        .vintage-slider::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(180deg, #090d16 0%, #1e293b 55%, #0f172a 100%);
+            border-radius: 2px;
+            border: 1px solid #475569;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.85);
+        }
+        .vintage-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 22px;
+            width: 12px;
+            background: linear-gradient(180deg, #f8fafc 0%, #cbd5e1 48%, #64748b 52%, #e2e8f0 100%);
+            border: 1px solid #0f172a;
+            border-radius: 2px;
+            margin-top: -8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.85);
+            background-image: linear-gradient(to right, transparent 4px, var(--accent) 4px, var(--accent) 8px, transparent 8px);
+        }
+        .sl-crimson { --accent: #dc2626; }
+        .sl-navy { --accent: #2563eb; }
+        .sl-emerald { --accent: #059669; }
+    </style>
+</head>
+<body class="flex flex-col lg:h-screen lg:overflow-hidden">
+
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ -->
+    <header class="bg-slate-950 border-b border-slate-800 px-4 py-2 flex justify-between items-center shrink-0">
+        <div class="flex items-center gap-3">
+            <img src="almaU.jpg" alt="AlmaU" class="w-9 h-9 object-contain bg-white rounded p-0.5 border border-slate-600" onerror="this.style.display='none';">
+            <div>
+                <h1 class="serif-title text-xl md:text-2xl font-bold tracking-wide text-slate-100 leading-none" id="hdr-title">
+                    Стандартная модель международной торговли 
+                </h1>
+                <p class="text-[10px] uppercase tracking-widest text-slate-400 font-semibold mt-0.5" id="hdr-sub">
+                    AlmaU • Школа цифровых технологий и экономики • Экономика
+                </p>
+            </div>
+        </div>
+
+        <div class="flex bg-slate-900 border border-slate-700 rounded p-0.5 text-xs font-semibold">
+            <button type="button" onclick="setLang('ru')" id="btn-ru" class="px-2.5 py-1 rounded bg-slate-200 text-slate-950 transition">RU</button>
+            <button type="button" onclick="setLang('en')" id="btn-en" class="px-2.5 py-1 rounded text-slate-400 hover:text-white transition">EN</button>
+        </div>
+    </header>
+
+    <!-- ОСНОВНАЯ СЕТКА: 1/3 ТЁМНАЯ ПАНЕЛЬ СЛАЙДЕРОВ | 2/3 БЕЛОЕ ПОЛЕ С ГРАФИКАМИ -->
+    <main class="flex-1 min-h-0 grid grid-cols-1 lg:grid-cols-12">
+
+        <!-- ЛЕВАЯ 1/3: ТЁМНАЯ ПАНЕЛЬ -->
+        <aside class="lg:col-span-4 bg-slate-900 border-r border-slate-800 p-3.5 flex flex-col justify-between gap-2.5 overflow-y-auto">
+            <!-- Сценарии -->
+            <div>
+                <div class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-1" id="lbl-mode">Режим анализа (Слайды 5–12):</div>
+                <div class="grid grid-cols-3 gap-1.5 text-[11px] font-semibold">
+                    <button type="button" onclick="setScenario('autarky')" id="sc-autarky" class="py-1 px-2 rounded border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Автаркия</button>
+                    <button type="button" onclick="setScenario('trade')" id="sc-trade" class="py-1 px-2 rounded border border-red-500/70 bg-red-950/70 text-red-200 transition">Торговля (ToT)</button>
+                    <button type="button" onclick="setScenario('growth')" id="sc-growth" class="py-1 px-2 rounded border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition">Рост (Biased)</button>
+                </div>
+            </div>
+
+            <!-- СЛАЙДЕР 1 -->
+            <div class="bg-slate-950/90 p-2.5 rounded border border-slate-800">
+                <div class="flex justify-between items-baseline mb-1.5">
+                    <label class="text-[11px] font-semibold text-slate-200" id="lbl-relp">Относительная цена ткани (P<sub>C</sub> / P<sub>F</sub>):</label>
+                    <span id="val-relp" class="mono-num text-xs font-bold text-red-400">1.35</span>
+                </div>
+                <input type="range" id="sl-relp" min="0.50" max="2.40" step="0.05" value="1.35" class="vintage-slider sl-crimson" oninput="updateModel()">
+                <div class="flex justify-between text-[9px] mono-num text-slate-500 mt-1">
+                    <span>0.50 (Импорт C)</span>
+                    <span id="lbl-aut-p">1.00 (Автаркия)</span>
+                    <span>2.40 (Экспорт C)</span>
+                </div>
+            </div>
+
+            <!-- СЛАЙДЕР 2 -->
+            <div class="bg-slate-950/90 p-2.5 rounded border border-slate-800">
+                <div class="flex justify-between items-baseline mb-1.5">
+                    <label class="text-[11px] font-semibold text-slate-200" id="lbl-bias">Сдвиг PPF / Рост сектора (Слайд 11):</label>
+                    <span id="val-bias" class="mono-num text-xs font-bold text-blue-400">База (0%)</span>
+                </div>
+                <input type="range" id="sl-bias" min="-40" max="40" step="5" value="0" class="vintage-slider sl-navy" oninput="updateModel()">
+                <div class="flex justify-between text-[9px] mono-num text-slate-500 mt-1">
+                    <span>← Рост Food (Q<sub>F</sub>)</span>
+                    <span>Симметрия</span>
+                    <span>Рост Cloth (Q<sub>C</sub>) →</span>
+                </div>
+            </div>
+
+            <!-- СЛАЙДЕР 3 -->
+            <div class="bg-slate-950/90 p-2.5 rounded border border-slate-800">
+                <div class="flex justify-between items-baseline mb-1.5">
+                    <label class="text-[11px] font-semibold text-slate-200" id="lbl-rd">Мировой относительный спрос (RD):</label>
+                    <span id="val-rd" class="mono-num text-xs font-bold text-emerald-400">1.00</span>
+                </div>
+                <input type="range" id="sl-rd" min="0.60" max="1.60" step="0.05" value="1.00" class="vintage-slider sl-emerald" oninput="updateModel()">
+                <div class="flex justify-between text-[9px] mono-num text-slate-500 mt-1">
+                    <span>Спрос на Food</span>
+                    <span>Базовый RD</span>
+                    <span>Спрос на Cloth</span>
+                </div>
+            </div>
+
+            <!-- ТАБЛИЦА РАСЧЁТОВ -->
+            <div class="bg-slate-950 rounded border border-slate-800 overflow-hidden text-[11px]">
+                <div class="bg-slate-800/80 px-2.5 py-1 font-bold text-slate-300 uppercase text-[9px] tracking-wider flex justify-between">
+                    <span id="tbl-head">Параметры равновесия (Home)</span>
+                    <span class="mono-num text-slate-400">P<sub>C</sub>Q<sub>C</sub> + P<sub>F</sub>Q<sub>F</sub> = V</span>
+                </div>
+                <div class="p-2.5 grid grid-cols-2 gap-2 mono-num">
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-sans" id="m-prod">Производство Q (Q<sub>C</sub>, Q<sub>F</sub>)</div>
+                        <div id="out-q" class="text-slate-100 font-bold">80.4, 59.5</div>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-sans" id="m-cons">Потребление D (D<sub>C</sub>, D<sub>F</sub>)</div>
+                        <div id="out-d" class="text-slate-100 font-bold">62.2, 84.0</div>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-sans" id="m-trade-c">Торговля Cloth (Q<sub>C</sub> − D<sub>C</sub>)</div>
+                        <div id="out-tc" class="text-emerald-400 font-bold">+18.1 (Экспорт)</div>
+                    </div>
+                    <div>
+                        <div class="text-[9px] text-slate-400 font-sans" id="m-trade-f">Торговля Food (Q<sub>F</sub> − D<sub>F</sub>)</div>
+                        <div id="out-tf" class="text-amber-400 font-bold">−24.5 (Импорт)</div>
+                    </div>
+                    <div class="col-span-2 pt-1.5 border-t border-slate-800 flex justify-between items-center">
+                        <span class="font-sans text-slate-300 font-semibold text-[10px]" id="m-welfare">Благосостояние U(D<sub>C</sub>, D<sub>F</sub>):</span>
+                        <span id="out-u" class="text-xs font-bold text-red-400">72.3 (+2.2% к автаркии)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- СПРАВКА -->
+            <div class="bg-slate-950/80 p-2 rounded border border-slate-800 text-[10px] text-slate-300 leading-snug" id="theory-note">
+                <strong>4 соотношения модели:</strong> (1) КПВ (<em>TT</em>) задаёт кривую <em>RS</em>; (2) относительные цены определяют <em>RD</em>; (3) пересечение <em>RS<sup>World</sup></em> и <em>RD</em> даёт мировую цену; (4) рост <strong>ToT</strong> повышает благосостояние.
+            </div>
+        </aside>
+
+        <!-- ПРАВАЯ 2/3: ЧИСТОЕ БЕЛОЕ ПОЛЕ С ФИКСИРОВАННОЙ ВЫСОТОЙ ГРАФИКОВ -->
+        <section class="lg:col-span-8 bg-white text-slate-900 p-4 flex flex-col justify-between min-h-0">
+            <!-- Заголовок белой области -->
+            <div class="border-b-2 border-slate-900 pb-2 mb-3 flex flex-col md:flex-row justify-between items-start md:items-end gap-2 shrink-0">
+                <div>
+                    <div class="text-[10px] font-bold uppercase tracking-widest text-blue-900" id="white-kicker">
+                        Standard Trade Model 
+                    </div>
+                    <h2 class="serif-title text-xl md:text-2xl font-bold text-slate-950 leading-tight" id="white-title">
+                        Производство, потребление, торговые потоки и мировое равновесие
+                    </h2>
+                </div>
+                <div class="mono-num text-[11px] bg-slate-100 border border-slate-300 px-2.5 py-1 rounded text-slate-800 font-semibold" id="tot-status">
+                    Terms of Trade (PC/PF) = 1.35 | Home экспортирует Cloth
+                </div>
+            </div>
+
+            <!-- ДВА ГРАФИКА В ЖЁСТКОМ КОНТЕЙНЕРЕ -->
+            <div class="grid grid-cols-1 xl:grid-cols-2 gap-4 flex-1 min-h-0">
+                <!-- ГРАФИК 1 -->
+                <div class="border border-slate-300 rounded bg-white p-2.5 flex flex-col min-h-[320px] shadow-sm">
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5 shrink-0">
+                        <span class="text-[11px] font-bold uppercase tracking-wide text-slate-800" id="g1-cap">Рис. 1. Производство (Q), потребление (D) и торговля</span>
+                        <span class="mono-num text-[10px] text-red-700 font-semibold">TT &amp; Isovalue VV</span>
+                    </div>
+                    <div class="relative flex-1 min-h-0 w-full overflow-hidden" id="wrapPPF">
+                        <canvas id="canvasPPF" class="block w-full h-full"></canvas>
+                    </div>
+                    <div class="mt-1.5 pt-1 border-t border-slate-100 flex flex-wrap gap-3 text-[10px] text-slate-600 shrink-0">
+                        <span class="flex items-center gap-1"><i class="inline-block w-3 h-0.5 bg-red-600"></i> PPF (TT)</span>
+                        <span class="flex items-center gap-1"><i class="inline-block w-3 h-0.5 bg-slate-900"></i> Isovalue (VV)</span>
+                        <span class="flex items-center gap-1"><i class="inline-block w-3 h-0.5 bg-blue-600"></i> Indifference Curve (U)</span>
+                    </div>
+                </div>
+
+                <!-- ГРАФИК 2 -->
+                <div class="border border-slate-300 rounded bg-white p-2.5 flex flex-col min-h-[320px] shadow-sm">
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-1 mb-1.5 shrink-0">
+                        <span class="text-[11px] font-bold uppercase tracking-wide text-slate-800" id="g2-cap">Рис. 2. Равновесная относительная цена (RS и RD)</span>
+                        <span class="mono-num text-[10px] text-blue-800 font-semibold">Q<sub>C</sub>/Q<sub>F</sub> vs P<sub>C</sub>/P<sub>F</sub></span>
+                    </div>
+                    <div class="relative flex-1 min-h-0 w-full overflow-hidden" id="wrapRSRD">
+                        <canvas id="canvasRSRD" class="block w-full h-full"></canvas>
+                    </div>
+                    <div class="mt-1.5 pt-1 border-t border-slate-100 flex flex-wrap gap-3 text-[10px] text-slate-600 shrink-0">
+                        <span class="flex items-center gap-1"><i class="inline-block w-3 h-0.5 bg-red-600"></i> RS (Home)</span>
+                        <span class="flex items-center gap-1"><i class="inline-block w-3 h-0.5 bg-red-400 border-b border-dashed"></i> RS<sup>World</sup> &amp; RS*</span>
+                        <span class="flex items-center gap-1"><i class="inline-block w-3 h-0.5 bg-blue-700"></i> RD (World Demand)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- НИЖНЯЯ СТРОКА -->
+            <div class="mt-2.5 pt-1.5 border-t border-slate-300 flex flex-col sm:flex-row justify-between text-[10px] text-slate-600 gap-1 shrink-0">
+                <span id="foot-left">Объединяет модели: Рикардо (технологии), Специфических факторов (краткосрочный период) и Хекшера–Олина (наделённость факторами).</span>
+                <span class="mono-num font-semibold text-slate-800">AlmaU • SDTE</span>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        let lang = 'ru';
+
+        function setScenario(type) {
+            const slP = document.getElementById('sl-relp');
+            const slB = document.getElementById('sl-bias');
+            const slR = document.getElementById('sl-rd');
+
+            ['sc-autarky', 'sc-trade', 'sc-growth'].forEach(id => {
+                document.getElementById(id).className = 'py-1 px-2 rounded border border-slate-700 bg-slate-800 text-slate-300 hover:bg-slate-700 transition';
+            });
+            document.getElementById('sc-' + type).className = 'py-1 px-2 rounded border border-red-500/70 bg-red-950/70 text-red-200 transition';
+
+            if (type === 'autarky') {
+                slB.value = 0;
+                slR.value = 1.00;
+                slP.value = 1.00;
+            } else if (type === 'trade') {
+                slB.value = 0;
+                slR.value = 1.00;
+                slP.value = 1.35;
+            } else if (type === 'growth') {
+                slB.value = 25;
+                slR.value = 1.00;
+                slP.value = 1.25;
+            }
+            updateModel();
+        }
+
+        function solveModel(p, biasPct, rdMult) {
+            const bias = biasPct / 100;
+            const A = 100 * (1 + bias);
+            const B = 100 * (1 - bias * 0.65);
+
+            const denom = Math.sqrt(Math.pow(p * A, 2) + Math.pow(B, 2));
+            const Qc = (p * A * A) / denom;
+            const Qf = (B * B) / denom;
+            const V = p * Qc + Qf;
+
+            const Dc = (V * 0.5) / p;
+            const Df = V * 0.5;
+            const U = Math.sqrt(Dc * Df);
+
+            const pAut = B / A;
+            const denomAut = Math.sqrt(Math.pow(pAut * A, 2) + Math.pow(B, 2));
+            const QcAut = (pAut * A * A) / denomAut;
+            const QfAut = (B * B) / denomAut;
+            const UAut = Math.sqrt(QcAut * QfAut);
+
+            return { A, B, Qc, Qf, V, Dc, Df, U, pAut, UAut, relQ: Qc / Qf };
+        }
+
+        function setupCanvas(canvasId, wrapId) {
+            const wrap = document.getElementById(wrapId);
+            const canvas = document.getElementById(canvasId);
+            const rect = wrap.getBoundingClientRect();
+            const W = Math.max(260, Math.floor(rect.width));
+            const H = Math.max(260, Math.floor(rect.height));
+            const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            canvas.width = W * dpr;
+            canvas.height = H * dpr;
+            const ctx = canvas.getContext('2d');
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            ctx.clearRect(0, 0, W, H);
+            return { ctx, W, H };
+        }
+
+        function drawPPFChart(state, p) {
+            const { ctx, W, H } = setupCanvas('canvasPPF', 'wrapPPF');
+
+            const padL = 44, padR = 22, padT = 22, padB = 34;
+            const plotW = W - padL - padR;
+            const plotH = H - padT - padB;
+            const maxVal = 155;
+
+            const sx = (v) => padL + (v / maxVal) * plotW;
+            const sy = (v) => padT + plotH - (v / maxVal) * plotH;
+
+            // Сетка
+            ctx.strokeStyle = '#f1f5f9';
+            ctx.lineWidth = 1;
+            for (let g = 25; g <= 150; g += 25) {
+                ctx.beginPath(); ctx.moveTo(sx(g), padT); ctx.lineTo(sx(g), padT + plotH); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(padL, sy(g)); ctx.lineTo(padL + plotW, sy(g)); ctx.stroke();
+            }
+
+            // Оси
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(padL, padT);
+            ctx.lineTo(padL, padT + plotH);
+            ctx.lineTo(padL + plotW, padT + plotH);
+            ctx.stroke();
+
+            // Подписи осей
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'italic 700 12px "Cormorant Garamond", Georgia, serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(lang === 'ru' ? 'Продовольствие, QF' : 'Quantity of food, QF', padL + 6, padT + 10);
+            ctx.textAlign = 'right';
+            ctx.fillText(lang === 'ru' ? 'Ткань, QC' : 'Quantity of cloth, QC', padL + plotW, padT + plotH + 24);
+
+            // Базовая PPF пунктиром при смещённом росте
+            if (Math.abs(state.A - 100) > 1) {
+                ctx.save();
+                ctx.setLineDash([4, 4]);
+                ctx.strokeStyle = '#94a3b8';
+                ctx.lineWidth = 1.2;
+                ctx.beginPath();
+                for (let t = 0; t <= 100; t += 2) {
+                    const x = 100 * Math.cos((t / 100) * Math.PI / 2);
+                    const y = 100 * Math.sin((t / 100) * Math.PI / 2);
+                    if (t === 0) ctx.moveTo(sx(x), sy(y));
+                    else ctx.lineTo(sx(x), sy(y));
+                }
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Кривая TT
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 2.4;
+            ctx.beginPath();
+            for (let i = 0; i <= 100; i++) {
+                const theta = (i / 100) * (Math.PI / 2);
+                const x = state.A * Math.cos(theta);
+                const y = state.B * Math.sin(theta);
+                if (i === 0) ctx.moveTo(sx(x), sy(y));
+                else ctx.lineTo(sx(x), sy(y));
+            }
+            ctx.stroke();
+            ctx.fillStyle = '#dc2626';
+            ctx.font = 'italic bold 12px Georgia, serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('TT', sx(state.A) + 4, sy(0) - 4);
+
+            // Линия изостоимости VV
+            const xIntercept = Math.min(maxVal, state.V / p);
+            const yAtXInt = Math.max(0, state.V - p * xIntercept);
+            const yIntercept = Math.min(maxVal, state.V);
+            const xAtYInt = Math.max(0, (state.V - yIntercept) / p);
+
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 1.7;
+            ctx.beginPath();
+            ctx.moveTo(sx(xAtYInt), sy(yIntercept));
+            ctx.lineTo(sx(xIntercept), sy(yAtXInt));
+            ctx.stroke();
+
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'italic 600 11px Georgia, serif';
+            ctx.textAlign = 'right';
+            ctx.fillText(`VV (${p.toFixed(2)})`, sx(xIntercept) - 4, sy(yAtXInt) - 8);
+
+            // Кривая безразличия U
+            ctx.strokeStyle = '#2563eb';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            let started = false;
+            const uSq = state.U * state.U;
+            for (let qx = state.Dc * 0.45; qx <= Math.min(maxVal, state.Dc * 1.85); qx += 1.5) {
+                const qy = uSq / qx;
+                if (qy <= maxVal && qy >= 4) {
+                    if (!started) { ctx.moveTo(sx(qx), sy(qy)); started = true; }
+                    else ctx.lineTo(sx(qx), sy(qy));
+                }
+            }
+            ctx.stroke();
+            ctx.fillStyle = '#1d4ed8';
+            ctx.font = 'italic bold 12px Georgia, serif';
+            ctx.textAlign = 'left';
+            const uLabelX = Math.min(maxVal - 15, state.Dc * 1.45);
+            const uLabelY = Math.min(maxVal - 10, uSq / uLabelX);
+            ctx.fillText('U', sx(uLabelX) + 4, sy(uLabelY));
+
+            // Проекции и треугольник торговли
+            const isTrading = Math.abs(state.Qc - state.Dc) > 1.2;
+            if (isTrading) {
+                ctx.save();
+                ctx.setLineDash([3, 3]);
+                ctx.strokeStyle = '#64748b';
+                ctx.lineWidth = 1.1;
+                ctx.beginPath();
+                ctx.moveTo(sx(state.Qc), sy(state.Qf)); ctx.lineTo(sx(state.Qc), sy(0));
+                ctx.moveTo(sx(state.Qc), sy(state.Qf)); ctx.lineTo(sx(0), sy(state.Qf));
+                ctx.moveTo(sx(state.Dc), sy(state.Df)); ctx.lineTo(sx(state.Dc), sy(0));
+                ctx.moveTo(sx(state.Dc), sy(state.Df)); ctx.lineTo(sx(0), sy(state.Df));
+                ctx.stroke();
+                ctx.restore();
+
+                ctx.save();
+                ctx.strokeStyle = '#059669';
+                ctx.lineWidth = 1.6;
+                ctx.beginPath();
+                ctx.moveTo(sx(state.Dc), sy(state.Df));
+                ctx.lineTo(sx(state.Dc), sy(state.Qf));
+                ctx.lineTo(sx(state.Qc), sy(state.Qf));
+                ctx.stroke();
+                ctx.restore();
+
+                ctx.fillStyle = '#047857';
+                ctx.font = 'bold 9px "IBM Plex Sans", sans-serif';
+                ctx.textAlign = 'center';
+                const midX = (sx(state.Dc) + sx(state.Qc)) / 2;
+                ctx.fillText(
+                    state.Qc > state.Dc
+                        ? (lang === 'ru' ? 'Экспорт C' : 'Cloth exports')
+                        : (lang === 'ru' ? 'Импорт C' : 'Cloth imports'),
+                    midX, sy(0) + 12
+                );
+
+                const midY = (sy(state.Df) + sy(state.Qf)) / 2;
+                ctx.fillStyle = '#b45309';
+                ctx.textAlign = 'right';
+                ctx.fillText(
+                    state.Df > state.Qf
+                        ? (lang === 'ru' ? 'Импорт F' : 'Food imports')
+                        : (lang === 'ru' ? 'Экспорт F' : 'Food exports'),
+                    padL - 4, midY + 3
+                );
+            }
+
+            // Точка Q
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath(); ctx.arc(sx(state.Qc), sy(state.Qf), 4, 0, Math.PI * 2); ctx.fill();
+            ctx.font = 'italic bold 13px Georgia, serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Q', sx(state.Qc) + 6, sy(state.Qf) - 5);
+
+            // Точка D
+            ctx.fillStyle = '#1d4ed8';
+            ctx.beginPath(); ctx.arc(sx(state.Dc), sy(state.Df), 4, 0, Math.PI * 2); ctx.fill();
+            ctx.fillText('D', sx(state.Dc) + 6, sy(state.Df) - 5);
+        }
+
+        function drawRSRDChart(state, p, rdMult) {
+            const { ctx, W, H } = setupCanvas('canvasRSRD', 'wrapRSRD');
+
+            const padL = 46, padR = 22, padT = 22, padB = 34;
+            const plotW = W - padL - padR;
+            const plotH = H - padT - padB;
+            const maxX = 2.8;
+            const maxY = 2.6;
+
+            const sx = (v) => padL + (v / maxX) * plotW;
+            const sy = (v) => padT + plotH - (v / maxY) * plotH;
+
+            // Сетка
+            ctx.strokeStyle = '#f1f5f9';
+            ctx.lineWidth = 1;
+            for (let gx = 0.5; gx <= 2.5; gx += 0.5) {
+                ctx.beginPath(); ctx.moveTo(sx(gx), padT); ctx.lineTo(sx(gx), padT + plotH); ctx.stroke();
+            }
+            for (let gy = 0.5; gy <= 2.5; gy += 0.5) {
+                ctx.beginPath(); ctx.moveTo(padL, sy(gy)); ctx.lineTo(padL + plotW, sy(gy)); ctx.stroke();
+            }
+
+            // Оси
+            ctx.strokeStyle = '#0f172a';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(padL, padT);
+            ctx.lineTo(padL, padT + plotH);
+            ctx.lineTo(padL + plotW, padT + plotH);
+            ctx.stroke();
+
+            // Подписи осей
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'italic 700 12px "Cormorant Garamond", Georgia, serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(lang === 'ru' ? 'Относит. цена, PC / PF' : 'Relative price, PC / PF', padL + 6, padT + 10);
+            ctx.textAlign = 'right';
+            ctx.fillText(lang === 'ru' ? 'Относит. кол-во, QC / QF' : 'Relative quantity, QC / QF', padL + plotW, padT + plotH + 24);
+
+            const ratioAB2 = Math.pow(state.A / state.B, 2);
+
+            // RS (Home)
+            ctx.strokeStyle = '#dc2626';
+            ctx.lineWidth = 2.3;
+            ctx.beginPath();
+            for (let rx = 0.08; rx <= maxX; rx += 0.05) {
+                const ry = rx / ratioAB2;
+                if (ry <= maxY) {
+                    if (rx === 0.08) ctx.moveTo(sx(rx), sy(ry));
+                    else ctx.lineTo(sx(rx), sy(ry));
+                }
+            }
+            ctx.stroke();
+            const rsLabelX = Math.min(maxX - 0.15, maxY * ratioAB2 * 0.90);
+            ctx.fillStyle = '#dc2626';
+            ctx.font = 'italic bold 12px Georgia, serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('RS', sx(rsLabelX), sy(rsLabelX / ratioAB2) - 6);
+
+            // RS* и RS_World
+            ctx.save();
+            ctx.setLineDash([4, 3]);
+            ctx.strokeStyle = '#f87171';
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            for (let rx = 0.08; rx <= maxX * 0.65; rx += 0.05) {
+                const ry = (rx / ratioAB2) * 1.65;
+                if (ry <= maxY) {
+                    if (rx === 0.08) ctx.moveTo(sx(rx), sy(ry));
+                    else ctx.lineTo(sx(rx), sy(ry));
+                }
+            }
+            ctx.stroke();
+            ctx.fillStyle = '#ef4444';
+            ctx.fillText('RS*', sx(1.05), sy((1.05 / ratioAB2) * 1.65) - 5);
+
+            ctx.strokeStyle = '#b91c1c';
+            ctx.beginPath();
+            for (let rx = 0.08; rx <= maxX * 0.85; rx += 0.05) {
+                const ry = (rx / ratioAB2) * 1.28;
+                if (ry <= maxY) {
+                    if (rx === 0.08) ctx.moveTo(sx(rx), sy(ry));
+                    else ctx.lineTo(sx(rx), sy(ry));
+                }
+            }
+            ctx.stroke();
+            ctx.fillText('RS World', sx(1.4), sy((1.4 / ratioAB2) * 1.28) - 5);
+            ctx.restore();
+
+            // RD (World Demand)
+            ctx.strokeStyle = '#1d4ed8';
+            ctx.lineWidth = 2.3;
+            ctx.beginPath();
+            let rdStarted = false;
+            for (let rx = 0.22; rx <= maxX; rx += 0.04) {
+                const ry = rdMult / rx;
+                if (ry <= maxY && ry >= 0.15) {
+                    if (!rdStarted) { ctx.moveTo(sx(rx), sy(ry)); rdStarted = true; }
+                    else ctx.lineTo(sx(rx), sy(ry));
+                }
+            }
+            ctx.stroke();
+            ctx.fillStyle = '#1d4ed8';
+            ctx.fillText('RD', sx(2.35), sy(rdMult / 2.35) - 7);
+
+            // Горизонтальная линия цены Pc/Pf
+            const relSupplyQ = Math.min(maxX, p * ratioAB2);
+            const relDemandQ = Math.min(maxX, rdMult / p);
+
+            ctx.save();
+            ctx.setLineDash([4, 4]);
+            ctx.strokeStyle = '#334155';
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.moveTo(padL, sy(p));
+            ctx.lineTo(sx(Math.max(relSupplyQ, relDemandQ)), sy(p));
+            ctx.stroke();
+            ctx.restore();
+
+            ctx.fillStyle = '#0f172a';
+            ctx.font = 'bold 10px "IBM Plex Mono", monospace';
+            ctx.textAlign = 'right';
+            ctx.fillText(p.toFixed(2), padL - 4, sy(p) + 3);
+
+            // Точки 1 (RS) и 1' (RD)
+            ctx.fillStyle = '#dc2626';
+            ctx.beginPath(); ctx.arc(sx(relSupplyQ), sy(p), 4, 0, Math.PI * 2); ctx.fill();
+            ctx.font = 'bold 11px Georgia, serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('1 (RS)', sx(relSupplyQ) + 5, sy(p) - 5);
+
+            ctx.fillStyle = '#1d4ed8';
+            ctx.beginPath(); ctx.arc(sx(relDemandQ), sy(p), 4, 0, Math.PI * 2); ctx.fill();
+            ctx.fillText("1' (RD)", sx(relDemandQ) + 5, sy(p) - 5);
+        }
+
+        function updateModel() {
+            const p = parseFloat(document.getElementById('sl-relp').value);
+            const bias = parseFloat(document.getElementById('sl-bias').value);
+            const rd = parseFloat(document.getElementById('sl-rd').value);
+
+            document.getElementById('val-relp').innerText = p.toFixed(2);
+            document.getElementById('val-rd').innerText = rd.toFixed(2);
+
+            if (bias === 0) {
+                document.getElementById('val-bias').innerText = lang === 'ru' ? 'База (0%)' : 'Base (0%)';
+            } else if (bias > 0) {
+                document.getElementById('val-bias').innerText = `Cloth +${bias}%`;
+            } else {
+                document.getElementById('val-bias').innerText = `Food +${Math.abs(bias)}%`;
+            }
+
+            const st = solveModel(p, bias, rd);
+            document.getElementById('lbl-aut-p').innerText = `${st.pAut.toFixed(2)} (${lang === 'ru' ? 'Автаркия' : 'Autarky'})`;
+
+            document.getElementById('out-q').innerText = `${st.Qc.toFixed(1)}, ${st.Qf.toFixed(1)}`;
+            document.getElementById('out-d').innerText = `${st.Dc.toFixed(1)}, ${st.Df.toFixed(1)}`;
+
+            const diffC = st.Qc - st.Dc;
+            const diffF = st.Qf - st.Df;
+
+            const tcEl = document.getElementById('out-tc');
+            const tfEl = document.getElementById('out-tf');
+
+            if (Math.abs(diffC) < 0.8) {
+                tcEl.className = 'text-slate-300 font-bold';
+                tcEl.innerText = lang === 'ru' ? '0.0 (Автаркия)' : '0.0 (Autarky)';
+                tfEl.className = 'text-slate-300 font-bold';
+                tfEl.innerText = lang === 'ru' ? '0.0 (Автаркия)' : '0.0 (Autarky)';
+            } else if (diffC > 0) {
+                tcEl.className = 'text-emerald-400 font-bold';
+                tcEl.innerText = `+${diffC.toFixed(1)} (${lang === 'ru' ? 'Экспорт' : 'Export'})`;
+                tfEl.className = 'text-amber-400 font-bold';
+                tfEl.innerText = `${diffF.toFixed(1)} (${lang === 'ru' ? 'Импорт' : 'Import'})`;
+            } else {
+                tcEl.className = 'text-amber-400 font-bold';
+                tcEl.innerText = `${diffC.toFixed(1)} (${lang === 'ru' ? 'Импорт' : 'Import'})`;
+                tfEl.className = 'text-emerald-400 font-bold';
+                tfEl.innerText = `+${diffF.toFixed(1)} (${lang === 'ru' ? 'Экспорт' : 'Export'})`;
+            }
+
+            const gainPct = ((st.U - st.UAut) / st.UAut) * 100;
+            document.getElementById('out-u').innerText = `${st.U.toFixed(1)} (+${Math.max(0, gainPct).toFixed(1)}% ${lang === 'ru' ? 'к автаркии' : 'vs autarky'})`;
+
+            const statusStr = Math.abs(diffC) < 0.8
+                ? `Terms of Trade (PC/PF) = ${p.toFixed(2)} | ${lang === 'ru' ? 'Закрытая экономика (Автаркия)' : 'Closed Economy (Autarky)'}`
+                : (diffC > 0
+                    ? `Terms of Trade (PC/PF) = ${p.toFixed(2)} | ${lang === 'ru' ? 'Home экспортирует Cloth, импортирует Food' : 'Home exports Cloth, imports Food'}`
+                    : `Terms of Trade (PC/PF) = ${p.toFixed(2)} | ${lang === 'ru' ? 'Home импортирует Cloth, экспортирует Food' : 'Home imports Cloth, exports Food'}`);
+            document.getElementById('tot-status').innerText = statusStr;
+
+            drawPPFChart(st, p);
+            drawRSRDChart(st, p, rd);
+        }
+
+        const i18n = {
+            ru: {
+                "hdr-title": "Стандартная модель международной торговли",
+                "hdr-sub": "AlmaU • Школа цифровых технологий и экономики • Экономика",
+                "lbl-mode": "Режим анализа (Слайды 5–12):",
+                "sc-autarky": "Автаркия",
+                "sc-trade": "Торговля (ToT)",
+                "sc-growth": "Рост (Biased)",
+                "lbl-relp": "Относительная цена ткани (P<sub>C</sub> / P<sub>F</sub>):",
+                "lbl-bias": "Сдвиг PPF / Рост сектора (Слайд 11):",
+                "lbl-rd": "Мировой относительный спрос (RD):",
+                "tbl-head": "Параметры равновесия (Home)",
+                "m-prod": "Производство Q (Q<sub>C</sub>, Q<sub>F</sub>)",
+                "m-cons": "Потребление D (D<sub>C</sub>, D<sub>F</sub>)",
+                "m-trade-c": "Торговля Cloth (Q<sub>C</sub> − D<sub>C</sub>)",
+                "m-trade-f": "Торговля Food (Q<sub>F</sub> − D<sub>F</sub>)",
+                "m-welfare": "Благосостояние U(D<sub>C</sub>, D<sub>F</sub>):",
+                "theory-note": "<strong>4 соотношения модели:</strong> (1) КПВ (<em>TT</em>) задаёт кривую <em>RS</em>; (2) относительные цены определяют <em>RD</em>; (3) пересечение <em>RS<sup>World</sup></em> и <em>RD</em> даёт мировую цену; (4) рост <strong>ToT</strong> повышает благосостояние.",
+                "white-kicker": "Standard Trade Model • Синтез общего равновесия",
+                "white-title": "Производство, потребление, торговые потоки и мировое равновесие",
+                "g1-cap": "Рис. 1. Производство (Q), потребление (D) и торговля",
+                "g2-cap": "Рис. 2. Равновесная относительная цена (RS и RD)",
+                "foot-left": "Объединяет модели: Рикардо (технологии), Специфических факторов (краткосрочный период) и Хекшера–Олина (наделённость факторами)."
+            },
+            en: {
+                "hdr-title": "The Standard Trade Model — Interactive Simulator",
+                "hdr-sub": "AlmaU • School of Digital Technologies & Economics • Economics",
+                "lbl-mode": "Analysis Mode (Slides 5–12):",
+                "sc-autarky": "Autarky",
+                "sc-trade": "Trade (ToT)",
+                "sc-growth": "Biased Growth",
+                "lbl-relp": "Relative Price of Cloth (P<sub>C</sub> / P<sub>F</sub>):",
+                "lbl-bias": "PPF Shift / Sector-Biased Growth (Slide 11):",
+                "lbl-rd": "World Relative Demand (RD):",
+                "tbl-head": "Equilibrium Metrics (Home)",
+                "m-prod": "Production Q (Q<sub>C</sub>, Q<sub>F</sub>)",
+                "m-cons": "Consumption D (D<sub>C</sub>, D<sub>F</sub>)",
+                "m-trade-c": "Cloth Trade (Q<sub>C</sub> − D<sub>C</sub>)",
+                "m-trade-f": "Food Trade (Q<sub>F</sub> − D<sub>F</sub>)",
+                "m-welfare": "Welfare Index U(D<sub>C</sub>, D<sub>F</sub>):",
+                "theory-note": "<strong>4 Key Relationships:</strong> (1) PPF (<em>TT</em>) determines <em>RS</em>; (2) relative prices determine <em>RD</em>; (3) world equilibrium is set by <em>RS<sup>World</sup></em> and <em>RD</em>; (4) an improvement in <strong>ToT</strong> raises welfare.",
+                "white-kicker": "Standard Trade Model • General Equilibrium Synthesis",
+                "white-title": "Production, Consumption, Trade Flows & World Equilibrium",
+                "g1-cap": "Fig. 1. Production (Q), Consumption (D) & Trade",
+                "g2-cap": "Fig. 2. Equilibrium Relative Price (RS & RD)",
+                "foot-left": "Synthesizes Ricardian (technology), Specific Factors (short run), and Heckscher-Ohlin (factor endowments) models."
+            }
+        };
+
+        function setLang(l) {
+            lang = l;
+            const d = i18n[l];
+            Object.keys(d).forEach(k => {
+                const el = document.getElementById(k);
+                if (el) el.innerHTML = d[k];
+            });
+            document.getElementById('btn-ru').className = l === 'ru' ? 'px-2.5 py-1 rounded bg-slate-200 text-slate-950 transition' : 'px-2.5 py-1 rounded text-slate-400 hover:text-white transition';
+            document.getElementById('btn-en').className = l === 'en' ? 'px-2.5 py-1 rounded bg-slate-200 text-slate-950 transition' : 'px-2.5 py-1 rounded text-slate-400 hover:text-white transition';
+            updateModel();
+        }
+
+        window.addEventListener('resize', updateModel);
+        window.addEventListener('load', () => setLang('ru'));
+    </script>
+</body>
+</html>

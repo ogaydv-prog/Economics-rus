@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Международная торговля | AlmaU SDTE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at 15% 0%, #0f172a 0%, #05070c 100%); color: #f1f5f9; min-height: 100vh; font-size: 13px; }
+        .glass-panel { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(20px); border: 1px solid rgba(51, 65, 85, 0.5); box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6); }
+        .tab-btn { transition: all 0.2s ease-in-out; display: flex; align-items: center; justify-content: center; text-align: center; min-height: 36px; }
+        .tab-btn.active { box-shadow: 0 0 14px currentColor; border-color: currentColor; transform: translateY(-1px); }
+        .trade-card { background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(51, 65, 85, 0.6); border-radius: 12px; padding: 14px; transition: all 0.25s ease; }
+        .trade-card:hover { border-color: #3b82f6; background: rgba(30, 41, 59, 0.9); }
+
+        .vintage-tuner {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            outline: none;
+            cursor: pointer;
+            --track-glow: rgba(245, 158, 11, 0.35);
+            --needle-color: #f59e0b;
+        }
+        .vintage-tuner::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 12px;
+            background: linear-gradient(180deg, #090d16 0%, #1e293b 50%, #0f172a 100%);
+            border-radius: 3px;
+            border: 1px solid #475569;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.9), 0 0 10px var(--track-glow);
+        }
+        .vintage-tuner::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 30px;
+            width: 16px;
+            background: linear-gradient(180deg, #f8fafc 0%, #94a3b8 45%, #475569 55%, #cbd5e1 100%);
+            border: 1px solid #ffffff;
+            border-radius: 2px;
+            margin-top: -10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.9);
+            background-image: linear-gradient(to right, transparent 6px, var(--needle-color) 6px, var(--needle-color) 10px, transparent 10px);
+        }
+        .tuner-amber { --track-glow: rgba(245, 158, 11, 0.45); --needle-color: #f59e0b; }
+        .tuner-emerald { --track-glow: rgba(16, 185, 129, 0.45); --needle-color: #10b981; }
+        .tuner-cyan { --track-glow: rgba(6, 182, 212, 0.45); --needle-color: #06b6d4; }
+        .tuner-rose { --track-glow: rgba(244, 63, 94, 0.5); --needle-color: #f43f5e; }
+        .tuner-blue { --track-glow: rgba(59, 130, 246, 0.45); --needle-color: #3b82f6; }
+
+        .pretty-math-text { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #fffbeb 0%, #fde047 50%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .chart-stage { min-height: 410px; height: calc(100vh - 295px); }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    </style>
+</head>
+<body class="p-3 md:p-4 flex flex-col justify-between min-h-screen">
+
+    <!-- ШАПКА -->
+    <header class="glass-panel p-3.5 rounded-xl mb-3 flex flex-col md:flex-row justify-between items-center gap-3 border-t-2 border-t-rose-500">
+        <div class="flex items-center gap-3.5">
+            <img src="almaU.jpg" alt="AlmaU Logo" class="w-14 h-14 md:w-16 md:h-16 object-contain rounded-xl bg-white p-1.5 shadow-lg border border-blue-400/50 shrink-0" onerror="this.style.display='none';">
+            <div>
+                <h1 class="text-xl md:text-2xl font-black tracking-tight text-rose-500" id="txt-header-title">
+                    Международная торговля
+                </h1>
+                <p class="text-xs text-blue-400 font-bold uppercase tracking-wider mt-0.5" id="txt-header-sub">
+                    AlmaU • Школа цифровых технологий и экономики
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700 shrink-0">
+            <button type="button" onclick="setLanguage('ru')" id="btn-lang-ru" class="px-3 py-1.5 text-xs font-black rounded bg-blue-600 text-white transition">RU</button>
+            <button type="button" onclick="setLanguage('en')" id="btn-lang-en" class="px-3 py-1.5 text-xs font-black rounded text-slate-400 hover:text-white transition">EN</button>
+        </div>
+    </header>
+
+    <!-- НАВИГАЦИЯ: РОВНО 4 ВКЛАДКИ СВЕРХУ И 4 СНИЗУ НА ВСЮ ШИРИНУ -->
+    <nav class="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3 w-full">
+        <button type="button" onclick="switchTab('tab-autarky', this)" class="tab-btn active w-full px-2.5 py-2 text-xs font-bold rounded-lg border border-amber-500/50 bg-amber-950/80 text-amber-300" id="nav-1">1. Равновесие без торговли</button>
+        <button type="button" onclick="switchTab('tab-export', this)" class="tab-btn w-full px-2.5 py-2 text-xs font-bold rounded-lg border border-emerald-500/50 bg-emerald-950/80 text-emerald-300" id="nav-2">2. Страна-экспортёр</button>
+        <button type="button" onclick="switchTab('tab-import', this)" class="tab-btn w-full px-2.5 py-2 text-xs font-bold rounded-lg border border-cyan-500/50 bg-cyan-950/80 text-cyan-300" id="nav-3">3. Страна-импортёр</button>
+        <button type="button" onclick="switchTab('tab-tariff', this)" class="tab-btn w-full px-2.5 py-2 text-xs font-bold rounded-lg border border-rose-500/50 bg-rose-950/80 text-rose-300" id="nav-4">4. Введение тарифа</button>
+
+        <button type="button" onclick="switchTab('tab-quota-args', this)" class="tab-btn w-full px-2.5 py-2 text-xs font-bold rounded-lg border border-purple-500/50 bg-purple-950/80 text-purple-300" id="nav-5">5. Квоты и протекционизм</button>
+        <button type="button" onclick="switchTab('tab-macro-flows', this)" class="tab-btn w-full px-2.5 py-2 text-xs font-bold rounded-lg border border-teal-500/50 bg-teal-950/80 text-teal-300" id="nav-6">6. Потоки NX = NCO</button>
+        <button type="button" onclick="switchTab('tab-fx-ppp', this)" class="tab-btn w-full px-2.5 py-2 text-xs font-bold rounded-lg border border-sky-500/50 bg-sky-950/80 text-sky-300" id="nav-7">7. Валютные курсы (PPP)</button>
+        <button type="button" onclick="switchTab('tab-trump-case', this)" class="tab-btn w-full px-2.5 py-2 text-xs font-bold rounded-lg border border-orange-500/50 bg-orange-950/80 text-orange-300" id="nav-8">8. Кейс: Тарифы Трампа</button>
+    </nav>
+
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <main class="flex-grow flex flex-col">
+
+        <!-- ВКЛАДКА 1: РАВНОВЕСИЕ БЕЗ МЕЖДУНАРОДНОЙ ТОРГОВЛИ -->
+        <section id="tab-autarky" class="tab-content flex-grow flex flex-col">
+            <div class="glass-panel p-4 rounded-xl border-l-4 border-l-amber-500 flex-grow flex flex-col justify-between gap-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-700 pb-2.5">
+                    <div>
+                        <h2 class="text-sm md:text-base font-black text-amber-400 uppercase" id="t1-title">Равновесие на рынке без международной торговли (Автаркия)</h2>
+                        <p class="text-xs text-slate-300" id="t1-sub">Когда страна закрыта от мирового рынка, цена и объём определяются исключительно внутренним спросом и предложением.</p>
+                    </div>
+                    <span id="aut-badge" class="px-3 py-1.5 rounded-lg text-xs font-mono font-black bg-amber-950 text-amber-300 border border-amber-500/40">P<sub>A</sub> = $50.0 | Q<sub>A</sub> = 66.7</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch flex-grow">
+                    <div class="lg:col-span-5 flex flex-col justify-between bg-slate-900/90 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-200 flex justify-between font-bold mb-2">
+                                <span id="t1-slider-lbl">Сдвиг внутреннего спроса (уровень равновесия):</span>
+                                <span id="disp-aut-shift" class="text-amber-300 font-mono font-black">P<sub>A</sub> = $50.0</span>
+                            </label>
+                            <input type="range" id="slider-aut" min="-15" max="15" step="1" value="0" class="vintage-tuner tuner-amber" oninput="updateAutarkyTab()" onchange="updateAutarkyTab()">
+                            <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1.5">
+                                <span>$37.5 (Низкий спрос)</span>
+                                <span>$50.0 (База)</span>
+                                <span>$62.5 (Высокий спрос)</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 font-mono text-xs">
+                            <div class="bg-slate-950 p-3 rounded-lg border border-blue-500/30">
+                                <div class="text-[10px] text-blue-400 mb-1" id="t1-cs-lbl">Излишек потребителей (CS)</div>
+                                <div id="aut-cs" class="text-lg font-black text-blue-300">1333.3</div>
+                            </div>
+                            <div class="bg-slate-950 p-3 rounded-lg border border-amber-500/30">
+                                <div class="text-[10px] text-amber-400 mb-1" id="t1-ps-lbl">Излишек производителей (PS)</div>
+                                <div id="aut-ps" class="text-lg font-black text-amber-300">1333.3</div>
+                            </div>
+                        </div>
+
+                        <div class="p-3.5 bg-slate-950 rounded-lg border border-amber-500/40 flex justify-between items-center">
+                            <span class="text-xs font-bold text-slate-300" id="t1-ts-lbl">Общий излишек (CS + PS):</span>
+                            <span id="aut-ts" class="text-xl font-mono font-black pretty-math-text">2666.7</span>
+                        </div>
+
+                        <p class="text-xs text-slate-300 leading-relaxed bg-slate-950/70 p-3 rounded-lg border border-slate-800" id="t1-note">
+                            Внутренняя равновесная цена <strong>P<sub>A</sub></strong> показывает альтернативные издержки производства товара внутри страны. Если мировая цена окажется выше P<sub>A</sub>, стране выгодно экспортировать; если ниже — импортировать.
+                        </p>
+                    </div>
+
+                    <div class="lg:col-span-7 chart-stage glass-panel p-3.5 rounded-xl relative">
+                        <canvas id="chartTab1"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 2: МЕЖДУНАРОДНАЯ ТОРГОВЛЯ В СТРАНЕ-ЭКСПОРТЁРЕ -->
+        <section id="tab-export" class="tab-content hidden flex-grow flex flex-col">
+            <div class="glass-panel p-4 rounded-xl border-l-4 border-l-emerald-500 flex-grow flex flex-col justify-between gap-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-700 pb-2.5">
+                    <div>
+                        <h2 class="text-sm md:text-base font-black text-emerald-400 uppercase" id="t2-title">Международная торговля в стране-экспортёре (P<sub>W</sub> &gt; P<sub>A</sub>)</h2>
+                        <p class="text-xs text-slate-300" id="t2-sub">Мировая цена выше внутренней равновесной ($50). Внутренняя цена поднимается до мировой, выпуск растёт, излишек уходит на экспорт.</p>
+                    </div>
+                    <span id="exp-badge" class="px-3 py-1.5 rounded-lg text-xs font-mono font-black bg-emerald-950 text-emerald-300 border border-emerald-500/40">Exports = 50.0 | +D = +375.0</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch flex-grow">
+                    <div class="lg:col-span-5 flex flex-col justify-between bg-slate-900/90 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-200 flex justify-between font-bold mb-2">
+                                <span id="t2-slider-lbl">Мировая цена (зелёная линия P<sub>W</sub>):</span>
+                                <span id="disp-exp-pw" class="text-emerald-400 font-mono font-black">$65.0</span>
+                            </label>
+                            <input type="range" id="slider-exp" min="50" max="80" step="1" value="65" class="vintage-tuner tuner-emerald" oninput="updateExportTab()" onchange="updateExportTab()">
+                            <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1.5">
+                                <span>$50 (Равновесие P<sub>A</sub>)</span>
+                                <span>$65</span>
+                                <span>$80 (Макс. экспорт)</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 font-mono text-xs text-center">
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                                <div class="text-[10px] text-blue-400" id="t2-qd-lbl">Спрос (Q<sub>d</sub>)</div>
+                                <div id="exp-qd" class="text-base font-black text-blue-300">41.7</div>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                                <div class="text-[10px] text-amber-400" id="t2-qs-lbl">Выпуск (Q<sub>s</sub>)</div>
+                                <div id="exp-qs" class="text-base font-black text-amber-300">91.7</div>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-emerald-500/40">
+                                <div class="text-[10px] text-emerald-400" id="t2-ex-lbl">Экспорт</div>
+                                <div id="exp-vol" class="text-base font-black text-emerald-300">50.0</div>
+                            </div>
+                        </div>
+
+                        <table class="w-full text-xs font-mono text-center border border-slate-800 rounded overflow-hidden">
+                            <thead class="bg-slate-950 text-slate-300">
+                                <tr>
+                                    <th class="p-2 text-left" id="t2-th1">Показатель</th>
+                                    <th class="p-2" id="t2-th2">Было</th>
+                                    <th class="p-2" id="t2-th3">Стало</th>
+                                    <th class="p-2" id="t2-th4">Итог</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800 text-slate-200">
+                                <tr>
+                                    <td class="p-2 text-left text-blue-300 font-sans font-bold">Consumer Surplus</td>
+                                    <td>1333.3</td>
+                                    <td id="exp-cs">520.8</td>
+                                    <td id="exp-dcs" class="text-rose-400 font-bold">−812.5</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 text-left text-amber-300 font-sans font-bold">Producer Surplus</td>
+                                    <td>1333.3</td>
+                                    <td id="exp-ps">2520.8</td>
+                                    <td id="exp-dps" class="text-emerald-400 font-bold">+1187.5</td>
+                                </tr>
+                                <tr class="bg-slate-950 font-bold">
+                                    <td class="p-2 text-left text-white font-sans">Total Surplus</td>
+                                    <td>2666.7</td>
+                                    <td id="exp-ts">3041.7</td>
+                                    <td id="exp-dts" class="text-emerald-400">+375.0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="lg:col-span-7 chart-stage glass-panel p-3.5 rounded-xl relative">
+                        <canvas id="chartTab2"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 3: МЕЖДУНАРОДНАЯ ТОРГОВЛЯ В СТРАНЕ-ИМПОРТЁРЕ -->
+        <section id="tab-import" class="tab-content hidden flex-grow flex flex-col">
+            <div class="glass-panel p-4 rounded-xl border-l-4 border-l-cyan-500 flex-grow flex flex-col justify-between gap-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-700 pb-2.5">
+                    <div>
+                        <h2 class="text-sm md:text-base font-black text-cyan-400 uppercase" id="t3-title">Международная торговля в стране-импортёре (P<sub>W</sub> &lt; P<sub>A</sub>)</h2>
+                        <p class="text-xs text-slate-300" id="t3-sub">Мировая цена ниже внутренней равновесной ($50). Внутренняя цена снижается до мировой, потребление растёт, разница покрывается импортом.</p>
+                    </div>
+                    <span id="imp-badge" class="px-3 py-1.5 rounded-lg text-xs font-mono font-black bg-cyan-950 text-cyan-300 border border-cyan-500/40">Imports = 50.0 | +D = +375.0</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch flex-grow">
+                    <div class="lg:col-span-5 flex flex-col justify-between bg-slate-900/90 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-200 flex justify-between font-bold mb-2">
+                                <span id="t3-slider-lbl">Мировая цена (голубая линия P<sub>W</sub>):</span>
+                                <span id="disp-imp-pw" class="text-cyan-400 font-mono font-black">$35.0</span>
+                            </label>
+                            <input type="range" id="slider-imp" min="20" max="50" step="1" value="35" class="vintage-tuner tuner-cyan" oninput="updateImportTab()" onchange="updateImportTab()">
+                            <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1.5">
+                                <span>$20 (Макс. импорт)</span>
+                                <span>$35</span>
+                                <span>$50 (Равновесие P<sub>A</sub>)</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 font-mono text-xs text-center">
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                                <div class="text-[10px] text-amber-400" id="t3-qs-lbl">Выпуск (Q<sub>s</sub>)</div>
+                                <div id="imp-qs" class="text-base font-black text-amber-300">41.7</div>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                                <div class="text-[10px] text-blue-400" id="t3-qd-lbl">Спрос (Q<sub>d</sub>)</div>
+                                <div id="imp-qd" class="text-base font-black text-blue-300">91.7</div>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-cyan-500/40">
+                                <div class="text-[10px] text-cyan-400" id="t3-im-lbl">Импорт</div>
+                                <div id="imp-vol" class="text-base font-black text-cyan-300">50.0</div>
+                            </div>
+                        </div>
+
+                        <table class="w-full text-xs font-mono text-center border border-slate-800 rounded overflow-hidden">
+                            <thead class="bg-slate-950 text-slate-300">
+                                <tr>
+                                    <th class="p-2 text-left" id="t3-th1">Показатель</th>
+                                    <th class="p-2" id="t3-th2">Было</th>
+                                    <th class="p-2" id="t3-th3">Стало</th>
+                                    <th class="p-2" id="t3-th4">Итог</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800 text-slate-200">
+                                <tr>
+                                    <td class="p-2 text-left text-blue-300 font-sans font-bold">Consumer Surplus</td>
+                                    <td>1333.3</td>
+                                    <td id="imp-cs">2520.8</td>
+                                    <td id="imp-dcs" class="text-emerald-400 font-bold">+1187.5</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 text-left text-amber-300 font-sans font-bold">Producer Surplus</td>
+                                    <td>1333.3</td>
+                                    <td id="imp-ps">520.8</td>
+                                    <td id="imp-dps" class="text-rose-400 font-bold">−812.5</td>
+                                </tr>
+                                <tr class="bg-slate-950 font-bold">
+                                    <td class="p-2 text-left text-white font-sans">Total Surplus</td>
+                                    <td>2666.7</td>
+                                    <td id="imp-ts">3041.7</td>
+                                    <td id="imp-dts" class="text-cyan-400">+375.0</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="lg:col-span-7 chart-stage glass-panel p-3.5 rounded-xl relative">
+                        <canvas id="chartTab3"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 4: ПОСЛЕДСТВИЯ ВВЕДЕНИЯ ТАРИФА -->
+        <section id="tab-tariff" class="tab-content hidden flex-grow flex flex-col">
+            <div class="glass-panel p-4 rounded-xl border-l-4 border-l-rose-500 flex-grow flex flex-col justify-between gap-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-700 pb-2.5">
+                    <div>
+                        <h2 class="text-sm md:text-base font-black text-rose-400 uppercase" id="t4-title">Последствия введения импортного тарифа (P<sub>dom</sub> = P<sub>W</sub> + t)</h2>
+                        <p class="text-xs text-slate-300" id="t4-sub">Базовая мировая цена P<sub>W</sub> = $35. Тариф поднимает внутреннюю цену (красная линия), сокращает импорт и создаёт чистые потери общества (D + F).</p>
+                    </div>
+                    <span id="tar-badge" class="px-3 py-1.5 rounded-lg text-xs font-mono font-black bg-rose-950 text-rose-300 border border-rose-500/40">DWL = 166.7 | Rev = 166.7</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch flex-grow">
+                    <div class="lg:col-span-5 flex flex-col justify-between bg-slate-900/90 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <div>
+                            <label class="text-xs text-slate-200 flex justify-between font-bold mb-2">
+                                <span id="t4-slider-lbl">Импортный тариф t (красная линия P<sub>W</sub> + t):</span>
+                                <span id="disp-tar-t" class="text-rose-400 font-mono font-black">t = $10 (Цена $45)</span>
+                            </label>
+                            <input type="range" id="slider-tar" min="0" max="15" step="1" value="10" class="vintage-tuner tuner-rose" oninput="updateTariffTab()" onchange="updateTariffTab()">
+                            <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1.5">
+                                <span>$0 (Свободный импорт)</span>
+                                <span>$10</span>
+                                <span>$15 (Автаркия $50)</span>
+                            </div>
+                        </div>
+
+                        <table class="w-full text-xs font-mono text-center border border-slate-800 rounded overflow-hidden">
+                            <thead class="bg-slate-950 text-slate-300">
+                                <tr>
+                                    <th class="p-2 text-left" id="t4-th1">Категория</th>
+                                    <th class="p-2" id="t4-th2">Без тарифа</th>
+                                    <th class="p-2" id="t4-th3">С тарифом</th>
+                                    <th class="p-2" id="t4-th4">Изменение</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800 text-slate-200">
+                                <tr>
+                                    <td class="p-2 text-left text-blue-300 font-sans font-bold">Consumer Surplus</td>
+                                    <td>2520.8</td>
+                                    <td id="tar-cs">1687.5</td>
+                                    <td id="tar-dcs" class="text-rose-400 font-bold">−833.3</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 text-left text-amber-300 font-sans font-bold">Producer Surplus</td>
+                                    <td>520.8</td>
+                                    <td id="tar-ps">1020.8</td>
+                                    <td id="tar-dps" class="text-emerald-400 font-bold">+500.0</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2 text-left text-purple-300 font-sans font-bold">Доход бюджета (E)</td>
+                                    <td>0.0</td>
+                                    <td id="tar-rev">166.7</td>
+                                    <td id="tar-drev" class="text-purple-300 font-bold">+166.7</td>
+                                </tr>
+                                <tr class="bg-slate-950 font-bold">
+                                    <td class="p-2 text-left text-white font-sans">Total Surplus</td>
+                                    <td>3041.7</td>
+                                    <td id="tar-ts">2875.0</td>
+                                    <td id="tar-dwl" class="text-rose-400">−166.7 (DWL)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="grid grid-cols-2 gap-2.5 font-mono text-xs text-center">
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                                <div class="text-[10px] text-slate-400" id="t4-imp-lbl">Импорт с тарифом</div>
+                                <div id="tar-imp" class="text-sm font-black text-cyan-300">16.7 (было 50.0)</div>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-rose-500/40">
+                                <div class="text-[10px] text-rose-400" id="t4-dwl-lbl">Потери общества (D + F)</div>
+                                <div id="tar-dwl-box" class="text-sm font-black text-rose-400">166.7</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-7 chart-stage glass-panel p-3.5 rounded-xl relative">
+                        <canvas id="chartTab4"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 5: КВОТЫ, АРГУМЕНТЫ ПРОТЕКЦИОНИЗМА И ВТО -->
+        <section id="tab-quota-args" class="tab-content hidden flex-grow flex flex-col">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-grow">
+                <div class="lg:col-span-5 glass-panel p-4 rounded-xl flex flex-col justify-between space-y-3 border-l-4 border-l-purple-500">
+                    <h3 class="text-sm font-black text-purple-400 uppercase tracking-wider" id="t5-q-title">Тариф против импортной квоты</h3>
+                    <div class="space-y-2.5 text-xs">
+                        <div class="trade-card">
+                            <div class="font-bold text-amber-300 mb-1" id="q1-t">1. Импортный тариф (Налог на импорт)</div>
+                            <p class="text-slate-300 text-xs" id="q1-d">Поднимает цену через налог. Выручку получает <strong>государство</strong> (бюджет). Создаёт потери эффективности в производстве и потреблении.</p>
+                        </div>
+                        <div class="trade-card">
+                            <div class="font-bold text-purple-300 mb-1" id="q2-t">2. Импортная квота (Физический лимит ввоза)</div>
+                            <p class="text-slate-300 text-xs" id="q2-d">Ограничивает физический объём ввоза. Прибыль (<strong>квотная рента</strong>) достаётся владельцам импортных лицензий, а не бюджету.</p>
+                        </div>
+                        <div class="trade-card">
+                            <div class="font-bold text-emerald-300 mb-1" id="q3-t">3. Аукцион импортных лицензий</div>
+                            <p class="text-slate-300 text-xs" id="q3-d">Если государство продаёт лицензии на аукционе по максимальной цене, оно изымает квотную ренту — эффект становится идентичен тарифу.</p>
+                        </div>
+                    </div>
+
+                    <div class="p-3.5 bg-indigo-950/60 border border-indigo-500/40 rounded-xl text-xs space-y-1">
+                        <div class="font-bold text-indigo-300" id="wto-t">🌐 ВТО и мониторинг мировой торговли (2026)</div>
+                        <p class="text-slate-300 text-xs leading-relaxed" id="wto-d">
+                            По данным мониторинга ВТО, накопленные торговые ограничения охватили <strong>21.3% мирового импорта</strong>. Несмотря на рост протекционизма, мировой товарный обмен сохранил устойчивость с темпом роста около <strong>+3.9% в 2026 г.</strong>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 glass-panel p-4 rounded-xl flex flex-col justify-between space-y-3">
+                    <h3 class="text-sm font-black text-amber-400 uppercase tracking-wider" id="t5-args-title">5 аргументов за ограничение торговли — и ответ экономистов</h3>
+                    <div class="overflow-x-auto flex-grow">
+                        <table class="w-full h-full text-left text-xs text-slate-300">
+                            <thead class="bg-slate-900 text-amber-300 font-bold border-b border-slate-700">
+                                <tr>
+                                    <th class="p-2.5" id="th-a1">Аргумент</th>
+                                    <th class="p-2.5" id="th-a2">Логика сторонников</th>
+                                    <th class="p-2.5" id="th-a3">Экономический контраргумент</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-800 text-xs">
+                                <tr>
+                                    <td class="p-2.5 font-bold text-rose-400" id="a1-n">1. Рабочие места</td>
+                                    <td class="p-2.5" id="a1-l">Дешёвый импорт разоряет заводы и лишает людей работы.</td>
+                                    <td class="p-2.5" id="a1-c">Свободная торговля создаёт новые рабочие места в экспортных отраслях и снижает цены для всех семей.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-bold text-amber-400" id="a2-n">2. Нацбезопасность</td>
+                                    <td class="p-2.5" id="a2-l">Сталь, чипы и энергия критичны в случае конфликта.</td>
+                                    <td class="p-2.5" id="a2-c">Оправдано в узких рамках, но лоббисты часто злоупотребляют этим аргументом ради защиты прибыли.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-bold text-cyan-400" id="a3-n">3. Молодая отрасль</td>
+                                    <td class="p-2.5" id="a3-l">Временные пошлины помогут стартапам окрепнуть.</td>
+                                    <td class="p-2.5" id="a3-c">Чиновники плохо угадывают «победителей», а «временная» защита почти всегда становится вечной.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-bold text-purple-400" id="a4-n">4. Нечестная конкуренция</td>
+                                    <td class="p-2.5" id="a4-l">Иностранные государства субсидируют своих экспортёров.</td>
+                                    <td class="p-2.5" id="a4-c">Если чужой бюджет дотирует дешёвые товары для наших граждан, выигрыш наших потребителей всё равно выше потерь фирм.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-2.5 font-bold text-emerald-400" id="a5-n">5. Козырь в переговорах</td>
+                                    <td class="p-2.5" id="a5-l">Угроза тарифа заставит партнёра открыть свой рынок.</td>
+                                    <td class="p-2.5" id="a5-c">Опасная игра: если партнёр не уступит, страна либо наносит ущерб себе, либо теряет репутацию.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 6: ПОТОКИ ТОВАРОВ И КАПИТАЛА (С ВИЗУАЛЬНОЙ SANKEY-ДИАГРАММОЙ) -->
+        <section id="tab-macro-flows" class="tab-content hidden flex-grow flex flex-col">
+            <div class="glass-panel p-4 rounded-xl border-l-4 border-l-teal-500 flex-grow flex flex-col justify-between gap-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-700 pb-2.5">
+                    <div>
+                        <h2 class="text-sm md:text-base font-black text-teal-400 uppercase tracking-wider" id="t6-m-title">Макроэкономика открытой экономики: Потоки товаров (NX) и капитала (NCO)</h2>
+                        <p class="text-xs text-slate-300 mt-0.5" id="t6-m-sub">Любая международная сделка имеет две стороны: движение товаров (NX) и встречное движение капитала (NCO).</p>
+                    </div>
+                    <div class="bg-slate-950 px-4 py-1.5 rounded-xl border border-teal-500/40 font-mono text-center">
+                        <div class="text-xs font-black text-teal-300">NX ≡ NCO &nbsp;|&nbsp; S = I + NCO</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch flex-grow">
+                    <div class="lg:col-span-5 flex flex-col justify-between bg-slate-900/90 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase" id="sim-macro-t">Баланс сбережений и инвестиций (млрд $)</h3>
+                        <div>
+                            <label class="text-xs text-slate-300 flex justify-between font-bold mb-1.5">
+                                <span id="lbl-sav">Национальные сбережения (S):</span>
+                                <span id="disp-sav" class="text-emerald-400 font-mono font-black">$320 млрд</span>
+                            </label>
+                            <input type="range" id="slider-sav" min="150" max="500" step="10" value="320" class="vintage-tuner tuner-emerald" oninput="updateMacroFlows()" onchange="updateMacroFlows()">
+                        </div>
+                        <div>
+                            <label class="text-xs text-slate-300 flex justify-between font-bold mb-1.5">
+                                <span id="lbl-inv">Внутренние инвестиции (I):</span>
+                                <span id="disp-inv" class="text-blue-400 font-mono font-black">$280 млрд</span>
+                            </label>
+                            <input type="range" id="slider-inv" min="150" max="500" step="10" value="280" class="vintage-tuner tuner-blue" oninput="updateMacroFlows()" onchange="updateMacroFlows()">
+                        </div>
+
+                        <div class="p-3 bg-slate-950 rounded-lg border border-amber-500/40 space-y-1.5 font-mono text-xs">
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Чистый отток капитала (NCO = S − I):</span>
+                                <span id="res-nco" class="font-black text-amber-300">+$40 млрд</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-400">Чистый экспорт (NX = Exports − Imports):</span>
+                                <span id="res-nx" class="font-black text-emerald-300">+$40 млрд</span>
+                            </div>
+                            <div id="macro-status-text" class="text-xs font-sans text-emerald-300 pt-1.5 border-t border-slate-800">
+                                Профицит торговли (NX &gt; 0): страна сберегает больше, чем инвестирует внутри, и кредитует остальной мир.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ВИЗУАЛЬНАЯ SANKEY / ПОТОКОВАЯ ДИАГРАММА -->
+                    <div class="lg:col-span-7 min-h-[300px] glass-panel p-3.5 rounded-xl flex flex-col justify-between">
+                        <div class="text-xs font-bold text-slate-300 flex justify-between mb-1">
+                            <span id="sankey-title">Потоковая диаграмма баланса: S → I + NCO (Sankey Flow)</span>
+                            <span class="text-[11px] font-mono text-teal-400">S = I + NX</span>
+                        </div>
+                        <div class="flex-grow relative w-full h-full">
+                            <canvas id="sankeyCanvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2.5 text-xs">
+                    <div class="trade-card border-emerald-500/40 space-y-1">
+                        <div class="text-emerald-400 font-black">1. Профицит торговли (NX &gt; 0)</div>
+                        <div class="font-mono text-[11px] text-amber-300">Exports &gt; Imports | S &gt; I | NCO &gt; 0</div>
+                        <p class="text-[11px] text-slate-300" id="mc1-d">Страна продаёт миру больше товаров, чем покупает. На полученную валюту резиденты покупают иностранные активы.</p>
+                    </div>
+                    <div class="trade-card border-slate-500/40 space-y-1">
+                        <div class="text-slate-200 font-black">2. Сбалансированная торговля (NX = 0)</div>
+                        <div class="font-mono text-[11px] text-amber-300">Exports = Imports | S = I | NCO = 0</div>
+                        <p class="text-[11px] text-slate-300" id="mc2-d">Экспорт равен импорту. Внутренние сбережения точно покрывают внутренние инвестиции.</p>
+                    </div>
+                    <div class="trade-card border-rose-500/40 space-y-1">
+                        <div class="text-rose-400 font-black">3. Дефицит торговли (NX &lt; 0)</div>
+                        <div class="font-mono text-[11px] text-amber-300">Exports &lt; Imports | S &lt; I | NCO &lt; 0</div>
+                        <p class="text-[11px] text-slate-300" id="mc3-d">Импорт превышает экспорт (пример США). Разницу финансирует приток иностранного капитала.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 7: ВАЛЮТНЫЕ КУРСЫ, PPP И РЕАЛЬНЫЙ КУРС -->
+        <section id="tab-fx-ppp" class="tab-content hidden flex-grow flex flex-col">
+            <div class="glass-panel p-4 rounded-xl flex-grow flex flex-col justify-between gap-4 border-l-4 border-l-sky-500">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-2 border-b border-slate-700 pb-2.5">
+                    <div>
+                        <h2 class="text-sm md:text-base font-black text-sky-400 uppercase tracking-wider" id="t7-fx-title">Номинальный (e), Реальный курс (ε) и Паритет покупательной способности (PPP)</h2>
+                        <p class="text-xs text-slate-400" id="t7-fx-sub">Как цена валюты и разница цен определяют ценовую конкурентоспособность товаров (KZT / USD)</p>
+                    </div>
+                    <div class="bg-slate-950 px-3 py-1.5 rounded-lg border border-sky-500/40 font-mono text-xs text-sky-300 font-bold">
+                        ε = e<sub>PPP</sub> / e<sub>рын</sub> &nbsp;|&nbsp; e<sub>PPP</sub> = P<sub>KZT</sub> / P<sub>USD</sub>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch flex-grow">
+                    <div class="lg:col-span-6 flex flex-col justify-between bg-slate-900/90 p-4 rounded-xl border border-slate-700 space-y-3">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase" id="fx-calc-t">Калькулятор курса KZT/USD и реального обменного курса</h3>
+                        <div class="space-y-3 text-xs">
+                            <div>
+                                <label class="text-slate-300 flex justify-between font-bold mb-1.5">
+                                    <span id="lbl-fx-rate">Рыночный курс (KZT за 1 USD):</span>
+                                    <span id="disp-fx-rate" class="text-amber-300 font-mono font-black">500 KZT/$</span>
+                                </label>
+                                <input type="range" id="slider-fx-rate" min="400" max="650" step="5" value="500" class="vintage-tuner tuner-amber" oninput="calcFxPpp()" onchange="calcFxPpp()">
+                            </div>
+                            <div>
+                                <label class="text-slate-300 flex justify-between font-bold mb-1.5">
+                                    <span id="lbl-p-kz">Цена корзины в Казахстане (P<sub>KZT</sub>):</span>
+                                    <span id="disp-p-kz" class="text-cyan-300 font-mono font-black">25 000 ₸</span>
+                                </label>
+                                <input type="range" id="slider-p-kz" min="20000" max="40000" step="500" value="25000" class="vintage-tuner tuner-cyan" oninput="calcFxPpp()" onchange="calcFxPpp()">
+                            </div>
+                            <div>
+                                <label class="text-slate-300 flex justify-between font-bold mb-1.5">
+                                    <span id="lbl-p-us">Цена корзины в США (P<sub>USD</sub>):</span>
+                                    <span id="disp-p-us" class="text-emerald-300 font-mono font-black">$50</span>
+                                </label>
+                                <input type="range" id="slider-p-us" min="40" max="80" step="1" value="50" class="vintage-tuner tuner-emerald" oninput="calcFxPpp()" onchange="calcFxPpp()">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2.5 text-center font-mono">
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                                <div class="text-[10px] text-slate-400" id="lbl-equip">Станок $10 000</div>
+                                <div id="res-equip-kzt" class="text-sm font-black text-amber-300">5.00 млн ₸</div>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-cyan-500/30">
+                                <div class="text-[10px] text-cyan-400" id="lbl-ppp-rate">Курс по PPP</div>
+                                <div id="res-ppp-rate" class="text-sm font-black text-cyan-300">500 KZT/$</div>
+                            </div>
+                            <div class="bg-slate-950 p-2.5 rounded-lg border border-emerald-500/30">
+                                <div class="text-[10px] text-emerald-400" id="lbl-real-er">Реальный курс ε</div>
+                                <div id="res-real-er" class="text-sm font-black text-emerald-300">1.00</div>
+                            </div>
+                        </div>
+                        <p id="fx-verdict" class="text-xs text-slate-300 bg-slate-950 p-3 rounded-lg border border-slate-800">
+                            ε ≈ 1.00: выполняется паритет покупательной способности (PPP) — корзины в РК и США стоят одинаково.
+                        </p>
+                    </div>
+
+                    <div class="lg:col-span-6 chart-stage glass-panel p-3.5 rounded-xl flex flex-col justify-between">
+                        <div class="text-xs font-bold text-slate-300 mb-1" id="fx-chart-t">Сравнение рыночного курса и паритета покупательной способности (KZT/$)</div>
+                        <div class="flex-grow relative"><canvas id="chartFxPpp"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ВКЛАДКА 8: КЕЙС 2025–2026 — ТАРИФНАЯ ПОЛИТИКА ТРАМПА -->
+        <section id="tab-trump-case" class="tab-content hidden flex-grow flex flex-col">
+            <div class="glass-panel p-4 rounded-xl border-l-4 border-l-orange-500 flex-grow flex flex-col justify-between gap-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3 border-b border-slate-700 pb-2.5">
+                    <div>
+                        <span class="px-2 py-0.5 rounded bg-orange-950 text-orange-300 border border-orange-500/40 text-[10px] font-black uppercase">Кейс-анализ • 2025–2026</span>
+                        <h2 class="text-sm md:text-base font-black text-orange-400 mt-1" id="tc-title">Тарифная политика Дональда Трампа (2025–2026): Микро- и Макроэффекты</h2>
+                    </div>
+                    <div class="bg-slate-950 px-3 py-1.5 rounded-xl border border-rose-500/40 text-right font-mono">
+                        <div class="text-[10px] text-slate-400" id="tc-avg-lbl">Средняя эффективная пошлина США</div>
+                        <div class="text-sm font-black text-rose-400">~2.4% (2024) → ~16.5% (2025–26)</div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch flex-grow">
+                    <div class="lg:col-span-6 flex flex-col justify-between space-y-2.5 text-xs">
+                        <div class="trade-card border-rose-500/30">
+                            <div class="font-bold text-rose-300 mb-1" id="tc1-t">1. Суть кейса: Универсальные и зеркальные тарифы</div>
+                            <p class="text-xs text-slate-300 leading-relaxed" id="tc1-d">
+                                В 2025–2026 гг. США ввели базовый универсальный тариф <strong>10%</strong> на импорт, повышенные тарифы на сталь, алюминий и авто (<strong>25%</strong>), а также жёсткие пошлины против Китая (<strong>54%+</strong>) и партнёров с профицитом (ЕС, Мексика, Канада, Вьетнам). Цели: защита рабочих мест, реиндустриализация и давление на переговорах.
+                            </p>
+                        </div>
+                        <div class="trade-card border-amber-500/30">
+                            <div class="font-bold text-amber-300 mb-1" id="tc2-t">2. Микроэффект: Кто реально платит за тариф?</div>
+                            <p class="text-xs text-slate-300 leading-relaxed" id="tc2-d">
+                                Тариф поднимает внутреннюю цену <strong>P<sub>dom</sub> = P<sub>W</sub> + t</strong>. Американские импортёры и потребители платят более высокую цену (сокращение Consumer Surplus), внутренние производители расширяют выпуск с более высокими издержками, а экономика несёт безвозвратные потери (Deadweight Loss).
+                            </p>
+                        </div>
+                        <div class="trade-card border-cyan-500/30">
+                            <div class="font-bold text-cyan-300 mb-1" id="tc3-t">3. Макропарадокс: Почему тариф не убирает торговый дефицит?</div>
+                            <p class="text-xs text-slate-300 leading-relaxed" id="tc3-d">
+                                Согласно тождеству <strong>NX = S − I</strong>, торговый дефицит США вызван низкими национальными сбережениями относительно инвестиций. Повышение тарифов сокращает спрос на иностранную валюту и вызывает <strong>реальное укрепление доллара (ε ↑)</strong>, что бьёт по экспортёрам США — в итоге общий торговый баланс почти не улучшается.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-6 chart-stage glass-panel p-3.5 rounded-xl flex flex-col justify-between relative">
+                        <div class="text-xs font-bold text-slate-300 mb-1" id="tc-chart-t">Сравнение ставок тарифов США по направлениям (2024 vs 2025–2026, %)</div>
+                        <div class="flex-grow relative"><canvas id="chartTrumpTariffs"></canvas></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ПОДВАЛ -->
+    <footer class="mt-3 text-center text-[10px] text-slate-500 font-bold uppercase tracking-widest pt-2 border-t border-slate-800/80" id="txt-footer">
+        AlmaU • Школа цифровых технологий и экономики | Международная торговля
+    </footer>
+
+    <script>
+        let currentLang = 'ru';
+        let chart1, chart2, chart3, chart4, fxChartObj, trumpChartObj;
+
+        const P_D = (q) => 90 - 0.6 * q;
+        const P_S = (q) => 10 + 0.6 * q;
+        const Q_D = (p) => (90 - p) / 0.6;
+        const Q_S = (p) => (p - 10) / 0.6;
+
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.remove('hidden');
+            if (btn) btn.classList.add('active');
+
+            setTimeout(() => {
+                if (tabId === 'tab-autarky' && chart1) { chart1.resize(); updateAutarkyTab(); }
+                if (tabId === 'tab-export' && chart2) { chart2.resize(); updateExportTab(); }
+                if (tabId === 'tab-import' && chart3) { chart3.resize(); updateImportTab(); }
+                if (tabId === 'tab-tariff' && chart4) { chart4.resize(); updateTariffTab(); }
+                if (tabId === 'tab-macro-flows') { drawSankeyFlow(); }
+                if (tabId === 'tab-fx-ppp' && fxChartObj) { fxChartObj.resize(); calcFxPpp(); }
+                if (tabId === 'tab-trump-case' && trumpChartObj) { trumpChartObj.resize(); }
+            }, 25);
+        }
+
+        const welfarePlugin = {
+            id: 'welfarePlugin',
+            beforeDatasetsDraw(chart, args, opts) {
+                if (!opts || !opts.mode) return;
+                const { ctx, scales: { x, y } } = chart;
+                if (!x || !y) return;
+
+                const px = (q) => x.getPixelForValue(q);
+                const py = (p) => y.getPixelForValue(p);
+
+                function fillPoly(pts, color) {
+                    if (!pts || pts.length < 3) return;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(px(pts[0][0]), py(pts[0][1]));
+                    for (let i = 1; i < pts.length; i++) ctx.lineTo(px(pts[i][0]), py(pts[i][1]));
+                    ctx.closePath();
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                const pa = 50;
+                const qa = 200 / 3;
+
+                if (opts.mode === 'autarky') {
+                    const shift = opts.shift || 0;
+                    const pEq = 50 + 0.5 * shift;
+                    const qEq = (pEq - 10) / 0.6;
+                    const pTop = 90 + shift;
+                    fillPoly([[0, pTop], [qEq, pEq], [0, pEq]], 'rgba(59, 130, 246, 0.30)');
+                    fillPoly([[0, pEq], [qEq, pEq], [0, 10]], 'rgba(245, 158, 11, 0.30)');
+                } else if (opts.mode === 'export') {
+                    const pw = opts.pw || 65;
+                    const qd = Q_D(pw);
+                    const qs = Q_S(pw);
+                    fillPoly([[0, 90], [qd, pw], [0, pw]], 'rgba(59, 130, 246, 0.30)');
+                    fillPoly([[0, pw], [qd, pw], [qa, pa], [0, pa]], 'rgba(168, 85, 247, 0.25)');
+                    fillPoly([[0, pa], [qa, pa], [0, 10]], 'rgba(245, 158, 11, 0.28)');
+                    if (pw > pa) fillPoly([[qd, pw], [qs, pw], [qa, pa]], 'rgba(16, 185, 129, 0.45)');
+                } else if (opts.mode === 'import') {
+                    const pw = opts.pw || 35;
+                    const qs = Q_S(pw);
+                    const qd = Q_D(pw);
+                    fillPoly([[0, 90], [qa, pa], [0, pa]], 'rgba(59, 130, 246, 0.28)');
+                    fillPoly([[0, pa], [qa, pa], [qs, pw], [0, pw]], 'rgba(168, 85, 247, 0.25)');
+                    fillPoly([[0, pw], [qs, pw], [0, 10]], 'rgba(245, 158, 11, 0.28)');
+                    if (pw < pa) fillPoly([[qs, pw], [qd, pw], [qa, pa]], 'rgba(6, 182, 212, 0.45)');
+                } else if (opts.mode === 'tariff') {
+                    const pw = opts.pw;
+                    const pdom = opts.pdom;
+                    const qs1 = Q_S(pw);
+                    const qd1 = Q_D(pw);
+                    const qs2 = Q_S(pdom);
+                    const qd2 = Q_D(pdom);
+
+                    fillPoly([[0, 90], [qd2, pdom], [0, pdom]], 'rgba(59, 130, 246, 0.28)');
+                    fillPoly([[0, pdom], [qs2, pdom], [qs1, pw], [0, pw]], 'rgba(16, 185, 129, 0.28)');
+                    fillPoly([[0, pw], [qs1, pw], [0, 10]], 'rgba(245, 158, 11, 0.28)');
+
+                    if (pdom > pw && qd2 > qs2) {
+                        fillPoly([[qs2, pdom], [qd2, pdom], [qd2, pw], [qs2, pw]], 'rgba(168, 85, 247, 0.40)');
+                        fillPoly([[qs2, pdom], [qs2, pw], [qs1, pw]], 'rgba(244, 63, 94, 0.58)');
+                        fillPoly([[qd2, pdom], [qd1, pw], [qd2, pw]], 'rgba(244, 63, 94, 0.58)');
+                    } else if (pdom === pw) {
+                        fillPoly([[qs1, pw], [qd1, pw], [qa, pa]], 'rgba(6, 182, 212, 0.38)');
+                    }
+                }
+            },
+            afterDatasetsDraw(chart, args, opts) {
+                if (!opts || !opts.mode) return;
+                const { ctx, scales: { x, y } } = chart;
+                if (!x || !y) return;
+                const lang = opts.lang || 'ru';
+
+                const px = (q) => x.getPixelForValue(q);
+                const py = (p) => y.getPixelForValue(p);
+
+                function drawDashed(x1, y1, x2, y2, color = '#94a3b8') {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.setLineDash([4, 4]);
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1.4;
+                    ctx.moveTo(px(x1), py(y1));
+                    ctx.lineTo(px(x2), py(y2));
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                function drawLabel(text, q, p, color = '#f8fafc', font = 'bold 12px Inter, sans-serif') {
+                    ctx.save();
+                    ctx.font = font;
+                    ctx.fillStyle = color;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(text, px(q), py(p));
+                    ctx.restore();
+                }
+
+                function drawBracket(qLeft, qRight, pLevel, labelText, color, labelAbove = false) {
+                    const xL = px(qLeft);
+                    const xR = px(qRight);
+                    const yB = py(pLevel);
+                    if (xR - xL < 14) return;
+                    ctx.save();
+                    ctx.strokeStyle = color;
+                    ctx.fillStyle = color;
+                    ctx.lineWidth = 1.8;
+                    ctx.beginPath();
+                    ctx.moveTo(xL, yB - 4);
+                    ctx.lineTo(xL, yB + 4);
+                    ctx.moveTo(xR, yB - 4);
+                    ctx.lineTo(xR, yB + 4);
+                    ctx.moveTo(xL, yB);
+                    ctx.lineTo(xR, yB);
+                    ctx.stroke();
+                    ctx.font = 'bold 11px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(labelText, (xL + xR) / 2, labelAbove ? yB - 9 : yB + 13);
+                    ctx.restore();
+                }
+
+                const pa = 50;
+                const qa = 200 / 3;
+
+                if (opts.mode === 'autarky') {
+                    const shift = opts.shift || 0;
+                    const pEq = 50 + 0.5 * shift;
+                    const qEq = (pEq - 10) / 0.6;
+                    drawDashed(qEq, pEq, qEq, 0, '#f59e0b');
+                    drawLabel('CS', qEq * 0.35, pEq + (90 + shift - pEq) * 0.4, '#93c5fd', '900 14px Inter');
+                    drawLabel('PS', qEq * 0.35, 10 + (pEq - 10) * 0.55, '#fcd34d', '900 14px Inter');
+                    drawLabel(`Q = ${qEq.toFixed(1)}`, qEq, 4, '#fbbf24', 'bold 11px monospace');
+                } else if (opts.mode === 'export') {
+                    const pw = opts.pw || 65;
+                    const qd = Q_D(pw);
+                    const qs = Q_S(pw);
+                    drawDashed(qd, pw, qd, 0, '#3b82f6');
+                    drawDashed(qs, pw, qs, 0, '#10b981');
+                    drawLabel('A', qd * 0.35, pw + (90 - pw) * 0.4, '#93c5fd', '900 13px Inter');
+                    drawLabel('B', qd * 0.45, (pw + pa) / 2, '#d8b4fe', '900 13px Inter');
+                    drawLabel('C', qa * 0.35, 32, '#fcd34d', '900 13px Inter');
+                    if (pw > pa + 2) {
+                        drawLabel('D', (qd + qs + qa) / 3, (2 * pw + pa) / 3, '#6ee7b7', '900 13px Inter');
+                        drawBracket(qd, qs, pw + 3.5, (lang === 'ru' ? 'Экспорт = ' : 'Exports = ') + (qs - qd).toFixed(1), '#34d399', true);
+                    }
+                } else if (opts.mode === 'import') {
+                    const pw = opts.pw || 35;
+                    const qs = Q_S(pw);
+                    const qd = Q_D(pw);
+                    drawDashed(qs, pw, qs, 0, '#f59e0b');
+                    drawDashed(qd, pw, qd, 0, '#06b6d4');
+                    drawLabel('A', qa * 0.35, 65, '#93c5fd', '900 13px Inter');
+                    drawLabel('B', qs * 0.45, (pw + pa) / 2, '#d8b4fe', '900 13px Inter');
+                    drawLabel('C', qs * 0.35, 10 + (pw - 10) * 0.5, '#fcd34d', '900 13px Inter');
+                    if (pw < pa - 2) {
+                        drawLabel('D', (qs + qd + qa) / 3, (2 * pw + pa) / 3, '#67e8f9', '900 13px Inter');
+                        drawBracket(qs, qd, pw - 4.5, (lang === 'ru' ? 'Импорт = ' : 'Imports = ') + (qd - qs).toFixed(1), '#22d3ee', false);
+                    }
+                } else if (opts.mode === 'tariff') {
+                    const pw = opts.pw;
+                    const pdom = opts.pdom;
+                    const qs1 = Q_S(pw);
+                    const qd1 = Q_D(pw);
+                    const qs2 = Q_S(pdom);
+                    const qd2 = Q_D(pdom);
+                    drawDashed(qs1, pw, qs1, 0, '#94a3b8');
+                    drawDashed(qd1, pw, qd1, 0, '#94a3b8');
+                    if (pdom > pw && qd2 > qs2) {
+                        drawDashed(qs2, pdom, qs2, 0, '#f43f5e');
+                        drawDashed(qd2, pdom, qd2, 0, '#f43f5e');
+                        drawLabel('CS', 22, (90 + pdom) / 2, '#93c5fd', 'bold 12px Inter');
+                        drawLabel('PS', 18, (10 + pdom) / 2, '#fcd34d', 'bold 12px Inter');
+                        drawLabel('E (Rev)', (qs2 + qd2) / 2, (pw + pdom) / 2, '#e9d5ff', 'bold 11px Inter');
+                        drawLabel('D', (qs1 + 2 * qs2) / 3, (2 * pw + pdom) / 3, '#fda4af', 'bold 11px Inter');
+                        drawLabel('F', (qd1 + 2 * qd2) / 3, (2 * pw + pdom) / 3, '#fda4af', 'bold 11px Inter');
+                        drawBracket(qs2, qd2, pdom + 3.5, (lang === 'ru' ? 'Импорт с тарифом = ' : 'Imports w/ tariff = ') + (qd2 - qs2).toFixed(1), '#fb7185', true);
+                    }
+                }
+            }
+        };
+
+        if (typeof Chart !== 'undefined') Chart.register(welfarePlugin);
+
+        const baseDemand = [{ x: 0, y: 90 }, { x: 100, y: 30 }];
+        const baseSupply = [{ x: 0, y: 10 }, { x: 100, y: 70 }];
+
+        function makeBaseChart(canvasId, extraDatasets, pluginOpts) {
+            const el = document.getElementById(canvasId);
+            if (!el || typeof Chart === 'undefined') return null;
+            return new Chart(el, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        { label: 'Спрос (Demand)', data: baseDemand, borderColor: '#3b82f6', borderWidth: 2.5, pointRadius: 0 },
+                        { label: 'Предложение (Supply)', data: baseSupply, borderColor: '#f59e0b', borderWidth: 2.5, pointRadius: 0 },
+                        ...extraDatasets
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 150 },
+                    plugins: {
+                        legend: { labels: { color: '#e2e8f0', font: { size: 11, weight: 'bold' }, boxWidth: 14 } },
+                        welfarePlugin: pluginOpts
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear', min: 0, max: 105,
+                            title: { display: true, text: 'Количество (Q)', color: '#94a3b8', font: { size: 11, weight: 'bold' } },
+                            ticks: { color: '#94a3b8', stepSize: 20 },
+                            grid: { color: 'rgba(51,65,85,0.35)' }
+                        },
+                        y: {
+                            min: 0, max: 105,
+                            title: { display: true, text: 'Цена (P, $)', color: '#94a3b8', font: { size: 11, weight: 'bold' } },
+                            ticks: { color: '#94a3b8', stepSize: 15 },
+                            grid: { color: 'rgba(51,65,85,0.35)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateAutarkyTab() {
+            const shift = parseFloat(document.getElementById('slider-aut').value);
+            const pEq = 50 + 0.5 * shift;
+            const qEq = (pEq - 10) / 0.6;
+            const pTop = 90 + shift;
+            const cs = 0.5 * (pTop - pEq) * qEq;
+            const ps = 0.5 * (pEq - 10) * qEq;
+            const ts = cs + ps;
+
+            document.getElementById('disp-aut-shift').innerHTML = `P<sub>A</sub> = $${pEq.toFixed(1)}`;
+            document.getElementById('aut-badge').innerHTML = `P<sub>A</sub> = $${pEq.toFixed(1)} | Q<sub>A</sub> = ${qEq.toFixed(1)}`;
+            document.getElementById('aut-cs').innerText = cs.toFixed(1);
+            document.getElementById('aut-ps').innerText = ps.toFixed(1);
+            document.getElementById('aut-ts').innerText = ts.toFixed(1);
+
+            if (chart1) {
+                chart1.data.datasets[0].data = [{ x: 0, y: pTop }, { x: 100, y: 30 + shift }];
+                chart1.data.datasets[2].data = [{ x: 0, y: pEq }, { x: qEq, y: pEq }];
+                chart1.options.plugins.welfarePlugin = { mode: 'autarky', shift: shift, lang: currentLang };
+                chart1.update();
+            }
+        }
+
+        function updateExportTab() {
+            const pw = parseFloat(document.getElementById('slider-exp').value);
+            const qd = Q_D(pw);
+            const qs = Q_S(pw);
+            const expVol = Math.max(0, qs - qd);
+            const cs = 0.5 * (90 - pw) * qd;
+            const ps = 0.5 * (pw - 10) * qs;
+            const ts = cs + ps;
+            const gain = ts - 2666.67;
+
+            document.getElementById('disp-exp-pw').innerText = `$${pw.toFixed(1)}`;
+            document.getElementById('exp-badge').innerText = `Exports = ${expVol.toFixed(1)} | +D = +${gain.toFixed(1)}`;
+            document.getElementById('exp-qd').innerText = qd.toFixed(1);
+            document.getElementById('exp-qs').innerText = qs.toFixed(1);
+            document.getElementById('exp-vol').innerText = expVol.toFixed(1);
+            document.getElementById('exp-cs').innerText = cs.toFixed(1);
+            document.getElementById('exp-dcs').innerText = (cs - 1333.33).toFixed(1);
+            document.getElementById('exp-ps').innerText = ps.toFixed(1);
+            document.getElementById('exp-dps').innerText = '+' + (ps - 1333.33).toFixed(1);
+            document.getElementById('exp-ts').innerText = ts.toFixed(1);
+            document.getElementById('exp-dts').innerText = '+' + gain.toFixed(1);
+
+            if (chart2) {
+                chart2.data.datasets[2].data = [{ x: 0, y: pw }, { x: 105, y: pw }];
+                chart2.options.plugins.welfarePlugin = { mode: 'export', pw: pw, lang: currentLang };
+                chart2.update();
+            }
+        }
+
+        function updateImportTab() {
+            const pw = parseFloat(document.getElementById('slider-imp').value);
+            const qs = Q_S(pw);
+            const qd = Q_D(pw);
+            const impVol = Math.max(0, qd - qs);
+            const cs = 0.5 * (90 - pw) * qd;
+            const ps = 0.5 * (pw - 10) * qs;
+            const ts = cs + ps;
+            const gain = ts - 2666.67;
+
+            document.getElementById('disp-imp-pw').innerText = `$${pw.toFixed(1)}`;
+            document.getElementById('imp-badge').innerText = `Imports = ${impVol.toFixed(1)} | +D = +${gain.toFixed(1)}`;
+            document.getElementById('imp-qs').innerText = qs.toFixed(1);
+            document.getElementById('imp-qd').innerText = qd.toFixed(1);
+            document.getElementById('imp-vol').innerText = impVol.toFixed(1);
+            document.getElementById('imp-cs').innerText = cs.toFixed(1);
+            document.getElementById('imp-dcs').innerText = '+' + (cs - 1333.33).toFixed(1);
+            document.getElementById('imp-ps').innerText = ps.toFixed(1);
+            document.getElementById('imp-dps').innerText = (ps - 1333.33).toFixed(1);
+            document.getElementById('imp-ts').innerText = ts.toFixed(1);
+            document.getElementById('imp-dts').innerText = '+' + gain.toFixed(1);
+
+            if (chart3) {
+                chart3.data.datasets[3].data = [{ x: 0, y: pw }, { x: 105, y: pw }];
+                chart3.options.plugins.welfarePlugin = { mode: 'import', pw: pw, lang: currentLang };
+                chart3.update();
+            }
+        }
+
+        function updateTariffTab() {
+            const pw = 35;
+            const t = parseFloat(document.getElementById('slider-tar').value);
+            const pdom = pw + t;
+            const qs = Q_S(pdom);
+            const qd = Q_D(pdom);
+            const imp = Math.max(0, qd - qs);
+            const cs = 0.5 * (90 - pdom) * qd;
+            const ps = 0.5 * (pdom - 10) * qs;
+            const rev = t * imp;
+            const ts = cs + ps + rev;
+            const dwl = 3041.67 - ts;
+
+            document.getElementById('disp-tar-t').innerText = `t = $${t} (Цена $${pdom})`;
+            document.getElementById('tar-badge').innerText = `DWL = ${dwl.toFixed(1)} | Rev = ${rev.toFixed(1)}`;
+            document.getElementById('tar-cs').innerText = cs.toFixed(1);
+            document.getElementById('tar-dcs').innerText = (cs - 2520.83).toFixed(1);
+            document.getElementById('tar-ps').innerText = ps.toFixed(1);
+            document.getElementById('tar-dps').innerText = '+' + (ps - 520.83).toFixed(1);
+            document.getElementById('tar-rev').innerText = rev.toFixed(1);
+            document.getElementById('tar-drev').innerText = '+' + rev.toFixed(1);
+            document.getElementById('tar-ts').innerText = ts.toFixed(1);
+            document.getElementById('tar-dwl').innerText = `−${dwl.toFixed(1)} (DWL)`;
+            document.getElementById('tar-imp').innerText = `${imp.toFixed(1)} (было 50.0)`;
+            document.getElementById('tar-dwl-box').innerText = dwl.toFixed(1);
+
+            if (chart4) {
+                chart4.data.datasets[2].data = [{ x: 0, y: pdom }, { x: 105, y: pdom }];
+                chart4.options.plugins.welfarePlugin = { mode: 'tariff', pw: pw, pdom: pdom, lang: currentLang };
+                chart4.update();
+            }
+        }
+
+        function drawSankeyFlow() {
+            const canvas = document.getElementById('sankeyCanvas');
+            if (!canvas) return;
+            const parent = canvas.parentElement;
+            canvas.width = parent.clientWidth;
+            canvas.height = parent.clientHeight;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const s = parseFloat(document.getElementById('slider-sav').value);
+            const i = parseFloat(document.getElementById('slider-inv').value);
+            const nco = s - i;
+            const unit = currentLang === 'ru' ? 'млрд' : 'B';
+
+            const scale = (h - 60) / 550;
+            const leftX = 35;
+            const rightX = w - 165;
+            const barW = 24;
+
+            function drawRibbon(x1, y1Top, y1Bot, x2, y2Top, y2Bot, fillStyle) {
+                ctx.beginPath();
+                ctx.moveTo(x1, y1Top);
+                const cpX = (x1 + x2) / 2;
+                ctx.bezierCurveTo(cpX, y1Top, cpX, y2Top, x2, y2Top);
+                ctx.lineTo(x2, y2Bot);
+                ctx.bezierCurveTo(cpX, y2Bot, cpX, y1Bot, x1, y1Bot);
+                ctx.closePath();
+                ctx.fillStyle = fillStyle;
+                ctx.fill();
+            }
+
+            if (nco >= 0) {
+                const sH = s * scale;
+                const iH = i * scale;
+                const ncoH = nco * scale;
+                const sTop = (h - sH) / 2;
+                const iTop = 22;
+                const ncoTop = iTop + iH + 24;
+
+                drawRibbon(leftX + barW, sTop, sTop + iH, rightX, iTop, iTop + iH, 'rgba(59, 130, 246, 0.35)');
+                if (nco > 0) {
+                    drawRibbon(leftX + barW, sTop + iH, sTop + sH, rightX, ncoTop, ncoTop + ncoH, 'rgba(16, 185, 129, 0.45)');
+                }
+
+                ctx.fillStyle = '#10b981';
+                ctx.fillRect(leftX, sTop, barW, sH);
+                ctx.fillStyle = '#f8fafc';
+                ctx.font = 'bold 11px Inter';
+                ctx.fillText(`S = $${s}${unit}`, leftX, sTop - 6);
+
+                ctx.fillStyle = '#3b82f6';
+                ctx.fillRect(rightX, iTop, barW, iH);
+                ctx.fillStyle = '#93c5fd';
+                ctx.fillText(`I = $${i}${unit}`, rightX + barW + 8, iTop + iH / 2 + 4);
+
+                if (nco > 0) {
+                    ctx.fillStyle = '#f59e0b';
+                    ctx.fillRect(rightX, ncoTop, barW, Math.max(6, ncoH));
+                    ctx.fillStyle = '#fcd34d';
+                    ctx.fillText(`NCO = NX = +$${nco}${unit}`, rightX + barW + 8, ncoTop + ncoH / 2 + 4);
+                }
+            } else {
+                const inflow = Math.abs(nco);
+                const iH = i * scale;
+                const sH = s * scale;
+                const inH = inflow * scale;
+                const iTop = (h - iH) / 2;
+                const sTop = 22;
+                const inTop = sTop + sH + 24;
+
+                drawRibbon(leftX + barW, sTop, sTop + sH, rightX, iTop, iTop + sH, 'rgba(16, 185, 129, 0.35)');
+                drawRibbon(leftX + barW, inTop, inTop + inH, rightX, iTop + sH, iTop + iH, 'rgba(244, 63, 94, 0.45)');
+
+                ctx.fillStyle = '#10b981';
+                ctx.fillRect(leftX, sTop, barW, sH);
+                ctx.fillStyle = '#6ee7b7';
+                ctx.fillText(`S = $${s}${unit}`, leftX, sTop - 6);
+
+                ctx.fillStyle = '#f43f5e';
+                ctx.fillRect(leftX, inTop, barW, Math.max(6, inH));
+                ctx.fillStyle = '#fda4af';
+                ctx.fillText(`Приток = $${inflow}${unit}`, leftX, inTop + inH + 13);
+
+                ctx.fillStyle = '#3b82f6';
+                ctx.fillRect(rightX, iTop, barW, iH);
+                ctx.fillStyle = '#93c5fd';
+                ctx.fillText(`I = $${i}${unit} (NX = −$${inflow}${unit})`, rightX + barW + 8, iTop + iH / 2 + 4);
+            }
+        }
+
+        function updateMacroFlows() {
+            const s = parseFloat(document.getElementById('slider-sav').value);
+            const i = parseFloat(document.getElementById('slider-inv').value);
+            const nco = s - i;
+            const unit = currentLang === 'ru' ? 'млрд' : 'B';
+
+            document.getElementById('disp-sav').innerText = `$${s} ${unit}`;
+            document.getElementById('disp-inv').innerText = `$${i} ${unit}`;
+            document.getElementById('res-nco').innerText = `${nco >= 0 ? '+' : ''}$${nco} ${unit}`;
+            document.getElementById('res-nx').innerText = `${nco >= 0 ? '+' : ''}$${nco} ${unit}`;
+
+            const st = document.getElementById('macro-status-text');
+            if (nco > 0) {
+                st.className = 'text-xs font-sans text-emerald-300 pt-1.5 border-t border-slate-800';
+                st.innerText = currentLang === 'ru'
+                    ? 'Профицит торговли (NX > 0): страна сберегает больше, чем инвестирует внутри, и кредитует остальной мир.'
+                    : 'Trade Surplus (NX > 0): domestic saving exceeds investment; the country lends abroad.';
+            } else if (nco < 0) {
+                st.className = 'text-xs font-sans text-rose-300 pt-1.5 border-t border-slate-800';
+                st.innerText = currentLang === 'ru'
+                    ? 'Дефицит торговли (NX < 0): внутренних сбережений не хватает на инвестиции — дефицит покрывает приток иностранного капитала.'
+                    : 'Trade Deficit (NX < 0): domestic investment exceeds saving; financed by foreign capital inflow.';
+            } else {
+                st.className = 'text-xs font-sans text-amber-300 pt-1.5 border-t border-slate-800';
+                st.innerText = currentLang === 'ru'
+                    ? 'Сбалансированная торговля (NX = NCO = 0): S = I.'
+                    : 'Balanced Trade (NX = NCO = 0): S = I.';
+            }
+
+            drawSankeyFlow();
+        }
+
+        function calcFxPpp() {
+            const e = parseFloat(document.getElementById('slider-fx-rate').value);
+            const pKz = parseFloat(document.getElementById('slider-p-kz').value);
+            const pUs = parseFloat(document.getElementById('slider-p-us').value);
+
+            document.getElementById('disp-fx-rate').innerText = `${e} KZT/$`;
+            document.getElementById('disp-p-kz').innerText = `${pKz.toLocaleString('ru-RU')} ₸`;
+            document.getElementById('disp-p-us').innerText = `$${pUs}`;
+
+            const equipMln = (10000 * e) / 1e6;
+            const ePpp = pKz / pUs;
+            const realEr = ePpp / e;
+            const mlnLbl = currentLang === 'ru' ? 'млн ₸' : 'M ₸';
+
+            document.getElementById('res-equip-kzt').innerText = `${equipMln.toFixed(2)} ${mlnLbl}`;
+            document.getElementById('res-ppp-rate').innerText = `${ePpp.toFixed(0)} KZT/$`;
+            document.getElementById('res-real-er').innerText = realEr.toFixed(2);
+
+            const verdictEl = document.getElementById('fx-verdict');
+            if (Math.abs(realEr - 1.0) < 0.015) {
+                verdictEl.innerText = currentLang === 'ru'
+                    ? 'ε ≈ 1.00: выполняется паритет покупательной способности (PPP) — корзины в РК и США стоят одинаково.'
+                    : 'ε ≈ 1.00: Purchasing Power Parity (PPP) holds — baskets in KZ and the US cost the same.';
+            } else if (realEr > 1.0) {
+                verdictEl.innerText = currentLang === 'ru'
+                    ? `ε = ${realEr.toFixed(2)} > 1: реальное укрепление тенге — товары в РК дороже американских (экспорт дорожает, импорт выгоднее).`
+                    : `ε = ${realEr.toFixed(2)} > 1: Real KZT appreciation — KZ goods are pricier than US goods.`;
+            } else {
+                verdictEl.innerText = currentLang === 'ru'
+                    ? `ε = ${realEr.toFixed(2)} < 1: реальное ослабление тенге — товары в РК дешевле американских (экспорт РК конкурентоспособнее).`
+                    : `ε = ${realEr.toFixed(2)} < 1: Real KZT depreciation — KZ goods are cheaper than US goods.`;
+            }
+
+            if (fxChartObj) {
+                fxChartObj.data.datasets[0].data = [e, parseFloat(ePpp.toFixed(1))];
+                fxChartObj.update();
+            }
+        }
+
+        const fullDict = {
+            ru: {
+                "txt-header-title": "Международная торговля",
+                "txt-header-sub": "AlmaU • Школа цифровых технологий и экономики",
+                "nav-1": "1. Равновесие без торговли",
+                "nav-2": "2. Страна-экспортёр",
+                "nav-3": "3. Страна-импортёр",
+                "nav-4": "4. Введение тарифа",
+                "nav-5": "5. Квоты и протекционизм",
+                "nav-6": "6. Потоки NX = NCO",
+                "nav-7": "7. Валютные курсы (PPP)",
+                "nav-8": "8. Кейс: Тарифы Трампа",
+                "t1-title": "Равновесие на рынке без международной торговли (Автаркия)",
+                "t1-sub": "Когда страна закрыта от мирового рынка, цена и объём определяются исключительно внутренним спросом и предложением.",
+                "t1-slider-lbl": "Сдвиг внутреннего спроса (уровень равновесия):",
+                "t1-cs-lbl": "Излишек потребителей (CS)", "t1-ps-lbl": "Излишек производителей (PS)", "t1-ts-lbl": "Общий излишек (CS + PS):",
+                "t2-title": "Международная торговля в стране-экспортёре (P<sub>W</sub> > P<sub>A</sub>)",
+                "t2-sub": "Мировая цена выше внутренней равновесной ($50). Внутренняя цена поднимается до мировой, выпуск растёт, излишек уходит на экспорт.",
+                "t2-slider-lbl": "Мировая цена (зелёная линия P<sub>W</sub>):",
+                "t2-qd-lbl": "Спрос (Q<sub>d</sub>)", "t2-qs-lbl": "Выпуск (Q<sub>s</sub>)", "t2-ex-lbl": "Экспорт",
+                "t2-th1": "Показатель", "t2-th2": "Было", "t2-th3": "Стало", "t2-th4": "Итог",
+                "t3-title": "Международная торговля в стране-импортёре (P<sub>W</sub> < P<sub>A</sub>)",
+                "t3-sub": "Мировая цена ниже внутренней равновесной ($50). Внутренняя цена снижается до мировой, потребление растёт, разница покрывается импортом.",
+                "t3-slider-lbl": "Мировая цена (голубая линия P<sub>W</sub>):",
+                "t3-qs-lbl": "Выпуск (Q<sub>s</sub>)", "t3-qd-lbl": "Спрос (Q<sub>d</sub>)", "t3-im-lbl": "Импорт",
+                "t3-th1": "Показатель", "t3-th2": "Было", "t3-th3": "Стало", "t3-th4": "Итог",
+                "t4-title": "Последствия введения импортного тарифа (P<sub>dom</sub> = P<sub>W</sub> + t)",
+                "t4-sub": "Базовая мировая цена P<sub>W</sub> = $35. Тариф поднимает внутреннюю цену (красная линия), сокращает импорт и создаёт чистые потери общества (D + F).",
+                "t4-slider-lbl": "Импортный тариф t (красная линия P<sub>W</sub> + t):",
+                "t4-th1": "Категория", "t4-th2": "Без тарифа", "t4-th3": "С тарифом", "t4-th4": "Изменение",
+                "t4-imp-lbl": "Импорт с тарифом", "t4-dwl-lbl": "Потери общества (D + F)",
+                "t5-q-title": "Тариф против импортной квоты",
+                "t5-args-title": "5 аргументов за ограничение торговли — и ответ экономистов",
+                "t6-m-title": "Макроэкономика открытой экономики: Потоки товаров (NX) и капитала (NCO)",
+                "t6-m-sub": "Любая международная сделка имеет две стороны: движение товаров (NX) и встречное движение капитала (NCO).",
+                "sim-macro-t": "Баланс сбережений и инвестиций (млрд $)",
+                "sankey-title": "Потоковая диаграмма баланса: S → I + NCO (Sankey Flow)",
+                "t7-fx-title": "Номинальный (e), Реальный курс (ε) и Паритет покупательной способности (PPP)",
+                "t7-fx-sub": "Как цена валюты и разница цен определяют ценовую конкурентоспособность товаров (KZT / USD)",
+                "fx-calc-t": "Калькулятор курса KZT/USD и реального обменного курса",
+                "fx-chart-t": "Сравнение рыночного курса и паритета покупательной способности (KZT/$)",
+                "tc-title": "Тарифная политика Дональда Трампа (2025–2026): Микро- и Макроэффекты",
+                "tc-chart-t": "Сравнение ставок тарифов США по направлениям (2024 vs 2025–2026, %)",
+                "txt-footer": "AlmaU • Школа цифровых технологий и экономики | Международная торговля"
+            },
+            en: {
+                "txt-header-title": "International Trade",
+                "txt-header-sub": "AlmaU • School of Digital Technologies & Economics",
+                "nav-1": "1. Autarky Equilibrium",
+                "nav-2": "2. Exporting Country",
+                "nav-3": "3. Importing Country",
+                "nav-4": "4. Import Tariff",
+                "nav-5": "5. Quotas & Protectionism",
+                "nav-6": "6. Flows NX = NCO",
+                "nav-7": "7. Exchange Rates (PPP)",
+                "nav-8": "8. Case: Trump Tariffs",
+                "t1-title": "Market Equilibrium without International Trade (Autarky)",
+                "t1-sub": "When an economy is closed to world markets, price and quantity adjust to balance domestic supply and demand.",
+                "t1-slider-lbl": "Domestic Demand Shift (Equilibrium Level):",
+                "t1-cs-lbl": "Consumer Surplus (CS)", "t1-ps-lbl": "Producer Surplus (PS)", "t1-ts-lbl": "Total Surplus (CS + PS):",
+                "t2-title": "International Trade in an Exporting Country (P<sub>W</sub> > P<sub>A</sub>)",
+                "t2-sub": "World price exceeds domestic equilibrium ($50). Domestic price rises to the world price, output expands, and surplus is exported.",
+                "t2-slider-lbl": "World Price (Green Line P<sub>W</sub>):",
+                "t2-qd-lbl": "Demand (Q<sub>d</sub>)", "t2-qs-lbl": "Supply (Q<sub>s</sub>)", "t2-ex-lbl": "Exports",
+                "t2-th1": "Metric", "t2-th2": "Before", "t2-th3": "After", "t2-th4": "Change",
+                "t3-title": "International Trade in an Importing Country (P<sub>W</sub> < P<sub>A</sub>)",
+                "t3-sub": "World price is below domestic equilibrium ($50). Domestic price falls to the world price, consumption expands, and imports fill the gap.",
+                "t3-slider-lbl": "World Price (Blue Line P<sub>W</sub>):",
+                "t3-qs-lbl": "Supply (Q<sub>s</sub>)", "t3-qd-lbl": "Demand (Q<sub>d</sub>)", "t3-im-lbl": "Imports",
+                "t3-th1": "Metric", "t3-th2": "Before", "t3-th3": "After", "t3-th4": "Change",
+                "t4-title": "The Effects of an Import Tariff (P<sub>dom</sub> = P<sub>W</sub> + t)",
+                "t4-sub": "Baseline world price P<sub>W</sub> = $35. The tariff raises domestic price (red line), shrinks imports, and creates deadweight loss (D + F).",
+                "t4-slider-lbl": "Import Tariff t (Red Line P<sub>W</sub> + t):",
+                "t4-th1": "Category", "t4-th2": "No Tariff", "t4-th3": "With Tariff", "t4-th4": "Change",
+                "t4-imp-lbl": "Imports w/ Tariff", "t4-dwl-lbl": "Deadweight Loss (D + F)",
+                "t5-q-title": "Tariff vs. Import Quota",
+                "t5-args-title": "5 Arguments for Restricting Trade — and Economists' Rebuttals",
+                "t6-m-title": "Open-Economy Macroeconomics: Goods Flows (NX) & Capital Flows (NCO)",
+                "t6-m-sub": "Every international transaction has two sides: flows of goods (NX) and matching flows of capital (NCO).",
+                "sim-macro-t": "Saving and Investment Balance ($ Billions)",
+                "sankey-title": "Balance Flow Diagram: S → I + NCO (Sankey Flow)",
+                "t7-fx-title": "Nominal (e), Real Exchange Rate (ε), and Purchasing Power Parity (PPP)",
+                "t7-fx-sub": "How currency prices and relative price levels determine goods competitiveness (KZT / USD)",
+                "fx-calc-t": "KZT/USD Exchange Rate & Real Rate Calculator",
+                "fx-chart-t": "Market Exchange Rate vs. PPP Benchmark (KZT/$)",
+                "tc-title": "Donald Trump's Tariff Policy (2025–2026): Micro & Macro Effects",
+                "tc-chart-t": "US Tariff Rates Comparison by Sector/Partner (2024 vs. 2025–2026, %)",
+                "txt-footer": "AlmaU • School of Digital Technologies & Economics | International Trade"
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const d = fullDict[lang];
+            Object.keys(d).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = d[id];
+            });
+
+            document.getElementById('btn-lang-ru').className = lang === 'ru'
+                ? "px-3 py-1.5 text-xs font-black rounded bg-blue-600 text-white transition"
+                : "px-3 py-1.5 text-xs font-black rounded text-slate-400 hover:text-white transition";
+            document.getElementById('btn-lang-en').className = lang === 'en'
+                ? "px-3 py-1.5 text-xs font-black rounded bg-blue-600 text-white transition"
+                : "px-3 py-1.5 text-xs font-black rounded text-slate-400 hover:text-white transition";
+
+            if (fxChartObj) {
+                fxChartObj.data.labels = lang === 'ru' ? ['Рыночный курс (e)', 'Курс по паритету (PPP)'] : ['Market Rate (e)', 'PPP Rate'];
+                fxChartObj.update();
+            }
+
+            if (trumpChartObj) {
+                trumpChartObj.data.labels = lang === 'ru'
+                    ? ['Китай', 'Сталь/Алюминий/Авто', 'Вьетнам / Азия', 'ЕС', 'Базовый мир', 'Средняя по США']
+                    : ['China', 'Steel/Aluminum/Autos', 'Vietnam / Asia', 'European Union', 'Global Baseline', 'US Effective Avg'];
+                trumpChartObj.data.datasets[0].label = lang === 'ru' ? '2024 (До пошлин, %)' : '2024 (Pre-Tariff, %)';
+                trumpChartObj.data.datasets[1].label = lang === 'ru' ? '2025–2026 (Тарифы Трампа, %)' : '2025–2026 (Trump Tariffs, %)';
+                trumpChartObj.update();
+            }
+
+            updateAutarkyTab();
+            updateExportTab();
+            updateImportTab();
+            updateTariffTab();
+            updateMacroFlows();
+            calcFxPpp();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            chart1 = makeBaseChart('chartTab1', [
+                {
+                    label: 'Равновесная цена (PA)',
+                    data: [{ x: 0, y: 50 }, { x: 66.67, y: 50 }],
+                    borderColor: '#f59e0b',
+                    borderDash: [6, 4],
+                    borderWidth: 2.2,
+                    pointRadius: 0
+                }
+            ], { mode: 'autarky', shift: 0, lang: 'ru' });
+
+            chart2 = makeBaseChart('chartTab2', [
+                {
+                    label: 'Мировая цена (PW)',
+                    data: [{ x: 0, y: 65 }, { x: 105, y: 65 }],
+                    borderColor: '#10b981',
+                    borderWidth: 2.8,
+                    pointRadius: 0
+                },
+                {
+                    label: 'Цена до торговли ($50)',
+                    data: [{ x: 0, y: 50 }, { x: 66.67, y: 50 }],
+                    borderColor: '#64748b',
+                    borderDash: [4, 4],
+                    borderWidth: 1.5,
+                    pointRadius: 0
+                }
+            ], { mode: 'export', pw: 65, lang: 'ru' });
+
+            chart3 = makeBaseChart('chartTab3', [
+                {
+                    label: 'Цена до торговли ($50)',
+                    data: [{ x: 0, y: 50 }, { x: 66.67, y: 50 }],
+                    borderColor: '#64748b',
+                    borderDash: [4, 4],
+                    borderWidth: 1.5,
+                    pointRadius: 0
+                },
+                {
+                    label: 'Мировая цена (PW)',
+                    data: [{ x: 0, y: 35 }, { x: 105, y: 35 }],
+                    borderColor: '#06b6d4',
+                    borderWidth: 2.8,
+                    pointRadius: 0
+                }
+            ], { mode: 'import', pw: 35, lang: 'ru' });
+
+            chart4 = makeBaseChart('chartTab4', [
+                {
+                    label: 'Цена с тарифом (PW + t)',
+                    data: [{ x: 0, y: 45 }, { x: 105, y: 45 }],
+                    borderColor: '#f43f5e',
+                    borderWidth: 2.8,
+                    pointRadius: 0
+                },
+                {
+                    label: 'Мировая цена без тарифа ($35)',
+                    data: [{ x: 0, y: 35 }, { x: 105, y: 35 }],
+                    borderColor: '#06b6d4',
+                    borderDash: [5, 3],
+                    borderWidth: 2,
+                    pointRadius: 0
+                }
+            ], { mode: 'tariff', pw: 35, pdom: 45, lang: 'ru' });
+
+            const fxCanvas = document.getElementById('chartFxPpp');
+            if (fxCanvas && typeof Chart !== 'undefined') {
+                fxChartObj = new Chart(fxCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Рыночный курс (e)', 'Курс по паритету (PPP)'],
+                        datasets: [{
+                            label: 'KZT за 1 USD',
+                            data: [500, 500],
+                            backgroundColor: ['#f59e0b', '#06b6d4'],
+                            borderRadius: 6,
+                            barThickness: 64
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: '#e2e8f0', font: { size: 11, weight: 'bold' } }, grid: { display: false } },
+                            y: { min: 300, max: 750, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51,65,85,0.4)' } }
+                        }
+                    }
+                });
+            }
+
+            const trumpCanvas = document.getElementById('chartTrumpTariffs');
+            if (trumpCanvas && typeof Chart !== 'undefined') {
+                trumpChartObj = new Chart(trumpCanvas, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Китай', 'Сталь/Алюминий/Авто', 'Вьетнам / Азия', 'ЕС', 'Базовый мир', 'Средняя по США'],
+                        datasets: [
+                            { label: '2024 (До пошлин, %)', data: [19.3, 2.5, 4.2, 1.5, 1.5, 2.4], backgroundColor: '#3b82f6', borderRadius: 4 },
+                            { label: '2025–2026 (Тарифы Трампа, %)', data: [54.0, 25.0, 20.0, 15.0, 10.0, 16.5], backgroundColor: '#f43f5e', borderRadius: 4 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { labels: { color: '#e2e8f0', font: { size: 10, weight: 'bold' } } } },
+                        scales: {
+                            x: { ticks: { color: '#cbd5e1', font: { size: 10 } }, grid: { display: false } },
+                            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(51,65,85,0.4)' } }
+                        }
+                    }
+                });
+            }
+
+            setLanguage('ru');
+        });
+    </script>
+</body>
+</html>

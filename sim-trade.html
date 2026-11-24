@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Симулятор международной торговли и тарифов | AlmaU SDTE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: radial-gradient(circle at 15% 0%, #0f172a 0%, #05070c 100%); color: #f1f5f9; min-height: 100vh; font-size: 13px; }
+        .glass-panel { background: rgba(15, 23, 42, 0.88); backdrop-filter: blur(20px); border: 1px solid rgba(51, 65, 85, 0.5); box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.6); }
+
+        .vintage-tuner {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+            outline: none;
+            cursor: pointer;
+            --track-glow: rgba(6, 182, 212, 0.45);
+            --needle-color: #06b6d4;
+        }
+        .vintage-tuner::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 12px;
+            background: linear-gradient(180deg, #090d16 0%, #1e293b 50%, #0f172a 100%);
+            border-radius: 3px;
+            border: 1px solid #475569;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.9), 0 0 10px var(--track-glow);
+        }
+        .vintage-tuner::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 30px;
+            width: 16px;
+            background: linear-gradient(180deg, #f8fafc 0%, #94a3b8 45%, #475569 55%, #cbd5e1 100%);
+            border: 1px solid #ffffff;
+            border-radius: 2px;
+            margin-top: -10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.9);
+            background-image: linear-gradient(to right, transparent 6px, var(--needle-color) 6px, var(--needle-color) 10px, transparent 10px);
+        }
+        .tuner-cyan { --track-glow: rgba(6, 182, 212, 0.45); --needle-color: #06b6d4; }
+        .tuner-rose { --track-glow: rgba(244, 63, 94, 0.5); --needle-color: #f43f5e; }
+
+        .pretty-math-text { font-family: 'Plus Jakarta Sans', sans-serif; background: linear-gradient(135deg, #fffbeb 0%, #fde047 50%, #f59e0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .chart-stage { min-height: 440px; height: calc(100vh - 220px); }
+    </style>
+</head>
+<body class="p-3 md:p-4 flex flex-col justify-between min-h-screen">
+
+    <!-- ШАПКА -->
+    <header class="glass-panel p-3.5 rounded-xl mb-3 flex flex-col md:flex-row justify-between items-center gap-3 border-t-2 border-t-blue-500">
+        <div class="flex items-center gap-3.5">
+            <img src="almaU.jpg" alt="AlmaU Logo" class="w-14 h-14 object-contain rounded-xl bg-white p-1.5 shadow-lg border border-blue-400/50 shrink-0" onerror="this.style.display='none';">
+            <div>
+                <h1 class="text-lg md:text-2xl font-black tracking-tight text-amber-400" id="sim-header-title">
+                    Интерактивный симулятор: Международная торговля и тарифы
+                </h1>
+                <p class="text-xs text-blue-400 font-bold uppercase tracking-wider mt-0.5" id="sim-header-sub">
+                    AlmaU • Школа цифровых технологий и экономики
+                </p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2">
+            <span id="regime-badge" class="px-3.5 py-1.5 rounded-lg text-xs font-black bg-amber-950 text-amber-300 border border-amber-500/50">РЕЖИМ: ИМПОРТ + ТАРИФ</span>
+            <div class="flex items-center gap-1 bg-slate-900/90 p-1 rounded-lg border border-slate-700 shrink-0">
+                <button type="button" onclick="setLanguage('ru')" id="btn-lang-ru" class="px-3 py-1.5 text-xs font-black rounded bg-blue-600 text-white transition">RU</button>
+                <button type="button" onclick="setLanguage('en')" id="btn-lang-en" class="px-3 py-1.5 text-xs font-black rounded text-slate-400 hover:text-white transition">EN</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- РАБОЧАЯ ОБЛАСТЬ СИМУЛЯТОРА -->
+    <main class="flex-grow flex flex-col">
+        <div class="glass-panel p-4 rounded-xl flex-grow flex flex-col justify-between gap-4 border-l-4 border-l-blue-500">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch flex-grow">
+                <!-- ЛЕВАЯ ПАНЕЛЬ УПРАВЛЕНИЯ -->
+                <div class="lg:col-span-5 flex flex-col justify-between bg-slate-900/90 p-4 rounded-xl border border-slate-700 space-y-3">
+                    <!-- БЫСТРЫЕ ПРЕСЕТЫ РЕЖИМОВ -->
+                    <div>
+                        <div class="text-[11px] font-bold text-slate-400 uppercase mb-1.5" id="lbl-presets">Быстрый выбор сценария:</div>
+                        <div class="grid grid-cols-4 gap-1.5 text-[11px] font-bold">
+                            <button type="button" onclick="applyPreset(50, 0)" class="py-1.5 px-2 rounded bg-amber-950/90 text-amber-300 border border-amber-500/40 hover:bg-amber-900 transition" id="pre-aut">Автаркия</button>
+                            <button type="button" onclick="applyPreset(65, 0)" class="py-1.5 px-2 rounded bg-emerald-950/90 text-emerald-300 border border-emerald-500/40 hover:bg-emerald-900 transition" id="pre-exp">Экспорт</button>
+                            <button type="button" onclick="applyPreset(35, 0)" class="py-1.5 px-2 rounded bg-cyan-950/90 text-cyan-300 border border-cyan-500/40 hover:bg-cyan-900 transition" id="pre-imp">Импорт</button>
+                            <button type="button" onclick="applyPreset(35, 10)" class="py-1.5 px-2 rounded bg-rose-950/90 text-rose-300 border border-rose-500/40 hover:bg-rose-900 transition" id="pre-tar">Тариф +$10</button>
+                        </div>
+                    </div>
+
+                    <!-- СЛАЙДЕР МИРОВОЙ ЦЕНЫ -->
+                    <div>
+                        <label class="text-xs text-slate-200 flex justify-between font-bold mb-1.5">
+                            <span id="lbl-pw">Мировая цена P<sub>W</sub> (равновесие P<sub>A</sub> = $50):</span>
+                            <span id="disp-pw" class="text-cyan-300 font-mono font-black">$35</span>
+                        </label>
+                        <input type="range" id="slider-pw" min="20" max="80" step="1" value="35" class="vintage-tuner tuner-cyan" oninput="updateTradeSim()" onchange="updateTradeSim()">
+                        <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
+                            <span>$20 (Импорт)</span>
+                            <span>$50 (Автаркия)</span>
+                            <span>$80 (Экспорт)</span>
+                        </div>
+                    </div>
+
+                    <!-- СЛАЙДЕР ИМПОРТНОГО ТАРИФА -->
+                    <div>
+                        <label class="text-xs text-slate-200 flex justify-between font-bold mb-1.5">
+                            <span id="lbl-tariff">Импортный тариф t (действует при P<sub>W</sub> &lt; $50):</span>
+                            <span id="disp-tariff" class="text-rose-400 font-mono font-black">$10</span>
+                        </label>
+                        <input type="range" id="slider-tariff" min="0" max="30" step="1" value="10" class="vintage-tuner tuner-rose" oninput="updateTradeSim()" onchange="updateTradeSim()">
+                        <div class="flex justify-between text-[10px] text-slate-400 font-mono mt-1">
+                            <span>$0 (Свободный импорт)</span>
+                            <span>$15</span>
+                            <span>$30 (Запретительный)</span>
+                        </div>
+                    </div>
+
+                    <!-- ПОКАЗАТЕЛИ БЛАГОСОСТОЯНИЯ -->
+                    <div class="grid grid-cols-2 gap-2.5 font-mono text-xs">
+                        <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                            <div class="text-[10px] text-slate-400" id="lbl-pdom">Внутренняя цена P<sub>dom</sub></div>
+                            <div id="sim-pdom" class="text-base font-black text-white">$45.0</div>
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+                            <div class="text-[10px] text-slate-400" id="lbl-vol">Объём торговли</div>
+                            <div id="sim-trade-vol" class="text-base font-black text-cyan-300">16.7 (Imp)</div>
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded-lg border border-blue-500/30">
+                            <div class="text-[10px] text-blue-400">Consumer Surplus (CS)</div>
+                            <div id="sim-cs" class="text-base font-black text-blue-300">1687.5</div>
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded-lg border border-emerald-500/30">
+                            <div class="text-[10px] text-emerald-400">Producer Surplus (PS)</div>
+                            <div id="sim-ps" class="text-base font-black text-emerald-300">1020.8</div>
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded-lg border border-amber-500/30">
+                            <div class="text-[10px] text-amber-400" id="lbl-govrev">Доход бюджета (t × Imp)</div>
+                            <div id="sim-rev" class="text-base font-black text-amber-300">166.7</div>
+                        </div>
+                        <div class="bg-slate-950 p-2.5 rounded-lg border border-rose-500/40">
+                            <div class="text-[10px] text-rose-400">Deadweight Loss (DWL)</div>
+                            <div id="sim-dwl" class="text-base font-black text-rose-400">166.7</div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-slate-950 rounded-lg border border-emerald-500/40 flex justify-between items-center">
+                        <span class="text-xs font-bold text-slate-300" id="lbl-ts-net">Общий излишек (TS) против автаркии:</span>
+                        <span id="sim-ts" class="text-lg font-mono font-black pretty-math-text">2875.0 (+208.3)</span>
+                    </div>
+                </div>
+
+                <!-- ПРАВЫЙ ИНТЕРАКТИВНЫЙ ГРАФИК -->
+                <div class="lg:col-span-7 chart-stage glass-panel p-3.5 rounded-xl relative">
+                    <canvas id="chartSimInteractive"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ПОДВАЛ -->
+    <footer class="mt-3 text-center text-[10px] text-slate-500 font-bold uppercase tracking-widest pt-2 border-t border-slate-800/80" id="txt-footer">
+        AlmaU • Школа цифровых технологий и экономики | Симулятор международной торговли
+    </footer>
+
+    <script>
+        let currentLang = 'ru';
+        let simChartObj;
+
+        const Q_D = (p) => (90 - p) / 0.6;
+        const Q_S = (p) => (p - 10) / 0.6;
+
+        function applyPreset(pw, t) {
+            document.getElementById('slider-pw').value = pw;
+            document.getElementById('slider-tariff').value = t;
+            updateTradeSim();
+        }
+
+        const simWelfarePlugin = {
+            id: 'simWelfarePlugin',
+            beforeDatasetsDraw(chart, args, opts) {
+                if (!opts) return;
+                const { ctx, scales: { x, y } } = chart;
+                if (!x || !y) return;
+
+                const px = (q) => x.getPixelForValue(q);
+                const py = (p) => y.getPixelForValue(p);
+
+                function fillPoly(pts, color) {
+                    if (!pts || pts.length < 3) return;
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(px(pts[0][0]), py(pts[0][1]));
+                    for (let i = 1; i < pts.length; i++) ctx.lineTo(px(pts[i][0]), py(pts[i][1]));
+                    ctx.closePath();
+                    ctx.fillStyle = color;
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                const pa = 50;
+                const qa = 200 / 3;
+                const pw = opts.pw;
+                const pdom = opts.pdom;
+
+                if (pw > pa) {
+                    const qd = Q_D(pw);
+                    const qs = Q_S(pw);
+                    fillPoly([[0, 90], [qd, pw], [0, pw]], 'rgba(59, 130, 246, 0.30)');
+                    fillPoly([[0, pw], [qd, pw], [qa, pa], [0, pa]], 'rgba(168, 85, 247, 0.25)');
+                    fillPoly([[0, pa], [qa, pa], [0, 10]], 'rgba(245, 158, 11, 0.28)');
+                    fillPoly([[qd, pw], [qs, pw], [qa, pa]], 'rgba(16, 185, 129, 0.45)');
+                } else if (pw < pa) {
+                    const qs1 = Q_S(pw);
+                    const qd1 = Q_D(pw);
+                    const qs2 = Q_S(pdom);
+                    const qd2 = Q_D(pdom);
+
+                    fillPoly([[0, 90], [qd2, pdom], [0, pdom]], 'rgba(59, 130, 246, 0.28)');
+                    fillPoly([[0, pdom], [qs2, pdom], [qs1, pw], [0, pw]], 'rgba(16, 185, 129, 0.28)');
+                    fillPoly([[0, pw], [qs1, pw], [0, 10]], 'rgba(245, 158, 11, 0.28)');
+
+                    if (pdom > pw && qd2 > qs2) {
+                        fillPoly([[qs2, pdom], [qd2, pdom], [qd2, pw], [qs2, pw]], 'rgba(168, 85, 247, 0.40)');
+                        fillPoly([[qs2, pdom], [qs2, pw], [qs1, pw]], 'rgba(244, 63, 94, 0.58)');
+                        fillPoly([[qd2, pdom], [qd1, pw], [qd2, pw]], 'rgba(244, 63, 94, 0.58)');
+                    } else if (pdom === pw) {
+                        fillPoly([[qs1, pw], [qd1, pw], [qa, pa]], 'rgba(6, 182, 212, 0.40)');
+                    }
+                } else {
+                    fillPoly([[0, 90], [qa, pa], [0, pa]], 'rgba(59, 130, 246, 0.30)');
+                    fillPoly([[0, pa], [qa, pa], [0, 10]], 'rgba(245, 158, 11, 0.30)');
+                }
+            },
+            afterDatasetsDraw(chart, args, opts) {
+                if (!opts) return;
+                const { ctx, scales: { x, y } } = chart;
+                if (!x || !y) return;
+                const lang = opts.lang || 'ru';
+
+                const px = (q) => x.getPixelForValue(q);
+                const py = (p) => y.getPixelForValue(p);
+
+                function drawDashed(x1, y1, x2, y2, color = '#94a3b8') {
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.setLineDash([4, 4]);
+                    ctx.strokeStyle = color;
+                    ctx.lineWidth = 1.4;
+                    ctx.moveTo(px(x1), py(y1));
+                    ctx.lineTo(px(x2), py(y2));
+                    ctx.stroke();
+                    ctx.restore();
+                }
+
+                function drawLabel(text, q, p, color = '#f8fafc', font = 'bold 12px Inter, sans-serif') {
+                    ctx.save();
+                    ctx.font = font;
+                    ctx.fillStyle = color;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(text, px(q), py(p));
+                    ctx.restore();
+                }
+
+                function drawBracket(qLeft, qRight, pLevel, labelText, color, labelAbove = false) {
+                    const xL = px(qLeft);
+                    const xR = px(qRight);
+                    const yB = py(pLevel);
+                    if (xR - xL < 14) return;
+                    ctx.save();
+                    ctx.strokeStyle = color;
+                    ctx.fillStyle = color;
+                    ctx.lineWidth = 1.8;
+                    ctx.beginPath();
+                    ctx.moveTo(xL, yB - 4);
+                    ctx.lineTo(xL, yB + 4);
+                    ctx.moveTo(xR, yB - 4);
+                    ctx.lineTo(xR, yB + 4);
+                    ctx.moveTo(xL, yB);
+                    ctx.lineTo(xR, yB);
+                    ctx.stroke();
+                    ctx.font = 'bold 11px Inter, sans-serif';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(labelText, (xL + xR) / 2, labelAbove ? yB - 9 : yB + 13);
+                    ctx.restore();
+                }
+
+                const pa = 50;
+                const qa = 200 / 3;
+                const pw = opts.pw;
+                const pdom = opts.pdom;
+
+                if (pw > pa) {
+                    const qd = Q_D(pw);
+                    const qs = Q_S(pw);
+                    drawDashed(qd, pw, qd, 0, '#3b82f6');
+                    drawDashed(qs, pw, qs, 0, '#10b981');
+                    drawLabel('CS', qd * 0.35, pw + (90 - pw) * 0.4, '#93c5fd', '900 13px Inter');
+                    drawLabel('PS', qa * 0.35, 32, '#fcd34d', '900 13px Inter');
+                    drawLabel('+D', (qd + qs + qa) / 3, (2 * pw + pa) / 3, '#6ee7b7', '900 13px Inter');
+                    drawBracket(qd, qs, pw + 3.5, (lang === 'ru' ? 'Экспорт = ' : 'Exports = ') + (qs - qd).toFixed(1), '#34d399', true);
+                } else if (pw < pa) {
+                    const qs1 = Q_S(pw);
+                    const qd1 = Q_D(pw);
+                    const qs2 = Q_S(pdom);
+                    const qd2 = Q_D(pdom);
+                    drawDashed(qs1, pw, qs1, 0, '#94a3b8');
+                    drawDashed(qd1, pw, qd1, 0, '#94a3b8');
+
+                    if (pdom > pw && qd2 > qs2) {
+                        drawDashed(qs2, pdom, qs2, 0, '#f43f5e');
+                        drawDashed(qd2, pdom, qd2, 0, '#f43f5e');
+                        drawLabel('CS', 22, (90 + pdom) / 2, '#93c5fd', 'bold 12px Inter');
+                        drawLabel('PS', 18, (10 + pdom) / 2, '#fcd34d', 'bold 12px Inter');
+                        drawLabel('E (Rev)', (qs2 + qd2) / 2, (pw + pdom) / 2, '#e9d5ff', 'bold 11px Inter');
+                        drawLabel('D', (qs1 + 2 * qs2) / 3, (2 * pw + pdom) / 3, '#fda4af', 'bold 11px Inter');
+                        drawLabel('F', (qd1 + 2 * qd2) / 3, (2 * pw + pdom) / 3, '#fda4af', 'bold 11px Inter');
+                        drawBracket(qs2, qd2, pdom + 3.5, (lang === 'ru' ? 'Импорт = ' : 'Imports = ') + (qd2 - qs2).toFixed(1), '#fb7185', true);
+                    } else if (pdom === pw) {
+                        drawLabel('CS', qa * 0.35, 65, '#93c5fd', '900 13px Inter');
+                        drawLabel('PS', qs1 * 0.35, 10 + (pw - 10) * 0.5, '#fcd34d', '900 13px Inter');
+                        drawLabel('+D', (qs1 + qd1 + qa) / 3, (2 * pw + pa) / 3, '#67e8f9', '900 13px Inter');
+                        drawBracket(qs1, qd1, pw - 4.5, (lang === 'ru' ? 'Импорт = ' : 'Imports = ') + (qd1 - qs1).toFixed(1), '#22d3ee', false);
+                    }
+                } else {
+                    drawDashed(qa, pa, qa, 0, '#f59e0b');
+                    drawLabel('CS', 22, 66, '#93c5fd', '900 13px Inter');
+                    drawLabel('PS', 22, 34, '#fcd34d', '900 13px Inter');
+                }
+            }
+        };
+
+        if (typeof Chart !== 'undefined') Chart.register(simWelfarePlugin);
+
+        function updateTradeSim() {
+            const pw = parseFloat(document.getElementById('slider-pw').value);
+            const t = parseFloat(document.getElementById('slider-tariff').value);
+            const pa = 50;
+            document.getElementById('disp-pw').innerText = '$' + pw;
+
+            let pDom = pw;
+            let regimeText = '';
+            let rev = 0;
+            let dwl = 0;
+            let tradeText = '';
+
+            if (pw > pa) {
+                pDom = pw;
+                document.getElementById('disp-tariff').innerText = '$0 (N/A)';
+                regimeText = currentLang === 'ru' ? 'РЕЖИМ: ЭКСПОРТЁР' : 'REGIME: EXPORTER';
+                document.getElementById('regime-badge').className = 'px-3.5 py-1.5 rounded-lg text-xs font-black bg-emerald-950 text-emerald-300 border border-emerald-500/50';
+            } else if (pw < pa) {
+                pDom = Math.min(pa, pw + t);
+                const effT = pDom - pw;
+                document.getElementById('disp-tariff').innerText = '$' + effT;
+                if (effT === 0) {
+                    regimeText = currentLang === 'ru' ? 'РЕЖИМ: СВОБОДНЫЙ ИМПОРТ' : 'REGIME: FREE IMPORTS';
+                    document.getElementById('regime-badge').className = 'px-3.5 py-1.5 rounded-lg text-xs font-black bg-cyan-950 text-cyan-300 border border-cyan-500/50';
+                } else if (pDom >= pa) {
+                    regimeText = currentLang === 'ru' ? 'РЕЖИМ: ЗАПРЕТИТЕЛЬНЫЙ ТАРИФ' : 'REGIME: PROHIBITIVE TARIFF';
+                    document.getElementById('regime-badge').className = 'px-3.5 py-1.5 rounded-lg text-xs font-black bg-rose-950 text-rose-300 border border-rose-500/50';
+                } else {
+                    regimeText = currentLang === 'ru' ? 'РЕЖИМ: ИМПОРТ + ТАРИФ' : 'REGIME: IMPORTS + TARIFF';
+                    document.getElementById('regime-badge').className = 'px-3.5 py-1.5 rounded-lg text-xs font-black bg-amber-950 text-amber-300 border border-amber-500/50';
+                }
+            } else {
+                pDom = pa;
+                document.getElementById('disp-tariff').innerText = '$0';
+                regimeText = currentLang === 'ru' ? 'РЕЖИМ: АВТАРКИЯ' : 'REGIME: AUTARKY';
+                document.getElementById('regime-badge').className = 'px-3.5 py-1.5 rounded-lg text-xs font-black bg-amber-950 text-amber-300 border border-amber-500/50';
+            }
+
+            document.getElementById('regime-badge').innerText = regimeText;
+
+            const qd = Q_D(pDom);
+            const qs = Q_S(pDom);
+            const cs = 0.5 * (90 - pDom) * qd;
+            const ps = 0.5 * (pDom - 10) * qs;
+
+            if (pw > pa) {
+                tradeText = (qs - qd).toFixed(1) + ' (Exp)';
+            } else if (pw < pa) {
+                const imp = Math.max(0, qd - qs);
+                const effT = pDom - pw;
+                rev = effT * imp;
+                dwl = 0.5 * effT * (qs - Q_S(pw)) + 0.5 * effT * (Q_D(pw) - qd);
+                tradeText = imp.toFixed(1) + ' (Imp)';
+            } else {
+                tradeText = '0.0';
+            }
+
+            const ts = cs + ps + rev;
+            const diffTs = ts - 2666.67;
+
+            document.getElementById('sim-pdom').innerText = '$' + pDom.toFixed(1);
+            document.getElementById('sim-trade-vol').innerText = tradeText;
+            document.getElementById('sim-cs').innerText = cs.toFixed(1);
+            document.getElementById('sim-ps').innerText = ps.toFixed(1);
+            document.getElementById('sim-rev').innerText = rev.toFixed(1);
+            document.getElementById('sim-dwl').innerText = dwl.toFixed(1);
+            document.getElementById('sim-ts').innerText = `${ts.toFixed(1)} (${diffTs >= 0 ? '+' : ''}${diffTs.toFixed(1)})`;
+
+            if (simChartObj) {
+                simChartObj.data.datasets[2].data = [{ x: 0, y: pw }, { x: 105, y: pw }];
+                simChartObj.data.datasets[3].data = [{ x: 0, y: pDom }, { x: 105, y: pDom }];
+                simChartObj.options.plugins.simWelfarePlugin = { pw: pw, pdom: pDom, lang: currentLang };
+                simChartObj.update();
+            }
+        }
+
+        const dict = {
+            ru: {
+                "sim-header-title": "Интерактивный симулятор: Международная торговля и тарифы",
+                "sim-header-sub": "AlmaU • Школа цифровых технологий и экономики",
+                "lbl-presets": "Быстрый выбор сценария:",
+                "pre-aut": "Автаркия", "pre-exp": "Экспорт", "pre-imp": "Импорт", "pre-tar": "Тариф +$10",
+                "lbl-pw": "Мировая цена P<sub>W</sub> (равновесие P<sub>A</sub> = $50):",
+                "lbl-tariff": "Импортный тариф t (действует при P<sub>W</sub> < $50):",
+                "lbl-pdom": "Внутренняя цена P<sub>dom</sub>",
+                "lbl-vol": "Объём торговли",
+                "lbl-govrev": "Доход бюджета (t × Imp)",
+                "lbl-ts-net": "Общий излишек (TS) против автаркии:",
+                "txt-footer": "AlmaU • Школа цифровых технологий и экономики | Симулятор международной торговли"
+            },
+            en: {
+                "sim-header-title": "Interactive Simulator: International Trade & Tariffs",
+                "sim-header-sub": "AlmaU • School of Digital Technologies & Economics",
+                "lbl-presets": "Quick Scenario Presets:",
+                "pre-aut": "Autarky", "pre-exp": "Export", "pre-imp": "Import", "pre-tar": "Tariff +$10",
+                "lbl-pw": "World Price P<sub>W</sub> (Autarky P<sub>A</sub> = $50):",
+                "lbl-tariff": "Import Tariff t (applies when P<sub>W</sub> < $50):",
+                "lbl-pdom": "Domestic Price P<sub>dom</sub>",
+                "lbl-vol": "Trade Volume",
+                "lbl-govrev": "Gov Revenue (t × Imp)",
+                "lbl-ts-net": "Total Surplus (TS) vs. Autarky:",
+                "txt-footer": "AlmaU • School of Digital Technologies & Economics | International Trade Simulator"
+            }
+        };
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            const d = dict[lang];
+            Object.keys(d).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = d[id];
+            });
+
+            document.getElementById('btn-lang-ru').className = lang === 'ru'
+                ? "px-3 py-1.5 text-xs font-black rounded bg-blue-600 text-white transition"
+                : "px-3 py-1.5 text-xs font-black rounded text-slate-400 hover:text-white transition";
+            document.getElementById('btn-lang-en').className = lang === 'en'
+                ? "px-3 py-1.5 text-xs font-black rounded bg-blue-600 text-white transition"
+                : "px-3 py-1.5 text-xs font-black rounded text-slate-400 hover:text-white transition";
+
+            updateTradeSim();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const el = document.getElementById('chartSimInteractive');
+            if (el && typeof Chart !== 'undefined') {
+                simChartObj = new Chart(el, {
+                    type: 'line',
+                    data: {
+                        datasets: [
+                            { label: 'Спрос (Demand)', data: [{ x: 0, y: 90 }, { x: 100, y: 30 }], borderColor: '#3b82f6', borderWidth: 2.5, pointRadius: 0 },
+                            { label: 'Предложение (Supply)', data: [{ x: 0, y: 10 }, { x: 100, y: 70 }], borderColor: '#f59e0b', borderWidth: 2.5, pointRadius: 0 },
+                            { label: 'Мировая цена (PW)', data: [{ x: 0, y: 35 }, { x: 105, y: 35 }], borderColor: '#06b6d4', borderDash: [5, 3], borderWidth: 2, pointRadius: 0 },
+                            { label: 'Внутренняя цена (Pdom)', data: [{ x: 0, y: 45 }, { x: 105, y: 45 }], borderColor: '#f43f5e', borderWidth: 2.8, pointRadius: 0 }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 150 },
+                        plugins: {
+                            legend: { labels: { color: '#e2e8f0', font: { size: 11, weight: 'bold' }, boxWidth: 14 } },
+                            simWelfarePlugin: { pw: 35, pdom: 45, lang: 'ru' }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear', min: 0, max: 105,
+                                title: { display: true, text: 'Количество (Q)', color: '#94a3b8', font: { size: 11, weight: 'bold' } },
+                                ticks: { color: '#94a3b8', stepSize: 20 },
+                                grid: { color: 'rgba(51,65,85,0.35)' }
+                            },
+                            y: {
+                                min: 0, max: 105,
+                                title: { display: true, text: 'Цена (P, $)', color: '#94a3b8', font: { size: 11, weight: 'bold' } },
+                                ticks: { color: '#94a3b8', stepSize: 15 },
+                                grid: { color: 'rgba(51,65,85,0.35)' }
+                            }
+                        }
+                    }
+                });
+            }
+            setLanguage('ru');
+        });
+    </script>
+</body>
+</html>
