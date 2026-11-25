@@ -3,1305 +3,1513 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ALMAU — Экономика (SE) Дашборд успеваемости</title>
-    <!-- Tailwind CSS -->
+    <title>Журнал успеваемости: Economics SE RUS</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts (Inter) -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: #0f172a; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #475569; }
-        .fade-enter { opacity: 0; transform: translateY(12px); }
-        .fade-enter-active { opacity: 1; transform: translateY(0); transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        #finalScoreCircle { transition: stroke-dashoffset 1.2s cubic-bezier(0.16, 1, 0.3, 1); }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            color: #1f2937;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .grade-input {
+            transition: all 0.2s;
+        }
+        .grade-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            background-color: #ffffff;
+        }
+        .comment-box {
+            resize: none;
+            overflow-y: hidden;
+            min-height: 2.5rem;
+            line-height: 1.35;
+        }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-indigo-500 selection:text-white">
-
-    <!-- Header -->
-    <header class="bg-slate-900 text-white border-b border-slate-800 shadow-xl sticky top-0 z-40 backdrop-blur-md bg-opacity-95">
-        <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-4">
-                <div class="p-3 bg-gradient-to-tr from-indigo-600 to-violet-600 rounded-xl text-white shadow-lg shadow-indigo-500/20">
-                    <i class="fa-solid fa-graduation-cap text-2xl"></i>
-                </div>
-                <div>
-                    <span class="text-xs font-bold tracking-widest text-indigo-400 uppercase">Экономика — SE DS PM IS - 2026 (Гибридный формат)</span>
-                    <h1 class="text-xl sm:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-100 to-indigo-200 bg-clip-text text-transparent">ALMAU</h1>
-                </div>
-            </div>
-            
-            <div class="flex items-center space-x-3">
-                <a href="index.html" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-semibold transition-all border border-slate-700 flex items-center space-x-1.5">
-                    <i class="fa-solid fa-arrow-left text-indigo-400"></i>
-                    <span>Главный хаб</span>
-                </a>
-
-                <div id="mode-badge" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center space-x-1.5">
-                    <span class="h-2 w-2 bg-indigo-400 rounded-full animate-pulse"></span>
-                    <span>Режим Студента</span>
-                </div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content Area -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<body class="p-4 md:p-6">
+    <div class="max-w-[1720px] mx-auto space-y-6">
         
-        <!-- ================= STUDENT VIEW ================= -->
-        <div id="student-view" class="space-y-8 block">
-            <div class="max-w-2xl mx-auto text-center space-y-4 py-6">
-                <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-indigo-200 to-slate-400 bg-clip-text text-transparent">
-                    Личный кабинет успеваемости
-                </h2>
-                <p class="text-sm sm:text-base text-slate-400">
-                    Введите ваше полное ФИО для просмотра оценок, баллов РК1, аналитики и комментария преподавателя.
-                </p>
-            </div>
-
-            <!-- Student Search Card -->
-            <div class="max-w-xl mx-auto bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-2xl relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-1.5 h-full bg-indigo-500"></div>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">ФИО Студента</label>
-                        <div class="relative">
-                            <i class="fa-solid fa-user absolute left-4 top-3.5 text-slate-500"></i>
-                            <input type="text" id="student-search-input" onkeydown="handleSearchKeyDown(event)" placeholder="Например: Долинин Тимур Евгеньевич" 
-                                class="w-full pl-11 pr-24 py-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 placeholder-slate-600 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all">
-                            <button onclick="searchStudentGrade()" class="absolute right-2 top-2 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors shadow-sm">
-                                Найти
-                            </button>
-                        </div>
+        <!-- Header & Formula Info -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-gray-100 pb-5">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <span class="bg-blue-600 text-white text-xs font-bold px-2.5 py-1 rounded uppercase tracking-wider">AlmaU</span>
+                        <h1 class="text-2xl font-bold text-gray-900">Журнал успеваемости: Economics SE RUS</h1>
                     </div>
+                    <p class="text-sm text-gray-500 mt-1">
+                        Преподаватель: <span class="font-medium text-gray-700">Д.В. Огай</span> | Силлабус 2026/2027 (Шкала: A = 4.0, B+ = 3.33, F &lt; 50%)
+                    </p>
                 </div>
-            </div>
-
-            <!-- Student Result Presentation Card -->
-            <div id="student-result-card" class="max-w-4xl mx-auto bg-slate-900 rounded-2xl border border-slate-800 shadow-2xl overflow-hidden hidden">
-                <div class="bg-gradient-to-r from-indigo-950/40 to-slate-900 px-6 py-5 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div>
-                        <span id="sr-group-badge" class="text-[10px] font-bold bg-indigo-900/50 text-indigo-300 px-2.5 py-1 rounded-full border border-indigo-800/30 uppercase tracking-wider">Группа</span>
-                        <h3 id="sr-name" class="text-xl font-extrabold text-white mt-1.5">ФИО Студента</h3>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-xs text-slate-400 block font-medium">Набранный балл</span>
-                        <div class="flex items-center justify-end space-x-2.5 mt-1">
-                            <span id="sr-letter" class="text-2xl font-black bg-indigo-600 px-3 py-1 rounded-xl text-white shadow-md">-</span>
-                            <span id="sr-total-score" class="text-3xl font-extrabold text-slate-100">0.0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Teacher Comment Banner -->
-                <div class="p-6 border-b border-slate-800 bg-indigo-950/20">
-                    <h4 class="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2 flex items-center gap-2">
-                        <i class="fa-solid fa-comment-dots text-indigo-400"></i>
-                        Вердикт и комментарий преподавателя (СРСП-1)
-                    </h4>
-                    <div id="sr-teacher-comment" class="text-sm text-slate-200 font-medium leading-relaxed bg-slate-950/80 p-4 rounded-xl border border-indigo-900/40">
-                        —
-                    </div>
-                </div>
-
-                <!-- Dashboard Graphs Grid -->
-                <div class="p-6 border-b border-slate-800 bg-slate-950/30">
-                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-6 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line text-indigo-400"></i>
-                        Аналитика успеваемости по элементам контроля
-                    </h4>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center">
-                            <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                                <i class="fa-solid fa-calendar-check"></i> Посещаемость (10%)
-                            </span>
-                            <div class="relative w-full h-28 flex items-center justify-center">
-                                <canvas id="attendanceBarChart"></canvas>
-                            </div>
-                            <div class="text-sm font-bold text-emerald-400 mt-2" id="val-att-text">0%</div>
-                        </div>
-
-                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center">
-                            <span class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                                <i class="fa-solid fa-bolt"></i> Текущий контроль (25%)
-                            </span>
-                            <div class="relative w-full h-28 flex items-center justify-center">
-                                <canvas id="activityLineChart"></canvas>
-                            </div>
-                            <div class="text-sm font-bold text-blue-400 mt-2" id="val-act-text">СРСП1 и СРСП2</div>
-                        </div>
-
-                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center">
-                            <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-2 flex items-center gap-1">
-                                <i class="fa-solid fa-pen-ruler"></i> Рубежные контроли (25%)
-                            </span>
-                            <div class="relative w-full h-28 flex items-center justify-center">
-                                <canvas id="examGaugeChart"></canvas>
-                            </div>
-                            <div class="text-sm font-bold text-amber-400 mt-2" id="val-ex-text">РК1 и РК2</div>
-                        </div>
-
-                        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 flex flex-col items-center justify-center relative overflow-hidden">
-                            <span class="text-[10px] font-bold text-violet-400 uppercase tracking-wider mb-3 flex items-center gap-1">
-                                <i class="fa-solid fa-circle-nodes"></i> Итоговый балл
-                            </span>
-                            <div class="relative w-24 h-24 flex items-center justify-center">
-                                <svg class="w-full h-full transform -rotate-90">
-                                    <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="6" class="text-slate-800" fill="transparent" />
-                                    <circle cx="48" cy="48" r="40" stroke="currentColor" stroke-width="8" class="text-violet-500 drop-shadow-[0_0_6px_rgba(139,92,246,0.6)]" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="251.2" id="finalScoreCircle" stroke-linecap="round" />
-                                </svg>
-                                <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                    <span class="text-xl font-black text-white" id="finalCircleLetter">-</span>
-                                    <span class="text-[10px] text-slate-400 font-semibold" id="finalCircleScore">0.0</span>
-                                </div>
-                            </div>
-                            <div class="text-[9px] text-violet-300 font-semibold uppercase mt-3 tracking-widest">Максимум: 100</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 6 Grade breakdown columns (без Активности для гибридного формата) -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-y sm:divide-y-0 divide-x divide-slate-800 border-b border-slate-800 bg-slate-900/20">
-                    <div class="p-3 text-center space-y-1">
-                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Посещаемость</h4>
-                        <div class="text-base font-bold text-emerald-400" id="sr-val-attendance">0 / 100</div>
-                        <p class="text-[8px] text-slate-500">Вес: <strong class="text-emerald-400">10%</strong></p>
-                    </div>
-                    <div class="p-3 text-center space-y-1 bg-indigo-950/40">
-                        <h4 class="text-[9px] font-semibold text-indigo-300 uppercase tracking-wider">СРСП 1</h4>
-                        <div class="text-base font-black text-indigo-400" id="sr-val-ca1">0 / 100</div>
-                        <p class="text-[8px] text-indigo-300 font-bold">Вес: 15%</p>
-                    </div>
-                    <div class="p-3 text-center space-y-1 bg-amber-950/30">
-                        <h4 class="text-[9px] font-semibold text-amber-300 uppercase tracking-wider">РК 1</h4>
-                        <div class="text-base font-black text-amber-400" id="sr-val-mc1">0 / 100</div>
-                        <p class="text-[8px] text-amber-300 font-bold">Вес: 15%</p>
-                    </div>
-                    <div class="p-3 text-center space-y-1">
-                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">СРСП 2</h4>
-                        <div class="text-base font-bold text-indigo-400" id="sr-val-ca2">0 / 100</div>
-                        <p class="text-[8px] text-slate-500">Вес: <strong class="text-indigo-400">10%</strong></p>
-                    </div>
-                    <div class="p-3 text-center space-y-1">
-                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">РК 2</h4>
-                        <div class="text-base font-bold text-orange-400" id="sr-val-mc2">0 / 100</div>
-                        <p class="text-[8px] text-slate-500">Вес: <strong class="text-orange-400">10%</strong></p>
-                    </div>
-                    <div class="p-3 text-center space-y-1">
-                        <h4 class="text-[9px] font-semibold text-slate-400 uppercase tracking-wider">Экзамен</h4>
-                        <div class="text-base font-bold text-rose-400" id="sr-val-exam">0 / 100</div>
-                        <p class="text-[8px] text-slate-500">Вес: <strong class="text-rose-400">40%</strong></p>
-                    </div>
-                </div>
-
-                <!-- Детализация посещаемости студента (15 оффлайн + 15 онлайн) -->
-                <div id="student-att-wrapper" class="p-6 border-b border-slate-800 bg-slate-950/20 hidden">
-                    <button onclick="toggleStudentAttDetails()" class="w-full flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider hover:text-slate-200 transition-colors">
-                        <span class="flex items-center gap-2">
-                            <i class="fa-solid fa-list-check text-emerald-400"></i>
-                            Детализация занятий (15 оффлайн + 15 онлайн = 30 занятий)
-                        </span>
-                        <span id="student-att-toggle-icon" class="text-[10px] bg-slate-800 px-2.5 py-1 rounded border border-slate-700 transition-all">Развернуть ▾</span>
+                <div class="flex flex-wrap gap-2">
+                    <button id="bellToggleBtn" onclick="toggleBellCurve()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                        <span id="bellToggleText">Показать кривую Белла</span>
                     </button>
-                    <div id="student-att-details" class="hidden mt-4 pt-4 border-t border-slate-800/60">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" id="student-att-list-grid"></div>
-                    </div>
-                </div>
-
-                <!-- Bottom info box -->
-                <div class="bg-indigo-950/20 px-6 py-4 flex items-start space-x-3">
-                    <i class="fa-solid fa-circle-info text-indigo-400 text-lg mt-0.5"></i>
-                    <div>
-                        <h5 class="text-xs font-bold text-slate-300">Политика оценивания (Гибридный формат)</h5>
-                        <p class="text-[11px] text-slate-400 mt-0.5 leading-relaxed">
-                            Формула расчета: Посещаемость (10%) + СРСП1 (15%) + РК1 (15%) + СРСП2 (10%) + РК2 (10%) + Экзамен (40%).
-                        </p>
-                    </div>
+                    <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        Добавить студента
+                    </button>
+                    <button onclick="exportToCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm flex items-center gap-1.5">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Экспорт в CSV
+                    </button>
+                    <button onclick="resetData()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium px-3 py-2 rounded-lg transition" title="Сбросить изменения к исходным">
+                        Сброс
+                    </button>
                 </div>
             </div>
 
-            <!-- Student Not Found State -->
-            <div id="student-not-found" class="max-w-xl mx-auto bg-rose-950/10 border border-rose-900/30 p-5 rounded-2xl text-center hidden">
-                <i class="fa-solid fa-user-slash text-rose-500 text-2xl mb-2.5"></i>
-                <h4 class="text-sm font-bold text-rose-400">Студент не найден</h4>
-                <p class="text-xs text-slate-400 mt-1 leading-relaxed">
-                    Проверьте правильность написания ФИО (например: <strong class="text-slate-300">Долинин Тимур Евгеньевич</strong>).
-                </p>
+            <!-- Formula Bar -->
+            <div class="mt-4 bg-blue-50/70 border border-blue-100 rounded-lg p-3 text-xs md:text-sm text-blue-900 flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    <span><strong>Весовая формула:</strong> Итог = (СРСП 1 × <strong>0.05</strong>) + (СРСП 2 × <strong>0.05</strong>) + (РК 1 × <strong>0.20</strong>) + (РК 2 × <strong>0.20</strong>) + (Финальный × <strong>0.40</strong>) <span class="text-blue-600 italic ml-1">(Сумма весов = 90%, макс. балл = 90)</span></span>
+                </div>
+                <div class="text-xs text-blue-700 font-medium">Автосохранение включено</div>
             </div>
         </div>
 
-        <!-- ================= INSTRUCTOR WORKSPACE VIEW ================= -->
-        <div id="teacher-view" class="space-y-8 hidden">
-            
-            <!-- Group Selector Bar -->
-            <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="flex items-center space-x-3">
-                    <i class="fa-solid fa-users-rectangle text-indigo-400 text-xl"></i>
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Учебная академическая группа</span>
-                        <h3 class="text-sm font-bold text-white" id="current-group-title">Eko 1362131-35- СН</h3>
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="stats-container"></div>
+
+        <!-- Optional Bell Curve Panel -->
+        <div id="bell-curve-panel" class="hidden bg-white rounded-xl shadow-sm border border-indigo-200 p-6 transition-all">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h2 class="text-lg font-bold text-gray-900">Распределение оценок и кривая Белла (Экспериментальный режим)</h2>
+                        <span class="text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded font-medium">Без жёстких квот</span>
                     </div>
+                    <p class="text-xs text-gray-500 mt-1">
+                        Сравнение фактического распределения итоговых баллов группы с теоретической нормальной кривой ($\mu$ — среднее, $\sigma$ — стандартное отклонение).
+                    </p>
                 </div>
-                <div class="flex items-center space-x-2 bg-slate-950 p-1 rounded-xl border border-slate-800">
-                    <button onclick="switchGroup('g1')" id="btn-group-g1" class="px-4 py-2 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md">
-                        Группа 1 (35- СН)
-                    </button>
-                    <button onclick="switchGroup('g2')" id="btn-group-g2" class="px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">
-                        Группа 2 (37-CH)
-                    </button>
+                <div class="flex items-center gap-3">
+                    <label class="inline-flex items-center gap-2 text-xs font-medium text-gray-700 cursor-pointer bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-200">
+                        <input type="checkbox" id="showIdealCurve" checked onchange="renderBellCurve()" class="rounded text-indigo-600 focus:ring-indigo-500">
+                        Добавить теоретический идеал (кривую Белла)
+                    </label>
+                    <button onclick="toggleBellCurve()" class="text-xs text-gray-400 hover:text-gray-600 underline">Скрыть</button>
                 </div>
             </div>
-
-            <!-- Statistics Overview Widgets -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-                <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Всего студентов</p>
-                        <h3 class="text-3xl font-extrabold text-white mt-1" id="stat-total-students">0</h3>
-                    </div>
-                    <div class="h-12 w-12 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center text-xl border border-indigo-500/20">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                </div>
-                <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" id="stat-avg-label">Средний балл РК1</p>
-                        <div class="flex items-baseline space-x-1.5 mt-1">
-                            <h3 class="text-3xl font-extrabold text-amber-400" id="stat-average-grade">0.0</h3>
-                            <span class="text-xs font-bold text-indigo-400" id="stat-average-letter">-</span>
-                        </div>
-                    </div>
-                    <div class="h-12 w-12 bg-amber-500/10 text-amber-400 rounded-xl flex items-center justify-center text-xl border border-amber-500/20">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </div>
-                </div>
-                <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" id="stat-pass-label">Сдали РК1 (>=50)</p>
-                        <h3 class="text-3xl font-extrabold text-white mt-1" id="stat-pass-rate">0%</h3>
-                    </div>
-                    <div class="h-12 w-12 bg-blue-500/10 text-blue-400 rounded-xl flex items-center justify-center text-xl border border-blue-500/20">
-                        <i class="fa-solid fa-user-check"></i>
-                    </div>
-                </div>
-                <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
-                    <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" id="stat-best-label">Лучший по РК1</p>
-                        <h3 class="text-sm font-bold text-violet-400 mt-2 truncate max-w-[160px]" id="stat-best-student">—</h3>
-                    </div>
-                    <div class="h-12 w-12 bg-violet-500/10 text-violet-400 rounded-xl flex items-center justify-center text-xl border border-violet-500/20">
-                        <i class="fa-solid fa-trophy"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BELL CURVE (NORMAL DISTRIBUTION) CHART WIDGET -->
-            <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-2xl space-y-4">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
-                    <div>
-                        <h3 class="text-base font-extrabold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-chart-area text-indigo-400"></i>
-                            Кривая нормального распределения баллов (Bell Curve)
-                        </h3>
-                        <p class="text-xs text-slate-400 mt-0.5">
-                            Сравнение фактического распределения оценок группы с теоретической кривой Гаусса
-                        </p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-2">
-                        <div class="flex items-center bg-slate-950 p-1 rounded-xl border border-slate-800">
-                            <button onclick="switchBellMetric('mc1')" id="btn-bell-mc1" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-amber-500 text-slate-950 shadow-sm">
-                                РК 1 (Рубеж)
-                            </button>
-                            <button onclick="switchBellMetric('ca1')" id="btn-bell-ca1" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">
-                                СРСП 1
-                            </button>
-                            <button onclick="switchBellMetric('ca2')" id="btn-bell-ca2" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">
-                                СРСП 2
-                            </button>
-                            <button onclick="switchBellMetric('total')" id="btn-bell-total" class="px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white">
-                                Итоговый балл
-                            </button>
-                        </div>
-                        <div class="flex items-center space-x-3 text-xs bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800 font-mono">
-                            <span class="text-indigo-400 font-bold">μ (Среднее): <span id="bell-mean-val" class="text-white">0.0</span></span>
-                            <span class="text-violet-400 font-bold">σ (Отклонение): <span id="bell-std-val" class="text-white">0.0</span></span>
-                        </div>
-                    </div>
-                </div>
-                <div class="relative w-full h-72">
-                    <canvas id="bellCurveCanvas"></canvas>
-                </div>
-            </div>
-
-            <!-- Main Interactive Table Grid -->
-            <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden flex flex-col shadow-2xl">
-                <div class="p-5 border-b border-slate-800 bg-slate-900/50 flex flex-col sm:flex-row justify-between items-center gap-4">
-                    <div class="relative w-full sm:w-72">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-slate-500"></i>
-                        <input type="text" id="teacher-search-input" placeholder="Поиск студента..." 
-                            class="w-full pl-9 pr-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all placeholder-slate-600">
-                    </div>
-                    <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
-                        <button onclick="exportToCSV()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-semibold shadow-md transition-colors flex items-center space-x-2">
-                            <i class="fa-solid fa-file-excel"></i>
-                            <span>Экспорт Excel</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto custom-scrollbar">
-                    <table class="w-full text-left border-collapse min-w-[780px]">
-                        <thead>
-                            <tr class="border-b border-slate-800 bg-slate-900/40 text-slate-400 text-[9px] font-bold uppercase tracking-wider">
-                                <th class="py-3.5 px-2 text-center w-9">№</th>
-                                <th class="py-3.5 px-2">ФИО Студента</th>
-                                <th class="py-3.5 px-1.5 text-center w-16">Пос (10%)</th>
-                                <th class="py-3.5 px-1.5 text-center w-16 bg-indigo-950/30 text-indigo-300">СРСП1 (15%)</th>
-                                <th class="py-3.5 px-1.5 text-center w-16 bg-amber-950/40 text-amber-300">РК1 (15%)</th>
-                                <th class="py-3.5 px-1.5 text-center w-14">СРСП2 (10%)</th>
-                                <th class="py-3.5 px-1.5 text-center w-14">РК2 (10%)</th>
-                                <th class="py-3.5 px-1.5 text-center w-14">Экз (40%)</th>
-                                <th class="py-3.5 px-2 text-right w-14 bg-indigo-950/20">Набрано</th>
-                                <th class="py-3.5 px-2 text-center w-12">Оценка</th>
-                                <th class="py-3.5 px-3 text-left">Комментарий к СРСП-1</th>
-                            </tr>
-                        </thead>
-                        <tbody id="students-table-body" class="divide-y divide-slate-800/40">
-                            <!-- Dynamic rows -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <div id="bell-curve-content" class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center"></div>
         </div>
-    </main>
 
-    <!-- Модальное окно детальной посещаемости (15 недель: 15 оффлайн + 15 онлайн = 30 занятий) -->
-    <div id="attendance-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
-        <div class="bg-slate-900 p-6 rounded-2xl max-w-2xl w-full mx-4 shadow-2xl border border-slate-800 transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh]">
-            <div class="flex justify-between items-center pb-3.5 border-b border-slate-800">
-                <div class="flex items-center space-x-3">
-                    <div class="h-10 w-10 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center text-lg border border-emerald-500/20">
-                        <i class="fa-solid fa-calendar-days"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-extrabold text-white" id="att-modal-student-name">Детализация посещаемости</h3>
-                        <p class="text-[10px] text-slate-400">15 Оффлайн + 15 Онлайн занятий (Всего 30 обязательных занятий)</p>
-                    </div>
-                </div>
-                <button onclick="closeAttendanceModal()" class="text-slate-400 hover:text-white transition-colors">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="flex-grow overflow-y-auto custom-scrollbar my-4 pr-1">
-                <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 mb-4 flex justify-between items-center">
-                    <span class="text-xs text-slate-400 font-semibold">Итоговый процент посещаемости:</span>
-                    <div class="flex items-center space-x-2">
-                        <span id="att-modal-percent" class="text-emerald-400 font-extrabold text-sm">0%</span>
-                        <span id="att-modal-hours" class="text-slate-500 text-xs font-medium">(0 из 30 зан.)</span>
-                    </div>
-                </div>
-                <div class="space-y-2.5" id="attendance-dates-grid"></div>
-            </div>
-
-            <div class="pt-4 border-t border-slate-800 flex justify-between items-center">
-                <div class="flex space-x-1.5">
-                    <button onclick="toggleAllAttendance(true)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-[10px] transition-all border border-slate-700">
-                        Отметить все
+        <!-- Tabs & Main Table -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <!-- Group Tabs -->
+            <div class="border-b border-gray-200 px-6 pt-4 flex flex-wrap items-center justify-between gap-4 bg-gray-50/50">
+                <div class="flex space-x-2">
+                    <button id="tab-g1" onclick="switchGroup(1)" class="px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 border-blue-600 text-blue-600 bg-white transition">
+                        Группа 1 <span id="badge-g1" class="ml-1.5 bg-blue-100 text-blue-700 py-0.5 px-2 rounded-full text-xs">42</span>
                     </button>
-                    <button onclick="toggleAllAttendance(false)" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-lg text-[10px] transition-all border border-slate-700">
-                        Снять все
+                    <button id="tab-g2" onclick="switchGroup(2)" class="px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100/50 transition">
+                        Группа 2 <span id="badge-g2" class="ml-1.5 bg-gray-200 text-gray-700 py-0.5 px-2 rounded-full text-xs">39</span>
                     </button>
                 </div>
-                <button onclick="saveAttendanceDetails()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-xs transition-colors shadow-lg shadow-emerald-600/30 flex items-center space-x-1.5">
-                    <i class="fa-solid fa-floppy-disk"></i>
-                    <span>Сохранить посещаемость</span>
-                </button>
+                <div class="pb-3 md:pb-0">
+                    <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="Поиск по фамилии..." class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 w-64 focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+
+            <!-- Table Wrapper -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-100 border-b border-gray-200 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                            <th class="py-3.5 px-3 text-center w-12">№</th>
+                            <th class="py-3.5 px-3 min-w-[200px]">Студент</th>
+                            <th class="py-3.5 px-2 text-center w-24">СРСП 1<br><span class="text-[10px] text-gray-400 font-normal">(5%)</span></th>
+                            <th class="py-3.5 px-3 min-w-[240px]">Комментарий (СРСП 1)</th>
+                            <th class="py-3.5 px-2 text-center w-24">СРСП 2<br><span class="text-[10px] text-gray-400 font-normal">(5%)</span></th>
+                            <th class="py-3.5 px-3 min-w-[270px]">Комментарий (СРСП 2)</th>
+                            <th class="py-3.5 px-2 text-center w-24">РК 1<br><span class="text-[10px] text-gray-400 font-normal">(20%)</span></th>
+                            <th class="py-3.5 px-2 text-center w-24">РК 2<br><span class="text-[10px] text-gray-400 font-normal">(20%)</span></th>
+                            <th class="py-3.5 px-2 text-center w-24">Финал<br><span class="text-[10px] text-gray-400 font-normal">(40%)</span></th>
+                            <th class="py-3.5 px-3 text-center w-24 bg-blue-50/50 text-blue-900">Итог<br><span class="text-[10px] text-blue-500 font-normal">(макс. 90)</span></th>
+                            <th class="py-3.5 px-3 text-center w-20 bg-blue-50/50 text-blue-900">Буква</th>
+                            <th class="py-3.5 px-3 text-center w-20 bg-blue-50/50 text-blue-900">GPA</th>
+                            <th class="py-3.5 px-3 text-center w-14">Действие</th>
+                        </tr>
+                    </thead>
+                    <tbody id="grades-tbody" class="divide-y divide-gray-200 text-sm"></tbody>
+                </table>
             </div>
         </div>
     </div>
 
-    <!-- Alert Toast notifications -->
-    <div id="toast-container" class="fixed bottom-12 right-5 z-50 flex flex-col space-y-2"></div>
-
-    <!-- Скрытый маленький ключик переключения режима в правом нижнем углу -->
-    <button id="secret-teacher-key" onclick="toggleTeacherMode()" title="Переключить режим преподавателя"
-        class="fixed bottom-3 right-3 z-50 w-7 h-7 rounded-full flex items-center justify-center text-slate-700/35 hover:text-slate-400/80 transition-colors duration-300 opacity-20 hover:opacity-75 focus:outline-none">
-        <i class="fa-solid fa-key text-[11px]"></i>
-    </button>
+    <!-- Modal for Adding Student -->
+    <div id="addStudentModal" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm hidden flex items-center justify-center z-50">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 mx-4">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Добавить нового студента</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">ФИО Студента</label>
+                    <input type="text" id="newStudentName" placeholder="Например: Иванов Иван Иванович" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Группа</label>
+                        <select id="newStudentGroup" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                            <option value="1">Группа 1</option>
+                            <option value="2">Группа 2</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">СРСП 1 (0-100)</label>
+                        <input type="number" id="newStudentCA1" value="0" min="0" max="100" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Комментарий (СРСП 1)</label>
+                    <input type="text" id="newStudentComment" placeholder="Необязательно..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 uppercase mb-1">Комментарий (СРСП 2)</label>
+                    <input type="text" id="newStudentComment2" placeholder="Необязательно..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-blue-500">
+                </div>
+            </div>
+            <div class="mt-6 flex justify-end gap-2">
+                <button onclick="closeModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition">Отмена</button>
+                <button onclick="addStudent()" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition">Добавить</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        const TOTAL_ATTENDANCE_SESSIONS = 30;
-        const CONDUCTED_SESSIONS_G1 = 28;
-
-        const weekLabels = [
-            "Неделя 1 (27-28 авг)",
-            "Неделя 2 (3-4 сен)",
-            "Неделя 3 (10-11 сен)",
-            "Неделя 4 (17-18 сен)",
-            "Неделя 5 (24-25 сен)",
-            "Неделя 6 (1-2 окт)",
-            "Неделя 7 (8-9 окт)",
-            "Неделя 8 (15-16 окт)",
-            "Неделя 9 (22 окт)",
-            "Неделя 10 (29 окт)",
-            "Неделя 11 (5 ноя)",
-            "Неделя 12 (12 ноя)",
-            "Неделя 13 (19 ноя)",
-            "Неделя 14 (26 ноя)",
-            "Неделя 15 (3-4 дек)"
-        ];
-
         const initialGroup1 = [
-            { id: "g1-st-1", name: "Азизбеков Максат Арманович", ca1: 0, mc1: 29.0, ca2: 70, mc2: 0, exam: 0, absences: [17, 19, 25], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-2", name: "Акимжанов Муслимбек Бекзодұлы", ca1: 0, mc1: 36.5, ca2: 70, mc2: 0, exam: 0, absences: [13, 17, 23], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-3", name: "Алпыспаев Мирас Жалғасұлы", ca1: 60, mc1: 73.5, ca2: 70, mc2: 0, exam: 0, absences: [9, 17], comment: "Оценка 60/100 из ведомости Platonus (11 сен)." },
-            { id: "g1-st-4", name: "Амирханов Даулет Сакенович", ca1: 50, mc1: 65.0, ca2: 95, mc2: 0, exam: 0, absences: [3, 7, 9, 25], comment: "50/100 (Подлог / Списано): Выбрал кейс 'Кофейня', а в текст вставил скопированный фрагмент про хлеб!" },
-            { id: "g1-st-5", name: "Ахметов Андрей Витальевич", ca1: 95, mc1: 82.0, ca2: 70, mc2: 0, exam: 0, absences: [13, 14, 23], comment: "95/100 (Отличная самостоятельная работа): Самостоятельный авторский анализ рынка фитнес-услуг Алматы." },
-            { id: "g1-st-6", name: "Әкімхан Рамазан Қайратұлы", ca1: 0, mc1: 34.5, ca2: 70, mc2: 0, exam: 0, absences: [9, 13, 14, 23, 25], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-7", name: "Байдалы Айсер Сабырханұлы", ca1: 0, mc1: 32.5, ca2: 70, mc2: 0, exam: 0, absences: [25], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-8", name: "Байдукова Арина Андреевна", ca1: 90, mc1: 90.0, ca2: 95, mc2: 0, exam: 0, absences: [], comment: "90/100 (Хорошая самостоятельная работа): Качественный разбор конкуренции спешелти-кофейни." },
-            { id: "g1-st-9", name: "Бекешев Дінмухамед Ермекұлы", ca1: 50, mc1: 73.5, ca2: 70, mc2: 0, exam: 0, absences: [5], comment: "50/100 (Генерация ИИ / ChatGPT): Прямое копирование сгенерированного текста ChatGPT." },
-            { id: "g1-st-10", name: "Гуков Арман Андрейұлы", ca1: 96, mc1: 75.5, ca2: 70, mc2: 0, exam: 0, absences: [17], comment: "96/100 (Глубокий авторский анализ): Отличный разбор с примерами продуктов первой необходимости." },
-            { id: "g1-st-11", name: "Долинин Тимур Евгеньевич", ca1: 97, mc1: 95.5, ca2: 70, mc2: 0, exam: 0, absences: [5, 19], comment: "97/100 (Высокий академический уровень): Глубокий самостоятельный разбор ценовой эластичности." },
-            { id: "g1-st-12", name: "Есіркеп Аян Бақытжанұлы", ca1: 90, mc1: 85.0, ca2: 95, mc2: 0, exam: 0, absences: [23], comment: "90/100 (Хорошая самостоятельная работа): Качественные выводы по кофейням у дома." },
-            { id: "g1-st-13", name: "Жалбаслар Дәулет Русланұлы", ca1: 0, mc1: 40.0, ca2: 95, mc2: 0, exam: 0, absences: [3, 5, 11], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-14", name: "Жарылгасынова Жасмин Максатовна", ca1: 90, mc1: 77.5, ca2: 0, mc2: 0, exam: 0, absences: [9, 17], comment: "90/100 (Хорошая самостоятельная работа): Грамотное объяснение неэластичности бензина АИ-92." },
-            { id: "g1-st-15", name: "Казымов Руслан", ca1: 60, mc1: 62.0, ca2: 0, mc2: 0, exam: 0, absences: [17, 19], comment: "60/100 (Слабая самостоятельная работа): Крайне поверхностная отписка в полстрочки." },
-            { id: "g1-st-16", name: "Кариева Карина Армановна", ca1: 50, mc1: 60.0, ca2: 95, mc2: 0, exam: 0, absences: [23], comment: "Оценка 50/100 из ведомости Platonus (11 сен)." },
-            { id: "g1-st-17", name: "Ким Валентин Владиславович", ca1: 0, mc1: 35.0, ca2: 70, mc2: 0, exam: 0, absences: [17, 19, 25], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-18", name: "Коваленко Илья Викторович", ca1: 55, mc1: 76.0, ca2: 85, mc2: 0, exam: 0, absences: [3, 19, 25], comment: "55/100 (Шаблон из общего чата): Вставлен стандартный шаблон заготовки с формулой." },
-            { id: "g1-st-19", name: "Конысбаев Айбек Ермаханович", ca1: 60, mc1: 67.0, ca2: 95, mc2: 0, exam: 0, absences: [3, 25], comment: "Оценка 60/100 из ведомости Platonus (11 сен)." },
-            { id: "g1-st-20", name: "Кошантаев Бексултан Маратович", ca1: 96, mc1: 92.5, ca2: 95, mc2: 0, exam: 0, absences: [13, 17, 23], comment: "96/100 (Глубокий математический анализ): Расчет процентного изменения показателей и детальный анализ." },
-            { id: "g1-st-21", name: "Масалимов Олжас Ержанович", ca1: 0, mc1: 0.0, ca2: 0, mc2: 0, exam: 0, absences: [3, 5, 7, 13, 14, 17, 19, 23], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-22", name: "Медиханов Тимур Фархадович", ca1: 55, mc1: 72.5, ca2: 95, mc2: 0, exam: 0, absences: [5], comment: "55/100 (Шаблон из общего чата): Скопирован готовый текст шаблонной заготовки." },
-            { id: "g1-st-23", name: "Морбекова Камилла Ескендеровна", ca1: 90, mc1: 76.5, ca2: 85, mc2: 0, exam: 0, absences: [], comment: "90/100 (Хорошая самостоятельная работа): Грамотный экономический анализ предельной выручки." },
-            { id: "g1-st-24", name: "Мусаев Ернур Русланович", ca1: 0, mc1: 34.5, ca2: 70, mc2: 0, exam: 0, absences: [], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-25", name: "Нұржанқызы Балнұр", ca1: 0, mc1: 48.5, ca2: 95, mc2: 0, exam: 0, absences: [3, 5, 17, 25], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-26", name: "Омаров Болат Айдосович", ca1: 0, mc1: 37.5, ca2: 70, mc2: 0, exam: 0, absences: [3, 5, 25], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-27", name: "Рамазанов Арсен Дауренұлы", ca1: 95, mc1: 78.5, ca2: 95, mc2: 0, exam: 0, absences: [], comment: "95/100 (Отличная самостоятельная работа): Живой самостоятельный экономический разбор фитнес-индустрии." },
-            { id: "g1-st-28", name: "Рахимбекова Сагыныш Рахимбековна", ca1: 60, mc1: 77.5, ca2: 70, mc2: 0, exam: 0, absences: [7], comment: "60/100 (Слабая самостоятельная работа): Поверхностное суждение в 2 предложения." },
-            { id: "g1-st-29", name: "Ровнов Владислав Александрович", ca1: 95, mc1: 87.5, ca2: 0, mc2: 0, exam: 0, absences: [23], comment: "95/100 (Отличная самостоятельная работа): Качественный разбор кофейного рынка Алматы с примерами брендов." },
-            { id: "g1-st-30", name: "Сәтпек Нұрлыбек Асланбекұлы", ca1: 0, mc1: 39.5, ca2: 70, mc2: 0, exam: 0, absences: [7, 13, 17], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-31", name: "Тастемір Шамиил Қайратұлы", ca1: 0, mc1: 29.5, ca2: 70, mc2: 0, exam: 0, absences: [3, 5], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-32", name: "Тәжібай Мухаммедазиз Мұхтарұлы", ca1: 0, mc1: 75.0, ca2: 70, mc2: 0, exam: 0, absences: [11, 17], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-33", name: "Терехов Вячеслав Константинович", ca1: 50, mc1: 67.5, ca2: 70, mc2: 0, exam: 0, absences: [], comment: "50/100 (Списание + Противоречие): В форме введена некорректная исходная цена." },
-            { id: "g1-st-34", name: "Титовский Андрей Сергеевич", ca1: 0, mc1: 38.5, ca2: 70, mc2: 0, exam: 0, absences: [3, 5], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-35", name: "Тұрсымбай Асқар Сүлейменұлы", ca1: 90, mc1: 82.5, ca2: 70, mc2: 0, exam: 0, absences: [5, 19], comment: "90/100 (Хорошая самостоятельная работа): Простой, честный авторский текст без применения ИИ." },
-            { id: "g1-st-36", name: "Уразалиев Сагит Ильдарович", ca1: 0, mc1: 42.0, ca2: 70, mc2: 0, exam: 0, absences: [9, 17, 25], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-37", name: "Филипенко Александр Юрьевич", ca1: 80, mc1: 87.5, ca2: 70, mc2: 0, exam: 0, absences: [], comment: "80/100 по ведомости Platonus (11 сен)." },
-            { id: "g1-st-38", name: "Хашимова Саида Ренатовна", ca1: 55, mc1: 72.0, ca2: 80, mc2: 0, exam: 0, absences: [3], comment: "55/100 (Шаблон из общего чата): Формальный списанный текст заготовки из чата." },
-            { id: "g1-st-39", name: "Хохлов Алексей Игоревич", ca1: 60, mc1: 77.0, ca2: 95, mc2: 0, exam: 0, absences: [3], comment: "60/100 (Слабая самостоятельная работа): Формальный короткий ответ без детального анализа." },
-            { id: "g1-st-40", name: "Шайкенова Камилла Азаматовна", ca1: 0, mc1: 37.5, ca2: 95, mc2: 0, exam: 0, absences: [3, 5, 17], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-41", name: "Юсупова Ильнара Дамировна", ca1: 95, mc1: 83.5, ca2: 70, mc2: 0, exam: 0, absences: [11, 19], comment: "95/100 (Отличная самостоятельная работа): Точный вывод формулы и качественный анализ субститутов." },
-            { id: "g1-st-42", name: "Яппаров Эмир Фанильевич", ca1: 50, mc1: 55.0, ca2: 95, mc2: 0, exam: 0, absences: [11, 13, 23], comment: "50/100 (Генерация ИИ / ChatGPT): Книжный сгенерированный нейросетью текст." }
+            {
+                "id": 1,
+                "name": "Азизбеков Максат Арманович",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибка в точке P_opt (указана максимальная цена 2999 тг вместо P_opt=1500 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно восстановлены амортизация и прибыль (DEPR=80, CORP=280 вместо 57 и 238), вывод сводится к переписыванию цифр без анализа СНС.",
+                "m1": 81,
+                "m2": 82,
+                "fin": 85
+            },
+            {
+                "id": 2,
+                "name": "Акимжанов Муслимбек Бекзодұлы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и грубая ошибка в расчете (выбрана цена 2681 при P_opt=1340 тг, хотя эластичность определена верно).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — грубая ошибка в расчёте W и G (90 и 100 вместо 324 и 172), крайне краткий вывод из двух предложений.",
+                "m1": 74,
+                "m2": 77,
+                "fin": 76
+            },
+            {
+                "id": 3,
+                "name": "Алпыспаев Мирас Жалғасұлы",
+                "ca1": 95,
+                "comment": "95% — отличное понимание, четкие расчеты (P_opt=1340, Ed=1.00) и полный анализ детерминантов спроса.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — в зачётной попытке неверно найдены прибыль и косвенные налоги (61 и 37 вместо 254 и 84), вывод шаблонный без привязки к цифрам варианта.",
+                "m1": 66,
+                "m2": 85,
+                "fin": 75
+            },
+            {
+                "id": 4,
+                "name": "Амирханов Даулет Сакенович",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и в тексте перепутаны P_opt (указано 1244 вместо 1446) и выручка.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно найдены R=57 и i=51, верно рассчитаны GDI (984 млрд) и профицит бюджета (+8 млрд), но описание слишком сжатое.",
+                "m1": 74,
+                "m2": 80,
+                "fin": 81
+            },
+            {
+                "id": 5,
+                "name": "Ахметов Андрей Витальевич",
+                "ca1": 95,
+                "comment": "95% — отличный, точный расчет (P_opt=2678) и глубокий экономический анализ с примерами конкурентов и ценового потолка.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — подставлены произвольные значения DEPR=1 и NFI=10 (вместо 65 и 45), арифметическая ошибка в сумме факторных доходов.",
+                "m1": 90,
+                "m2": 87,
+                "fin": 92
+            },
+            {
+                "id": 6,
+                "name": "Әкімхан Рамазан Қайратұлы",
+                "ca1": 0,
+                "comment": "",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно определены SE=67 и G=203 (вместо 95 и 196) из-за ложного требования равенства GDI=GDP при любом бюджете.",
+                "m1": 0,
+                "m2": 32,
+                "fin": 0
+            },
+            {
+                "id": 7,
+                "name": "Байдалы Айсер Сабырханұлы",
+                "ca1": 95,
+                "comment": "95% — все расчеты точны (P_opt=1498, TR макс.), выводы по эластичности и детерминантам исчерпывающие.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — использованы произвольные нормативы вместо параметров варианта (DEPR=78, G=200 вместо 69 и 202).",
+                "m1": 84,
+                "m2": 85,
+                "fin": 83
+            },
+            {
+                "id": 8,
+                "name": "Байдукова Арина Андреевна",
+                "ca1": 95,
+                "comment": "95% — качественный анализ в 2 этапа (до и после), верные выводы по неэластичности и детерминантам.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно найдены прибыль (294 млрд) и норма сбережений (18%), корректно объяснён профицит бюджета (+11 млрд) и разрыв GDI/GDP.",
+                "m1": 79,
+                "m2": 92,
+                "fin": 88
+            },
+            {
+                "id": 9,
+                "name": "Бекешев Дінмухамед Ермекұлы",
+                "ca1": 95,
+                "comment": "95% — идеальные расчеты (P_opt=202), четкая логика и полный перечень факторов эластичности.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — ошибочный подбор W=100 и T_ind=127 (вместо 373 и 102) ради искусственного зануления сальдо бюджета.",
+                "m1": 89,
+                "m2": 90,
+                "fin": 87
+            },
+            {
+                "id": 10,
+                "name": "Гуков Арман Андрейұлы",
+                "ca1": 95,
+                "comment": "95% — верная математическая интуиция (половина макс. цены), точное попадание в P_opt=319 и хороший анализ заменителей.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно подобраны R=72 и SE=36 (вместо 75 и 70), не учтён бюджетный дисбаланс в тождестве СНС.",
+                "m1": 81,
+                "m2": 80,
+                "fin": 82
+            },
+            {
+                "id": 11,
+                "name": "Долинин Тимур Евгеньевич",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания. Ошибка: попытка анализировать неэластичный участок (179 тг) вместо нахождения оптимума (P_opt=202).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — произвольно взяты CORP=100 и G=186 (вместо 318 и 226) для принудительного обнуления дефицита бюджета.",
+                "m1": 68,
+                "m2": 60,
+                "fin": 65
+            },
+            {
+                "id": 12,
+                "name": "Есіркеп Аян Бақытжанұлы",
+                "ca1": 95,
+                "comment": "95% — отличное, структурированное эссе (P_opt=202), все экономические взаимосвязи объяснены точно.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — верно найдены DEPR=79 и i=48, корректно рассчитаны налоги (236 млрд), профицит (+4 млрд) и финансирование инвестиций.",
+                "m1": 74,
+                "m2": 75,
+                "fin": 76
+            },
+            {
+                "id": 13,
+                "name": "Жалбаслар Дәулет Русланұлы",
+                "ca1": 95,
+                "comment": "95% — хорошие, точные расчеты (P_opt=1498), верное обоснование максимизации выручки и факторов спроса.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно рассчитаны T_ind=114 и G=238, верно определены GDI (1193 млрд), GDP (1188 млрд) и профицит (+5 млрд).",
+                "m1": 68,
+                "m2": 87,
+                "fin": 77
+            },
+            {
+                "id": 14,
+                "name": "Жарылгасынова Жасмин Максатовна",
+                "ca1": 95,
+                "comment": "95% — отличный разбор эластичности и влияния внешних факторов на спрос (P_opt=1340).",
+                "ca2": 0,
+                "comment2": "Работа не сдана (отсутствует в выгрузке тренажёра СНС).",
+                "m1": 75,
+                "m2": 85,
+                "fin": 78
+            },
+            {
+                "id": 15,
+                "name": "Казымов Руслан",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания, в тексте выбрана неверная цена 155 тг вместо оптимума P_opt=202 тг.",
+                "ca2": 0,
+                "comment2": "Работа не сдана (отсутствует в выгрузке тренажёра СНС).",
+                "m1": 0,
+                "m2": 32,
+                "fin": 0
+            },
+            {
+                "id": 16,
+                "name": "Кариева Карина Армановна",
+                "ca1": 95,
+                "comment": "95% — качественный расчет (P_opt=202), четкие выводы по эластичности и неценовым детерминантам.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно определены DEPR=87 и CORP=248, полный и логичный макроэкономический анализ баланса СНС.",
+                "m1": 90,
+                "m2": 90,
+                "fin": 90
+            },
+            {
+                "id": 17,
+                "name": "Ким Валентин Владиславович",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибочный выбор цены 288 тг вместо оптимума P_opt=202 тг.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — пустые поля ввода в тренажёре (не сохранены W и G), в тексте неверная гипотеза о равенстве T и G.",
+                "m1": 74,
+                "m2": 72,
+                "fin": 72
+            },
+            {
+                "id": 18,
+                "name": "Коваленко Илья Викторович",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания, но сам текст (P_opt=1340, Ed=1.00) и анализ рынка написаны грамотно.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно найдены CORP=230 и T_ind=174 (вместо 264 и 84), хотя структура рассуждений по СНС выстроена аккуратно.",
+                "m1": 74,
+                "m2": 70,
+                "fin": 72
+            },
+            {
+                "id": 19,
+                "name": "Конысбаев Айбек Ермаханович",
+                "ca1": 95,
+                "comment": "95% — верная точка оптимума (P_opt=2678), хорошее объяснение эластичности и факторов спроса.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — идеально восстановлены R=57 и i=41, точный расчёт налогов и совокупного дохода (984 млрд).",
+                "m1": 89,
+                "m2": 92,
+                "fin": 90
+            },
+            {
+                "id": 20,
+                "name": "Кошантаев Бексултан Маратович",
+                "ca1": 95,
+                "comment": "95% — все расчеты точны (P_opt=2678), хорошее объяснение баланса цены и объема продаж.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — образцовый расчёт DEPR=55 и NFI=35, пошагово выведены GDI (980 млрд), GDP (1062 млрд) и дефицит бюджета (-82 млрд).",
+                "m1": 84,
+                "m2": 80,
+                "fin": 82
+            },
+            {
+                "id": 21,
+                "name": "Масалимов Олжас Ержанович",
+                "ca1": 0,
+                "comment": "",
+                "ca2": 0,
+                "comment2": "Работа не сдана (отсутствует в выгрузке тренажёра СНС).",
+                "m1": 68,
+                "m2": 85,
+                "fin": 75
+            },
+            {
+                "id": 22,
+                "name": "Медиханов Тимур Фархадович",
+                "ca1": 95,
+                "comment": "95% — отличный, точный расчет (P_opt=319) и грамотная интерпретация неэластичного спроса на хлеб.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно найдены DEPR=59 и G=162, верно подсчитаны налоги и бюджетный профицит (+49 млрд).",
+                "m1": 74,
+                "m2": 72,
+                "fin": 75
+            },
+            {
+                "id": 23,
+                "name": "Морбекова Камилла Ескендеровна",
+                "ca1": 95,
+                "comment": "95% — хорошие расчеты (P_opt=1340), верное объяснение эластичности и факторов спроса.",
+                "ca2": 85,
+                "comment2": "⚠️ Частично (1/2 верно) — норма сбережений (20%) определена верно, но прибыль корпораций (55 вместо 304) подобрана ошибочно ради нулевого сальдо бюджета.",
+                "m1": 81,
+                "m2": 87,
+                "fin": 85
+            },
+            {
+                "id": 24,
+                "name": "Мусаев Ернур Русланович",
+                "ca1": 95,
+                "comment": "95% — точные расчеты (P_opt=2678), хорошее объяснение неэластичного спроса на кофе и поведения клиентов.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — ошибочные значения W=250 и T_ind=64 (вместо 368 и 102), неверная балансировка счетов.",
+                "m1": 86,
+                "m2": 90,
+                "fin": 88
+            },
+            {
+                "id": 25,
+                "name": "Нұржанқызы Балнұр",
+                "ca1": 95,
+                "comment": "95% — прекрасная работа, все расчеты точны (P_opt=319) и даны развернутые, логичные ответы на все вопросы.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно восстановлены R=75 и SE=100, корректно расписаны формулы доходов, налогов и потоков СНС.",
+                "m1": 84,
+                "m2": 85,
+                "fin": 84
+            },
+            {
+                "id": 26,
+                "name": "Омаров Болат Айдосович",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и выбрана неверная цена 1730 тг вместо оптимума P_opt=1500 тг.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — оба параметра заданы произвольно (CORP=87, G=87 вместо 328 и 186), путаница в интерпретации профицита.",
+                "m1": 74,
+                "m2": 72,
+                "fin": 73
+            },
+            {
+                "id": 27,
+                "name": "Рамазанов Арсен Дауренұлы",
+                "ca1": 95,
+                "comment": "95% — хорошие расчеты (P_opt=1498), верное обоснование максимизации выручки и роли субститутов.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно определены DEPR=69 и i=38, грамотно выполнен анализ балансировки национальных счетов.",
+                "m1": 86,
+                "m2": 85,
+                "fin": 85
+            },
+            {
+                "id": 28,
+                "name": "Рахимбекова Сагыныш Рахимбековна",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания, хотя в тексте указана верная цена 1498 тг и неплохо описаны факторы спроса.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — подставлены неверные значения T_ind=1 и G=107 (вместо 114 и 198), смешение понятий ВВП и ВНП в формуле.",
+                "m1": 68,
+                "m2": 65,
+                "fin": 66
+            },
+            {
+                "id": 29,
+                "name": "Ровнов Владислав Александрович",
+                "ca1": 0,
+                "comment": "",
+                "ca2": 0,
+                "comment2": "Работа не сдана (отсутствует в выгрузке тренажёра СНС).",
+                "m1": 0,
+                "m2": 58,
+                "fin": 0
+            },
+            {
+                "id": 30,
+                "name": "Сәтпек Нұрлыбек Асланбекұлы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и выбрана неверная цена 1450 тг вместо оптимума P_opt=1340 тг.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — оба неизвестных показателя оставлены нулевыми (R=0, NFI=0 вместо 45 и 40), вывод построен на ложной предпосылке закрытой экономики.",
+                "m1": 74,
+                "m2": 72,
+                "fin": 73
+            },
+            {
+                "id": 31,
+                "name": "Тастемір Шамиил Қайратұлы",
+                "ca1": 95,
+                "comment": "95% — отличный расчет (P_opt=1498), четкое объяснение максимизации выручки и влияния неценовых факторов.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно найдены DEPR=30 и CORP=390 (вместо 77 и 258) из-за принудительного приравнивания GDI и GDP.",
+                "m1": 74,
+                "m2": 80,
+                "fin": 78
+            },
+            {
+                "id": 32,
+                "name": "Тәжібай Мухаммедазиз Мұхтарұлы",
+                "ca1": 95,
+                "comment": "95% — верные расчеты (P_opt=2678), хорошее объяснение неэластичности и факторов спроса.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — незначительное отклонение по W (320 вместо 314) и существенная ошибка по G (186 вместо 222) из-за искусственного обнуления сальдо бюджета.",
+                "m1": 79,
+                "m2": 75,
+                "fin": 77
+            },
+            {
+                "id": 33,
+                "name": "Терехов Вячеслав Константинович",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и допущена ошибка в точке оптимума (выбрана цена 1299 тг при P_opt=1500 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно рассчитаны CORP=122 и T_ind=53 (вместо 274 и 84), хотя структура теоретического описания СНС оформлена хорошо.",
+                "m1": 79,
+                "m2": 87,
+                "fin": 84
+            },
+            {
+                "id": 34,
+                "name": "Титовский Андрей Сергеевич",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания. Текст верный (P_opt=1446), но слишком поверхностный и краткий.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — ошибочные значения R=24 и i=23 (вместо 57 и 66) в результате подгонки под равенство GDI=GDP.",
+                "m1": 74,
+                "m2": 80,
+                "fin": 78
+            },
+            {
+                "id": 35,
+                "name": "Тұрсымбай Асқар Сүлейменұлы",
+                "ca1": 95,
+                "comment": "95% — качественный расчет (P_opt=1500), четкая логика и полный перечень детерминантов спроса.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно найдены DEPR=95 и NFI=10 (вместо 85 и 25), допущены арифметические неточности в выводе ВВП.",
+                "m1": 89,
+                "m2": 90,
+                "fin": 89
+            },
+            {
+                "id": 36,
+                "name": "Уразалиев Сагит Ильдарович",
+                "ca1": 95,
+                "comment": "95% — хорошие расчеты (P_opt=319), верное понимание неэластичного спроса и факторов рынка хлеба.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно рассчитаны SE=78 и G=210 (вместо 65 и 246) при попытке искусственно сбалансировать бюджет.",
+                "m1": 86,
+                "m2": 85,
+                "fin": 86
+            },
+            {
+                "id": 37,
+                "name": "Филипенко Александр Юрьевич",
+                "ca1": 95,
+                "comment": "95% — отличный расчет (P_opt=319), четкое обоснование социальной значимости товара и детерминантов.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно восстановлены DEPR=70 и G=210 (вместо 89 и 252), в эссе есть корректная методика расчёта NI, но подгонка G исказила баланс.",
+                "m1": 90,
+                "m2": 90,
+                "fin": 90
+            },
+            {
+                "id": 38,
+                "name": "Хашимова Саида Ренатовна",
+                "ca1": 95,
+                "comment": "95% — точные расчеты (P_opt=1340), грамотное объяснение эластичности и факторов спроса.",
+                "ca2": 85,
+                "comment2": "⚠️ Частично (1/2 верно) — в первой (основной) попытке верно определена норма сбережений (22%), но прибыль завышена (518 вместо 314) ради T=G; во второй попытке исправлено на 314.",
+                "m1": 81,
+                "m2": 87,
+                "fin": 85
+            },
+            {
+                "id": 39,
+                "name": "Хохлов Алексей Игоревич",
+                "ca1": 95,
+                "comment": "95% — верная точка оптимума (P_opt=202), отличная аргументация по влиянию доходов и погоды на спрос.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно найдены W=363 и T_ind=102, верно рассчитаны налоги (223 млрд), дефицит бюджета (-41 млрд) и GDP (1165 млрд).",
+                "m1": 84,
+                "m2": 85,
+                "fin": 84
+            },
+            {
+                "id": 40,
+                "name": "Шайкенова Камилла Азаматовна",
+                "ca1": 95,
+                "comment": "95% — прекрасная работа, все расчеты точны (P_opt=1498) и выводы по эластичности максимально полные.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно определены R=75 и SE=85, корректно вычислены доходы домохозяйств (585 млрд), налоги (ИПН 59, КПН 66) и GDI (1160 млрд).",
+                "m1": 84,
+                "m2": 90,
+                "fin": 87
+            },
+            {
+                "id": 41,
+                "name": "Юсупова Ильнара Дамировна",
+                "ca1": 95,
+                "comment": "95% — хороший расчет (P_opt=1446), четкое объяснение баланса цены и объема продаж.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно найдены CORP=49 и G=178 (вместо 338 и 276) из-за ложного приравнивания GDI и GDP.",
+                "m1": 74,
+                "m2": 80,
+                "fin": 78
+            },
+            {
+                "id": 42,
+                "name": "Яппаров Эмир Фанильевич",
+                "ca1": 95,
+                "comment": "95% — отличный расчет (P_opt=1498), верное объяснение эластичности и факторов спроса.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно восстановлены параметры варианта №42 (DEPR=59, i=63), грамотно описан баланс потоков СНС.",
+                "m1": 84,
+                "m2": 85,
+                "fin": 84
+            }
         ];
 
         const initialGroup2 = [
-            { id: "g2-st-1", name: "Абдрайм Еркежан Беркинбайкызы", attendance: 13.3, ca1: 55, mc1: 70.0, ca2: 70, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирована заготовка фразировки из чата." },
-            { id: "g2-st-2", name: "Абдулла Нұрислам Бауыржанұлы", attendance: 0, ca1: 98, mc1: 84.0, ca2: 70, mc2: 0, exam: 0, comment: "98/100 (Высокий глубокий анализ): Разбор с привязкой к законам РК (СЗПТ, АЗРК, маржа 15%)." },
-            { id: "g2-st-3", name: "Абраев Радмир Ниязович", attendance: 13.3, ca1: 50, mc1: 87.5, ca2: 70, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Текст сгенерирован ИИ с академической канцелярией." },
-            { id: "g2-st-4", name: "АКБАРАЛИЕВ ФАХРИДИН АЛИШЕРОВИЧ", attendance: 13.3, ca1: 55, mc1: 71.0, ca2: 70, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирован размытый шаблон заготовки." },
-            { id: "g2-st-5", name: "Амангелді Айдос Даулетұлы", attendance: 13.3, ca1: 90, mc1: 90.0, ca2: 85, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельный вывод про валовую выручку." },
-            { id: "g2-st-6", name: "Асанғалиева Әсия Арманқызы", attendance: 6.7, ca1: 90, mc1: 82.0, ca2: 70, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Прямое обоснование оптимальной цены вершины параболы." },
-            { id: "g2-st-7", name: "Асланов Алишер Асланович", attendance: 6.7, ca1: 55, mc1: 63.0, ca2: 70, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Поверхностная списанная шаблонная заготовка." },
-            { id: "g2-st-8", name: "Ахметов Танирберген Дауренулы", attendance: 0, ca1: 0, mc1: 32.0, ca2: 95, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-9", name: "Әбілдаев Нұрым Тәліпханұлы", attendance: 6.7, ca1: 0, mc1: 47.0, ca2: 70, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-10", name: "Әділ Гүлсезім Әсетқызы", attendance: 13.3, ca1: 55, mc1: 80.0, ca2: 95, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирована распространенная заготовка." },
-            { id: "g2-st-11", name: "Биманов Алишер Бакытович", attendance: 6.7, ca1: 50, mc1: 75.0, ca2: 95, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Подставлен сгенерированный ИИ-текст." },
-            { id: "g2-st-12", name: "Власова Валерия Семеновна", attendance: 13.3, ca1: 90, mc1: 91.0, ca2: 70, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Детальный авторский разбор маркетплейсов Kaspi, Temu, OZON." },
-            { id: "g2-st-13", name: "Дүйсенбай Әлімхан Дәулетұлы", attendance: 13.3, ca1: 0, mc1: 25.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-14", name: "Избасар Даниял Тауржанұлы", attendance: 13.3, ca1: 0, mc1: 41.0, ca2: 70, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-15", name: "Истамов Изат", attendance: 6.7, ca1: 0, mc1: 0.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-16", name: "Йылмаз Мухаммедали", attendance: 0, ca1: 90, mc1: 85.0, ca2: 70, mc2: 0, exam: 0, comment: "85/100 (Хорошая самостоятельная работа): Авторский разбор Kaspi, Wildberries и Pinduoduo." },
-            { id: "g2-st-17", name: "Кадирханов Жангир Адилетович", attendance: 6.7, ca1: 0, mc1: 45.0, ca2: 70, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-18", name: "Кенжегузин Санжар Ерланұлы", attendance: 0, ca1: 90, mc1: 86.5, ca2: 70, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельное объяснение перетока клиентов фитнес-клубов." },
-            { id: "g2-st-19", name: "Кенжегулов Нургазы Сергазыевич", attendance: 13.3, ca1: 0, mc1: 37.5, ca2: 70, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-20", name: "Князьбек Нұрбек Нұрланұлы", attendance: 6.7, ca1: 0, mc1: 40.0, ca2: 70, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-21", name: "Коробов Илья Александрович", attendance: 13.3, ca1: 0, mc1: 42.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-22", name: "Кочетов Руслан Юрьевич", attendance: 6.7, ca1: 0, mc1: 42.5, ca2: 95, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-23", name: "Кукушкин Юрий Кириллович", attendance: 6.7, ca1: 0, mc1: 42.5, ca2: 95, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-24", name: "Қабылбек Жантөре Батырбекұлы", attendance: 6.7, ca1: 0, mc1: 40.0, ca2: 95, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-25", name: "Ли Аделина Сергеевна", attendance: 13.3, ca1: 90, mc1: 93.5, ca2: 85, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Анализ локальных брендов одежды и конкуренции с маркетплейсами." },
-            { id: "g2-st-26", name: "Мажитов Султан Канатович", attendance: 6.7, ca1: 0, mc1: 37.5, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-27", name: "Мазат Ерсұлтан Ердосұлы", attendance: 6.7, ca1: 90, mc1: 80.0, ca2: 70, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Самостоятельный расчет TR и единичной эластичности." },
-            { id: "g2-st-28", name: "Мамаев Станислав Алексеевич", attendance: 13.3, ca1: 55, mc1: 87.5, ca2: 95, mc2: 0, exam: 0, comment: "55/100 (Шаблон из общего чата): Скопирован готовый текст-шаблон из чата." },
-            { id: "g2-st-29", name: "Молдыбай Амина Айратқызы", attendance: 13.3, ca1: 90, mc1: 86.0, ca2: 70, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Авторский разбор ценообразования и конкуренции с Zara и H&M." },
-            { id: "g2-st-30", name: "Мусаева Элина Князьевна", attendance: 13.3, ca1: 90, mc1: 85.0, ca2: 70, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Искренний авторский текст с детальным объяснением пика параболы." },
-            { id: "g2-st-31", name: "Мухтар Бекасыл Асылбекулы", attendance: 6.7, ca1: 0, mc1: 40.0, ca2: 70, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-32", name: "Нурканат Алиар", attendance: 13.3, ca1: 50, mc1: 75.0, ca2: 70, mc2: 0, exam: 0, comment: "50/100 (Генерация ИИ / ChatGPT): Вставлен сгенерированный фрагмент из ChatGPT." },
-            { id: "g2-st-33", name: "Нұрбек Нүркен Анарбекұлы", attendance: 6.7, ca1: 0, mc1: 38.0, ca2: 0, mc2: 0, exam: 0, comment: "Работа не сдана в симулятор." },
-            { id: "g2-st-34", name: "Нұрғали Айсана", attendance: 13.3, ca1: 90, mc1: 85.0, ca2: 70, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Логичный разбор альтернатив АИ-92 (автогаз, такси)." },
-            { id: "g2-st-35", name: "Сейтқасым Әкежан Серікұлы", attendance: 13.3, ca1: 60, mc1: 55.0, ca2: 95, mc2: 0, exam: 0, comment: "60/100 (Слабая самостоятельная работа): Поверхностное суждение в 1 предложение." },
-            { id: "g2-st-36", name: "Смайылова Жасмин Рысбекқызы", attendance: 13.3, ca1: 95, mc1: 92.5, ca2: 70, mc2: 0, exam: 0, comment: "95/100 (Отличная самостоятельная работа): Точные самостоятельные вычисления прироста выручки." },
-            { id: "g2-st-37", name: "Тильдахметов Алмат Зайнуллаұлы", attendance: 0, ca1: 97, mc1: 91.0, ca2: 70, mc2: 0, exam: 0, comment: "97/100 (Высокий академический уровень): Глубокий вывод линейной функции спроса Q(P) вручную." },
-            { id: "g2-st-38", name: "Убниев Бекзат Нурсипатович", attendance: 13.3, ca1: 85, mc1: 89.5, ca2: 95, mc2: 0, exam: 0, comment: "85/100 (Хорошая самостоятельная работа): Логичный разбор альтернатив." },
-            { id: "g2-st-39", name: "Шаймухамбетов Алим Асланулы", attendance: 13.3, ca1: 90, mc1: 90.0, ca2: 85, mc2: 0, exam: 0, comment: "90/100 (Хорошая самостоятельная работа): Детальный расчет прироста выручки." }
+            {
+                "id": 1,
+                "name": "Абдрайм Еркежан Беркинбайкызы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и серьезная ошибка в расчетах (указана цена 129 тг при оптимуме 202 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно подобраны T_ind=100 и G=200 (вместо 114 и 288), поверхностный вывод.",
+                "m1": 60,
+                "m2": 72,
+                "fin": 68
+            },
+            {
+                "id": 2,
+                "name": "Абдулла Нұрислам Бауыржанұлы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибка в цене (указано 1690 тг при оптимуме 1498 тг), но хорошо описаны факторы спроса.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — нереалистично заниженные значения W=5 и CORP=9 (вместо 398 и 252) ради подгонки под равенство GDI=GDP.",
+                "m1": 68,
+                "m2": 60,
+                "fin": 66
+            },
+            {
+                "id": 3,
+                "name": "Абраев Радмир Ниязович",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибка с оптимальной ценой (указано 1749 тг вместо 1446 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — оба неизвестных показателя оставлены нулями (R=0, NFI=0 вместо 45 и 30), неполное описание из двух фраз.",
+                "m1": 74,
+                "m2": 70,
+                "fin": 72
+            },
+            {
+                "id": 4,
+                "name": "АКБАРАЛИЕВ ФАХРИДИН АЛИШЕРОВИЧ",
+                "ca1": 95,
+                "comment": "95% — отличный расчет (P_opt=1498), четкое объяснение максимизации выручки и детерминантов спроса.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — ошибочные значения DEPR=90 и CORP=206 (вместо 67 и 268), искусственно обнулено бюджетное сальдо.",
+                "m1": 81,
+                "m2": 82,
+                "fin": 81
+            },
+            {
+                "id": 5,
+                "name": "Амангелді Айдос Даулетұлы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания. Текст верный (P_opt=202), но крайне краткий.",
+                "ca2": 85,
+                "comment2": "⚠️ Частично (1/2 верно) — заработная плата (W=419) найдена абсолютно точно, но госзакупки (G=195 вместо 182) подобраны ошибочно ради T=G.",
+                "m1": 79,
+                "m2": 75,
+                "fin": 76
+            },
+            {
+                "id": 6,
+                "name": "Асанғалиева Әсия Арманқызы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибка в точке оптимума (выбрана цена 2600 тг при P_opt=1340 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно найдены CORP=375 и T_ind=63 (вместо 284 и 84), краткий шаблонный вывод без расчётов.",
+                "m1": 74,
+                "m2": 80,
+                "fin": 76
+            },
+            {
+                "id": 7,
+                "name": "Асланов Алишер Асланович",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания, хотя в тексте верно найдена цена (1498 тг) и хорошо описаны субституты.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — в тренажёр введены R=0 и i=7 (вместо 57 и 56), в тексте неверная формула ВВП.",
+                "m1": 74,
+                "m2": 85,
+                "fin": 78
+            },
+            {
+                "id": 8,
+                "name": "Ахметов Танирберген Дауренулы",
+                "ca1": 95,
+                "comment": "95% — точные расчеты (1446 тг), отличная аргументация о балансе цены и оттока клиентов.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно определены DEPR=75 и NFI=50, корректно подсчитаны первичные доходы (540 млрд) и все виды налогов (204 млрд).",
+                "m1": 88,
+                "m2": 85,
+                "fin": 87
+            },
+            {
+                "id": 9,
+                "name": "Әбілдаев Нұрым Тәліпханұлы",
+                "ca1": 95,
+                "comment": "95% — грамотный, структурированный ответ (P_opt=319), корректно раскрыты все пункты задания.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно найдены SE=60 и G=207 (вместо 95 и 206) из-за ложного условия обязательного равенства GDI и GDP.",
+                "m1": 79,
+                "m2": 70,
+                "fin": 75
+            },
+            {
+                "id": 10,
+                "name": "Әділ Гүлсезім Әсетқызы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания, хотя расчет в тексте (2679 тг при P_opt=2678) и выводы верны.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно восстановлены DEPR=79 и G=212, верно посчитаны совокупные доходы и расходы экономики.",
+                "m1": 86,
+                "m2": 90,
+                "fin": 86
+            },
+            {
+                "id": 11,
+                "name": "Биманов Алишер Бакытович",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания, при этом сам текст с расчетом 1498 тг написан корректно.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно определены CORP=324 и норма сбережений 11%, корректно объяснено расхождение между GDI (1093 млрд) и GDP (1091 млрд).",
+                "m1": 86,
+                "m2": 80,
+                "fin": 82
+            },
+            {
+                "id": 12,
+                "name": "Власова Валерия Семеновна",
+                "ca1": 95,
+                "comment": "95% — превосходный расчет (P_opt=320) и отличное объяснение социальной значимости и эластичности хлеба.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — грубая ошибка в подборе W=7 и T_ind=139 (вместо 358 и 102), неверная структура расчёта ВВП.",
+                "m1": 72,
+                "m2": 95,
+                "fin": 82
+            },
+            {
+                "id": 13,
+                "name": "Дүйсенбай Әлімхан Дәулетұлы",
+                "ca1": 0,
+                "comment": "",
+                "ca2": 0,
+                "comment2": "Работа не сдана (отсутствует в выгрузке тренажёра СНС).",
+                "m1": 0,
+                "m2": 0,
+                "fin": 0
+            },
+            {
+                "id": 14,
+                "name": "Избасар Даниял Тауржанұлы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания, хотя в тексте P_opt=202 и эластичность определены правильно.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — ошибочно подобраны CORP=100 и G=185 (вместо 238 и 236) ради искусственного равенства G=T.",
+                "m1": 75,
+                "m2": 72,
+                "fin": 73
+            },
+            {
+                "id": 15,
+                "name": "Истамов Изат",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибка в цене (1699 тг вместо 1340 тг), но неплохой анализ конкурентов.",
+                "ca2": 0,
+                "comment2": "Работа не сдана (отсутствует в выгрузке тренажёра СНС).",
+                "m1": 68,
+                "m2": 82,
+                "fin": 70
+            },
+            {
+                "id": 16,
+                "name": "Йылмаз Мухаммедали",
+                "ca1": 0,
+                "comment": "",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно найдены T_ind=112 и G=195 (вместо 114 и 248), вывод состоит из трёх коротких формул без анализа.",
+                "m1": 0,
+                "m2": 58,
+                "fin": 0
+            },
+            {
+                "id": 17,
+                "name": "Кадирханов Жангир Адилетович",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания. Ошибка: анализ на эластичном участке (298 тг) вместо оптимума (202 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — искусственно завышена зарплата W=730 и занижена прибыль CORP=200 (вместо 393 и 262) для обнуления дефицита бюджета.",
+                "m1": 72,
+                "m2": 60,
+                "fin": 68
+            },
+            {
+                "id": 18,
+                "name": "Кенжегузин Санжар Ерланұлы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибка в цене (2100 тг вместо 1446 тг), хотя общая логика прослеживается.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — ошибочные значения R=35 и NFI=0 (вместо 45 и 55), неполное описание с опечатками.",
+                "m1": 73,
+                "m2": 65,
+                "fin": 70
+            },
+            {
+                "id": 19,
+                "name": "Кенжегулов Нургазы Сергазыевич",
+                "ca1": 95,
+                "comment": "95% — хороший расчет (P_opt=1340), верное объяснение влияния эластичности и факторов спроса.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно найдены DEPR=50 и CORP=628 (вместо 57 и 278) из-за ложного условия баланса бюджета.",
+                "m1": 89,
+                "m2": 70,
+                "fin": 80
+            },
+            {
+                "id": 20,
+                "name": "Князьбек Нұрбек Нұрланұлы",
+                "ca1": 95,
+                "comment": "95% — отличные расчеты (P_opt=1498), четкое и логичное обоснование максимизации выручки.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — ошибочные значения W=385 и G=196 (вместо 414 и 272) при попытке подогнать GDI под GDP.",
+                "m1": 80,
+                "m2": 87,
+                "fin": 82
+            },
+            {
+                "id": 21,
+                "name": "Коробов Илья Александрович",
+                "ca1": 95,
+                "comment": "95% — точные расчеты (1446 тг), верная интерпретация единичной эластичности и факторов спроса.",
+                "ca2": 0,
+                "comment2": "❌ Неверно (0/2 верно) — сдано с опозданием (18.11), оба показателя определены неверно (CORP=154, T_ind=200 вместо 294 и 84), краткий шаблонный вывод.",
+                "m1": 80,
+                "m2": 85,
+                "fin": 80
+            },
+            {
+                "id": 22,
+                "name": "Кочетов Руслан Юрьевич",
+                "ca1": 95,
+                "comment": "95% — очень грамотный, глубокий анализ (P_opt=319) с учетом регулирования цен и структуры затрат пекарни.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно найдены R=57 и i=46 по варианту №64, безупречный пошаговый расчёт всех агрегатов СНС.",
+                "m1": 89,
+                "m2": 95,
+                "fin": 92
+            },
+            {
+                "id": 23,
+                "name": "Кукушкин Юрий Кириллович",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания, хотя в тексте указана верная оптимальная цена (2679 тг при P_opt=2678).",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно определены DEPR=65 и NFI=40, последовательно и грамотно выведены все макроэкономические показатели.",
+                "m1": 89,
+                "m2": 95,
+                "fin": 89
+            },
+            {
+                "id": 24,
+                "name": "Қабылбек Жантөре Батырбекұлы",
+                "ca1": 95,
+                "comment": "95% — отличный расчет (P_opt=2678), глубокое понимание динамики TR и факторов спроса на кофе.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно найдены SE=80 и G=166, верно подсчитаны совокупные доходы населения (529 млрд) и подоходный налог (53 млрд).",
+                "m1": 89,
+                "m2": 85,
+                "fin": 88
+            },
+            {
+                "id": 25,
+                "name": "Ли Аделина Сергеевна",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибка в цене (указано 188 тг при оптимуме 202 тг), хотя логика рассуждений верна.",
+                "ca2": 85,
+                "comment2": "⚠️ Частично (1/2 верно) — амортизация (DEPR=69) рассчитана абсолютно точно по формуле, но госзакупки (G=216 вместо 172) приравнены к налогам.",
+                "m1": 84,
+                "m2": 75,
+                "fin": 79
+            },
+            {
+                "id": 26,
+                "name": "Мажитов Султан Канатович",
+                "ca1": 0,
+                "comment": "",
+                "ca2": 0,
+                "comment2": "Работа не сдана (отсутствует в выгрузке тренажёра СНС).",
+                "m1": 64,
+                "m2": 0,
+                "fin": 0
+            },
+            {
+                "id": 27,
+                "name": "Мазат Ерсұлтан Ердосұлы",
+                "ca1": 95,
+                "comment": "95% — качественный расчет (P_opt=1340), точное описание кривой выручки и факторов спроса.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно найдены W=312 и T_ind=83 (вместо 353 и 102) из-за ложного приравнивания GDI к GDP.",
+                "m1": 74,
+                "m2": 70,
+                "fin": 74
+            },
+            {
+                "id": 28,
+                "name": "Мамаев Станислав Алексеевич",
+                "ca1": 95,
+                "comment": "95% — точные расчеты (P_opt=2678), отличная аргументация по неэластичному спросу и детерминантам.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно восстановлены R=75 и SE=100, глубокий экономический вывод о профиците бюджета (+20 млрд), госсбережениях и сдерживающей фискальной политике.",
+                "m1": 89,
+                "m2": 92,
+                "fin": 90
+            },
+            {
+                "id": 29,
+                "name": "Молдыбай Амина Айратқызы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибка в цене (выбрана цена 2600 тг при P_opt=1340 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — ошибочные значения CORP=230 и G=213 (вместо 248 и 196) ради искусственного обнуления сальдо бюджета.",
+                "m1": 74,
+                "m2": 70,
+                "fin": 72
+            },
+            {
+                "id": 30,
+                "name": "Мусаева Элина Князьевна",
+                "ca1": 95,
+                "comment": "95% — хорошие расчеты (P_opt=202), четкое объяснение максимизации выручки и факторов спроса.",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно определены DEPR=50 и i=45 (вместо 79 и 43), слишком общий вывод без числовых расчётов.",
+                "m1": 79,
+                "m2": 80,
+                "fin": 79
+            },
+            {
+                "id": 31,
+                "name": "Мухтар Бекасыл Асылбекулы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и грубая ошибка в расчете (выбрана цена 2681 при P_opt=1340 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — ошибочный подбор T_ind=100 и G=211 (вместо 114 и 208) ради искусственного равенства G=T.",
+                "m1": 74,
+                "m2": 75,
+                "fin": 74
+            },
+            {
+                "id": 32,
+                "name": "Нурканат Алиар",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибка в расчете (выбрана цена 129 тг вместо P_opt=202 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно найдены W=457 и CORP=150 (вместо 388 и 272), хотя теоретические формулы выписаны верно.",
+                "m1": 74,
+                "m2": 70,
+                "fin": 72
+            },
+            {
+                "id": 33,
+                "name": "Нұрбек Нүркен Анарбекұлы",
+                "ca1": 0,
+                "comment": "",
+                "ca2": 0,
+                "comment2": "Работа не сдана (отсутствует в выгрузке тренажёра СНС).",
+                "m1": 0,
+                "m2": 0,
+                "fin": 0
+            },
+            {
+                "id": 34,
+                "name": "Нұрғали Айсана",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибка в цене (выбрана цена 2600 тг при P_opt=1340 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — неверно восстановлены DEPR=99 и CORP=445 (вместо 87 и 288) при подгонке счетов.",
+                "m1": 74,
+                "m2": 75,
+                "fin": 74
+            },
+            {
+                "id": 35,
+                "name": "Сейтқасым Әкежан Серікұлы",
+                "ca1": 95,
+                "comment": "95% — отличный расчет (P_opt=1498), четкое объяснение эластичности и факторов спроса.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно определены W=409 и G=232, структурированный и грамотный расчёт доходов, налогов (201 млрд) и дефицита бюджета (-31 млрд).",
+                "m1": 84,
+                "m2": 85,
+                "fin": 84
+            },
+            {
+                "id": 36,
+                "name": "Смайылова Жасмин Рысбекқызы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и ошибка в цене (указано 1699 тг при оптимуме 1498 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — ошибочные значения CORP=36 и T_ind=85 (вместо 304 и 84), студентка изменила заданный параметр G ради равенства T=G.",
+                "m1": 74,
+                "m2": 75,
+                "fin": 74
+            },
+            {
+                "id": 37,
+                "name": "Тильдахметов Алмат Зайнуллаұлы",
+                "ca1": 60,
+                "comment": "60% — неполное описание, провалены задания и грубая ошибка в цене (указано 129 тг при оптимуме 202 тг).",
+                "ca2": 55,
+                "comment2": "❌ Неверно (0/2 верно) — резко завышены значения R=456 и i=80 (вместо 57 и 36) при попытке искусственно уравнять GDI и GDP.",
+                "m1": 68,
+                "m2": 65,
+                "fin": 66
+            },
+            {
+                "id": 38,
+                "name": "Убниев Бекзат Нурсипатович",
+                "ca1": 95,
+                "comment": "95% — верные расчеты (P_opt=1446), хорошее обоснование баланса цены и объема продаж.",
+                "ca2": 95,
+                "comment2": "✅ Отлично (2/2 верно) — точно найдены DEPR=55 и NFI=30, последовательно и корректно рассчитаны все агрегаты СНС.",
+                "m1": 84,
+                "m2": 85,
+                "fin": 84
+            },
+            {
+                "id": 39,
+                "name": "Шаймухамбетов Алим Асланулы",
+                "ca1": 95,
+                "comment": "95% — хорошие расчеты (P_opt=1498), верное объяснение эластичности и факторов спроса.",
+                "ca2": 85,
+                "comment2": "⚠️ Частично (1/2 верно) — доход от собственности (SE=65) определён точно, но госзакупки (G=209 вместо 256) занижены ради искусственного баланса бюджета.",
+                "m1": 79,
+                "m2": 80,
+                "fin": 79
+            }
         ];
 
-        function buildAttendanceArray(absences) {
-            const arr = Array(TOTAL_ATTENDANCE_SESSIONS).fill(false);
-            for (let session = 1; session <= CONDUCTED_SESSIONS_G1; session++) {
-                if (!absences.includes(session)) {
-                    arr[session - 1] = true;
-                }
-            }
-            return arr;
-        }
-
-        function prepareGroupData(rawGroup, hasSessionMap) {
-            return rawGroup.map(st => {
-                if (hasSessionMap && Array.isArray(st.absences)) {
-                    const attSessions = buildAttendanceArray(st.absences);
-                    const presentCount = attSessions.filter(Boolean).length;
-                    const attPercent = Math.round((presentCount / TOTAL_ATTENDANCE_SESSIONS) * 100);
-                    return { ...st, attendance: attPercent, attendanceSessions: attSessions };
-                } else {
-                    const approxSessions = Math.round(((st.attendance || 0) / 100) * TOTAL_ATTENDANCE_SESSIONS);
-                    const attSessions = Array(TOTAL_ATTENDANCE_SESSIONS).fill(false).map((_, i) => i < approxSessions);
-                    return { ...st, attendanceSessions: attSessions };
-                }
-            });
-        }
-
-        let currentGroupKey = 'g1';
-        let currentBellMetric = 'mc1';
-        let database = {
-            g1: prepareGroupData(initialGroup1, true),
-            g2: prepareGroupData(initialGroup2, false)
-        };
-        let students = [];
-        
-        let personalAttChart = null;
-        let personalActChart = null;
-        let personalExamChart = null;
-        let bellCurveChart = null;
-        let isTeacherMode = false;
-
-        let activeEditingStudentId = null;
-        let tempAttendanceSessions = [];
-
-        window.onload = function() {
-            loadDatabase();
-            updateDashboardData();
-            
-            document.getElementById('teacher-search-input').addEventListener('input', function(e) {
-                renderTeacherTable(e.target.value);
-            });
+        let currentGroup = 1;
+        let showBell = false;
+        let data = {
+            1: [],
+            2: []
         };
 
-        function loadDatabase() {
-            database = {
-                g1: prepareGroupData(initialGroup1, true),
-                g2: prepareGroupData(initialGroup2, false)
-            };
-            students = database[currentGroupKey];
-            saveDatabase();
-        }
+        const STORAGE_KEY = 'almau_grades_se_rus_v3';
 
-        function saveDatabase() {
-            database[currentGroupKey] = students;
-            localStorage.setItem('almau_economics_se_rus_groups_v14', JSON.stringify(database));
-        }
-
-        function switchGroup(groupKey) {
-            currentGroupKey = groupKey;
-            students = database[currentGroupKey];
-            
-            const btnG1 = document.getElementById('btn-group-g1');
-            const btnG2 = document.getElementById('btn-group-g2');
-            const title = document.getElementById('current-group-title');
-
-            if (groupKey === 'g1') {
-                title.textContent = "Eko 1362131-35- СН";
-                btnG1.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md";
-                btnG2.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
+        function init() {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) {
+                data = JSON.parse(saved);
+                [1, 2].forEach(g => {
+                    data[g] = data[g].map(s => ({ comment2: '', ...s }));
+                });
             } else {
-                title.textContent = "Eko 1362131-37-CH";
-                btnG2.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-md";
-                btnG1.className = "px-4 py-2 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
+                data[1] = JSON.parse(JSON.stringify(initialGroup1));
+                data[2] = JSON.parse(JSON.stringify(initialGroup2));
+                saveData();
             }
-            
-            updateDashboardData();
-            showToast(`Переключено на группу: ${title.textContent}`, 'info');
+            updateBadges();
+            renderTable();
         }
 
-        function switchBellMetric(metric) {
-            currentBellMetric = metric;
-            const metrics = ['mc1', 'ca1', 'ca2', 'total'];
-            metrics.forEach(m => {
-                const btn = document.getElementById(`btn-bell-${m}`);
-                if (!btn) return;
-                if (m === metric) {
-                    if (m === 'mc1') btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-amber-500 text-slate-950 shadow-sm";
-                    else if (m === 'ca1') btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-indigo-600 text-white shadow-sm";
-                    else if (m === 'ca2') btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-sky-600 text-white shadow-sm";
-                    else btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-violet-600 text-white shadow-sm";
-                } else {
-                    btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold transition-all text-slate-400 hover:text-white";
-                }
-            });
-            updateStats();
-            renderBellCurveChart();
+        function saveData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+            updateBadges();
         }
 
-        // Формула расчета для гибридного формата (без активности):
-        // Посещаемость (10%) + СРСП1 (15%) + РК1 (15%) + СРСП2 (10%) + РК2 (10%) + Экзамен (40%)
-        function calculateWeightedScore(att, ca1, mc1, ca2, mc2, exam) {
-            const wAtt = (att || 0) * 0.10;
-            const wCa1 = (ca1 || 0) * 0.15;
-            const wMc1 = (mc1 || 0) * 0.15;
-            const wCa2 = (ca2 || 0) * 0.10;
-            const wMc2 = (mc2 || 0) * 0.10;
-            const wExam = (exam || 0) * 0.40;
-            return parseFloat((wAtt + wCa1 + wMc1 + wCa2 + wMc2 + wExam).toFixed(1));
-        }
-
-        function getLetterGrade(score) {
-            if (score >= 95) return { letter: 'A', class: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' };
-            if (score >= 90) return { letter: 'A-', class: 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' };
-            if (score >= 84) return { letter: 'B+', class: 'bg-blue-500/10 text-blue-400 border-blue-500/30' };
-            if (score >= 79) return { letter: 'B', class: 'bg-blue-500/10 text-blue-300 border-blue-500/20' };
-            if (score >= 74) return { letter: 'B-', class: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/30' };
-            if (score >= 69) return { letter: 'C+', class: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20' };
-            if (score >= 64) return { letter: 'C', class: 'bg-amber-500/10 text-amber-400 border-amber-500/30' };
-            if (score >= 60) return { letter: 'C-', class: 'bg-amber-500/10 text-amber-300 border-amber-500/20' };
-            if (score >= 55) return { letter: 'D+', class: 'bg-orange-500/10 text-orange-400 border-orange-500/30' };
-            if (score >= 50) return { letter: 'D', class: 'bg-orange-500/10 text-orange-300 border-orange-500/20' };
-            return { letter: 'F', class: 'bg-rose-500/10 text-rose-400 border-rose-500/30' };
-        }
-
-        function searchStudentGrade() {
-            const searchInput = document.getElementById('student-search-input').value.trim().toLowerCase();
-            const resultCard = document.getElementById('student-result-card');
-            const notFoundCard = document.getElementById('student-not-found');
-
-            if (!searchInput) {
-                showToast('Пожалуйста, введите ваше ФИО!', 'error');
-                return;
+        function resetData() {
+            if (confirm('Вы уверены? Все внесенные вручную изменения будут сброшены к исходным оценкам и комментариям из кода.')) {
+                localStorage.removeItem(STORAGE_KEY);
+                init();
             }
+        }
 
-            const allStudents = [...database.g1, ...database.g2];
-            const queryWords = searchInput.split(/\s+/);
-            const matchedStudent = allStudents.find(s => {
-                const normalizedName = s.name.toLowerCase();
-                return queryWords.every(word => normalizedName.includes(word));
-            });
+        function updateBadges() {
+            document.getElementById('badge-g1').innerText = data[1].length;
+            document.getElementById('badge-g2').innerText = data[2].length;
+        }
 
-            if (matchedStudent) {
-                notFoundCard.classList.add('hidden');
-                
-                const finalScore = calculateWeightedScore(
-                    matchedStudent.attendance,
-                    matchedStudent.ca1, matchedStudent.mc1,
-                    matchedStudent.ca2, matchedStudent.mc2, matchedStudent.exam
-                );
-                const gradeInfo = getLetterGrade(finalScore);
+        function calculateGrade(s) {
+            const total = (s.ca1 * 0.05) + (s.ca2 * 0.05) + (s.m1 * 0.20) + (s.m2 * 0.20) + (s.fin * 0.40);
+            const roundedTotal = Math.round(total * 100) / 100;
 
-                document.getElementById('sr-name').textContent = matchedStudent.name;
-                document.getElementById('sr-teacher-comment').textContent = matchedStudent.comment || "Работа не сдана.";
-                
-                const isG1 = database.g1.some(s => s.id === matchedStudent.id);
-                document.getElementById('sr-group-badge').textContent = isG1 ? 'Группа Eko 1362131-35- СН' : 'Группа Eko 1362131-37-CH';
-                
-                const letterBadge = document.getElementById('sr-letter');
-                letterBadge.textContent = gradeInfo.letter;
-                letterBadge.className = `text-2xl font-black px-3.5 py-1 rounded-xl text-white shadow-md bg-indigo-600`;
+            let letter = 'F';
+            let gpa = '0.00';
+            let badgeClass = 'bg-red-100 text-red-800 border-red-200';
 
-                document.getElementById('sr-total-score').textContent = finalScore;
-                document.getElementById('sr-val-attendance').textContent = `${matchedStudent.attendance || 0}%`;
-                document.getElementById('sr-val-ca1').textContent = `${matchedStudent.ca1 || 0}`;
-                document.getElementById('sr-val-mc1').textContent = `${matchedStudent.mc1 || 0}`;
-                document.getElementById('sr-val-ca2').textContent = `${matchedStudent.ca2 || 0}`;
-                document.getElementById('sr-val-mc2').textContent = `${matchedStudent.mc2 || 0}`;
-                document.getElementById('sr-val-exam').textContent = `${matchedStudent.exam || 0}`;
+            if (roundedTotal >= 95) { letter = 'A'; gpa = '4.00'; badgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200'; }
+            else if (roundedTotal >= 90) { letter = 'A-'; gpa = '3.67'; badgeClass = 'bg-emerald-100 text-emerald-800 border-emerald-200'; }
+            else if (roundedTotal >= 85) { letter = 'B+'; gpa = '3.33'; badgeClass = 'bg-blue-100 text-blue-800 border-blue-200'; }
+            else if (roundedTotal >= 80) { letter = 'B'; gpa = '3.00'; badgeClass = 'bg-blue-100 text-blue-800 border-blue-200'; }
+            else if (roundedTotal >= 75) { letter = 'B-'; gpa = '2.67'; badgeClass = 'bg-blue-100 text-blue-800 border-blue-200'; }
+            else if (roundedTotal >= 70) { letter = 'C+'; gpa = '2.33'; badgeClass = 'bg-amber-100 text-amber-800 border-amber-200'; }
+            else if (roundedTotal >= 65) { letter = 'C'; gpa = '2.00'; badgeClass = 'bg-amber-100 text-amber-800 border-amber-200'; }
+            else if (roundedTotal >= 60) { letter = 'C-'; gpa = '1.67'; badgeClass = 'bg-amber-100 text-amber-800 border-amber-200'; }
+            else if (roundedTotal >= 55) { letter = 'D+'; gpa = '1.33'; badgeClass = 'bg-orange-100 text-orange-800 border-orange-200'; }
+            else if (roundedTotal >= 50) { letter = 'D'; gpa = '1.00'; badgeClass = 'bg-orange-100 text-orange-800 border-orange-200'; }
 
-                const attWrapper = document.getElementById('student-att-wrapper');
-                if (isG1 && Array.isArray(matchedStudent.attendanceSessions)) {
-                    attWrapper.classList.remove('hidden');
-                    renderStudentAttendanceDetails(matchedStudent);
-                } else {
-                    attWrapper.classList.add('hidden');
-                }
+            return { total: roundedTotal.toFixed(2), numTotal: roundedTotal, letter, gpa, badgeClass };
+        }
 
-                renderPersonalCharts(matchedStudent, finalScore, gradeInfo.letter);
+        function getScoreColor(val) {
+            if (val === 0) return 'text-red-600 bg-red-50/50 border-red-200 font-semibold';
+            if (val < 50) return 'text-orange-600 bg-orange-50/50 border-orange-200 font-semibold';
+            if (val >= 90) return 'text-emerald-700 bg-emerald-50/30 border-gray-200 font-medium';
+            return 'text-gray-800 bg-gray-50/50 border-gray-200';
+        }
 
-                resultCard.classList.remove('hidden');
-                resultCard.classList.add('fade-enter');
-                setTimeout(() => {
-                    resultCard.classList.add('fade-enter-active');
-                }, 10);
+        function getCommentStyle(text) {
+            if (!text) return 'text-gray-600 bg-gray-50/50 border-gray-200';
+            if (text.includes('❌') || text.startsWith('60%')) return 'text-red-900 bg-red-50/35 border-red-200';
+            if (text.includes('⚠️')) return 'text-amber-900 bg-amber-50/40 border-amber-200';
+            if (text.includes('✅') || text.startsWith('95%')) return 'text-emerald-900 bg-emerald-50/35 border-emerald-200';
+            return 'text-gray-700 bg-gray-50/50 border-gray-200';
+        }
 
-                showToast(`Загружены результаты: ${matchedStudent.name}`, 'success');
+        function toggleBellCurve() {
+            showBell = !showBell;
+            const panel = document.getElementById('bell-curve-panel');
+            const btnText = document.getElementById('bellToggleText');
+            if (showBell) {
+                panel.classList.remove('hidden');
+                btnText.innerText = 'Скрыть кривую Белла';
+                renderBellCurve();
             } else {
-                resultCard.classList.add('hidden');
-                notFoundCard.classList.remove('hidden');
-                showToast('Студент не найден в списках групп', 'error');
+                panel.classList.add('hidden');
+                btnText.innerText = 'Показать кривую Белла';
             }
         }
 
-        function handleSearchKeyDown(event) {
-            if (event.key === 'Enter') searchStudentGrade();
-        }
-
-        function renderPersonalCharts(student, total, letter) {
-            if (personalAttChart) personalAttChart.destroy();
-            if (personalActChart) personalActChart.destroy();
-            if (personalExamChart) personalExamChart.destroy();
-
-            const attCtx = document.getElementById('attendanceBarChart').getContext('2d');
-            document.getElementById('val-att-text').textContent = `${student.attendance}%`;
-            personalAttChart = new Chart(attCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Факт', 'Семестр'],
-                    datasets: [{
-                        data: [student.attendance, 100],
-                        backgroundColor: ['rgba(16, 185, 129, 0.85)', 'rgba(16, 185, 129, 0.15)'],
-                        borderRadius: 6, maxBarThickness: 16
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } },
-                        y: { min: 0, max: 100, grid: { color: '#1e293b' }, ticks: { display: false } }
-                    }
-                }
-            });
-
-            const actCtx = document.getElementById('activityLineChart').getContext('2d');
-            personalActChart = new Chart(actCtx, {
-                type: 'line',
-                data: {
-                    labels: ['СРСП 1', 'СРСП 2'],
-                    datasets: [{
-                        data: [student.ca1 || 0, student.ca2 || 0],
-                        borderColor: '#3b82f6', backgroundColor: 'rgba(59, 130, 246, 0.12)',
-                        fill: true, tension: 0.3, borderWidth: 2, pointBackgroundColor: '#3b82f6', pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 9 } } },
-                        y: { min: 0, max: 100, grid: { color: '#1e293b' }, ticks: { display: false } }
-                    }
-                }
-            });
-
-            const exCtx = document.getElementById('examGaugeChart').getContext('2d');
-            const avgMc = Math.round(((student.mc1 || 0) + (student.mc2 || 0)) / 2);
-            personalExamChart = new Chart(exCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Средний РК', 'Остаток'],
-                    datasets: [{
-                        data: [avgMc, 100 - avgMc],
-                        backgroundColor: ['rgba(245, 158, 11, 0.9)', 'rgba(30, 41, 59, 0.6)'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    circumference: 180, rotation: 270, cutout: '80%',
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
-                }
-            });
-
-            const circle = document.getElementById('finalScoreCircle');
-            document.getElementById('finalCircleLetter').textContent = letter;
-            document.getElementById('finalCircleScore').textContent = total.toFixed(1);
-            const strokeOffset = 251.2 - (251.2 * total) / 100;
-            circle.style.strokeDashoffset = strokeOffset;
-        }
-
-        function getMetricValue(student, metric) {
-            if (metric === 'mc1') return Number(student.mc1) || 0;
-            if (metric === 'ca1') return Number(student.ca1) || 0;
-            if (metric === 'ca2') return Number(student.ca2) || 0;
-            return calculateWeightedScore(student.attendance, student.ca1, student.mc1, student.ca2, student.mc2, student.exam);
-        }
-
-        function getMetricTitle(metric) {
-            if (metric === 'mc1') return 'РК 1';
-            if (metric === 'ca1') return 'СРСП 1';
-            if (metric === 'ca2') return 'СРСП 2';
-            return 'Итогового балла';
-        }
-
-        /* КРИВАЯ НОРМАЛЬНОГО РАСПРЕДЕЛЕНИЯ (ГАУССА) ПО ВЫБРАННОМУ ПОКАЗАТЕЛЮ */
-        function renderBellCurveChart() {
-            if (bellCurveChart) bellCurveChart.destroy();
-
-            const scores = students.map(s => getMetricValue(s, currentBellMetric));
-            const metricLabel = getMetricTitle(currentBellMetric);
-
-            if (scores.length === 0) return;
-
-            const n = scores.length;
+        function renderBellCurve() {
+            if (!showBell) return;
+            const list = data[currentGroup];
+            const scores = list.map(s => calculateGrade(s).numTotal);
+            const n = scores.length || 1;
             const mean = scores.reduce((a, b) => a + b, 0) / n;
-            const variance = scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / n;
-            const stdDev = Math.sqrt(variance) || 1;
+            const variance = scores.reduce((acc, val) => acc + Math.pow(val - mean, 2), 0) / n;
+            const std = Math.sqrt(variance) || 1;
 
-            document.getElementById('bell-mean-val').textContent = mean.toFixed(1);
-            document.getElementById('bell-std-val').textContent = stdDev.toFixed(1);
+            const bins = [
+                { label: 'F (<50)', min: 0, max: 49.99, mid: 40, color: '#ef4444', count: 0 },
+                { label: 'D / D+ (50-59)', min: 50, max: 59.99, mid: 55, color: '#f97316', count: 0 },
+                { label: 'C- / C / C+ (60-74)', min: 60, max: 74.99, mid: 67.5, color: '#f59e0b', count: 0 },
+                { label: 'B- / B / B+ (75-89)', min: 75, max: 89.99, mid: 82.5, color: '#3b82f6', count: 0 },
+                { label: 'A- / A (90+)', min: 90, max: 100, mid: 92.5, color: '#10b981', count: 0 }
+            ];
 
-            const bins = ['0-49', '50-59', '60-69', '70-79', '80-89', '90-100'];
-            const counts = [0, 0, 0, 0, 0, 0];
-
-            scores.forEach(s => {
-                if (s < 50) counts[0]++;
-                else if (s < 60) counts[1]++;
-                else if (s < 70) counts[2]++;
-                else if (s < 80) counts[3]++;
-                else if (s < 90) counts[4]++;
-                else counts[5]++;
+            scores.forEach(sc => {
+                const b = bins.find(item => sc >= item.min && sc <= item.max);
+                if (b) b.count++;
             });
 
-            const actualProfilePoints = counts.map(val => val);
-
-            function gaussianPDF(x, mu, sigma) {
-                return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2));
-            }
-
-            const binCenters = [25, 54.5, 64.5, 74.5, 84.5, 95];
-            const binWidths = [50, 10, 10, 10, 10, 10];
-
-            const rawTheoretical = binCenters.map((center, idx) => {
-                return gaussianPDF(center, mean, stdDev) * binWidths[idx] * n;
+            // Normal PDF scaled to bin widths (~15 pts) and sample size n
+            const idealCounts = bins.map(b => {
+                const binWidth = b.label.startsWith('F') ? 20 : (b.label.startsWith('D') ? 10 : (b.label.startsWith('A') ? 10 : 15));
+                const z = (b.mid - mean) / std;
+                const pdf = (1 / (std * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * z * z);
+                return pdf * binWidth * n;
             });
 
-            const peakTheoretical = gaussianPDF(mean, mean, stdDev) * 10 * n;
-            const maxActual = Math.max(...counts, 1);
-            const scaleFactor = maxActual / Math.max(peakTheoretical, 0.001);
+            const maxVal = Math.max(...bins.map(b => b.count), ...idealCounts, 1);
+            const showIdeal = document.getElementById('showIdealCurve').checked;
 
-            const idealGaussianPoints = rawTheoretical.map(val => parseFloat((val * scaleFactor).toFixed(2)));
-            const yAxisCeiling = Math.max(10, Math.ceil(Math.max(maxActual, ...idealGaussianPoints)) + 2);
+            const svgW = 540, svgH = 210, padL = 36, padR = 20, padT = 20, padB = 42;
+            const chartW = svgW - padL - padR;
+            const chartH = svgH - padT - padB;
+            const colW = chartW / bins.length;
 
-            const ctx = document.getElementById('bellCurveCanvas').getContext('2d');
-            bellCurveChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: bins,
-                    datasets: [
-                        {
-                            type: 'bar',
-                            label: `Фактически студентов (${metricLabel})`,
-                            data: counts,
-                            backgroundColor: 'rgba(99, 102, 241, 0.45)',
-                            borderColor: '#6366f1',
-                            borderWidth: 1,
-                            borderRadius: 8,
-                            barPercentage: 0.65
-                        },
-                        {
-                            type: 'line',
-                            label: 'Фактический профиль (Огибающая)',
-                            data: actualProfilePoints,
-                            borderColor: '#c084fc',
-                            borderWidth: 3,
-                            pointBackgroundColor: '#c084fc',
-                            pointBorderColor: '#ffffff',
-                            pointRadius: 4,
-                            fill: false,
-                            tension: 0.35
-                        },
-                        {
-                            type: 'line',
-                            label: 'Идеальный Гаусс (Эталон)',
-                            data: idealGaussianPoints,
-                            borderColor: '#f59e0b',
-                            borderWidth: 2,
-                            borderDash: [6, 6],
-                            pointBackgroundColor: '#f59e0b',
-                            pointRadius: 3,
-                            fill: false,
-                            cubicInterpolationMode: 'monotone',
-                            tension: 0.4
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: true,
-                            labels: { color: '#94a3b8', font: { size: 11, weight: 'bold' } }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            grid: { color: '#1e293b' },
-                            ticks: { color: '#94a3b8', font: { size: 10, weight: '600' } }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            suggestedMax: yAxisCeiling,
-                            grid: { color: '#1e293b' },
-                            ticks: { color: '#94a3b8', precision: 0 },
-                            title: { display: true, text: 'Количество студентов', color: '#64748b', font: { size: 10 } }
-                        }
-                    }
+            let barsSvg = '';
+            let points = [];
+
+            bins.forEach((b, i) => {
+                const barH = (b.count / maxVal) * chartH;
+                const x = padL + i * colW + colW * 0.18;
+                const w = colW * 0.64;
+                const y = padT + chartH - barH;
+                const pct = ((b.count / n) * 100).toFixed(0);
+
+                barsSvg += `
+                    <rect x="${x}" y="${y}" width="${w}" height="${barH}" rx="4" fill="${b.color}" fill-opacity="0.82"></rect>
+                    <text x="${x + w / 2}" y="${y - 5}" text-anchor="middle" font-size="11" font-weight="600" fill="#1f2937">${b.count} (${pct}%)</text>
+                    <text x="${x + w / 2}" y="${padT + chartH + 16}" text-anchor="middle" font-size="10" fill="#4b5563">${b.label}</text>
+                `;
+
+                const idealH = (idealCounts[i] / maxVal) * chartH;
+                points.push({ x: padL + (i + 0.5) * colW, y: padT + chartH - idealH });
+            });
+
+            let curveSvg = '';
+            if (showIdeal && points.length > 1) {
+                let d = `M ${points[0].x} ${points[0].y}`;
+                for (let i = 0; i < points.length - 1; i++) {
+                    const xc = (points[i].x + points[i + 1].x) / 2;
+                    const yc = (points[i].y + points[i + 1].y) / 2;
+                    d += ` Q ${points[i].x} ${points[i].y}, ${xc} ${yc}`;
                 }
+                const last = points[points.length - 1];
+                d += ` T ${last.x} ${last.y}`;
+
+                curveSvg = `
+                    <path d="${d}" fill="none" stroke="#4f46e5" stroke-width="2.5" stroke-dasharray="5,3"></path>
+                    ${points.map(p => `<circle cx="${p.x}" cy="${p.y}" r="3.5" fill="#4f46e5"></circle>`).join('')}
+                `;
+            }
+
+            const statsHtml = `
+                <div class="lg:col-span-2 bg-gray-50/70 rounded-lg p-3 border border-gray-200">
+                    <svg viewBox="0 0 ${svgW} ${svgH}" class="w-full h-auto">
+                        <line x1="${padL}" y1="${padT + chartH}" x2="${svgW - padR}" y2="${padT + chartH}" stroke="#d1d5db" stroke-width="1"></line>
+                        ${barsSvg}
+                        ${curveSvg}
+                    </svg>
+                    <div class="flex flex-wrap items-center justify-center gap-4 mt-1 text-xs text-gray-600">
+                        <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-sm bg-blue-500 inline-block"></span> Фактическое число студентов</span>
+                        ${showIdeal ? '<span class="flex items-center gap-1.5"><span class="w-5 border-t-2 border-dashed border-indigo-600 inline-block"></span> Теоретическая кривая Белла</span>' : ''}
+                    </div>
+                </div>
+                <div class="space-y-3 text-xs">
+                    <div class="p-3 rounded-lg bg-indigo-50/60 border border-indigo-100">
+                        <div class="font-semibold text-indigo-900 mb-1">Параметры распределения (Группа ${currentGroup})</div>
+                        <div class="flex justify-between py-1 border-b border-indigo-100/80"><span class="text-gray-600">Среднее значение (μ):</span><span class="font-bold text-gray-900">${mean.toFixed(2)} балл.</span></div>
+                        <div class="flex justify-between py-1 border-b border-indigo-100/80"><span class="text-gray-600">Станд. отклонение (σ):</span><span class="font-bold text-gray-900">${std.toFixed(2)}</span></div>
+                        <div class="flex justify-between py-1"><span class="text-gray-600">Диапазон μ ± 1σ:</span><span class="font-bold text-gray-900">${Math.max(0, mean - std).toFixed(1)} – ${Math.min(90, mean + std).toFixed(1)}</span></div>
+                    </div>
+                    <p class="text-gray-500 leading-relaxed">
+                        Поскольку в силлабусе нет жёстких квот на долю оценок A/B/C, кривая носит справочный характер и показывает смещение фактических баллов относительно нормального колокола.
+                    </p>
+                </div>
+            `;
+            document.getElementById('bell-curve-content').innerHTML = statsHtml;
+        }
+
+        function renderStats() {
+            const list = data[currentGroup];
+            const totalStudents = list.length;
+            let sumTotal = 0;
+            let sumGpa = 0;
+            let failingCount = 0;
+
+            list.forEach(s => {
+                const res = calculateGrade(s);
+                const numTotal = res.numTotal;
+                sumTotal += numTotal;
+                sumGpa += parseFloat(res.gpa);
+                if (numTotal < 50) failingCount++;
             });
+
+            const avgScore = totalStudents ? (sumTotal / totalStudents).toFixed(2) : '0.00';
+            const avgGpa = totalStudents ? (sumGpa / totalStudents).toFixed(2) : '0.00';
+
+            document.getElementById('stats-container').innerHTML = `
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Студентов в группе</p>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">${totalStudents}</p>
+                    </div>
+                    <div class="p-3 bg-blue-50 text-blue-600 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Средний балл (из 90)</p>
+                        <p class="text-2xl font-bold text-gray-900 mt-1">${avgScore}</p>
+                    </div>
+                    <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Средний GPA группы</p>
+                        <p class="text-2xl font-bold text-emerald-600 mt-1">${avgGpa}</p>
+                    </div>
+                    <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                    </div>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wider">Неуд (F &lt; 50%)</p>
+                        <p class="text-2xl font-bold text-red-600 mt-1">${failingCount} <span class="text-xs font-normal text-gray-400">чел.</span></p>
+                    </div>
+                    <div class="p-3 bg-red-50 text-red-600 rounded-lg">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                </div>
+            `;
+            renderBellCurve();
         }
 
-        function toggleTeacherMode() {
-            isTeacherMode = !isTeacherMode;
-            updateViewMode();
-            if (isTeacherMode) {
-                showToast('Панель преподавателя открыта.', 'success');
-            } else {
-                showToast('Переключено в режим студента.', 'info');
-            }
+        function autoResizeTextarea(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
         }
 
-        function updateViewMode() {
-            const studentView = document.getElementById('student-view');
-            const teacherView = document.getElementById('teacher-view');
-            const badge = document.getElementById('mode-badge');
+        function renderTable() {
+            const tbody = document.getElementById('grades-tbody');
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            const list = data[currentGroup];
 
-            if (isTeacherMode) {
-                studentView.classList.add('hidden');
-                teacherView.classList.remove('hidden');
-                badge.innerHTML = `<span class="h-2 w-2 bg-emerald-400 rounded-full animate-pulse"></span><span>Режим Преподавателя</span>`;
-                badge.className = "px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center space-x-1.5";
-                updateDashboardData();
-            } else {
-                studentView.classList.remove('hidden');
-                teacherView.classList.add('hidden');
-                badge.innerHTML = `<span class="h-2 w-2 bg-indigo-400 rounded-full animate-pulse"></span><span>Режим Студента</span>`;
-                badge.className = "px-3.5 py-1.5 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center space-x-1.5";
-            }
-        }
-
-        function renderTeacherTable(filterQuery = '') {
-            const tbody = document.getElementById('students-table-body');
             tbody.innerHTML = '';
 
-            const query = filterQuery.toLowerCase().trim();
-            const filtered = students.filter(s => s.name.toLowerCase().includes(query));
+            list.forEach((student, index) => {
+                if (searchQuery && !student.name.toLowerCase().includes(searchQuery)) return;
 
-            filtered.forEach(student => {
-                const rowNumber = students.indexOf(student) + 1;
-                const finalScore = calculateWeightedScore(
-                    student.attendance, student.ca1,
-                    student.mc1, student.ca2, student.mc2, student.exam
-                );
-                const gradeInfo = getLetterGrade(finalScore);
+                const res = calculateGrade(student);
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-blue-50/30 transition group';
 
-                const row = document.createElement('tr');
-                row.className = "hover:bg-slate-900/60 transition-colors border-b border-slate-800/40";
-                row.innerHTML = `
-                    <td class="py-2.5 px-2 text-center text-xs font-mono font-bold text-slate-500">
-                        ${rowNumber}
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 text-center text-gray-400 font-medium">${index + 1}</td>
+                    <td class="py-2.5 px-3 font-medium text-gray-900">
+                        <input type="text" value="${student.name.replace(/"/g, '&quot;')}" onchange="updateField(${index}, 'name', this.value)" class="w-full bg-transparent hover:bg-white focus:bg-white border border-transparent focus:border-blue-400 rounded px-1.5 py-1 transition focus:outline-none">
                     </td>
-                    <td class="py-2.5 px-2 font-medium text-slate-100 text-xs">
-                        <strong>${student.name}</strong>
+                    <td class="py-2.5 px-2 text-center">
+                        <input type="number" min="0" max="100" value="${student.ca1}" onchange="updateScore(${index}, 'ca1', this.value)" class="grade-input w-16 text-center border rounded-md py-1 text-sm ${getScoreColor(student.ca1)}">
                     </td>
-                    <td class="py-2.5 px-1 text-center">
-                        <button onclick="openAttendanceModal('${student.id}')"
-                            class="px-1.5 py-1 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-lg text-emerald-400 text-xs font-bold w-full transition-all flex items-center justify-center gap-1" title="Учет посещаемости (15 оффлайн + 15 онлайн = 30 зан.)">
-                            <span>${student.attendance}%</span>
-                            <i class="fa-solid fa-pencil text-[8px] text-slate-500"></i>
+                    <td class="py-2.5 px-3">
+                        <textarea rows="2" onchange="updateField(${index}, 'comment', this.value)" oninput="autoResizeTextarea(this)" placeholder="Добавить комментарий к СРСП 1..." class="comment-box w-full text-xs border rounded-md px-2 py-1.5 transition focus:outline-none focus:bg-white focus:border-blue-400 ${getCommentStyle(student.comment)}">${student.comment || ''}</textarea>
+                    </td>
+                    <td class="py-2.5 px-2 text-center">
+                        <input type="number" min="0" max="100" value="${student.ca2}" onchange="updateScore(${index}, 'ca2', this.value)" class="grade-input w-16 text-center border rounded-md py-1 text-sm ${getScoreColor(student.ca2)}">
+                    </td>
+                    <td class="py-2.5 px-3">
+                        <textarea rows="2" onchange="updateField(${index}, 'comment2', this.value)" oninput="autoResizeTextarea(this)" placeholder="Добавить комментарий к СРСП 2..." class="comment-box w-full text-xs border rounded-md px-2 py-1.5 transition focus:outline-none focus:bg-white focus:border-blue-400 ${getCommentStyle(student.comment2)}">${student.comment2 || ''}</textarea>
+                    </td>
+                    <td class="py-2.5 px-2 text-center">
+                        <input type="number" min="0" max="100" value="${student.m1}" onchange="updateScore(${index}, 'm1', this.value)" class="grade-input w-16 text-center border rounded-md py-1 text-sm ${getScoreColor(student.m1)}">
+                    </td>
+                    <td class="py-2.5 px-2 text-center">
+                        <input type="number" min="0" max="100" value="${student.m2}" onchange="updateScore(${index}, 'm2', this.value)" class="grade-input w-16 text-center border rounded-md py-1 text-sm ${getScoreColor(student.m2)}">
+                    </td>
+                    <td class="py-2.5 px-2 text-center">
+                        <input type="number" min="0" max="100" value="${student.fin}" onchange="updateScore(${index}, 'fin', this.value)" class="grade-input w-16 text-center border rounded-md py-1 text-sm ${getScoreColor(student.fin)}">
+                    </td>
+                    <td class="py-2.5 px-3 text-center font-bold text-gray-900 bg-blue-50/30">${res.total}</td>
+                    <td class="py-2.5 px-3 text-center bg-blue-50/30">
+                        <span class="inline-block px-2.5 py-0.5 text-xs font-bold rounded border ${res.badgeClass}">${res.letter}</span>
+                    </td>
+                    <td class="py-2.5 px-3 text-center font-semibold text-gray-700 bg-blue-50/30">${res.gpa}</td>
+                    <td class="py-2.5 px-3 text-center">
+                        <button onclick="deleteStudent(${index})" class="text-gray-400 hover:text-red-600 transition p-1 rounded hover:bg-red-50" title="Удалить студента">
+                            <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                         </button>
                     </td>
-                    <td class="py-2.5 px-1 text-center bg-indigo-950/40 font-black text-indigo-400 text-sm">${student.ca1 || 0}</td>
-                    <td class="py-2.5 px-1 text-center bg-amber-950/40 font-black text-amber-400 text-sm">${student.mc1 || 0}</td>
-                    <td class="py-2.5 px-1 text-center text-slate-300 text-xs">${student.ca2 || 0}</td>
-                    <td class="py-2.5 px-1 text-center text-orange-300 text-xs">${student.mc2 || 0}</td>
-                    <td class="py-2.5 px-1 text-center text-rose-300 text-xs">${student.exam || 0}</td>
-                    <td class="py-2.5 px-2 text-right font-extrabold text-violet-400 bg-indigo-950/10 text-xs">${finalScore}</td>
-                    <td class="py-2.5 px-2 text-center">
-                        <span class="inline-flex items-center justify-center px-2 py-0.5 text-[11px] font-bold rounded-lg border ${gradeInfo.class} w-10">
-                            ${gradeInfo.letter}
-                        </span>
-                    </td>
-                    <td class="py-2.5 px-3 text-slate-300 text-[11px] italic leading-tight">
-                        ${student.comment || "Работа не сдана"}
-                    </td>
                 `;
-                tbody.appendChild(row);
+                tbody.appendChild(tr);
             });
+
+            document.querySelectorAll('.comment-box').forEach(autoResizeTextarea);
+            renderStats();
         }
 
-        function updateStats() {
-            const total = students.length;
-            document.getElementById('stat-total-students').textContent = total;
+        function updateScore(index, field, value) {
+            let num = parseFloat(value);
+            if (isNaN(num) || num < 0) num = 0;
+            if (num > 100) num = 100;
+            data[currentGroup][index][field] = num;
+            saveData();
+            renderTable();
+        }
 
-            const metricTitle = getMetricTitle(currentBellMetric);
-            document.getElementById('stat-avg-label').textContent = `Средний балл (${metricTitle})`;
-            document.getElementById('stat-pass-label').textContent = `Успеваемость (${metricTitle} >=50)`;
-            document.getElementById('stat-best-label').textContent = `Лучший (${metricTitle})`;
+        function updateField(index, field, value) {
+            data[currentGroup][index][field] = value;
+            saveData();
+            if (field === 'comment' || field === 'comment2') renderTable();
+        }
 
-            if (total === 0) {
-                document.getElementById('stat-average-grade').textContent = '0.0';
-                document.getElementById('stat-average-letter').textContent = '-';
-                document.getElementById('stat-pass-rate').textContent = '0%';
-                document.getElementById('stat-best-student').textContent = '—';
+        function switchGroup(groupNum) {
+            currentGroup = groupNum;
+            const tab1 = document.getElementById('tab-g1');
+            const tab2 = document.getElementById('tab-g2');
+
+            if (groupNum === 1) {
+                tab1.className = 'px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 border-blue-600 text-blue-600 bg-white transition';
+                tab2.className = 'px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100/50 transition';
+            } else {
+                tab2.className = 'px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 border-blue-600 text-blue-600 bg-white transition';
+                tab1.className = 'px-5 py-2.5 text-sm font-medium rounded-t-lg border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-100/50 transition';
+            }
+            renderTable();
+        }
+
+        function openModal() {
+            document.getElementById('newStudentGroup').value = currentGroup;
+            document.getElementById('addStudentModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('addStudentModal').classList.add('hidden');
+            document.getElementById('newStudentName').value = '';
+            document.getElementById('newStudentCA1').value = '0';
+            document.getElementById('newStudentComment').value = '';
+            document.getElementById('newStudentComment2').value = '';
+        }
+
+        function addStudent() {
+            const name = document.getElementById('newStudentName').value.trim();
+            if (!name) {
+                alert('Пожалуйста, введите ФИО студента');
                 return;
             }
+            const grp = parseInt(document.getElementById('newStudentGroup').value);
+            let ca1 = parseFloat(document.getElementById('newStudentCA1').value) || 0;
+            if (ca1 < 0) ca1 = 0;
+            if (ca1 > 100) ca1 = 100;
+            const comment = document.getElementById('newStudentComment').value.trim();
+            const comment2 = document.getElementById('newStudentComment2').value.trim();
 
-            let sumVal = 0;
-            let passes = 0;
-            let topStudent = null;
-            let topVal = -1;
-
-            students.forEach(s => {
-                const val = getMetricValue(s, currentBellMetric);
-                sumVal += val;
-                if (val >= 50) passes++;
-                
-                if (val > topVal) {
-                    topVal = val;
-                    topStudent = s;
-                }
+            data[grp].push({
+                id: Date.now(),
+                name: name,
+                ca1: ca1,
+                comment: comment,
+                ca2: 0,
+                comment2: comment2,
+                m1: 0,
+                m2: 0,
+                fin: 0
             });
 
-            const avgVal = sumVal / total;
-            document.getElementById('stat-average-grade').textContent = avgVal.toFixed(1);
-            document.getElementById('stat-average-letter').textContent = getLetterGrade(avgVal).letter;
+            data[grp].sort((a, b) => a.name.localeCompare(b.name, 'ru'));
 
-            const passPercent = Math.round((passes / total) * 100);
-            document.getElementById('stat-pass-rate').textContent = `${passPercent}%`;
-
-            if (topStudent) {
-                document.getElementById('stat-best-student').textContent = `${topStudent.name} (${topVal.toFixed(1)})`;
-            }
+            saveData();
+            closeModal();
+            if (currentGroup !== grp) switchGroup(grp);
+            else renderTable();
         }
 
-        function updateDashboardData() {
-            renderTeacherTable();
-            updateStats();
-            renderBellCurveChart();
-        }
-
-        function toggleStudentAttDetails() {
-            const container = document.getElementById('student-att-details');
-            const toggleIcon = document.getElementById('student-att-toggle-icon');
-            if (container.classList.contains('hidden')) {
-                container.classList.remove('hidden');
-                toggleIcon.textContent = "Свернуть ▴";
-            } else {
-                container.classList.add('hidden');
-                toggleIcon.textContent = "Развернуть ▾";
-            }
-        }
-
-        function renderStudentAttendanceDetails(student) {
-            const grid = document.getElementById('student-att-list-grid');
-            grid.innerHTML = '';
-
-            for (let week = 1; week <= 15; week++) {
-                const offPresent = student.attendanceSessions[(week - 1) * 2];
-                const onlPresent = student.attendanceSessions[(week - 1) * 2 + 1];
-
-                const dateRow = document.createElement('div');
-                dateRow.className = "bg-slate-900/60 border border-slate-800/80 rounded-xl p-2.5 flex flex-col space-y-1.5 text-xs";
-                dateRow.innerHTML = `
-                    <span class="font-bold text-slate-300 flex items-center gap-1.5">
-                        <i class="fa-solid fa-calendar-week text-indigo-400 text-[11px]"></i>
-                        ${weekLabels[week - 1]}
-                    </span>
-                    <div class="flex items-center justify-between space-x-2">
-                        <span class="px-2 py-0.5 rounded font-semibold text-[10px] flex-1 flex items-center justify-center gap-1 ${offPresent ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-950 text-slate-600 border border-slate-800'}">
-                            Оффлайн: ${offPresent ? '<i class="fa-solid fa-check text-[9px]"></i>' : '<i class="fa-solid fa-xmark text-[9px]"></i>'}
-                        </span>
-                        <span class="px-2 py-0.5 rounded font-semibold text-[10px] flex-1 flex items-center justify-center gap-1 ${onlPresent ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20' : 'bg-slate-950 text-slate-600 border border-slate-800'}">
-                            Онлайн: ${onlPresent ? '<i class="fa-solid fa-check text-[9px]"></i>' : '<i class="fa-solid fa-xmark text-[9px]"></i>'}
-                        </span>
-                    </div>
-                `;
-                grid.appendChild(dateRow);
-            }
-        }
-
-        function openAttendanceModal(studentId) {
-            const student = students.find(s => s.id === studentId);
-            if (!student) return;
-
-            activeEditingStudentId = studentId;
-            if (!Array.isArray(student.attendanceSessions) || student.attendanceSessions.length !== TOTAL_ATTENDANCE_SESSIONS) {
-                student.attendanceSessions = Array(TOTAL_ATTENDANCE_SESSIONS).fill(false);
-            }
-            tempAttendanceSessions = [...student.attendanceSessions];
-
-            document.getElementById('att-modal-student-name').textContent = student.name;
-            updateAttendanceModalStats();
-
-            const grid = document.getElementById('attendance-dates-grid');
-            grid.innerHTML = '';
-
-            for (let week = 1; week <= 15; week++) {
-                const offIdx = (week - 1) * 2;
-                const onlIdx = (week - 1) * 2 + 1;
-
-                const row = document.createElement('div');
-                row.className = "bg-slate-900 border border-slate-800/80 p-2.5 rounded-xl flex items-center justify-between";
-                row.innerHTML = `
-                    <span class="text-xs font-bold text-slate-300 flex items-center gap-2">
-                        <span class="h-5 w-5 rounded bg-slate-950 flex items-center justify-center text-[10px] text-indigo-400 border border-indigo-900/30">Н${week}</span>
-                        ${weekLabels[week - 1]}
-                    </span>
-                    <div class="flex items-center space-x-2">
-                        <button onclick="toggleTempSession(${offIdx})" id="temp-chk-${offIdx}" class="px-3 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1">Оффлайн</button>
-                        <button onclick="toggleTempSession(${onlIdx})" id="temp-chk-${onlIdx}" class="px-3 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1">Онлайн</button>
-                    </div>
-                `;
-                grid.appendChild(row);
-                updateTempSessionButtonUI(offIdx);
-                updateTempSessionButtonUI(onlIdx);
-            }
-
-            const modal = document.getElementById('attendance-modal');
-            modal.classList.remove('hidden');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                modal.querySelector('div').classList.remove('scale-95');
-            }, 10);
-        }
-
-        function closeAttendanceModal() {
-            const modal = document.getElementById('attendance-modal');
-            modal.classList.add('opacity-0');
-            modal.querySelector('div').classList.add('scale-95');
-            setTimeout(() => {
-                modal.classList.add('hidden');
-            }, 200);
-            activeEditingStudentId = null;
-        }
-
-        function toggleTempSession(idx) {
-            tempAttendanceSessions[idx] = !tempAttendanceSessions[idx];
-            updateTempSessionButtonUI(idx);
-            updateAttendanceModalStats();
-        }
-
-        function updateTempSessionButtonUI(idx) {
-            const btn = document.getElementById(`temp-chk-${idx}`);
-            if (!btn) return;
-            const isChecked = tempAttendanceSessions[idx];
-            const isOffline = (idx % 2) === 0;
-            const label = isOffline ? "Оффлайн" : "Онлайн";
-            if (isChecked) {
-                btn.className = isOffline
-                    ? "px-3 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/10 border-emerald-500/30 text-emerald-400 border transition-all flex items-center gap-1"
-                    : "px-3 py-1 rounded-lg text-[10px] font-bold bg-sky-500/10 border-sky-500/30 text-sky-400 border transition-all flex items-center gap-1";
-                btn.innerHTML = `<i class="fa-solid fa-check"></i> ${label}`;
-            } else {
-                btn.className = "px-3 py-1 rounded-lg text-[10px] font-bold bg-slate-950 border-slate-800 text-slate-500 border transition-all flex items-center gap-1";
-                btn.innerHTML = `<i class="fa-solid fa-xmark"></i> ${label}`;
-            }
-        }
-
-        function toggleAllAttendance(status) {
-            for (let i = 0; i < TOTAL_ATTENDANCE_SESSIONS; i++) {
-                tempAttendanceSessions[i] = status;
-                updateTempSessionButtonUI(i);
-            }
-            updateAttendanceModalStats();
-        }
-
-        function updateAttendanceModalStats() {
-            const checkedCount = tempAttendanceSessions.filter(Boolean).length;
-            const percent = Math.round((checkedCount / TOTAL_ATTENDANCE_SESSIONS) * 100);
-            document.getElementById('att-modal-percent').textContent = `${percent}%`;
-            document.getElementById('att-modal-hours').textContent = `(${checkedCount} из ${TOTAL_ATTENDANCE_SESSIONS} зан.)`;
-        }
-
-        function saveAttendanceDetails() {
-            if (!activeEditingStudentId) return;
-
-            const student = students.find(s => s.id === activeEditingStudentId);
-            if (student) {
-                student.attendanceSessions = [...tempAttendanceSessions];
-                const checkedCount = student.attendanceSessions.filter(Boolean).length;
-                student.attendance = Math.round((checkedCount / TOTAL_ATTENDANCE_SESSIONS) * 100);
-
-                saveDatabase();
-                const searchFilter = document.getElementById('teacher-search-input').value;
-                renderTeacherTable(searchFilter);
-                updateStats();
-                renderBellCurveChart();
-                closeAttendanceModal();
-                showToast(`Посещаемость обновлена для ${student.name}.`, 'success');
+        function deleteStudent(index) {
+            const stName = data[currentGroup][index].name;
+            if (confirm(`Удалить студента "${stName}" из списка?`)) {
+                data[currentGroup].splice(index, 1);
+                saveData();
+                renderTable();
             }
         }
 
         function exportToCSV() {
-            if (students.length === 0) {
-                showToast('Журнал текущей группы пуст!', 'error');
-                return;
-            }
+            let csv = '\uFEFF';
+            csv += 'Группа;№;ФИО Студента;СРСП 1 (5%);Комментарий (СРСП 1);СРСП 2 (5%);Комментарий (СРСП 2);РК 1 (20%);РК 2 (20%);Финальный (40%);Итоговый балл;Буква;GPA\n';
 
-            let csvContent = "\uFEFF";
-            csvContent += "№;ФИО Студента;Посещаемость;СРСП 1;РК 1;СРСП 2;РК 2;Экзамен;Итоговый балл;Оценка;Комментарий преподавателя\n";
-
-            students.forEach((s, index) => {
-                const final = calculateWeightedScore(s.attendance, s.ca1, s.mc1, s.ca2, s.mc2, s.exam);
-                const letter = getLetterGrade(final).letter;
-                csvContent += `${index + 1};"${s.name.replace(/"/g, '""')}";${s.attendance}%;${s.ca1 || 0};${s.mc1 || 0};${s.ca2 || 0};${s.mc2 || 0};${s.exam || 0};${final};${letter};"${(s.comment || '').replace(/"/g, '""')}"\n`;
+            [1, 2].forEach(grpNum => {
+                data[grpNum].forEach((s, idx) => {
+                    const res = calculateGrade(s);
+                    const cleanComment1 = (s.comment || '').replace(/"/g, '""').replace(/\n/g, ' ');
+                    const cleanComment2 = (s.comment2 || '').replace(/"/g, '""').replace(/\n/g, ' ');
+                    csv += `Группа ${grpNum};${idx + 1};"${s.name}";${s.ca1};"${cleanComment1}";${s.ca2};"${cleanComment2}";${s.m1};${s.m2};${s.fin};${res.total.replace('.', ',')};"${res.letter}";${res.gpa.replace('.', ',')}\n`;
+                });
             });
 
-            const groupNameTitle = currentGroupKey === 'g1' ? 'Eko_1362131-35-CH' : 'Eko_1362131-37-CH';
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.setAttribute("href", url);
-            link.setAttribute("download", `ALMAU_Economics_SE_Grades_${groupNameTitle}.csv`);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'Успеваемость_Economics_SE_RUS_2026.csv');
+            link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            showToast('Экспорт в Excel завершен!', 'success');
         }
 
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            let bgClass = 'bg-slate-800 text-slate-100 border-slate-700';
-            let iconClass = 'fa-circle-info text-indigo-400';
-            
-            if (type === 'success') {
-                bgClass = 'bg-emerald-950/80 text-emerald-300 border-emerald-900/50';
-                iconClass = 'fa-circle-check text-emerald-400';
-            } else if (type === 'error') {
-                bgClass = 'bg-rose-950/80 text-rose-300 border-rose-900/50';
-                iconClass = 'fa-triangle-exclamation text-rose-400';
-            } else if (type === 'info') {
-                bgClass = 'bg-indigo-950/80 text-indigo-300 border-indigo-900/50';
-                iconClass = 'fa-bell text-indigo-400';
-            }
-
-            toast.className = `${bgClass} border px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2.5 text-xs font-semibold transform translate-y-2 opacity-0 transition-all duration-300 max-w-sm`;
-            toast.innerHTML = `<i class="fa-solid ${iconClass} text-sm"></i><span>${message}</span>`;
-
-            container.appendChild(toast);
-            
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('translate-y-2', 'opacity-0');
-                setTimeout(() => { toast.remove(); }, 300);
-            }, 3500);
-        }
+        init();
     </script>
 </body>
 </html>
