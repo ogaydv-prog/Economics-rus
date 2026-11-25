@@ -210,12 +210,12 @@
                     </div>
                 </div>
 
-                <!-- Детализация посещаемости студента -->
+                <!-- Детализация посещаемости студента (15 оффлайн + 15 онлайн) -->
                 <div id="student-att-wrapper" class="p-6 border-b border-slate-800 bg-slate-950/20 hidden">
                     <button onclick="toggleStudentAttDetails()" class="w-full flex items-center justify-between text-xs font-bold text-slate-400 uppercase tracking-wider hover:text-slate-200 transition-colors">
                         <span class="flex items-center gap-2">
                             <i class="fa-solid fa-list-check text-emerald-400"></i>
-                            Детализация занятий (15 недель × 3 часа = 45 часов)
+                            Детализация занятий (15 оффлайн + 15 онлайн = 30 занятий)
                         </span>
                         <span id="student-att-toggle-icon" class="text-[10px] bg-slate-800 px-2.5 py-1 rounded border border-slate-700 transition-all">Развернуть ▾</span>
                     </button>
@@ -281,7 +281,7 @@
                 </div>
                 <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Средний балл РК1</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Средний (СРСП1 + РК1)</p>
                         <div class="flex items-baseline space-x-1.5 mt-1">
                             <h3 class="text-3xl font-extrabold text-amber-400" id="stat-average-grade">0.0</h3>
                             <span class="text-xs font-bold text-indigo-400" id="stat-average-letter">-</span>
@@ -293,7 +293,7 @@
                 </div>
                 <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Успеваемость РК1 (>=50)</p>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Успеваемость (>=50)</p>
                         <h3 class="text-3xl font-extrabold text-white mt-1" id="stat-pass-rate">0%</h3>
                     </div>
                     <div class="h-12 w-12 bg-blue-500/10 text-blue-400 rounded-xl flex items-center justify-center text-xl border border-blue-500/20">
@@ -302,8 +302,8 @@
                 </div>
                 <div class="bg-slate-900 p-5 rounded-2xl border border-slate-800 flex items-center justify-between shadow-lg">
                     <div>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Лучший результат РК1</p>
-                        <h3 class="text-sm font-bold text-violet-400 mt-2 truncate max-w-[150px]" id="stat-best-student">—</h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Лучший (СРСП1 + РК1)</p>
+                        <h3 class="text-sm font-bold text-violet-400 mt-2 truncate max-w-[160px]" id="stat-best-student">—</h3>
                     </div>
                     <div class="h-12 w-12 bg-violet-500/10 text-violet-400 rounded-xl flex items-center justify-center text-xl border border-violet-500/20">
                         <i class="fa-solid fa-trophy"></i>
@@ -313,30 +313,19 @@
 
             <!-- BELL CURVE (NORMAL DISTRIBUTION) CHART WIDGET -->
             <div class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-2xl space-y-4">
-                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-3 border-b border-slate-800 pb-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
                     <div>
                         <h3 class="text-base font-extrabold text-white flex items-center gap-2">
                             <i class="fa-solid fa-chart-area text-indigo-400"></i>
-                            Кривая нормального распределения баллов (Bell Curve / Кривая Гаусса)
+                            Кривая нормального распределения баллов (Общий результат: СРСП 1 + РК 1)
                         </h3>
                         <p class="text-xs text-slate-400 mt-0.5">
-                            Сравнение фактического распределения оценок с теоретической кривой Гаусса
+                            Сравнение фактического распределения итогов 1-го модуля (СРСП-1 + РК-1) с теоретической кривой Гаусса
                         </p>
                     </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div class="flex items-center space-x-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[11px] font-bold">
-                            <button onclick="setBellMetric('mc1')" id="bell-btn-mc1" class="px-2.5 py-1 rounded-lg bg-indigo-600 text-white transition-all">РК 1</button>
-                            <button onclick="setBellMetric('ca1')" id="bell-btn-ca1" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all">СРСП 1</button>
-                            <button onclick="setBellMetric('ca2')" id="bell-btn-ca2" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all">СРСП 2</button>
-                            <button onclick="setBellMetric('activities')" id="bell-btn-activities" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all">Акт</button>
-                            <button onclick="setBellMetric('total')" id="bell-btn-total" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all">Итог</button>
-                            <button onclick="setBellMetric('mc2')" id="bell-btn-mc2" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all">РК 2</button>
-                            <button onclick="setBellMetric('exam')" id="bell-btn-exam" class="px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all">Экзамен</button>
-                        </div>
-                        <div class="flex items-center space-x-3 text-xs bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800 font-mono">
-                            <span class="text-indigo-400 font-bold">μ (Среднее): <span id="bell-mean-val" class="text-white">0.0</span></span>
-                            <span class="text-violet-400 font-bold">σ (Отклонение): <span id="bell-std-val" class="text-white">0.0</span></span>
-                        </div>
+                    <div class="flex items-center space-x-3 text-xs bg-slate-950 px-3.5 py-1.5 rounded-xl border border-slate-800 font-mono">
+                        <span class="text-indigo-400 font-bold">μ (Среднее): <span id="bell-mean-val" class="text-white">0.0</span></span>
+                        <span class="text-violet-400 font-bold">σ (Отклонение): <span id="bell-std-val" class="text-white">0.0</span></span>
                     </div>
                 </div>
                 <div class="relative w-full h-72">
@@ -387,7 +376,7 @@
         </div>
     </main>
 
-    <!-- Модальное окно детальной посещаемости (15 недель × 3 часа) -->
+    <!-- Модальное окно детальной посещаемости (15 недель: 15 оффлайн + 15 онлайн = 30 занятий) -->
     <div id="attendance-modal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
         <div class="bg-slate-900 p-6 rounded-2xl max-w-2xl w-full mx-4 shadow-2xl border border-slate-800 transform scale-95 transition-transform duration-200 flex flex-col max-h-[85vh]">
             <div class="flex justify-between items-center pb-3.5 border-b border-slate-800">
@@ -397,7 +386,7 @@
                     </div>
                     <div>
                         <h3 class="text-sm font-extrabold text-white" id="att-modal-student-name">Детализация посещаемости</h3>
-                        <p class="text-[10px] text-slate-400">15 Недель × 3 Читаемых часа (45 Академических часов)</p>
+                        <p class="text-[10px] text-slate-400">15 Оффлайн + 15 Онлайн занятий (Всего 30 обязательных занятий)</p>
                     </div>
                 </div>
                 <button onclick="closeAttendanceModal()" class="text-slate-400 hover:text-white transition-colors">
@@ -410,7 +399,7 @@
                     <span class="text-xs text-slate-400 font-semibold">Итоговый процент посещаемости:</span>
                     <div class="flex items-center space-x-2">
                         <span id="att-modal-percent" class="text-emerald-400 font-extrabold text-sm">0%</span>
-                        <span id="att-modal-hours" class="text-slate-500 text-xs font-medium">(0 из 45 ч)</span>
+                        <span id="att-modal-hours" class="text-slate-500 text-xs font-medium">(0 из 30 зан.)</span>
                     </div>
                 </div>
                 <div class="space-y-2.5" id="attendance-dates-grid"></div>
@@ -443,7 +432,10 @@
     </button>
 
     <script>
-        const TOTAL_ATTENDANCE_HOURS = 45;
+        // График дисциплины: 15 обязательных оффлайн + 15 онлайн занятий = 30 часов
+        const TOTAL_ATTENDANCE_SESSIONS = 30;
+        // По скриншотам Platonus на 26 ноября проведено 28 занятий (14 оффлайн + 14 онлайн)
+        const CONDUCTED_SESSIONS_G1 = 28;
 
         const weekLabels = [
             "Неделя 1 (27-28 авг)",
@@ -454,63 +446,74 @@
             "Неделя 6 (1-2 окт)",
             "Неделя 7 (8-9 окт)",
             "Неделя 8 (15-16 окт)",
-            "Неделя 9 (22-23 окт)",
-            "Неделя 10 (29-30 окт)",
-            "Неделя 11 (5-6 ноя)",
+            "Неделя 9 (22 окт)",
+            "Неделя 10 (29 окт)",
+            "Неделя 11 (5 ноя)",
             "Неделя 12 (12 ноя)",
-            "Неделя 13",
-            "Неделя 14",
-            "Неделя 15"
+            "Неделя 13 (19 ноя)",
+            "Неделя 14 (26 ноя)",
+            "Неделя 15 (3-4 дек)"
         ];
 
-        // Карта часов первой группы (24 проведенных часа из 45 по скриншотам Platonus):
-        // 1: 27 авг, 2: 28 авг, 3: 3 сен, 4: 4 сен, 5: 10 сен, 6: 11 сен, 7: 17 сен, 8: 18 сен,
-        // 9: 24 сен, 10: 25 сен, 11: 1 окт, 12: 2 окт, 13: 8 окт, 14: 9 окт, 15: 15 окт, 16: 16 окт,
-        // 17: 22 окт, 18: 23 окт, 19: 29 окт, 20: 30 окт, 21: 5 ноя, 22: 6 ноя, 23: 12 ноя, 24: 13 ноя
-        // В массиве absences указаны номера часов (1..24), где стоит отметка «н».
+        // Карта 28 проведенных занятий первой группы (14 оффлайн + 14 онлайн из 30) по скриншотам Platonus:
+        // Неделя 1: 1 (27 авг оффлайн), 2 (28 авг онлайн)
+        // Неделя 2: 3 (3 сен оффлайн), 4 (4 сен онлайн)
+        // Неделя 3: 5 (10 сен оффлайн), 6 (11 сен онлайн)
+        // Неделя 4: 7 (17 сен оффлайн), 8 (18 сен онлайн)
+        // Неделя 5: 9 (24 сен оффлайн), 10 (25 сен онлайн)
+        // Неделя 6: 11 (1 окт оффлайн), 12 (2 окт онлайн)
+        // Неделя 7: 13 (8 окт оффлайн), 14 (9 окт онлайн)
+        // Неделя 8: 15 (15 окт оффлайн), 16 (16 окт онлайн)
+        // Неделя 9: 17 (22 окт оффлайн), 18 (22 окт онлайн)
+        // Неделя 10: 19 (29 окт оффлайн), 20 (29 окт онлайн)
+        // Неделя 11: 21 (5 ноя оффлайн), 22 (5 ноя онлайн)
+        // Неделя 12: 23 (12 ноя оффлайн), 24 (12 ноя онлайн)
+        // Неделя 13: 25 (19 ноя оффлайн), 26 (19 ноя онлайн)
+        // Неделя 14: 27 (26 ноя оффлайн), 28 (26 ноя онлайн)
+        // В массиве absences указаны номера занятий (1..28), где в Platonus стоит серый квадратик «н».
         const initialGroup1 = [
-            { id: "g1-st-1", name: "Азизбеков Максат Арманович", activities: 0, ca1: 0, mc1: 58, ca2: 70, mc2: 0, exam: 0, absences: [17, 19], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-2", name: "Акимжанов Муслимбек Бекзодұлы", activities: 0, ca1: 0, mc1: 73, ca2: 70, mc2: 0, exam: 0, absences: [13, 17, 18, 22], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-3", name: "Алпыспаев Мирас Жалғасұлы", activities: 0, ca1: 60, mc1: 87, ca2: 70, mc2: 0, exam: 0, absences: [9, 17], comment: "Оценка 60/100 из ведомости Platonus (11 сен)." },
-            { id: "g1-st-4", name: "Амирханов Даулет Сакенович", activities: 0, ca1: 50, mc1: 80, ca2: 95, mc2: 0, exam: 0, absences: [3, 7, 9], comment: "50/100 (Подлог / Списано): Выбрал кейс 'Кофейня', а в текст вставил скопированный фрагмент про хлеб!" },
-            { id: "g1-st-5", name: "Ахметов Андрей Витальевич", activities: 0, ca1: 95, mc1: 69, ca2: 70, mc2: 0, exam: 0, absences: [13, 14], comment: "95/100 (Отличная самостоятельная работа): Самостоятельный авторский анализ рынка фитнес-услуг Алматы." },
-            { id: "g1-st-6", name: "Әкімхан Рамазан Қайратұлы", activities: 0, ca1: 0, mc1: 69, ca2: 70, mc2: 0, exam: 0, absences: [9, 13, 14, 17], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-7", name: "Байдалы Айсер Сабырханұлы", activities: 0, ca1: 0, mc1: 65, ca2: 70, mc2: 0, exam: 0, absences: [], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-8", name: "Байдукова Арина Андреевна", activities: 0, ca1: 90, mc1: 90, ca2: 95, mc2: 0, exam: 0, absences: [], comment: "90/100 (Хорошая самостоятельная работа): Качественный разбор конкуренции спешелти-кофейни." },
-            { id: "g1-st-9", name: "Бекешев Дінмухамед Ермекұлы", activities: 0, ca1: 50, mc1: 97, ca2: 70, mc2: 0, exam: 0, absences: [5], comment: "50/100 (Генерация ИИ / ChatGPT): Прямое копирование сгенерированного текста ChatGPT." },
-            { id: "g1-st-10", name: "Гуков Арман Андрейұлы", activities: 0, ca1: 96, mc1: 55, ca2: 70, mc2: 0, exam: 0, absences: [17], comment: "96/100 (Глубокий авторский анализ): Отличный разбор с примерами продуктов первой необходимости." },
-            { id: "g1-st-11", name: "Долинин Тимур Евгеньевич", activities: 0, ca1: 97, mc1: 94, ca2: 70, mc2: 0, exam: 0, absences: [5, 19], comment: "97/100 (Высокий академический уровень): Глубокий самостоятельный разбор ценовой эластичности." },
-            { id: "g1-st-12", name: "Есіркеп Аян Бақытжанұлы", activities: 0, ca1: 90, mc1: 80, ca2: 95, mc2: 0, exam: 0, absences: [22], comment: "90/100 (Хорошая самостоятельная работа): Качественные выводы по кофейням у дома." },
-            { id: "g1-st-13", name: "Жалбаслар Дәулет Русланұлы", activities: 0, ca1: 0, mc1: 80, ca2: 95, mc2: 0, exam: 0, absences: [3, 5, 11], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-14", name: "Жарылгасынова Жасмин Максатовна", activities: 0, ca1: 90, mc1: 65, ca2: 0, mc2: 0, exam: 0, absences: [9, 17], comment: "90/100 (Хорошая самостоятельная работа): Грамотное объяснение неэластичности бензина АИ-92." },
-            { id: "g1-st-15", name: "Казымов Руслан", activities: 0, ca1: 60, mc1: 64, ca2: 0, mc2: 0, exam: 0, absences: [17, 22], comment: "60/100 (Слабая самостоятельная работа): Крайне поверхностная отписка в полстрочки." },
-            { id: "g1-st-16", name: "Кариева Карина Армановна", activities: 0, ca1: 50, mc1: 70, ca2: 95, mc2: 0, exam: 0, absences: [22], comment: "Оценка 50/100 из ведомости Platonus (11 сен)." },
-            { id: "g1-st-17", name: "Ким Валентин Владиславович", activities: 0, ca1: 0, mc1: 70, ca2: 70, mc2: 0, exam: 0, absences: [17, 19], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-18", name: "Коваленко Илья Викторович", activities: 0, ca1: 55, mc1: 97, ca2: 70, mc2: 0, exam: 0, absences: [3, 19], comment: "55/100 (Шаблон из общего чата): Вставлен стандартный шаблон заготовки с формулой." },
-            { id: "g1-st-19", name: "Конысбаев Айбек Ермаханович", activities: 0, ca1: 60, mc1: 74, ca2: 95, mc2: 0, exam: 0, absences: [3], comment: "Оценка 60/100 из ведомости Platonus (11 сен)." },
-            { id: "g1-st-20", name: "Кошантаев Бексултан Маратович", activities: 0, ca1: 96, mc1: 89, ca2: 95, mc2: 0, exam: 0, absences: [13, 17, 22], comment: "96/100 (Глубокий математический анализ): Расчет процентного изменения показателей и детальный анализ." },
-            { id: "g1-st-21", name: "Масалимов Олжас Ержанович", activities: 0, ca1: 0, mc1: 0, ca2: 0, mc2: 0, exam: 0, absences: [3, 5, 7, 13, 14, 17, 19, 22], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-22", name: "Медиханов Тимур Фархадович", activities: 0, ca1: 55, mc1: 90, ca2: 95, mc2: 0, exam: 0, absences: [5, 18], comment: "55/100 (Шаблон из общего чата): Скопирован готовый текст шаблонной заготовки." },
-            { id: "g1-st-23", name: "Морбекова Камилла Ескендеровна", activities: 0, ca1: 90, mc1: 83, ca2: 85, mc2: 0, exam: 0, absences: [18], comment: "90/100 (Хорошая самостоятельная работа): Грамотный экономический анализ предельной выручки." },
-            { id: "g1-st-24", name: "Мусаев Ернур Русланович", activities: 0, ca1: 0, mc1: 69, ca2: 70, mc2: 0, exam: 0, absences: [18], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-25", name: "Нұржанқызы Балнұр", activities: 0, ca1: 0, mc1: 97, ca2: 95, mc2: 0, exam: 0, absences: [3, 5, 17, 18], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-26", name: "Омаров Болат Айдосович", activities: 0, ca1: 0, mc1: 75, ca2: 70, mc2: 0, exam: 0, absences: [3, 5, 18], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-27", name: "Рамазанов Арсен Дауренұлы", activities: 0, ca1: 95, mc1: 82, ca2: 95, mc2: 0, exam: 0, absences: [], comment: "95/100 (Отличная самостоятельная работа): Живой самостоятельный экономический разбор фитнес-индустрии." },
-            { id: "g1-st-28", name: "Рахимбекова Сагыныш Рахимбековна", activities: 0, ca1: 60, mc1: 96, ca2: 70, mc2: 0, exam: 0, absences: [7], comment: "60/100 (Слабая самостоятельная работа): Поверхностное суждение в 2 предложения." },
-            { id: "g1-st-29", name: "Ровнов Владислав Александрович", activities: 0, ca1: 95, mc1: 85, ca2: 0, mc2: 0, exam: 0, absences: [18, 22], comment: "95/100 (Отличная самостоятельная работа): Качественный разбор кофейного рынка Алматы с примерами брендов." },
-            { id: "g1-st-30", name: "Сәтпек Нұрлыбек Асланбекұлы", activities: 0, ca1: 0, mc1: 79, ca2: 70, mc2: 0, exam: 0, absences: [7, 13, 18], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-31", name: "Тастемір Шамиил Қайратұлы", activities: 0, ca1: 0, mc1: 59, ca2: 70, mc2: 0, exam: 0, absences: [3, 5, 18], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-32", name: "Тәжібай Мухаммедазиз Мұхтарұлы", activities: 0, ca1: 0, mc1: 75, ca2: 70, mc2: 0, exam: 0, absences: [11, 17, 18], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-33", name: "Терехов Вячеслав Константинович", activities: 0, ca1: 50, mc1: 85, ca2: 70, mc2: 0, exam: 0, absences: [], comment: "50/100 (Списание + Противоречие): В форме введена некорректная исходная цена." },
-            { id: "g1-st-34", name: "Титовский Андрей Сергеевич", activities: 0, ca1: 0, mc1: 77, ca2: 70, mc2: 0, exam: 0, absences: [3, 5, 18], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-35", name: "Тұрсымбай Асқар Сүлейменұлы", activities: 0, ca1: 90, mc1: 75, ca2: 70, mc2: 0, exam: 0, absences: [5, 18, 19], comment: "90/100 (Хорошая самостоятельная работа): Простой, честный авторский текст без применения ИИ." },
-            { id: "g1-st-36", name: "Уразалиев Сагит Ильдарович", activities: 0, ca1: 0, mc1: 84, ca2: 70, mc2: 0, exam: 0, absences: [9, 18, 19], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-37", name: "Филипенко Александр Юрьевич", activities: 0, ca1: 80, mc1: 95, ca2: 70, mc2: 0, exam: 0, absences: [], comment: "80/100 по ведомости Platonus (11 сен)." },
-            { id: "g1-st-38", name: "Хашимова Саида Ренатовна", activities: 0, ca1: 55, mc1: 89, ca2: 85, mc2: 0, exam: 0, absences: [3, 18], comment: "55/100 (Шаблон из общего чата): Формальный списанный текст заготовки из чата." },
-            { id: "g1-st-39", name: "Хохлов Алексей Игоревич", activities: 0, ca1: 60, mc1: 94, ca2: 95, mc2: 0, exam: 0, absences: [3, 18], comment: "60/100 (Слабая самостоятельная работа): Формальный короткий ответ без детального анализа." },
-            { id: "g1-st-40", name: "Шайкенова Камилла Азаматовна", activities: 0, ca1: 0, mc1: 75, ca2: 95, mc2: 0, exam: 0, absences: [3, 5, 17, 18], comment: "Работа не сдана в симулятор." },
-            { id: "g1-st-41", name: "Юсупова Ильнара Дамировна", activities: 0, ca1: 95, mc1: 72, ca2: 70, mc2: 0, exam: 0, absences: [11, 18, 19], comment: "95/100 (Отличная самостоятельная работа): Точный вывод формулы и качественный анализ субститутов." },
-            { id: "g1-st-42", name: "Яппаров Эмир Фанильевич", activities: 0, ca1: 50, mc1: 60, ca2: 95, mc2: 0, exam: 0, absences: [11, 13, 18], comment: "50/100 (Генерация ИИ / ChatGPT): Книжный сгенерированный нейросетью текст." }
+            { id: "g1-st-1", name: "Азизбеков Максат Арманович", activities: 0, ca1: 0, mc1: 29.0, ca2: 70, mc2: 0, exam: 0, absences: [17, 19, 25], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-2", name: "Акимжанов Муслимбек Бекзодұлы", activities: 0, ca1: 0, mc1: 36.5, ca2: 70, mc2: 0, exam: 0, absences: [13, 17, 23], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-3", name: "Алпыспаев Мирас Жалғасұлы", activities: 0, ca1: 60, mc1: 73.5, ca2: 70, mc2: 0, exam: 0, absences: [9, 17], comment: "Оценка 60/100 из ведомости Platonus (11 сен)." },
+            { id: "g1-st-4", name: "Амирханов Даулет Сакенович", activities: 0, ca1: 50, mc1: 65.0, ca2: 95, mc2: 0, exam: 0, absences: [3, 7, 9, 25], comment: "50/100 (Подлог / Списано): Выбрал кейс 'Кофейня', а в текст вставил скопированный фрагмент про хлеб!" },
+            { id: "g1-st-5", name: "Ахметов Андрей Витальевич", activities: 0, ca1: 95, mc1: 82.0, ca2: 70, mc2: 0, exam: 0, absences: [13, 14, 23], comment: "95/100 (Отличная самостоятельная работа): Самостоятельный авторский анализ рынка фитнес-услуг Алматы." },
+            { id: "g1-st-6", name: "Әкімхан Рамазан Қайратұлы", activities: 0, ca1: 0, mc1: 34.5, ca2: 70, mc2: 0, exam: 0, absences: [9, 13, 14, 23, 25], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-7", name: "Байдалы Айсер Сабырханұлы", activities: 0, ca1: 0, mc1: 32.5, ca2: 70, mc2: 0, exam: 0, absences: [25], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-8", name: "Байдукова Арина Андреевна", activities: 0, ca1: 90, mc1: 90.0, ca2: 95, mc2: 0, exam: 0, absences: [], comment: "90/100 (Хорошая самостоятельная работа): Качественный разбор конкуренции спешелти-кофейни." },
+            { id: "g1-st-9", name: "Бекешев Дінмухамед Ермекұлы", activities: 0, ca1: 50, mc1: 73.5, ca2: 70, mc2: 0, exam: 0, absences: [5], comment: "50/100 (Генерация ИИ / ChatGPT): Прямое копирование сгенерированного текста ChatGPT." },
+            { id: "g1-st-10", name: "Гуков Арман Андрейұлы", activities: 0, ca1: 96, mc1: 75.5, ca2: 70, mc2: 0, exam: 0, absences: [17], comment: "96/100 (Глубокий авторский анализ): Отличный разбор с примерами продуктов первой необходимости." },
+            { id: "g1-st-11", name: "Долинин Тимур Евгеньевич", activities: 0, ca1: 97, mc1: 95.5, ca2: 70, mc2: 0, exam: 0, absences: [5, 19], comment: "97/100 (Высокий академический уровень): Глубокий самостоятельный разбор ценовой эластичности." },
+            { id: "g1-st-12", name: "Есіркеп Аян Бақытжанұлы", activities: 0, ca1: 90, mc1: 85.0, ca2: 95, mc2: 0, exam: 0, absences: [23], comment: "90/100 (Хорошая самостоятельная работа): Качественные выводы по кофейням у дома." },
+            { id: "g1-st-13", name: "Жалбаслар Дәулет Русланұлы", activities: 0, ca1: 0, mc1: 40.0, ca2: 95, mc2: 0, exam: 0, absences: [3, 5, 11], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-14", name: "Жарылгасынова Жасмин Максатовна", activities: 0, ca1: 90, mc1: 77.5, ca2: 0, mc2: 0, exam: 0, absences: [9, 17], comment: "90/100 (Хорошая самостоятельная работа): Грамотное объяснение неэластичности бензина АИ-92." },
+            { id: "g1-st-15", name: "Казымов Руслан", activities: 0, ca1: 60, mc1: 62.0, ca2: 0, mc2: 0, exam: 0, absences: [17, 19], comment: "60/100 (Слабая самостоятельная работа): Крайне поверхностная отписка в полстрочки." },
+            { id: "g1-st-16", name: "Кариева Карина Армановна", activities: 0, ca1: 50, mc1: 60.0, ca2: 95, mc2: 0, exam: 0, absences: [23], comment: "Оценка 50/100 из ведомости Platonus (11 сен)." },
+            { id: "g1-st-17", name: "Ким Валентин Владиславович", activities: 0, ca1: 0, mc1: 35.0, ca2: 70, mc2: 0, exam: 0, absences: [17, 19, 25], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-18", name: "Коваленко Илья Викторович", activities: 0, ca1: 55, mc1: 76.0, ca2: 85, mc2: 0, exam: 0, absences: [3, 19, 25], comment: "55/100 (Шаблон из общего чата): Вставлен стандартный шаблон заготовки с формулой." },
+            { id: "g1-st-19", name: "Конысбаев Айбек Ермаханович", activities: 0, ca1: 60, mc1: 67.0, ca2: 95, mc2: 0, exam: 0, absences: [3, 25], comment: "Оценка 60/100 из ведомости Platonus (11 сен)." },
+            { id: "g1-st-20", name: "Кошантаев Бексултан Маратович", activities: 0, ca1: 96, mc1: 92.5, ca2: 95, mc2: 0, exam: 0, absences: [13, 17, 23], comment: "96/100 (Глубокий математический анализ): Расчет процентного изменения показателей и детальный анализ." },
+            { id: "g1-st-21", name: "Масалимов Олжас Ержанович", activities: 0, ca1: 0, mc1: 0.0, ca2: 0, mc2: 0, exam: 0, absences: [3, 5, 7, 13, 14, 17, 19, 23], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-22", name: "Медиханов Тимур Фархадович", activities: 0, ca1: 55, mc1: 72.5, ca2: 95, mc2: 0, exam: 0, absences: [5], comment: "55/100 (Шаблон из общего чата): Скопирован готовый текст шаблонной заготовки." },
+            { id: "g1-st-23", name: "Морбекова Камилла Ескендеровна", activities: 0, ca1: 90, mc1: 76.5, ca2: 85, mc2: 0, exam: 0, absences: [], comment: "90/100 (Хорошая самостоятельная работа): Грамотный экономический анализ предельной выручки." },
+            { id: "g1-st-24", name: "Мусаев Ернур Русланович", activities: 0, ca1: 0, mc1: 34.5, ca2: 70, mc2: 0, exam: 0, absences: [], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-25", name: "Нұржанқызы Балнұр", activities: 0, ca1: 0, mc1: 48.5, ca2: 95, mc2: 0, exam: 0, absences: [3, 5, 17, 25], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-26", name: "Омаров Болат Айдосович", activities: 0, ca1: 0, mc1: 37.5, ca2: 70, mc2: 0, exam: 0, absences: [3, 5, 25], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-27", name: "Рамазанов Арсен Дауренұлы", activities: 0, ca1: 95, mc1: 78.5, ca2: 95, mc2: 0, exam: 0, absences: [], comment: "95/100 (Отличная самостоятельная работа): Живой самостоятельный экономический разбор фитнес-индустрии." },
+            { id: "g1-st-28", name: "Рахимбекова Сагыныш Рахимбековна", activities: 0, ca1: 60, mc1: 77.5, ca2: 70, mc2: 0, exam: 0, absences: [7], comment: "60/100 (Слабая самостоятельная работа): Поверхностное суждение в 2 предложения." },
+            { id: "g1-st-29", name: "Ровнов Владислав Александрович", activities: 0, ca1: 95, mc1: 87.5, ca2: 0, mc2: 0, exam: 0, absences: [23], comment: "95/100 (Отличная самостоятельная работа): Качественный разбор кофейного рынка Алматы с примерами брендов." },
+            { id: "g1-st-30", name: "Сәтпек Нұрлыбек Асланбекұлы", activities: 0, ca1: 0, mc1: 39.5, ca2: 70, mc2: 0, exam: 0, absences: [7, 13, 17], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-31", name: "Тастемір Шамиил Қайратұлы", activities: 0, ca1: 0, mc1: 29.5, ca2: 70, mc2: 0, exam: 0, absences: [3, 5], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-32", name: "Тәжібай Мухаммедазиз Мұхтарұлы", activities: 0, ca1: 0, mc1: 75.0, ca2: 70, mc2: 0, exam: 0, absences: [11, 17], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-33", name: "Терехов Вячеслав Константинович", activities: 0, ca1: 50, mc1: 67.5, ca2: 70, mc2: 0, exam: 0, absences: [], comment: "50/100 (Списание + Противоречие): В форме введена некорректная исходная цена." },
+            { id: "g1-st-34", name: "Титовский Андрей Сергеевич", activities: 0, ca1: 0, mc1: 38.5, ca2: 70, mc2: 0, exam: 0, absences: [3, 5], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-35", name: "Тұрсымбай Асқар Сүлейменұлы", activities: 0, ca1: 90, mc1: 82.5, ca2: 70, mc2: 0, exam: 0, absences: [5, 19], comment: "90/100 (Хорошая самостоятельная работа): Простой, честный авторский текст без применения ИИ." },
+            { id: "g1-st-36", name: "Уразалиев Сагит Ильдарович", activities: 0, ca1: 0, mc1: 42.0, ca2: 70, mc2: 0, exam: 0, absences: [9, 17, 25], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-37", name: "Филипенко Александр Юрьевич", activities: 0, ca1: 80, mc1: 87.5, ca2: 70, mc2: 0, exam: 0, absences: [], comment: "80/100 по ведомости Platonus (11 сен)." },
+            { id: "g1-st-38", name: "Хашимова Саида Ренатовна", activities: 0, ca1: 55, mc1: 72.0, ca2: 80, mc2: 0, exam: 0, absences: [3], comment: "55/100 (Шаблон из общего чата): Формальный списанный текст заготовки из чата." },
+            { id: "g1-st-39", name: "Хохлов Алексей Игоревич", activities: 0, ca1: 60, mc1: 77.0, ca2: 95, mc2: 0, exam: 0, absences: [3], comment: "60/100 (Слабая самостоятельная работа): Формальный короткий ответ без детального анализа." },
+            { id: "g1-st-40", name: "Шайкенова Камилла Азаматовна", activities: 0, ca1: 0, mc1: 37.5, ca2: 95, mc2: 0, exam: 0, absences: [3, 5, 17], comment: "Работа не сдана в симулятор." },
+            { id: "g1-st-41", name: "Юсупова Ильнара Дамировна", activities: 0, ca1: 95, mc1: 83.5, ca2: 70, mc2: 0, exam: 0, absences: [11, 19], comment: "95/100 (Отличная самостоятельная работа): Точный вывод формулы и качественный анализ субститутов." },
+            { id: "g1-st-42", name: "Яппаров Эмир Фанильевич", activities: 0, ca1: 50, mc1: 55.0, ca2: 95, mc2: 0, exam: 0, absences: [11, 13, 23], comment: "50/100 (Генерация ИИ / ChatGPT): Книжный сгенерированный нейросетью текст." }
         ];
 
         const initialGroup2 = [
@@ -556,27 +559,27 @@
         ];
 
         function buildAttendanceArray(absences) {
-            const arr = Array(TOTAL_ATTENDANCE_HOURS).fill(false);
-            // Проставляем посещения за 24 проведенных часа (из 45), исключая часы с серой отметкой «н»
-            for (let hour = 1; hour <= 24; hour++) {
-                if (!absences.includes(hour)) {
-                    arr[hour - 1] = true;
+            const arr = Array(TOTAL_ATTENDANCE_SESSIONS).fill(false);
+            // Проставляем посещения за 28 проведенных занятий (14 оффлайн + 14 онлайн из 30), исключая занятия с серым квадратиком «н»
+            for (let session = 1; session <= CONDUCTED_SESSIONS_G1; session++) {
+                if (!absences.includes(session)) {
+                    arr[session - 1] = true;
                 }
             }
             return arr;
         }
 
-        function prepareGroupData(rawGroup, hasHourMap) {
+        function prepareGroupData(rawGroup, hasSessionMap) {
             return rawGroup.map(st => {
-                if (hasHourMap && Array.isArray(st.absences)) {
-                    const attHours = buildAttendanceArray(st.absences);
-                    const presentCount = attHours.filter(Boolean).length;
-                    const attPercent = Math.round((presentCount / TOTAL_ATTENDANCE_HOURS) * 100);
-                    return { ...st, attendance: attPercent, attendanceHours: attHours };
+                if (hasSessionMap && Array.isArray(st.absences)) {
+                    const attSessions = buildAttendanceArray(st.absences);
+                    const presentCount = attSessions.filter(Boolean).length;
+                    const attPercent = Math.round((presentCount / TOTAL_ATTENDANCE_SESSIONS) * 100);
+                    return { ...st, attendance: attPercent, attendanceSessions: attSessions };
                 } else {
-                    const approxHours = Math.round(((st.attendance || 0) / 100) * TOTAL_ATTENDANCE_HOURS);
-                    const attHours = Array(TOTAL_ATTENDANCE_HOURS).fill(false).map((_, i) => i < approxHours);
-                    return { ...st, attendanceHours: attHours };
+                    const approxSessions = Math.round(((st.attendance || 0) / 100) * TOTAL_ATTENDANCE_SESSIONS);
+                    const attSessions = Array(TOTAL_ATTENDANCE_SESSIONS).fill(false).map((_, i) => i < approxSessions);
+                    return { ...st, attendanceSessions: attSessions };
                 }
             });
         }
@@ -592,11 +595,10 @@
         let personalActChart = null;
         let personalExamChart = null;
         let bellCurveChart = null;
-        let bellMetric = 'mc1';
         let isTeacherMode = false;
 
         let activeEditingStudentId = null;
-        let tempAttendanceHours = [];
+        let tempAttendanceSessions = [];
 
         window.onload = function() {
             loadDatabase();
@@ -607,7 +609,6 @@
             });
         };
 
-        // Загружаем актуальные данные напрямую из кода файла (независимо от старого кэша)
         function loadDatabase() {
             database = {
                 g1: prepareGroupData(initialGroup1, true),
@@ -619,7 +620,7 @@
 
         function saveDatabase() {
             database[currentGroupKey] = students;
-            localStorage.setItem('almau_economics_se_rus_groups_v11', JSON.stringify(database));
+            localStorage.setItem('almau_economics_se_rus_groups_v13', JSON.stringify(database));
         }
 
         function switchGroup(groupKey) {
@@ -653,6 +654,10 @@
             const wMc2 = (mc2 || 0) * 0.10;
             const wExam = (exam || 0) * 0.40;
             return parseFloat((wAtt + wAct + wCa1 + wMc1 + wCa2 + wMc2 + wExam).toFixed(1));
+        }
+
+        function getModule1CombinedScore(student) {
+            return parseFloat((((Number(student.ca1) || 0) + (Number(student.mc1) || 0)) / 2).toFixed(1));
         }
 
         function getLetterGrade(score) {
@@ -716,7 +721,7 @@
                 document.getElementById('sr-val-exam').textContent = `${matchedStudent.exam || 0}`;
 
                 const attWrapper = document.getElementById('student-att-wrapper');
-                if (isG1 && Array.isArray(matchedStudent.attendanceHours)) {
+                if (isG1 && Array.isArray(matchedStudent.attendanceSessions)) {
                     attWrapper.classList.remove('hidden');
                     renderStudentAttendanceDetails(matchedStudent);
                 } else {
@@ -817,33 +822,11 @@
             circle.style.strokeDashoffset = strokeOffset;
         }
 
-        function setBellMetric(metric) {
-            bellMetric = metric;
-            ['mc1', 'ca1', 'ca2', 'activities', 'total', 'mc2', 'exam'].forEach(m => {
-                const btn = document.getElementById(`bell-btn-${m}`);
-                if (!btn) return;
-                if (m === metric) {
-                    btn.className = "px-2.5 py-1 rounded-lg bg-indigo-600 text-white transition-all";
-                } else {
-                    btn.className = "px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all";
-                }
-            });
-            renderBellCurveChart();
-        }
-
-        /* ДВОЙНАЯ АНАЛИТИКА: ФАКТИЧЕСКИЙ ПРОФИЛЬ + ЗОЛОТОЙ ЭТАЛОН ГАУССА */
+        /* ДВОЙНАЯ АНАЛИТИКА: ФАКТИЧЕСКИЙ ПРОФИЛЬ (СРСП-1 + РК-1) + ЗОЛОТОЙ ЭТАЛОН ГАУССА */
         function renderBellCurveChart() {
             if (bellCurveChart) bellCurveChart.destroy();
 
-            const scores = students.map(s => {
-                if (bellMetric === 'mc1') return Number(s.mc1) || 0;
-                if (bellMetric === 'ca1') return Number(s.ca1) || 0;
-                if (bellMetric === 'ca2') return Number(s.ca2) || 0;
-                if (bellMetric === 'activities') return Number(s.activities) || 0;
-                if (bellMetric === 'mc2') return Number(s.mc2) || 0;
-                if (bellMetric === 'exam') return Number(s.exam) || 0;
-                return calculateWeightedScore(s.attendance, s.activities, s.ca1, s.mc1, s.ca2, s.mc2, s.exam);
-            });
+            const scores = students.map(s => getModule1CombinedScore(s));
 
             if (scores.length === 0) return;
 
@@ -895,7 +878,7 @@
                     datasets: [
                         {
                             type: 'bar',
-                            label: 'Фактически студентов (Барчат)',
+                            label: 'Фактически студентов (СРСП 1 + РК 1)',
                             data: counts,
                             backgroundColor: 'rgba(99, 102, 241, 0.45)',
                             borderColor: '#6366f1',
@@ -956,7 +939,6 @@
             });
         }
 
-        // Мгновенное переключение между режимом студента и кабинетом преподавателя по клику на ключик
         function toggleTeacherMode() {
             isTeacherMode = !isTeacherMode;
             updateViewMode();
@@ -1012,7 +994,7 @@
                     </td>
                     <td class="py-2.5 px-1 text-center">
                         <button onclick="openAttendanceModal('${student.id}')"
-                            class="px-1.5 py-1 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-lg text-emerald-400 text-xs font-bold w-full transition-all flex items-center justify-center gap-1" title="Учет посещаемости (45 ч)">
+                            class="px-1.5 py-1 bg-slate-950 hover:bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-lg text-emerald-400 text-xs font-bold w-full transition-all flex items-center justify-center gap-1" title="Учет посещаемости (15 оффлайн + 15 онлайн = 30 зан.)">
                             <span>${student.attendance}%</span>
                             <i class="fa-solid fa-pencil text-[8px] text-slate-500"></i>
                         </button>
@@ -1049,31 +1031,31 @@
                 return;
             }
 
-            let sumMc1 = 0;
+            let sumMod1 = 0;
             let passes = 0;
             let topStudent = null;
-            let topMc1Score = -1;
+            let topMod1Score = -1;
 
             students.forEach(s => {
-                const mc1Score = Number(s.mc1) || 0;
-                sumMc1 += mc1Score;
-                if (mc1Score >= 50) passes++;
+                const mod1Score = getModule1CombinedScore(s);
+                sumMod1 += mod1Score;
+                if (mod1Score >= 50) passes++;
                 
-                if (mc1Score > topMc1Score) {
-                    topMc1Score = mc1Score;
+                if (mod1Score > topMod1Score) {
+                    topMod1Score = mod1Score;
                     topStudent = s;
                 }
             });
 
-            const avgMc1 = sumMc1 / total;
-            document.getElementById('stat-average-grade').textContent = avgMc1.toFixed(1);
-            document.getElementById('stat-average-letter').textContent = getLetterGrade(avgMc1).letter;
+            const avgMod1 = sumMod1 / total;
+            document.getElementById('stat-average-grade').textContent = avgMod1.toFixed(1);
+            document.getElementById('stat-average-letter').textContent = getLetterGrade(avgMod1).letter;
 
             const passPercent = Math.round((passes / total) * 100);
             document.getElementById('stat-pass-rate').textContent = `${passPercent}%`;
 
             if (topStudent) {
-                document.getElementById('stat-best-student').textContent = `${topStudent.name} (${topMc1Score})`;
+                document.getElementById('stat-best-student').textContent = `${topStudent.name} (${topMod1Score.toFixed(1)})`;
             }
         }
 
@@ -1100,9 +1082,8 @@
             grid.innerHTML = '';
 
             for (let week = 1; week <= 15; week++) {
-                const h1 = student.attendanceHours[(week - 1) * 3];
-                const h2 = student.attendanceHours[(week - 1) * 3 + 1];
-                const h3 = student.attendanceHours[(week - 1) * 3 + 2];
+                const offPresent = student.attendanceSessions[(week - 1) * 2];
+                const onlPresent = student.attendanceSessions[(week - 1) * 2 + 1];
 
                 const dateRow = document.createElement('div');
                 dateRow.className = "bg-slate-900/60 border border-slate-800/80 rounded-xl p-2.5 flex flex-col space-y-1.5 text-xs";
@@ -1111,15 +1092,12 @@
                         <i class="fa-solid fa-calendar-week text-indigo-400 text-[11px]"></i>
                         ${weekLabels[week - 1]}
                     </span>
-                    <div class="flex items-center justify-between space-x-1">
-                        <span class="px-1.5 py-0.5 rounded font-semibold text-[9px] flex items-center gap-0.5 ${h1 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-950 text-slate-600 border border-slate-800'}">
-                            Занятие 1: ${h1 ? '<i class="fa-solid fa-check text-[8px]"></i>' : '<i class="fa-solid fa-xmark text-[8px]"></i>'}
+                    <div class="flex items-center justify-between space-x-2">
+                        <span class="px-2 py-0.5 rounded font-semibold text-[10px] flex-1 flex items-center justify-center gap-1 ${offPresent ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-950 text-slate-600 border border-slate-800'}">
+                            Оффлайн: ${offPresent ? '<i class="fa-solid fa-check text-[9px]"></i>' : '<i class="fa-solid fa-xmark text-[9px]"></i>'}
                         </span>
-                        <span class="px-1.5 py-0.5 rounded font-semibold text-[9px] flex items-center gap-0.5 ${h2 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-950 text-slate-600 border border-slate-800'}">
-                            Занятие 2: ${h2 ? '<i class="fa-solid fa-check text-[8px]"></i>' : '<i class="fa-solid fa-xmark text-[8px]"></i>'}
-                        </span>
-                        <span class="px-1.5 py-0.5 rounded font-semibold text-[9px] flex items-center gap-0.5 ${h3 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-950 text-slate-600 border border-slate-800'}">
-                            Занятие 3: ${h3 ? '<i class="fa-solid fa-check text-[8px]"></i>' : '<i class="fa-solid fa-xmark text-[8px]"></i>'}
+                        <span class="px-2 py-0.5 rounded font-semibold text-[10px] flex-1 flex items-center justify-center gap-1 ${onlPresent ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20' : 'bg-slate-950 text-slate-600 border border-slate-800'}">
+                            Онлайн: ${onlPresent ? '<i class="fa-solid fa-check text-[9px]"></i>' : '<i class="fa-solid fa-xmark text-[9px]"></i>'}
                         </span>
                     </div>
                 `;
@@ -1132,10 +1110,10 @@
             if (!student) return;
 
             activeEditingStudentId = studentId;
-            if (!Array.isArray(student.attendanceHours) || student.attendanceHours.length !== TOTAL_ATTENDANCE_HOURS) {
-                student.attendanceHours = Array(TOTAL_ATTENDANCE_HOURS).fill(false);
+            if (!Array.isArray(student.attendanceSessions) || student.attendanceSessions.length !== TOTAL_ATTENDANCE_SESSIONS) {
+                student.attendanceSessions = Array(TOTAL_ATTENDANCE_SESSIONS).fill(false);
             }
-            tempAttendanceHours = [...student.attendanceHours];
+            tempAttendanceSessions = [...student.attendanceSessions];
 
             document.getElementById('att-modal-student-name').textContent = student.name;
             updateAttendanceModalStats();
@@ -1144,9 +1122,8 @@
             grid.innerHTML = '';
 
             for (let week = 1; week <= 15; week++) {
-                const h1Idx = (week - 1) * 3;
-                const h2Idx = (week - 1) * 3 + 1;
-                const h3Idx = (week - 1) * 3 + 2;
+                const offIdx = (week - 1) * 2;
+                const onlIdx = (week - 1) * 2 + 1;
 
                 const row = document.createElement('div');
                 row.className = "bg-slate-900 border border-slate-800/80 p-2.5 rounded-xl flex items-center justify-between";
@@ -1155,16 +1132,14 @@
                         <span class="h-5 w-5 rounded bg-slate-950 flex items-center justify-center text-[10px] text-indigo-400 border border-indigo-900/30">Н${week}</span>
                         ${weekLabels[week - 1]}
                     </span>
-                    <div class="flex items-center space-x-1.5">
-                        <button onclick="toggleTempHour(${h1Idx})" id="temp-chk-${h1Idx}" class="px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1">Час 1</button>
-                        <button onclick="toggleTempHour(${h2Idx})" id="temp-chk-${h2Idx}" class="px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1">Час 2</button>
-                        <button onclick="toggleTempHour(${h3Idx})" id="temp-chk-${h3Idx}" class="px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1">Час 3</button>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="toggleTempSession(${offIdx})" id="temp-chk-${offIdx}" class="px-3 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1">Оффлайн</button>
+                        <button onclick="toggleTempSession(${onlIdx})" id="temp-chk-${onlIdx}" class="px-3 py-1 rounded-lg text-[10px] font-bold border transition-all flex items-center gap-1">Онлайн</button>
                     </div>
                 `;
                 grid.appendChild(row);
-                updateTempHourButtonUI(h1Idx);
-                updateTempHourButtonUI(h2Idx);
-                updateTempHourButtonUI(h3Idx);
+                updateTempSessionButtonUI(offIdx);
+                updateTempSessionButtonUI(onlIdx);
             }
 
             const modal = document.getElementById('attendance-modal');
@@ -1185,39 +1160,42 @@
             activeEditingStudentId = null;
         }
 
-        function toggleTempHour(idx) {
-            tempAttendanceHours[idx] = !tempAttendanceHours[idx];
-            updateTempHourButtonUI(idx);
+        function toggleTempSession(idx) {
+            tempAttendanceSessions[idx] = !tempAttendanceSessions[idx];
+            updateTempSessionButtonUI(idx);
             updateAttendanceModalStats();
         }
 
-        function updateTempHourButtonUI(idx) {
+        function updateTempSessionButtonUI(idx) {
             const btn = document.getElementById(`temp-chk-${idx}`);
             if (!btn) return;
-            const isChecked = tempAttendanceHours[idx];
-            const lessonNum = (idx % 3) + 1;
+            const isChecked = tempAttendanceSessions[idx];
+            const isOffline = (idx % 2) === 0;
+            const label = isOffline ? "Оффлайн" : "Онлайн";
             if (isChecked) {
-                btn.className = "px-2.5 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/10 border-emerald-500/30 text-emerald-400 border transition-all flex items-center gap-1";
-                btn.innerHTML = `<i class="fa-solid fa-check"></i> Час ${lessonNum}`;
+                btn.className = isOffline
+                    ? "px-3 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/10 border-emerald-500/30 text-emerald-400 border transition-all flex items-center gap-1"
+                    : "px-3 py-1 rounded-lg text-[10px] font-bold bg-sky-500/10 border-sky-500/30 text-sky-400 border transition-all flex items-center gap-1";
+                btn.innerHTML = `<i class="fa-solid fa-check"></i> ${label}`;
             } else {
-                btn.className = "px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-950 border-slate-800 text-slate-500 border transition-all flex items-center gap-1";
-                btn.innerHTML = `<i class="fa-solid fa-xmark"></i> Час ${lessonNum}`;
+                btn.className = "px-3 py-1 rounded-lg text-[10px] font-bold bg-slate-950 border-slate-800 text-slate-500 border transition-all flex items-center gap-1";
+                btn.innerHTML = `<i class="fa-solid fa-xmark"></i> ${label}`;
             }
         }
 
         function toggleAllAttendance(status) {
-            for (let i = 0; i < TOTAL_ATTENDANCE_HOURS; i++) {
-                tempAttendanceHours[i] = status;
-                updateTempHourButtonUI(i);
+            for (let i = 0; i < TOTAL_ATTENDANCE_SESSIONS; i++) {
+                tempAttendanceSessions[i] = status;
+                updateTempSessionButtonUI(i);
             }
             updateAttendanceModalStats();
         }
 
         function updateAttendanceModalStats() {
-            const checkedCount = tempAttendanceHours.filter(Boolean).length;
-            const percent = Math.round((checkedCount / TOTAL_ATTENDANCE_HOURS) * 100);
+            const checkedCount = tempAttendanceSessions.filter(Boolean).length;
+            const percent = Math.round((checkedCount / TOTAL_ATTENDANCE_SESSIONS) * 100);
             document.getElementById('att-modal-percent').textContent = `${percent}%`;
-            document.getElementById('att-modal-hours').textContent = `(${checkedCount} из ${TOTAL_ATTENDANCE_HOURS} ч)`;
+            document.getElementById('att-modal-hours').textContent = `(${checkedCount} из ${TOTAL_ATTENDANCE_SESSIONS} зан.)`;
         }
 
         function saveAttendanceDetails() {
@@ -1225,9 +1203,9 @@
 
             const student = students.find(s => s.id === activeEditingStudentId);
             if (student) {
-                student.attendanceHours = [...tempAttendanceHours];
-                const checkedCount = student.attendanceHours.filter(Boolean).length;
-                student.attendance = Math.round((checkedCount / TOTAL_ATTENDANCE_HOURS) * 100);
+                student.attendanceSessions = [...tempAttendanceSessions];
+                const checkedCount = student.attendanceSessions.filter(Boolean).length;
+                student.attendance = Math.round((checkedCount / TOTAL_ATTENDANCE_SESSIONS) * 100);
 
                 saveDatabase();
                 const searchFilter = document.getElementById('teacher-search-input').value;
